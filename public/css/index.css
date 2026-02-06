@@ -1,0 +1,48 @@
+/* GENERAL */
+body {
+    padding-top: 70px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* HERO */
+.hero-section {
+    padding: 80px 0;
+    background: #f8fafc;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+}
+
+.hero-text {
+    font-size: 1.1rem;
+    color: #555;
+}
+
+/* HERO CARD */
+.hero-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    display: inline-block;
+}
+
+/* BENEFICIOS */
+.benefit-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    height: 100%;
+}
+
+/* FOOTER */
+.footer {
+    background: #fff;
+    border-top: 1px solid #eee;
+    padding: 20px 0;
+    font-size: 0.9rem;
+    color: #777;
+}

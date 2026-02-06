@@ -1,0 +1,37 @@
+.login-body {
+    background-color: #f4f6f9;
+    font-family: system-ui, sans-serif;
+}
+
+.login-header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 15px 30px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.login-links {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+}
+
+.login-links a {
+    text-decoration: none;
+    color: #0d6efd;
+}
+
+.login-links a:hover {
+    text-decoration: underline;
+}
