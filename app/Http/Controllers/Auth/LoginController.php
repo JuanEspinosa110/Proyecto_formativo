@@ -59,7 +59,7 @@ class LoginController extends Controller
         |----------------------------------
         */
         if (Auth::guard('superadmin')->attempt([
-            'documento' => $request->doc_us,
+            'doc_super_admin' => $request->doc_us,
             'password'  => $request->password,
             'id_estado' => 1,
         ])) {

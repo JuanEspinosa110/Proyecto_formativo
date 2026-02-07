@@ -1,0 +1,158 @@
+/* =========================
+   RESET SOLO SUPER ADMIN
+========================= */
+.sa-dash-body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #f8fafc;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+.sa-dash-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+.sa-dash-sidebar {
+    width: 260px;
+    background: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sa-dash-brand {
+    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.sa-dash-brand-icon {
+    background: #2563eb;
+    color: #fff;
+    padding: 0.6rem;
+    border-radius: 12px;
+}
+
+.sa-dash-brand h1 {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.sa-dash-brand small {
+    color: #64748b;
+}
+
+/* =========================
+   NAV
+========================= */
+.sa-dash-nav {
+    flex: 1;
+    padding: 1rem;
+}
+
+.sa-dash-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #475569;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.sa-dash-nav-link:hover {
+    background: #f1f5f9;
+}
+
+.sa-dash-nav-link.active {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+/* =========================
+   FOOTER SIDEBAR
+========================= */
+.sa-dash-sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.sa-dash-logout-btn {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: #dc2626;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
+.sa-dash-main {
+    flex: 1;
+    padding: 2rem;
+}
+
+/* =========================
+   HEADER
+========================= */
+.sa-dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.sa-dash-search {
+    width: 360px;
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+/* =========================
+   KPIS
+========================= */
+.sa-dash-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.sa-dash-kpi {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.2rem;
+}
+
+.sa-dash-kpi span {
+    font-size: 28px;
+    color: #2563eb;
+}
+
+.sa-dash-kpi.alert span {
+    color: #dc2626;
+}
+
+/* =========================
+   ACTIONS
+========================= */
+.sa-dash-actions {
+    display: flex;
+    gap: 1rem;
+}

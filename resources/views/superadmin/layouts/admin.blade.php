@@ -1,100 +1,112 @@
 <!DOCTYPE html>
 <html lang="es" class="light">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>@yield('title', 'Panel Administrador')</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'Super Admin')</title>
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
+    <!-- CSS propio -->
+    <link rel="stylesheet" href="{{ asset('../css/super-admin.css') }}">
 </head>
 
-<body class="sa-body">
-<div class="sa-layout">
+<body class="sa-dash-body">
 
-  <!-- Sidebar -->
-  <aside class="sa-sidebar">
-    <div class="sa-sidebar-brand">
-      <div class="sa-brand-icon">🚍</div>
-      <div>
-        <h1 class="sa-brand-title">Transport Global</h1>
-        <p class="sa-brand-role">Super Admin</p>
-      </div>
-    </div>
+<div class="sa-dash-layout">
 
-    <nav class="sa-sidebar-nav">
-      <div class="sa-nav-group">
-        <p class="sa-nav-label">General</p>
-        <a class="sa-nav-link sa-nav-link-active">
-          <span class="material-symbols-outlined">dashboard</span> Dashboard
-        </a>
-      </div>
+    {{-- SIDEBAR --}}
+    <aside class="sa-dash-sidebar">
 
-      <div class="sa-nav-group">
-        <p class="sa-nav-label">Administración</p>
-        <a class="sa-nav-link"><span class="material-symbols-outlined">shield_person</span> Roles</a>
-        <a class="sa-nav-link"><span class="material-symbols-outlined">group</span> Usuarios</a>
-        <a class="sa-nav-link"><span class="material-symbols-outlined">apartment</span> Empresas</a>
-        <a class="sa-nav-link"><span class="material-symbols-outlined">link</span> Afiliaciones</a>
-      </div>
+        {{-- BRAND --}}
+        <div class="sa-dash-brand">
+            <span class="material-symbols-outlined sa-dash-brand-icon">
+                admin_panel_settings
+            </span>
+            <div>
+                <h1>Admin Panel</h1>
+                <small>Public Transport System</small>
+            </div>
+        </div>
 
-      <div class="sa-nav-group">
-        <p class="sa-nav-label">Operación</p>
-        <a class="sa-nav-link"><span class="material-symbols-outlined">directions_bus</span> Buses</a>
-        <a class="sa-nav-link"><span class="material-symbols-outlined">map</span> Rutas</a>
-        <a class="sa-nav-link"><span class="material-symbols-outlined">route</span> Viajes</a>
-        <a class="sa-nav-link"><span class="material-symbols-outlined">confirmation_number</span> Pasajes</a>
-        <a class="sa-nav-link"><span class="material-symbols-outlined">credit_card</span> Tarjetas</a>
-      </div>
+        {{-- NAV --}}
+        <nav class="sa-dash-nav">
 
-      <div class="sa-nav-group">
-        <p class="sa-nav-label">Control</p>
-        <a class="sa-nav-link"><span class="material-symbols-outlined">folder_open</span> Documentación</a>
-        <a class="sa-nav-link"><span class="material-symbols-outlined">build</span> Mantenimiento</a>
-      </div>
+            <a class="sa-dash-nav-link active" href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
 
-      <div class="sa-nav-group">
-        <p class="sa-nav-label">Análisis</p>
-        <a class="sa-nav-link"><span class="material-symbols-outlined">bar_chart</span> Reportes</a>
-      </div>
-    </nav>
+            <a class="sa-dash-nav-link" href="#">
+                <span class="material-symbols-outlined">shield_person</span>
+                Roles y permisos
+            </a>
 
-    <div class="sa-sidebar-footer">
-      <a class="sa-nav-link"><span class="material-symbols-outlined">settings</span> Configuración</a>
-    </div>
-  </aside>
+            <a class="sa-dash-nav-link" href="#">
+                <span class="material-symbols-outlined">group</span>
+                Usuarios
+            </a>
 
-  <!-- Main -->
-  <div class="sa-main">
+            <a class="sa-dash-nav-link" href="#">
+                <span class="material-symbols-outlined">business</span>
+                Empresas
+            </a>
 
-    <!-- Header -->
-    <header class="sa-header">
-      <h2 class="sa-header-title">@yield('page-title', 'Dashboard')</h2>
+            <a class="sa-dash-nav-link" href="#">
+                <span class="material-symbols-outlined">description</span>
+                Documentación
+            </a>
 
-      <div class="sa-header-actions">
-        <input class="sa-search" placeholder="Búsqueda global..." />
-        <button class="sa-icon-btn">
-          <span class="material-symbols-outlined">notifications</span>
-        </button>
-        <button class="sa-icon-btn">
-          <span class="material-symbols-outlined">dark_mode</span>
-        </button>
-      </div>
-    </header>
+            <a class="sa-dash-nav-link" href="#">
+                <span class="material-symbols-outlined">credit_card</span>
+                Tarjetas
+            </a>
 
-    <!-- Dynamic Content -->
-    <main class="sa-content">
+            <a class="sa-dash-nav-link" href="#">
+                <span class="material-symbols-outlined">badge</span>
+                Licencias
+            </a>
+
+            <a class="sa-dash-nav-link" href="#">
+                <span class="material-symbols-outlined">analytics</span>
+                Reportes
+            </a>
+
+            <a class="sa-dash-nav-link" href="#">
+                <span class="material-symbols-outlined">notifications</span>
+                Alertas
+            </a>
+
+            <a class="sa-dash-nav-link" href="#">
+                <span class="material-symbols-outlined">settings</span>
+                Configuración
+            </a>
+
+        </nav>
+
+        {{-- FOOTER --}}
+        <div class="sa-dash-sidebar-footer">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="sa-dash-logout-btn">
+                    <span class="material-symbols-outlined">logout</span>
+                    Cerrar sesión
+                </button>
+            </form>
+        </div>
+
+    </aside>
+
+    {{-- CONTENIDO --}}
+    <main class="sa-main">
         @yield('content')
     </main>
 
-  </div>
 </div>
+
 </body>
 </html>
