@@ -16,6 +16,9 @@
 </head>
 
 <body class="sa-dash-body">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@stack('scripts')
+
 
 <div class="sa-dash-layout">
 

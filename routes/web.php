@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\SuperAdmin\DashboardController;
 
 Route::get('/', function () {
     return view('index');
@@ -32,4 +33,10 @@ Route::middleware('auth:superadmin')->group(function () {
     Route::get('/superadmin/dashboard', fn () => view('superadmin.dashboard'))
         ->name('superadmin.dashboard');
 });
+
+
+Route::get('/superadmin/dashboard/stats', 
+    [DashboardController::class, 'superAdminStats']
+)->name('superadmin.dashboard.stats');
+
 

@@ -4,8 +4,13 @@
 
 @section('content')
 
+
+
 <header class="sa-dash-header">
-    <h2>Dashboard Administrativo</h2>
+    <div>
+        <h2 class="sa-dash-title">Dashboard Administrativo</h2>
+        <p class="sa-dash-subtitle">Resumen general del sistema</p>
+    </div>
 
     <input
         type="text"
@@ -14,30 +19,64 @@
     >
 </header>
 
-<section class="sa-dash-kpis">
-    <div class="sa-kpi">
-        <span class="material-symbols-outlined">business</span>
-        <p>Empresas</p>
-        <h3>124</h3>
+
+</section>
+
+<section class="sa-dash-charts">
+
+    <div class="sa-dash-chart-card">
+        <h4>Usuarios</h4>
+        <canvas id="chartUsuarios"></canvas>
     </div>
 
-    <div class="sa-dash-kpi">
-        <span class="material-symbols-outlined">person</span>
-        <p>Usuarios</p>
-        <h3>12,850</h3>
+    <div class="sa-dash-chart-card">
+        <h4>Empresas</h4>
+        <canvas id="chartEmpresas"></canvas>
     </div>
 
-    <div class="sa-dash-kpi alert">
-        <span class="material-symbols-outlined">report_problem</span>
-        <p>Alertas</p>
-        <h3>5</h3>
+    <div class="sa-dash-chart-card">
+        <h4>Documentos</h4>
+        <canvas id="chartDocumentos"></canvas>
     </div>
+
+    <div class="sa-dash-chart-card">
+        <h4>Tarjetas</h4>
+        <canvas id="chartTarjetas"></canvas>
+    </div>
+
 </section>
 
 <section class="sa-dash-actions">
-    <button class="btn btn-primary">Crear Usuario</button>
-    <button class="btn btn-outline-secondary">Registrar Empresa</button>
-    <button class="btn btn-outline-secondary">Cargar Documento</button>
+
+    <h4>Acciones rápidas</h4>
+
+    <div class="sa-dash-actions-buttons">
+        <a href="#" class="btn btn-primary">➕ Crear Usuario</a>
+        <a href="#" class="btn btn-outline-primary">🏢 Registrar Empresa</a>
+        <a href="#" class="btn btn-outline-secondary">📄 Cargar Documento</a>
+    </div>
+
 </section>
+
+
+<canvas id="dashboardChart"></canvas>
+
+</section>
+
+
+
+@push('scripts')
+<script>
+    const DASHBOARD_STATS_URL = "{{ route('superadmin.dashboard.stats') }}";
+</script>
+
+<script src="{{ asset('js/dashboard/superadmin.js') }}"></script>
+
+<script>
+    cargarDashboard(DASHBOARD_STATS_URL);
+    setInterval(() => cargarDashboard(DASHBOARD_STATS_URL), 10000);
+</script>
+@endpush
+
 
 @endsection
