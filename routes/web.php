@@ -2,7 +2,18 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\SuperAdmin\DashboardController;
+use App\Http\Controllers\SuperAdmin\{
+    DashboardController,
+    RolController,
+    UsuarioController,
+    EmpresaController,
+    DocumentoController,
+    TarjetaController,
+    LicenciaController,
+    ReporteController,
+    AlertaController,
+    ConfiguracionController
+};
 
 Route::get('/', function () {
     return view('index');
@@ -38,5 +49,22 @@ Route::middleware('auth:superadmin')->group(function () {
 Route::get('/superadmin/dashboard/stats', 
     [DashboardController::class, 'superAdminStats']
 )->name('superadmin.dashboard.stats');
+
+Route::prefix('superadmin')
+    ->name('superadmin.')
+    ->middleware(['auth:superadmin'])
+    ->group(function () {
+
+        Route::get('/roles', [RolController::class, 'index'])->name('roles.index');
+        Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
+        Route::get('/empresas', [EmpresaController::class, 'index'])->name('empresas.index');
+        Route::get('/documentos', [DocumentoController::class, 'index'])->name('documentos.index');
+        Route::get('/tarjetas', [TarjetaController::class, 'index'])->name('tarjetas.index');
+        Route::get('/licencias', [LicenciaController::class, 'index'])->name('licencias.index');
+        Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
+        Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
+        Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+
+    }); 
 
 

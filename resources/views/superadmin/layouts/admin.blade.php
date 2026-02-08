@@ -39,55 +39,56 @@
         {{-- NAV --}}
         <nav class="sa-dash-nav">
 
-            <a class="sa-dash-nav-link active" href="#">
-                <span class="material-symbols-outlined">dashboard</span>
-                Dashboard
-            </a>
+            <a class="sa-dash-nav-link" href="{{ route('superadmin.dashboard') }}">
+    <span class="material-symbols-outlined">dashboard</span>
+    Dashboard
+</a>
 
-            <a class="sa-dash-nav-link" href="#">
-                <span class="material-symbols-outlined">shield_person</span>
-                Roles y permisos
-            </a>
+<a class="sa-dash-nav-link" href="{{ route('superadmin.roles.index') }}">
+    <span class="material-symbols-outlined">shield_person</span>
+    Roles y permisos
+</a>
 
-            <a class="sa-dash-nav-link" href="#">
-                <span class="material-symbols-outlined">group</span>
-                Usuarios
-            </a>
+<a class="sa-dash-nav-link" href="{{ route('superadmin.usuarios.index') }}">
+    <span class="material-symbols-outlined">group</span>
+    Usuarios
+</a>
 
-            <a class="sa-dash-nav-link" href="#">
-                <span class="material-symbols-outlined">business</span>
-                Empresas
-            </a>
+<a class="sa-dash-nav-link" href="{{ route('superadmin.empresas.index') }}">
+    <span class="material-symbols-outlined">business</span>
+    Empresas
+</a>
 
-            <a class="sa-dash-nav-link" href="#">
-                <span class="material-symbols-outlined">description</span>
-                Documentación
-            </a>
+<a class="sa-dash-nav-link" href="{{ route('superadmin.documentos.index') }}">
+    <span class="material-symbols-outlined">description</span>
+    Documentación
+</a>
 
-            <a class="sa-dash-nav-link" href="#">
-                <span class="material-symbols-outlined">credit_card</span>
-                Tarjetas
-            </a>
+<a class="sa-dash-nav-link" href="{{ route('superadmin.tarjetas.index') }}">
+    <span class="material-symbols-outlined">credit_card</span>
+    Tarjetas
+</a>
 
-            <a class="sa-dash-nav-link" href="#">
-                <span class="material-symbols-outlined">badge</span>
-                Licencias
-            </a>
+<a class="sa-dash-nav-link" href="{{ route('superadmin.licencias.index') }}">
+    <span class="material-symbols-outlined">badge</span>
+    Licencias
+</a>
 
-            <a class="sa-dash-nav-link" href="#">
-                <span class="material-symbols-outlined">analytics</span>
-                Reportes
-            </a>
+<a class="sa-dash-nav-link" href="{{ route('superadmin.reportes.index') }}">
+    <span class="material-symbols-outlined">analytics</span>
+    Reportes
+</a>
 
-            <a class="sa-dash-nav-link" href="#">
-                <span class="material-symbols-outlined">notifications</span>
-                Alertas
-            </a>
+<a class="sa-dash-nav-link" href="{{ route('superadmin.alertas.index') }}">
+    <span class="material-symbols-outlined">notifications</span>
+    Alertas
+</a>
 
-            <a class="sa-dash-nav-link" href="#">
-                <span class="material-symbols-outlined">settings</span>
-                Configuración
-            </a>
+<a class="sa-dash-nav-link" href="{{ route('superadmin.configuracion.index') }}">
+    <span class="material-symbols-outlined">settings</span>
+    Configuración
+</a>
+
 
         </nav>
 
