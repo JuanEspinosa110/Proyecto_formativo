@@ -48,10 +48,6 @@
             <div class="sa-roles-stat-label">Total Usuarios</div>
             <div class="sa-roles-stat-value">{{ $tiposUsuario->sum('usuarios_count') }}</div>
         </div>
-        <div class="sa-roles-stat-card">
-            <div class="sa-roles-stat-label">Permisos Disponibles</div>
-            <div class="sa-roles-stat-value">15</div>
-        </div>
     </div>
 
     <!-- Tabla de tipos de usuario -->
@@ -68,7 +64,6 @@
                             <th>ID</th>
                             <th>Nombre</th>
                             <th>Usuarios Asignados</th>
-                            <th>Permisos</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -94,21 +89,7 @@
                                 @endif
                             </td>
                             <td>
-                                <span class="sa-roles-badge sa-roles-badge-success">
-                                    @if($tipo->id_tipo_usuario == 1)
-                                        Acceso completo
-                                    @else
-                                        Acceso limitado
-                                    @endif
-                                </span>
-                            </td>
-                            <td>
                                 <div class="sa-roles-actions">
-                                    <a href="{{ route('superadmin.roles.permissions.show', $tipo->id_tipo_usuario) }}" 
-                                       class="sa-roles-btn sa-roles-btn-sm sa-roles-btn-secondary"
-                                       title="Ver permisos">
-                                        <span class="material-symbols-outlined" style="font-size: 1rem;">visibility</span>
-                                    </a>
                                     <a href="{{ route('superadmin.roles.edit', $tipo->id_tipo_usuario) }}" 
                                        class="sa-roles-btn sa-roles-btn-sm sa-roles-btn-warning"
                                        title="Editar">
@@ -160,25 +141,5 @@
         </div>
     </div>
 
-    <!-- Información adicional -->
-    <div class="sa-roles-card">
-        <div class="sa-roles-card-header">
-            <h2 class="sa-roles-card-title">
-                <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 0.5rem;">info</span>
-                Acerca de los Permisos
-            </h2>
-        </div>
-        <div class="sa-roles-card-body">
-            <div class="sa-roles-alert sa-roles-alert-info">
-                <span class="material-symbols-outlined">lightbulb</span>
-                <div>
-                    <strong>Nota:</strong> La gestión granular de permisos está disponible como vista de demostración. 
-                    Los permisos actualmente se controlan a nivel de tipo de usuario en el código de la aplicación.
-                    <br><br>
-                    Para implementar un sistema completo de permisos dinámicos, considera agregar la tabla de permisos en el futuro.
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 @endsection

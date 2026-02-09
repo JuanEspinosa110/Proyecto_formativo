@@ -76,7 +76,6 @@ Route::prefix('superadmin')
         Route::put('perfil_seguridad/cambiar-contrasena', [PerfilSeguridadController::class, 'actualizarContrasena'])->name('perfil.actualizar-contrasena');
         Route::post('perfil_seguridad/actualizar-foto', [PerfilSeguridadController::class, 'actualizarFoto'])->name('perfil.actualizar-foto');
         Route::delete('perfil_seguridad/eliminar-foto', [PerfilSeguridadController::class, 'eliminarFoto'])->name('perfil.eliminar-foto');
-        Route::get('perfil_seguridad/actividad', [PerfilSeguridadController::class, 'actividad'])->name('perfil.actividad');
         Route::get('perfil_seguridad/seguridad', [PerfilSeguridadController::class, 'seguridad'])->name('perfil.seguridad');
         Route::get('perfil_seguridad/exportar-datos', [PerfilSeguridadController::class, 'exportarDatos'])->name('perfil.exportar-datos');
 
@@ -84,7 +83,13 @@ Route::prefix('superadmin')
         Route::get('/empresas', [EmpresaController::class, 'index'])->name('empresas.index');
         Route::get('/documentos', [DocumentoController::class, 'index'])->name('documentos.index');
         Route::get('/tarjetas', [TarjetaController::class, 'index'])->name('tarjetas.index');
+        
+        // Licencias
         Route::get('/licencias', [LicenciaController::class, 'index'])->name('licencias.index');
+        Route::get('/licencias/crear', [LicenciaController::class, 'create'])->name('licencias.create');
+        Route::get('/licencias/configurar-plan', [LicenciaController::class, 'configurarPlan'])->name('licencias.configurar-plan');
+        Route::get('/licencias/{id}/editar', [LicenciaController::class, 'edit'])->name('licencias.edit');
+        
         Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');

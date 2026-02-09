@@ -72,51 +72,6 @@
             </div>
         </div>
 
-        <!-- Permisos (Vista de demostración) -->
-        <div class="sa-roles-card">
-            <div class="sa-roles-card-header">
-                <h2 class="sa-roles-card-title">Permisos Disponibles (Vista Demo)</h2>
-            </div>
-            <div class="sa-roles-card-body">
-                <div class="sa-roles-alert sa-roles-alert-info">
-                    <span class="material-symbols-outlined">info</span>
-                    <div>
-                        <strong>Vista de Demostración:</strong> Los permisos que se muestran a continuación son solo visuales. 
-                        Los permisos reales se controlan actualmente en el código de la aplicación según el tipo de usuario.
-                        <br><br>
-                        Para habilitar la gestión dinámica de permisos, será necesario implementar la tabla de permisos en el futuro.
-                    </div>
-                </div>
-
-                <div class="sa-roles-permissions-section">
-                    @foreach($permissions as $module => $modulePermissions)
-                    <div class="sa-roles-permissions-module">
-                        <h3 class="sa-roles-permissions-module-title">
-                            <span class="material-symbols-outlined" style="vertical-align: middle; margin-right: 0.5rem;">folder</span>
-                            {{ $module }}
-                        </h3>
-                        <div class="sa-roles-permissions-grid">
-                            @foreach($modulePermissions as $permission)
-                            <div class="sa-roles-permission-item" style="opacity: 0.6; cursor: not-allowed;">
-                                <input type="checkbox" 
-                                       id="permission_{{ $permission->id }}" 
-                                       class="sa-roles-permission-checkbox"
-                                       disabled>
-                                <label for="permission_{{ $permission->id }}" class="sa-roles-permission-label">
-                                    <div>{{ $permission->name }}</div>
-                                    @if($permission->description)
-                                    <div class="sa-roles-permission-description">{{ $permission->description }}</div>
-                                    @endif
-                                </label>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-
         <!-- Botones de acción -->
         <div class="sa-roles-card">
             <div class="sa-roles-card-body">

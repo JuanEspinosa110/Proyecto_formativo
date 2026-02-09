@@ -23,13 +23,7 @@ class PerfilSeguridadController extends Controller
                 ->with('error', 'Sesión expirada');
         }
 
-        // Obtener actividad reciente
-        $actividadReciente = $this->getActividadReciente($superAdmin->doc_super_admin, 10);
-
-        // Estadísticas de seguridad
-        $estadisticas = $this->getEstadisticasSeguridad($superAdmin->doc_super_admin);
-
-        return view('superadmin.perfil_seguridad.index', compact('superAdmin', 'actividadReciente', 'estadisticas'));
+        return view('superadmin.perfil_seguridad.index', compact('superAdmin'));
     }
 
     /**
@@ -77,12 +71,6 @@ class PerfilSeguridadController extends Controller
                     'telefono' => $validated['telefono'],
                 ]);
 
-            // Registrar actividad
-            $this->registrarActividad(
-                $superAdmin->doc_super_admin,
-                'Actualización de información personal',
-                'Perfil y Seguridad'
-            );
 
             return redirect()
                 ->route('superadmin.perfil.index')
@@ -148,13 +136,6 @@ class PerfilSeguridadController extends Controller
                     'password' => Hash::make($validated['password']),
                 ]);
 
-            // Registrar actividad
-            $this->registrarActividad(
-                $superAdmin->doc_super_admin,
-                'Cambio de contraseña',
-                'Seguridad'
-            );
-
             return redirect()
                 ->route('superadmin.perfil.index')
                 ->with('success', 'Contraseña actualizada correctamente');
@@ -200,12 +181,6 @@ class PerfilSeguridadController extends Controller
                     'foto_perfil' => $path,
                 ]);
 
-            // Registrar actividad
-            $this->registrarActividad(
-                $superAdmin->doc_super_admin,
-                'Actualización de foto de perfil',
-                'Perfil y Seguridad'
-            );
 
             return response()->json([
                 'success' => true,
@@ -244,13 +219,6 @@ class PerfilSeguridadController extends Controller
                     'foto_perfil' => null,
                 ]);
 
-            // Registrar actividad
-            $this->registrarActividad(
-                $superAdmin->doc_super_admin,
-                'Eliminación de foto de perfil',
-                'Perfil y Seguridad'
-            );
-
             return response()->json([
                 'success' => true,
                 'message' => 'Foto eliminada correctamente'
@@ -264,55 +232,7 @@ class PerfilSeguridadController extends Controller
         }
     }
 
-    /**
-     * Mostrar actividad reciente
-     */
-    public function actividadReciente()
-    {
-        $superAdmin = $this->getSuperAdmin();
-        
-        if (!$superAdmin) {
-            return redirect()->route('superadmin.login');
-        }
-
-        $actividades = $this->getActividadReciente($superAdmin->doc_super_admin, 50);
-
-        return view('superadmin.perfil_seguridad.actividad_reciente', compact('superAdmin', 'actividades'));
-    }
-
-    /**
-     * Mostrar actividad (alias de actividadReciente)
-     */
-    public function actividad()
-    {
-        $superAdmin = $this->getSuperAdmin();
-        
-        if (!$superAdmin) {
-            return redirect()->route('superadmin.login');
-        }
-
-        // Obtener módulos únicos para el filtro
-        $modulos = DB::table('actividad_log')
-            ->where('doc_usuario', $superAdmin->doc_super_admin)
-            ->whereNull('tipo_usuario')
-            ->distinct()
-            ->pluck('modulo')
-            ->sort()
-            ->values();
-
-        // Obtener actividades con filtros opcionales
-        $query = DB::table('actividad_log')
-            ->where('doc_usuario', $superAdmin->doc_super_admin)
-            ->whereNull('tipo_usuario');
-
-        if (request('modulo')) {
-            $query->where('modulo', request('modulo'));
-        }
-
-        $actividades = $query->orderBy('fecha_registro', 'desc')->paginate(15);
-
-        return view('superadmin.perfil_seguridad.actividad', compact('superAdmin', 'actividades', 'modulos'));
-    }
+    
 
     /**
      * Mostrar opciones de seguridad
@@ -325,10 +245,7 @@ class PerfilSeguridadController extends Controller
             return redirect()->route('superadmin.login');
         }
 
-        $estadisticas = $this->getEstadisticasSeguridad($superAdmin->doc_super_admin);
-        $ultimoAcceso = $this->getUltimoAcceso($superAdmin->doc_super_admin);
-
-        return view('superadmin.perfil_seguridad.seguridad', compact('superAdmin', 'estadisticas', 'ultimoAcceso'));
+        return view('superadmin.perfil_seguridad.seguridad', compact('superAdmin'));
     }
 
     /**
@@ -342,17 +259,10 @@ class PerfilSeguridadController extends Controller
             return redirect()->route('superadmin.login');
         }
 
-        // Obtener todas las actividades del usuario
-        $actividades = DB::table('actividad_log')
-            ->where('doc_usuario', $superAdmin->doc_super_admin)
-            ->whereNull('tipo_usuario')
-            ->orderBy('fecha_registro', 'desc')
-            ->get();
 
         // Preparar datos para exportar
         $datos = [
             'usuario' => $superAdmin,
-            'actividades' => $actividades,
             'fecha_exportacion' => now()->format('Y-m-d H:i:s'),
         ];
 
@@ -381,81 +291,5 @@ class PerfilSeguridadController extends Controller
             ->first();
     }
 
-    /**
-     * Registrar actividad en el log
-     */
-    private function registrarActividad($docUsuario, $accion, $modulo)
-    {
-        DB::table('actividad_log')->insert([
-            'doc_usuario' => $docUsuario,
-            'tipo_usuario' => null, // Super Admin usa NULL
-            'accion' => $accion,
-            'modulo' => $modulo,
-            'ip_address' => request()->ip(),
-            'fecha_registro' => now(),
-        ]);
-    }
 
-    /**
-     * Obtener actividad reciente
-     */
-    private function getActividadReciente($docUsuario, $limit = 10)
-    {
-        return DB::table('actividad_log')
-            ->where('doc_usuario', $docUsuario)
-            ->whereNull('tipo_usuario')
-            ->orderBy('fecha_registro', 'desc')
-            ->limit($limit)
-            ->get();
-    }
-
-    /**
-     * Obtener estadísticas de seguridad
-     */
-    private function getEstadisticasSeguridad($docUsuario)
-    {
-        $hoy = now()->startOfDay();
-        $semanaAnterior = now()->subWeek();
-        $mesAnterior = now()->subMonth();
-
-        return [
-            'accesos_hoy' => DB::table('actividad_log')
-                ->where('doc_usuario', $docUsuario)
-                ->whereNull('tipo_usuario')
-                ->where('accion', 'LIKE', '%Inicio de sesión%')
-                ->where('fecha_registro', '>=', $hoy)
-                ->count(),
-            
-            'actividades_semana' => DB::table('actividad_log')
-                ->where('doc_usuario', $docUsuario)
-                ->whereNull('tipo_usuario')
-                ->where('fecha_registro', '>=', $semanaAnterior)
-                ->count(),
-            
-            'actividades_mes' => DB::table('actividad_log')
-                ->where('doc_usuario', $docUsuario)
-                ->whereNull('tipo_usuario')
-                ->where('fecha_registro', '>=', $mesAnterior)
-                ->count(),
-            
-            'total_actividades' => DB::table('actividad_log')
-                ->where('doc_usuario', $docUsuario)
-                ->whereNull('tipo_usuario')
-                ->count(),
-        ];
-    }
-
-    /**
-     * Obtener último acceso
-     */
-    private function getUltimoAcceso($docUsuario)
-    {
-        return DB::table('actividad_log')
-            ->where('doc_usuario', $docUsuario)
-            ->whereNull('tipo_usuario')
-            ->where('accion', 'LIKE', '%Inicio de sesión%')
-            ->orderBy('fecha_registro', 'desc')
-            ->skip(1) // Saltar el acceso actual
-            ->first();
-    }
 }

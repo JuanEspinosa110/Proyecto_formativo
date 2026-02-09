@@ -32,10 +32,7 @@ class TipoUsuarioController extends Controller
      */
     public function create()
     {
-        // Permisos mockeados para la vista (datos de ejemplo)
-        $permissions = $this->getPermissionsMock();
-
-        return view('superadmin.roles.create', compact('permissions'));
+        return view('superadmin.roles.create');
     }
 
     /**
@@ -82,11 +79,9 @@ class TipoUsuarioController extends Controller
                 ->with('error', 'Tipo de usuario no encontrado');
         }
 
-        // Permisos mockeados para la vista (datos de ejemplo)
-        $permissions = $this->getPermissionsMock();
-        $rolePermissions = []; // Array vacío por ahora
 
-        return view('superadmin.roles.edit', compact('tipoUsuario', 'permissions', 'rolePermissions'));
+
+        return view('superadmin.roles.edit', compact('tipoUsuario'));
     }
 
     /**
@@ -159,25 +154,6 @@ class TipoUsuarioController extends Controller
     }
 
     /**
-     * Ver permisos de un tipo de usuario (MOCKUP)
-     */
-    public function showPermissions($id)
-    {
-        $tipoUsuario = DB::table('tipo_usuario')
-            ->where('id_tipo_usuario', $id)
-            ->first();
-
-        if (!$tipoUsuario) {
-            return redirect()
-                ->route('superadmin.roles.index')
-                ->with('error', 'Tipo de usuario no encontrado');
-        }
-
-        // Permisos mockeados organizados por módulo
-        $permissionsByModule = $this->getPermissionsMockByModule($id);
-
-        return view('superadmin.roles.permissions', compact('tipoUsuario', 'permissionsByModule'));
-    }
 
     /**
      * Mostrar usuarios con tipo específico
@@ -204,61 +180,5 @@ class TipoUsuarioController extends Controller
         return view('superadmin.roles.users', compact('tipoUsuario', 'usuarios'));
     }
 
-    /**
-     * Obtener permisos mock agrupados para la vista
-     */
-    private function getPermissionsMock()
-    {
-        return collect([
-            'Dashboard' => [
-                (object)['id' => 1, 'name' => 'dashboard.ver', 'description' => 'Ver panel de control', 'module' => 'Dashboard'],
-                (object)['id' => 2, 'name' => 'dashboard.estadisticas', 'description' => 'Ver estadísticas completas', 'module' => 'Dashboard'],
-            ],
-            'Usuarios' => [
-                (object)['id' => 3, 'name' => 'usuarios.ver', 'description' => 'Ver listado de usuarios', 'module' => 'Usuarios'],
-                (object)['id' => 4, 'name' => 'usuarios.crear', 'description' => 'Crear nuevos usuarios', 'module' => 'Usuarios'],
-                (object)['id' => 5, 'name' => 'usuarios.editar', 'description' => 'Editar información de usuarios', 'module' => 'Usuarios'],
-                (object)['id' => 6, 'name' => 'usuarios.eliminar', 'description' => 'Eliminar usuarios del sistema', 'module' => 'Usuarios'],
-            ],
-            'Empresas' => [
-                (object)['id' => 7, 'name' => 'empresas.ver', 'description' => 'Ver listado de empresas', 'module' => 'Empresas'],
-                (object)['id' => 8, 'name' => 'empresas.crear', 'description' => 'Registrar nuevas empresas', 'module' => 'Empresas'],
-                (object)['id' => 9, 'name' => 'empresas.editar', 'description' => 'Editar información de empresas', 'module' => 'Empresas'],
-                (object)['id' => 10, 'name' => 'empresas.eliminar', 'description' => 'Eliminar empresas', 'module' => 'Empresas'],
-            ],
-            'Tarjetas' => [
-                (object)['id' => 11, 'name' => 'tarjetas.ver', 'description' => 'Ver listado de tarjetas', 'module' => 'Tarjetas'],
-                (object)['id' => 12, 'name' => 'tarjetas.gestionar_saldo', 'description' => 'Gestionar saldo de tarjetas', 'module' => 'Tarjetas'],
-                (object)['id' => 13, 'name' => 'tarjetas.bloquear', 'description' => 'Bloquear o desbloquear tarjetas', 'module' => 'Tarjetas'],
-            ],
-            'Documentación' => [
-                (object)['id' => 14, 'name' => 'documentos.ver', 'description' => 'Ver documentos del sistema', 'module' => 'Documentación'],
-                (object)['id' => 15, 'name' => 'documentos.aprobar', 'description' => 'Aprobar o rechazar documentos', 'module' => 'Documentación'],
-            ],
-        ]);
-    }
-
-    /**
-     * Obtener permisos mock por módulo según el tipo de usuario
-     */
-    private function getPermissionsMockByModule($tipoId)
-    {
-        $allPermissions = $this->getPermissionsMock();
-
-        // Simular permisos según tipo de usuario
-        if ($tipoId == 1) { // Admin - todos los permisos
-            return $allPermissions;
-        } else if ($tipoId == 2) { // Pasajero - permisos limitados
-            return collect([
-                'Dashboard' => [
-                    (object)['id' => 1, 'name' => 'dashboard.ver', 'description' => 'Ver panel de control', 'module' => 'Dashboard'],
-                ],
-                'Tarjetas' => [
-                    (object)['id' => 11, 'name' => 'tarjetas.ver', 'description' => 'Ver listado de tarjetas', 'module' => 'Tarjetas'],
-                ],
-            ]);
-        }
-
-        return collect([]);
-    }
+    
 }
