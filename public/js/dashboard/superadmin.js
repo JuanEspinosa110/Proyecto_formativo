@@ -5,47 +5,57 @@ async function cargarDashboard(url) {
         .then(res => res.json())
         .then(data => {
 
-            crearGrafica('chartUsuarios', 'Usuarios', data.usuario);
-            crearGrafica('chartEmpresas', 'Empresas', data.empresa);
-            crearGrafica('chartTarjetas', 'Tarjetas', data.tarjeta);
+            crearGraficaEstado('chartUsuarios', 'Usuarios', data.usuarios);
+            crearGraficaEstado('chartEmpresas', 'Empresas', data.empresas);
+            crearGraficaEstado('chartTarjetas', 'Tarjetas', data.tarjetas);
 
             crearGraficaDocumentos(data.documentos);
-
 
         })
         .catch(err => console.error('Dashboard error:', err));
 }
 
-function crearGrafica(id, label, value) {
+function crearGraficaEstado(id, label, dataEstados) {
+
     const canvas = document.getElementById(id);
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
 
+    const datos = [
+        Number(dataEstados.activos),
+        Number(dataEstados.inactivos)
+    ];
+
     if (charts[id]) {
-        charts[id].data.datasets[0].data = [Number(value)];
+        charts[id].data.datasets[0].data = datos;
         charts[id].update();
         return;
     }
 
     charts[id] = new Chart(ctx, {
-        type: 'bar',
+        type: 'pie',
         data: {
-            labels: [label],
+            labels: ['Activos', 'Inactivos'],
             datasets: [{
-                data: [Number(value)],
-                backgroundColor: '#2563eb'
+                data: datos,
+                backgroundColor: [
+                    '#16a34a',  // verde activo
+                    '#dc2626'   // rojo inactivo
+                ]
             }]
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { beginAtZero: true, ticks: { precision: 0 } }
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
             }
         }
     });
 }
+
 
 function crearGraficaDocumentos(data) {
     const canvas = document.getElementById('chartDocumentos');

@@ -1,0 +1,306 @@
+/* ========================================
+   ROLES Y PERMISOS - ESTILOS
+   ======================================== */
+
+   /* Contenedor y Títulos */
+.sa-licencia-container {
+    padding: 2rem;
+    background-color: #f8f9fa;
+}
+
+.sa-licencia-title {
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.sa-licencia-btn-new {
+    background-color: #2563eb;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+}
+
+/* Tabla y Avatares */
+.sa-licencia-table thead th {
+    background-color: #fcfcfc;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    padding: 1rem;
+}
+
+.sa-licencia-avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #e0e7ff;
+    color: #4338ca;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+/* Estados (Basados en tu tabla 'estado') */
+.sa-licencia-status-active {
+    background-color: #dcfce7;
+    color: #15803d;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+}
+
+.sa-licencia-status-expired {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+}
+
+.sa-licencia-badge-plan {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+}
+
+/* Stats Cards */
+.sa-licencia-stat-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.sa-licencia-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.bg-blue-light { background-color: #eff6ff; }
+
+/* Cards y Formularios */
+.sa-licencia-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.sa-licencia-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+}
+
+.sa-licencia-input {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    padding: 0.6rem;
+    font-size: 0.9rem;
+}
+
+/* Plan Selection */
+.sa-licencia-plan-card {
+    border: 2px solid #f3f4f6;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.sa-licencia-plan-recommended {
+    border-color: #2563eb;
+    transform: scale(1.03);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1);
+}
+
+.sa-licencia-plan-price {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #111827;
+}
+
+.sa-licencia-feature-list li {
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.sa-licencia-btn-select {
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.sa-licencia-plan-recommended .sa-licencia-btn-select {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+}
+
+/* Selección de Plan en Edición */
+.sa-licencia-plan-select {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 1.5rem 1rem;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.sa-licencia-plan-select:hover {
+    border-color: #2563eb;
+    background-color: #f8faff;
+}
+
+.sa-licencia-plan-select.active {
+    border-color: #2563eb;
+    background-color: #eff6ff;
+    box-shadow: 0 0 0 1px #2563eb;
+}
+
+.sa-licencia-plan-tag {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+}
+
+/* Selector de Estado */
+.sa-licencia-status-select {
+    font-weight: 700;
+    text-align: center;
+    border-radius: 8px;
+    padding: 0.75rem;
+}
+
+/* Colores de estado dentro del select */
+.sa-licencia-status-select option[value="1"] { color: #15803d; }
+.sa-licencia-status-select option[value="3"] { color: #9a3412; }
+.sa-licencia-status-select option[value="21"] { color: #b91c1c; }
+
+/* Icono Blue de Cabecera */
+.sa-licencia-icon-blue {
+    width: 80px;
+    height: 80px;
+    background-color: #2563eb;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+/* Badge de Advertencia */
+.sa-licencia-badge-warning {
+    background-color: #fffbeb;
+    color: #b45309;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+/* Alert Info (Celeste) */
+.sa-licencia-alert-info {
+    background-color: #eff6ff;
+    border-left: 4px solid #3b82f6;
+}
+
+/* Caja de Historial */
+.sa-licencia-history-box {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+}
+
+/* Botón Renovar */
+.sa-licencia-btn-renew {
+    background-color: #2563eb;
+    border: none;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.sa-licencia-btn-renew:hover {
+    background-color: #1d4ed8;
+}
+
+/* Cards de Resumen Superior */
+.sa-status-summary-card {
+    border: 1px solid #edf2f7;
+    background-color: #fcfdfe;
+}
+
+.sa-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+/* Interfaz de Radio Cards */
+.sa-status-option-label {
+    cursor: pointer;
+}
+
+.sa-status-option-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.7;
+    border-width: 2px;
+}
+
+.sa-status-option-label input:checked + .sa-status-option-card {
+    opacity: 1;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.sa-status-option-label input:checked + .sa-status-option-card.border-success { border-color: #10b981 !important; background-color: #f0fdf4; }
+.sa-status-option-label input:checked + .sa-status-option-card.border-warning { border-color: #f59e0b !important; background-color: #fffbeb; }
+.sa-status-option-label input:checked + .sa-status-option-card.border-info { border-color: #06b6d4 !important; background-color: #ecfeff; }
+.sa-status-option-label input:checked + .sa-status-option-card.border-danger { border-color: #ef4444 !important; background-color: #fef2f2; }
+
+/* Badge soft para advertencias */
+.bg-danger-soft {
+    background-color: #fef2f2;
+}
+
+.sa-btn-confirm-status {
+    background-color: #2563eb;
+}
+
+/* Colores Soft para Badges y Cards */
+.bg-primary-soft { background-color: #eff6ff; }
+.bg-success-soft { background-color: #ecfeff; }
+.bg-warning-soft { background-color: #fffbeb; }
+.bg-danger-soft { background-color: #fef2f2; }
+.bg-info-soft { background-color: #f0f9ff; }
+.bg-secondary-soft { background-color: #f9fafb; }
+
+.x-small { font-size: 0.75rem; }
+
+/* Tabla */
+.table thead th {
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    border-bottom-width: 1px;
+}
+
+.progress-bar.bg-danger {
+    background-color: #ef4444 !important;
+}
+
+.pagination .page-link {
+    border-radius: 4px;
+    margin: 0 2px;
+    color: #4b5563;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}

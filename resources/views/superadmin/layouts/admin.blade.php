@@ -13,6 +13,8 @@
 
     <!-- CSS propio -->
     <link rel="stylesheet" href="{{ asset('../css/super-admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('../css/super-admin-roles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/perfil-seguridad.css') }}">
 </head>
 
 <body class="sa-dash-body">
@@ -82,6 +84,11 @@
 <a class="sa-dash-nav-link" href="{{ route('superadmin.alertas.index') }}">
     <span class="material-symbols-outlined">notifications</span>
     Alertas
+</a>
+
+<a class="sa-dash-nav-link" href="{{ route('superadmin.perfil.index') }}">
+    <span class="material-symbols-outlined">security</span>
+    Perfil y seguridad
 </a>
 
 <a class="sa-dash-nav-link" href="{{ route('superadmin.configuracion.index') }}">
