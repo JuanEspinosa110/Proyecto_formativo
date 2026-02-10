@@ -4,23 +4,25 @@
 
 @section('content')
 
-
+<div class="sa-dash-container">
 
 <header class="sa-dash-header">
-    <div>
-        <h2 class="sa-dash-title">Dashboard Administrativo</h2>
-        <p class="sa-dash-subtitle">Resumen general del sistema</p>
-    </div>
-
-    <input
-        type="text"
-        class="sa-dash-search"
-        placeholder="Buscar empresas, usuarios o documentos..."
-    >
+    <h2 class="sa-dash-title">Dashboard Administrativo</h2>
+    <p class="sa-dash-subtitle">Resumen general del sistema</p>
 </header>
 
+<div class="sa-divider"></div>
 
+<section class="sa-dash-actions">
+    <h4>Acciones rápidas</h4>
+
+    <div class="sa-dash-actions-buttons">
+        <a href="#" class="btn btn-primary">Crear Usuario</a>
+        <a href="#" class="btn btn-outline-primary">Registrar Empresa</a>
+    </div>
 </section>
+
+<div class="sa-divider"></div>
 
 <section class="sa-dash-charts">
 
@@ -46,17 +48,7 @@
 
 </section>
 
-<section class="sa-dash-actions">
-
-    <h4>Acciones rápidas</h4>
-
-    <div class="sa-dash-actions-buttons">
-        <a href="#" class="btn btn-primary">➕ Crear Usuario</a>
-        <a href="#" class="btn btn-outline-primary">🏢 Registrar Empresa</a>
-        <a href="#" class="btn btn-outline-secondary">📄 Cargar Documento</a>
-    </div>
-
-</section>
+</div>
 
 
 <canvas id="dashboardChart"></canvas>
