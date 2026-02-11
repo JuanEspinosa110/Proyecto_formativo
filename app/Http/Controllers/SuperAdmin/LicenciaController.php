@@ -257,8 +257,11 @@ class LicenciaController extends Controller
 
         $validated = $request->validate([
             'id_plan' => 'required|exists:planes_licencia,id_plan',
-            'fecha_inicio' => 'required|date',
-            'fecha_vencimiento' => 'required|date|after:fecha_inicio',
+            'fecha_inicio' => 'required|date|date_format:Y-m-d|after_or_equal:today',
+            'fecha_vencimiento' => 'required|date|date_format:Y-m-d|after:fecha_inicio',
+        ], [
+            'fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser menor a la de hoy.',
+            'fecha_vencimiento.after' => 'La fecha de vencimiento debe ser posterior a la fecha de inicio.',
         ]);
 
         try {
@@ -374,6 +377,28 @@ class LicenciaController extends Controller
             ->select('licencias.*', 'empresa.nombre_empresa', 'planes_licencia.nombre_plan', 'estado.nombre_estado')
             ->orderBy('licencias.fecha_creacion', 'desc')->get();
         return view('superadmin.licencias.historial', compact('licencias'));
+    }
+
+    /**
+     * Obtener datos del plan de licencia (AJAX)
+     */
+    public function getPlanData($id_plan)
+    {
+        $plan = DB::table('planes_licencia')
+            ->where('id_plan', $id_plan)
+            ->where('id_estado', 1)
+            ->first();
+
+        if (!$plan) {
+            return response()->json(['error' => 'Plan no encontrado'], 404);
+        }
+
+        return response()->json([
+            'id_plan' => $plan->id_plan,
+            'nombre_plan' => $plan->nombre_plan,
+            'duracion_meses' => $plan->duracion_meses,
+            'precio' => $plan->precio,
+        ]);
     }
 
     /**
