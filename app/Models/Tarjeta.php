@@ -14,6 +14,7 @@ class Tarjeta extends Model
 
     protected $fillable = [
         'id_tarjeta',
+        'codigo_tarjeta',
         'saldo',
         'id_estado'
     ];

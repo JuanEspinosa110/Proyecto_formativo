@@ -32,7 +32,7 @@
         <div class="sa-perfil-card-body">
             <div class="sa-perfil-foto-container">
                 <div class="sa-perfil-foto-wrapper">
-                    @if($superAdmin->foto_perfil)
+                    @if(!empty($superAdmin->foto_perfil))
                         <img src="{{ asset('storage/' . $superAdmin->foto_perfil) }}" 
                              alt="Foto de perfil" 
                              class="sa-perfil-foto"
@@ -56,7 +56,7 @@
                                class="sa-perfil-file-input" 
                                accept="image/jpeg,image/png,image/jpg">
                         
-                        @if($superAdmin->foto_perfil)
+                        @if(!empty($superAdmin->foto_perfil))
                         <button type="button" 
                                 class="sa-perfil-btn sa-perfil-btn-danger"
                                 onclick="eliminarFoto()">
