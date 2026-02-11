@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
+use App\Http\Controllers\Auth\RegistroController;
 
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
@@ -33,6 +34,8 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::view('/register', 'auth.register')->name('register');
+Route::post('/register', [RegistroController::class, 'store'])
+    ->name('register.store');
 
 Route::middleware('auth:web')->group(function () {
 
