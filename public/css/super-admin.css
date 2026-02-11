@@ -179,3 +179,901 @@
     gap: 15px;
 }
 
+/* ======================================================
+   SUPERADMIN - ALERTAS CENTER
+====================================================== */
+
+.sa-alertas-wrapper {
+    padding: 36px;
+}
+
+/* ================= HEADER ================= */
+
+.sa-alertas-header {
+    margin-bottom: 30px;
+}
+
+.sa-alertas-title {
+    font-size: 32px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sa-alertas-subtitle {
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* ================= BLOQUES ================= */
+
+.sa-alertas-block {
+    margin-bottom: 40px;
+}
+
+.sa-alertas-block-title {
+    font-size: 20px;
+    font-weight: 900;
+    margin-bottom: 18px;
+}
+
+/* ================= GRID ================= */
+
+.sa-alertas-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 22px;
+}
+
+/* ================= CARD ================= */
+
+.sa-alertas-card {
+    position: relative;
+    background: white;
+    border-radius: 18px;
+    padding: 22px 22px 20px 60px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+    transition: all 0.25s ease;
+}
+
+.sa-alertas-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 36px rgba(0,0,0,0.14);
+}
+
+/* Barra lateral */
+
+.sa-alertas-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 8px;
+    background: #f59e0b;
+}
+
+/* Icono */
+
+.sa-alertas-card::after {
+    content: "⚠";
+    position: absolute;
+    left: 18px;
+    top: 22px;
+    font-size: 24px;
+}
+
+/* Textos */
+
+.sa-alertas-card-title {
+    font-size: 17px;
+    font-weight: 900;
+}
+
+.sa-alertas-card-text {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #374151;
+}
+
+.sa-alertas-card-date {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #6b7280;
+}
+
+/* ================= SEVERIDAD ================= */
+
+.sa-alertas-card.leve::before {
+    background: #f59e0b;
+}
+
+.sa-alertas-card.leve::after {
+    content: "⚠️";
+}
+
+.sa-alertas-card.grave::before {
+    background: #dc2626;
+}
+
+.sa-alertas-card.grave::after {
+    content: "🚨";
+}
+
+.sa-alertas-card.info::before {
+    background: #3b82f6;
+}
+
+.sa-alertas-card.info::after {
+    content: "ℹ️";
+}
+
+/* ================= SHORTCUTS ================= */
+
+.sa-alertas-shortcuts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
+}
+
+.sa-alertas-shortcut-card {
+    background: white;
+    border-radius: 18px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    font-weight: 800;
+    color: #1f2933;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+    transition: all 0.25s ease;
+}
+
+.sa-alertas-shortcut-card i {
+    font-size: 22px;
+}
+
+.sa-alertas-shortcut-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 34px rgba(0,0,0,0.14);
+}
+
+/* Shortcut crítico */
+
+.sa-alertas-shortcut-card.critical {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border-color: #f87171;
+    color: #991b1b;
+}
+
+/* ================= FOOTER ================= */
+
+.sa-alertas-footer {
+    margin-top: 44px;
+    display: flex;
+    justify-content: center;
+}
+
+.sa-alertas-btn-back {
+    background: linear-gradient(135deg, #334155, #1f2933);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 999px;
+    font-weight: 800;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 12px 26px rgba(0,0,0,0.3);
+    transition: all 0.25s ease;
+}
+
+.sa-alertas-btn-back:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 34px rgba(0,0,0,0.4);
+}
+
+
+/* =====================================
+   VARIANTES POR TIPO
+===================================== */
+
+.sa-alertas-card.info::before {
+    background: #3b82f6;
+}
+.sa-alertas-card.info::after {
+    content: 'ℹ️';
+}
+
+.sa-alertas-card.warning::before {
+    background: #f59e0b;
+}
+.sa-alertas-card.warning::after {
+    content: '⚠️';
+}
+
+.sa-alertas-card.critical::before {
+    background: #dc2626;
+}
+.sa-alertas-card.critical::after {
+    content: '🚨';
+}
+
+/* ---- Glow suave ---- */
+
+.sa-alertas-card.info:hover {
+    box-shadow: 0 18px 40px rgba(59,130,246,0.3);
+}
+
+.sa-alertas-card.warning:hover {
+    box-shadow: 0 18px 40px rgba(245,158,11,0.35);
+}
+
+.sa-alertas-card.critical:hover {
+    box-shadow: 0 18px 40px rgba(220,38,38,0.4);
+}
+
+/* ======================================================
+   SUPERADMIN - ALERTAS FOOTER & SEVERIDAD
+====================================================== */
+
+.sa-alertas-footer {
+    margin-top: 36px;
+    display: flex;
+    justify-content: center;
+}
+
+/* ---- Botón volver ---- */
+
+.sa-alertas-btn-back {
+    background: linear-gradient(135deg, #334155, #1f2933);
+    color: white;
+    padding: 12px 28px;
+    border-radius: 999px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s ease;
+    box-shadow: 0 10px 22px rgba(234, 7, 7, 0.25);
+}
+
+.sa-alertas-btn-back:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 30px #0000005a;
+}
+
+/* =====================================
+   ALERTAS LEVES (NARANJA)
+===================================== */
+
+.sa-alertas-card.leve::before {
+    background: #f59e0b;
+}
+
+.sa-alertas-card.leve::after {
+    content: '⚠️';
+}
+
+.sa-alertas-card.leve:hover {
+    box-shadow: 0 18px 40px rgba(245,158,11,0.45);
+}
+
+/* =====================================
+   ALERTAS GRAVES (ROJO)
+===================================== */
+
+.sa-alertas-card.grave::before {
+    background: #dc2626;
+}
+
+.sa-alertas-card.grave::after {
+    content: '🚨';
+}
+
+.sa-alertas-card.grave:hover {
+    box-shadow: 0 18px 40px rgba(220,38,38,0.5);
+}
+
+
+
+/* ======================================================
+   SUPERADMIN - DOCUMENTACION
+====================================================== */
+
+.sa-doc-wrapper {
+    padding: 36px;
+    background: linear-gradient(180deg, #f8fafc, transparent);
+}
+
+/* ================= HEADER ================= */
+
+.sa-doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 28px;
+}
+
+.sa-doc-title {
+    font-size: 30px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sa-doc-subtitle {
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* Acciones header */
+
+.sa-doc-header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.sa-doc-btn-primary {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    padding: 12px 26px;
+    border-radius: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 10px 22px rgba(37,99,235,0.35);
+    transition: all 0.25s ease;
+}
+
+.sa-doc-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 30px rgba(37,99,235,0.5);
+}
+
+.sa-doc-btn-secondary {
+    background: white;
+    color: #1f2933;
+    padding: 12px 22px;
+    border-radius: 14px;
+    font-weight: 800;
+    border: 1px solid #e5e7eb;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s ease;
+}
+
+.sa-doc-btn-secondary:hover {
+    background: #f8fafc;
+}
+
+/* ================= FILTROS ================= */
+
+.sa-doc-filters {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 26px;
+}
+
+.sa-doc-filter-input {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+
+.sa-doc-filter-select {
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+
+/* ================= TABLA ================= */
+
+.sa-doc-table-wrapper {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.08);
+}
+
+.sa-doc-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* Head */
+
+.sa-doc-thead {
+    background: linear-gradient(180deg, #f1f5f9, #e5e7eb);
+}
+
+.sa-doc-thead th {
+    padding: 14px 16px;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-bottom: 2px solid #cbd5f5;
+    color: #334155;
+}
+
+/* Body */
+
+.sa-doc-tbody td {
+    padding: 13px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.sa-doc-tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* ================= ESTADOS ================= */
+
+.sa-doc-status {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+.sa-doc-status.expired {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.sa-doc-status.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* ================= ACCIONES ================= */
+
+.sa-doc-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.sa-doc-action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #334155;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.25s ease;
+}
+
+.sa-doc-action-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Variantes */
+
+.sa-doc-action-btn.download:hover {
+    background: #e0f2fe;
+    border-color: #38bdf8;
+}
+
+.sa-doc-action-btn.alert:hover {
+    background: #fef3c7;
+    border-color: #facc15;
+}
+
+.sa-doc-action-btn.mark:hover {
+    background: #fee2e2;
+    border-color: #f87171;
+}
+
+.sa-doc-action-btn.edit:hover {
+    background: #dbeafe;
+    border-color: #60a5fa;
+}
+
+.sa-doc-action-btn.delete:hover {
+    background: #fecaca;
+    border-color: #ef4444;
+}
+
+
+/* ======================================================
+   SUPERADMIN - EMPRESAS
+====================================================== */
+
+.sa-emp-wrapper {
+    padding: 36px;
+    background: linear-gradient(180deg, #f8fafc, transparent);
+}
+
+/* ---- Header ---- */
+
+.sa-emp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.sa-emp-title {
+    font-size: 30px;
+    font-weight: 900;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    letter-spacing: 0.4px;
+}
+
+.sa-emp-subtitle {
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* ---- Buttons ---- */
+
+.sa-emp-btn-create {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    padding: 12px 26px;
+    border-radius: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 10px 22px rgba(37,99,235,0.35);
+    transition: all 0.25s ease;
+}
+
+.sa-emp-btn-create:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 32px rgba(37,99,235,0.5);
+}
+
+/* ---- Filters ---- */
+
+.sa-emp-filters {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 26px;
+}
+
+.sa-emp-search-box {
+    flex: 1;
+    background: white;
+    border-radius: 14px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+}
+
+.sa-emp-search-input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+}
+
+.sa-emp-filter-select {
+    border-radius: 14px;
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+
+/* ---- Table ---- */
+
+.sa-emp-table-wrapper {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.08);
+}
+
+.sa-emp-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* Header */
+
+.sa-emp-thead {
+    background: linear-gradient(180deg, #f1f5f9, #e5e7eb);
+}
+
+.sa-emp-thead th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #334155;
+    border-bottom: 2px solid #cbd5f5;
+}
+
+/* Body */
+
+.sa-emp-tbody td {
+    padding: 13px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.sa-emp-tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* ---- Status ---- */
+
+.sa-emp-status {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+.sa-emp-status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.sa-emp-status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.sa-emp-license-ok {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+/* ---- Actions ---- */
+
+.sa-emp-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* Botones medianos y trabajados */
+
+.sa-emp-action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    color: #334155;
+    border: 1px solid #e5e7eb;
+    text-decoration: none;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: all 0.25s ease;
+}
+
+.sa-emp-action-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Variantes */
+
+.sa-emp-action-btn.view:hover {
+    background: #e0f2fe;
+    border-color: #38bdf8;
+}
+
+.sa-emp-action-btn.edit:hover {
+    background: #dbeafe;
+    border-color: #60a5fa;
+}
+
+.sa-emp-action-btn.block:hover,
+.sa-emp-action-btn.delete:hover {
+    background: #fee2e2;
+    border-color: #f87171;
+}
+
+.sa-emp-action-btn.aux:hover,
+.sa-emp-action-btn.bus:hover {
+    background: #ecfeff;
+    border-color: #67e8f9;
+}
+
+.sa-emp-action-btn.docs:hover,
+.sa-emp-action-btn.upload:hover {
+    background: #f3e8ff;
+    border-color: #c084fc;
+}
+
+/* ======================================================
+   SUPERADMIN - USUARIOS
+====================================================== */
+
+.sa-users-wrapper {
+    padding: 26px 32px;
+    max-height: calc(100vh - 90px);
+}
+
+/* ================= HEADER ================= */
+
+.sa-users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.sa-users-title {
+    font-size: 28px;
+    font-weight: 900;
+    display: flex;
+    gap: 10px;
+}
+
+.sa-users-subtitle {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.sa-users-btn-create {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    padding: 11px 22px;
+    border-radius: 14px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+/* ================= FILTROS ================= */
+
+.sa-users-filters {
+    display: grid;
+    grid-template-columns: 2fr repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.sa-users-search-input,
+.sa-users-filter-select {
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    font-size: 13px;
+}
+
+/* ================= TABLA ================= */
+
+.sa-users-table-wrapper {
+    background: white;
+    border-radius: 18px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.sa-users-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.sa-users-thead {
+    background: #f1f5f9;
+}
+
+.sa-users-thead th {
+    padding: 12px 14px;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.sa-users-tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+}
+
+/* ================= USER BOX ================= */
+
+.sa-users-userbox {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.sa-users-avatar {
+    width: 34px;
+    height: 34px;
+    background: #e0f2fe;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ================= STATUS ================= */
+
+.sa-users-status {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.sa-users-status.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.sa-users-status.blocked {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* ================= ACTIONS ================= */
+
+.sa-users-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.sa-users-action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #334155;
+    transition: all 0.2s ease;
+}
+
+.sa-users-action-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Variantes */
+
+.sa-users-action-btn.view:hover { background:#e0f2fe; }
+.sa-users-action-btn.edit:hover { background:#dbeafe; }
+.sa-users-action-btn.role:hover { background:#ede9fe; }
+.sa-users-action-btn.company:hover { background:#fef3c7; }
+.sa-users-action-btn.password:hover { background:#cffafe; }
+.sa-users-action-btn.docs:hover { background:#f3e8ff; }
+.sa-users-action-btn.bus:hover { background:#ecfeff; }
+.sa-users-action-btn.toggle:hover { background:#dcfce7; }
+.sa-users-action-btn.delete:hover { background:#fee2e2; }
