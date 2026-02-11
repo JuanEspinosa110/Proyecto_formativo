@@ -1,5 +1,5 @@
 @extends('superadmin.layouts.admin')
-
+@section('title', 'Renovar Licencia')
 @section('content')
 <div class="container sa-licencia-container">
     <nav aria-label="breadcrumb">
@@ -19,7 +19,7 @@
             </div>
             <div>
                 <span class="badge sa-licencia-badge-warning mb-1">EXPIRA PRONTO</span>
-                <h4 class="fw-bold mb-1">{{ $licencia->empresa->nombre_empresa }} - {{ $licencia->plan->nombre_plan }}</h4>
+                <h4 class="fw-bold mb-1">{{ $licencia->nombre_empresa }} - {{ $licencia->nombre_plan }}</h4>
                 <div class="text-muted small">
                     <i class="far fa-calendar-alt me-1"></i> Expira en: <strong>{{ \Carbon\Carbon::parse($licencia->fecha_vencimiento)->format('M d, Y') }}</strong>
                 </div>

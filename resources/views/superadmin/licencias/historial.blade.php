@@ -1,4 +1,5 @@
 @extends('superadmin.layouts.admin')
+@section('title', 'Historial de Licencias')
 
 @section('content')
 <div class="container-fluid sa-licencia-container py-4">
@@ -67,7 +68,7 @@
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-download me-1"></i> Exportar PDF</button>
-                <a href="{{ route('superadmin.licencias.crear') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Añadir Empresa</a>
+                <a href="{{ route('superadmin.licencias.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Añadir Empresa</a>
             </div>
         </div>
         <div class="table-responsive">
@@ -88,23 +89,24 @@
                     @foreach($licencias as $lic)
                     <tr>
                         <td class="ps-4">
-                            <div class="fw-bold text-dark">{{ $lic->empresa->nombre_empresa }}</div>
-                            <div class="small text-muted">{{ $lic->plan->nombre_plan }}</div>
+                            <div class="fw-bold text-dark">{{ $lic->nombre_empresa }}</div>
+                            <div class="small text-muted">{{ $lic->nombre_plan }}</div>
                         </td>
                         <td>
                             @php
-                                $statusClass = match($lic->id_estado) {
-                                    1 => 'bg-success-soft text-success',
-                                    3 => 'bg-warning-soft text-warning',
-                                    14 => 'bg-danger-soft text-danger',
-                                    default => 'bg-secondary-soft text-secondary'
-                                };
+                            $statusClass = match($lic->id_estado) {
+                            1 => 'bg-success-soft text-success',
+                            3 => 'bg-warning-soft text-warning',
+                            14 => 'bg-danger-soft text-danger',
+                            default => 'bg-secondary-soft text-secondary'
+                            };
                             @endphp
-                            <span class="badge {{ $statusClass }} rounded-pill px-3">{{ $lic->estado->nombre_estado }}</span>
+                            <span class="badge {{ $statusClass }} rounded-pill px-3">{{ $lic->nombre_estado }}</span>
                         </td>
-                        <td class="fw-semibold">850</td> <td class="fw-semibold">45</td>
+                        <td class="fw-semibold">850</td>
+                        <td class="fw-semibold">45</td>
                         <td class="fw-semibold">120</td>
-                        <td><span class="badge border text-dark fw-normal">{{ $lic->plan->nombre_plan }}</span></td>
+                        <td><span class="badge border text-dark fw-normal">{{ $lic->nombre_plan }}</span></td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
                                 <div class="progress w-100" style="height: 6px;">
@@ -114,11 +116,7 @@
                             </div>
                             <div class="x-small text-muted">24.7Gb / 25Gb</div>
                         </td>
-                        <td class="text-center">
-                            <a href="{{ route('superadmin.licencias.configurar_plan', $lic->id_licencia) }}" class="btn btn-link text-primary p-0">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        </td>
+
                     </tr>
                     @endforeach
                 </tbody>

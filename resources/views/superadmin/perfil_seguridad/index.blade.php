@@ -107,7 +107,7 @@
     <div class="row">
 
         <!-- Seguridad -->
-        <div class="col-lg-4">
+        <div class="col-12">
             <div class="sa-perfil-card">
                 <div class="sa-perfil-card-header">
                     <h2 class="sa-perfil-card-title">
