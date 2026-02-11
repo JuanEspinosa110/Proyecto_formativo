@@ -83,13 +83,27 @@ Route::prefix('superadmin')
         Route::get('/empresas', [EmpresaController::class, 'index'])->name('empresas.index');
         Route::get('/documentos', [DocumentoController::class, 'index'])->name('documentos.index');
         Route::get('/tarjetas', [TarjetaController::class, 'index'])->name('tarjetas.index');
-        
+
         // Licencias
-        Route::get('/licencias', [LicenciaController::class, 'index'])->name('licencias.index');
-        Route::get('/licencias/crear', [LicenciaController::class, 'create'])->name('licencias.create');
-        Route::get('/licencias/configurar-plan', [LicenciaController::class, 'configurarPlan'])->name('licencias.configurar-plan');
-        Route::get('/licencias/{id}/editar', [LicenciaController::class, 'edit'])->name('licencias.edit');
-        
+        Route::get('licencias', [LicenciaController::class, 'index'])->name('licencias.index');
+        // PASO 1 creación de licencia
+        Route::get('licencias/crear', [LicenciaController::class, 'create'])->name('licencias.create');
+        Route::post('licencias/paso1', [LicenciaController::class, 'guardarPaso1'])->name('licencias.guardar-paso1');
+        // PASO 2 creación de licencia
+        Route::get('licencias/crear/paso2', [LicenciaController::class, 'crearPaso2'])->name('licencias.crear-paso2');
+        Route::post('licencias', [LicenciaController::class, 'store'])->name('licencias.store');
+
+        Route::get('licencias/{id}/editar', [LicenciaController::class, 'edit'])->name('licencias.edit');
+        Route::put('licencias/{id}', [LicenciaController::class, 'update'])->name('licencias.update');
+        Route::get('licencias/{id}/gestionar-estado', [LicenciaController::class, 'gestionarEstado'])->name('licencias.gestionar-estado');
+        Route::patch('/licencias/{id}/actualizar-estado', [LicenciaController::class, 'actualizarEstado'])->name('superadmin.licencias.actualizar-estado');
+        Route::patch('licencias/{id}/estado', [LicenciaController::class, 'actualizarEstado'])->name('licencias.actualizar-estado');
+        Route::get('licencias/{id}/renovar', [LicenciaController::class, 'renovar'])->name('licencias.renovar');
+        Route::put('licencias/{id}/renovar', [LicenciaController::class, 'procesarRenovacion'])->name('licencias.procesar-renovacion');
+        Route::get('licencias/historial', [LicenciaController::class, 'historial'])->name('licencias.historial');
+        Route::get('licencias/verificar-nit/{nit}', [LicenciaController::class, 'verificarNit']);
+        Route::get('licencias/ciudades/{id_departamento}', [LicenciaController::class, 'getCiudades']);
+
         Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
