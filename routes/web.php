@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
+
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
     RolController,
@@ -90,7 +92,23 @@ Route::prefix('superadmin')
         Route::get('/licencias/configurar-plan', [LicenciaController::class, 'configurarPlan'])->name('licencias.configurar-plan');
         Route::get('/licencias/{id}/editar', [LicenciaController::class, 'edit'])->name('licencias.edit');
         
-        Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+
+        //Reportes 
+            Route::get('reportes', [ReporteController::class, 'index'])
+                ->name('reportes.index');
+
+            Route::get('/reportes/pdf', [ReporteController::class, 'exportPdf'])
+                ->name('reportes.pdf');
+
+        // Tarjetas
+        Route::get('/tarjetas/{tarjeta}', [TarjetaController::class, 'show'])
+            ->name('tarjetas.show');
+
+        Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
+            ->name('tarjetas.update');
+
+
     });
+
