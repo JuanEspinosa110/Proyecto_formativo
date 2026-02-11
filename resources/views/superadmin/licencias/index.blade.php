@@ -114,8 +114,8 @@
                         <option value="4">Enterprise</option>
                     </select>
                 </div>
-                <div class="col-md-3 text-end">
-                    <a href="{{ route('superadmin.licencias.historial') }}" class="btn btn-outline-secondary me-2">
+                <div class="col-md-3 d-flex justify-content-end align-items-center gap-2">
+                    <a href="{{ route('superadmin.licencias.historial') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-history me-1"></i> Historial
                     </a>
                     <button class="btn btn-outline-secondary" onclick="window.print()">
