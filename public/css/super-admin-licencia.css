@@ -1,5 +1,5 @@
 /* ========================================
-   ROLES Y PERMISOS - ESTILOS
+   LICENCIAS - ESTILOS
    ======================================== */
 
    /* Contenedor y Títulos */
@@ -140,14 +140,21 @@
     border: none;
 }
 
-/* Selección de Plan en Edición */
 .sa-licencia-plan-select {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     border: 1px solid #e5e7eb;
     border-radius: 10px;
     padding: 1.5rem 1rem;
     cursor: pointer;
     position: relative;
     transition: all 0.2s ease;
+    min-height: 140px;
+    height: 100%;
+    width: 100%;
 }
 
 .sa-licencia-plan-select:hover {
@@ -243,8 +250,11 @@
 }
 
 /* Interfaz de Radio Cards */
-.sa-status-option-label {
-    cursor: pointer;
+.sa-status-option-label input[type="radio"]:checked + .sa-status-option-card {
+    border-width: 3px !important;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
 }
 
 .sa-status-option-card {
@@ -303,4 +313,40 @@
 .pagination .page-item.active .page-link {
     background-color: #2563eb;
     border-color: #2563eb;
+}
+
+.sa-licencia-tab {
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #6b7280;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.sa-licencia-tab:hover {
+    background: #f9fafb;
+    border-color: #2563eb;
+}
+
+.sa-licencia-tab.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+.sa-licencia-tab.active .badge {
+    background: white !important;
+    color: #2563eb !important;
+}
+
+.btn-group .btn {
+    border: none;
+    padding: 0.25rem 0.5rem;
+}
+
+.btn-group .btn:hover {
+    background-color: #f3f4f6;
+    border-radius: 4px;
 }
