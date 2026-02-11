@@ -102,6 +102,7 @@ Route::prefix('superadmin')
         Route::put('licencias/{id}/renovar', [LicenciaController::class, 'procesarRenovacion'])->name('licencias.procesar-renovacion');
         Route::get('licencias/historial', [LicenciaController::class, 'historial'])->name('licencias.historial');
         Route::get('licencias/verificar-nit/{nit}', [LicenciaController::class, 'verificarNit']);
+        Route::get('licencias/plan/{id_plan}', [LicenciaController::class, 'getPlanData']);
         Route::get('licencias/ciudades/{id_departamento}', [LicenciaController::class, 'getCiudades']);
 
         Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
