@@ -10,6 +10,9 @@
             <h2 class="sa-licencia-title">Listado General de Licencias</h2>
             <p class="text-muted">Panel centralizado para el monitoreo, renovación y gestión de licencias B2B activas.</p>
         </div>
+        <a href="{{ route('superadmin.planes.index') }}" class="btn btn-outline-primary">
+            <i class="fas fa-layer-group me-2"></i>Gestionar Planes
+        </a>
         <a href="{{ route('superadmin.licencias.create') }}" class="btn btn-primary sa-licencia-btn-new">
             <i class="fas fa-plus me-2"></i>Nueva Licencia
         </a>
