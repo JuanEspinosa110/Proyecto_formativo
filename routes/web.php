@@ -19,6 +19,7 @@ use App\Http\Controllers\SuperAdmin\{
     ConfiguracionController,
     TipoUsuarioController,
     PerfilSeguridadController,
+    PlanLicenciaController,
 };
 
 Route::get('/', function () {
@@ -149,16 +150,25 @@ Route::prefix('superadmin')
         Route::get('/licencias/crear', [LicenciaController::class, 'create'])->name('licencias.create');
         Route::get('/licencias/configurar-plan', [LicenciaController::class, 'configurarPlan'])->name('licencias.configurar-plan');
         Route::get('/licencias/{id}/editar', [LicenciaController::class, 'edit'])->name('licencias.edit');
-        
+
+        // PLANES DE LICENCIA
+        Route::get('planes', [PlanLicenciaController::class, 'index'])->name('planes.index');
+        Route::get('planes/crear', [PlanLicenciaController::class, 'create'])->name('planes.create');
+        Route::post('planes', [PlanLicenciaController::class, 'store'])->name('planes.store');
+        Route::get('planes/{id}/editar', [PlanLicenciaController::class, 'edit'])->name('planes.edit');
+        Route::put('planes/{id}', [PlanLicenciaController::class, 'update'])->name('planes.update');
+        Route::delete('planes/{id}', [PlanLicenciaController::class, 'destroy'])->name('planes.destroy');
+        Route::post('planes/{id}/toggle-estado', [PlanLicenciaController::class, 'toggleEstado']);
+
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
 
         //Reportes 
-            Route::get('reportes', [ReporteController::class, 'index'])
-                ->name('reportes.index');
+        Route::get('reportes', [ReporteController::class, 'index'])
+            ->name('reportes.index');
 
-            Route::get('/reportes/pdf', [ReporteController::class, 'exportPdf'])
-                ->name('reportes.pdf');
+        Route::get('/reportes/pdf', [ReporteController::class, 'exportPdf'])
+            ->name('reportes.pdf');
 
         // Tarjetas
         Route::get('/tarjetas/{tarjeta}', [TarjetaController::class, 'show'])
@@ -166,7 +176,4 @@ Route::prefix('superadmin')
 
         Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
             ->name('tarjetas.update');
-
-
     });
-
