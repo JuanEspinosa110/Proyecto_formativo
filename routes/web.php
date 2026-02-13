@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
+use App\Http\Controllers\Auth\RecuperarPasswordController;
 
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
@@ -36,6 +37,39 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::view('/register', 'auth.register')->name('register');
 Route::post('/register', [RegistroController::class, 'store'])
     ->name('register.store');
+
+Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
+
+Route::post('/recuperar/enviar-codigo', 
+    [RecuperarPasswordController::class, 'enviarCodigo']
+)->name('password.send.code');
+
+Route::get('/codigo', function () {
+    return view('auth.codigo');
+})->name('password.codigo.form');
+
+Route::post('/codigo/verificar', [RecuperarPasswordController::class, 'verificarCodigo'])
+    ->name('password.verify.code');
+
+Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCodigo'])
+    ->name('password.resend.code');
+
+// Mostrar vista nueva contraseña
+Route::get('/nueva-password', function () {
+    if (!session('correo')) {
+        return redirect()->route('recuperar');
+    }
+
+    return view('auth.nueva_password');
+})->name('password.nueva.form');
+
+
+// Procesar actualización
+Route::post('/nueva-password', 
+    [RecuperarPasswordController::class, 'actualizarPassword']
+)->name('password.update');
+
+
 
 Route::middleware('auth:web')->group(function () {
 
