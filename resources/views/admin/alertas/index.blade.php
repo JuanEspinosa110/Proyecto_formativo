@@ -1,4 +1,4 @@
-@extends('superadmin.layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Alertas')
 
