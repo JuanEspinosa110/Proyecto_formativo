@@ -150,7 +150,7 @@ Route::prefix('superadmin')
         Route::get('/licencias/crear', [LicenciaController::class, 'create'])->name('licencias.create');
         Route::get('/licencias/configurar-plan', [LicenciaController::class, 'configurarPlan'])->name('licencias.configurar-plan');
         Route::get('/licencias/{id}/editar', [LicenciaController::class, 'edit'])->name('licencias.edit');
-<<<<<<< HEAD
+
         
 
          // Ruta para obtener ciudades por departamento (AJAX)
@@ -160,7 +160,7 @@ Route::prefix('superadmin')
         // Rutas CRUD de Empresas
         Route::resource('empresas', EmpresaController::class);
         
-=======
+
 
         // PLANES DE LICENCIA
         Route::get('planes', [PlanLicenciaController::class, 'index'])->name('planes.index');
@@ -171,7 +171,7 @@ Route::prefix('superadmin')
         Route::delete('planes/{id}', [PlanLicenciaController::class, 'destroy'])->name('planes.destroy');
         Route::post('planes/{id}/toggle-estado', [PlanLicenciaController::class, 'toggleEstado']);
 
->>>>>>> origin/develop
+
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
 
