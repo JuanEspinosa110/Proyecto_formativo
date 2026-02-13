@@ -15,14 +15,15 @@
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
-    <!-- Font -->
+     <!-- Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <!-- CSS propio -->
-    <link rel="stylesheet" href="{{ asset('../css/super-admin.css') }}">
-    <link rel="stylesheet" href="{{ asset('../css/super-admin-roles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/super-admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/super-admin-roles.css') }}">
     <link rel="stylesheet" href="{{ asset('css/perfil-seguridad.css') }}">
     <link rel="stylesheet" href="{{ asset('css/super-admin-licencia.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/empresas.css') }}">
 
 </head>
 
@@ -121,6 +122,29 @@
 
         </aside>
 
+        @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+
         {{-- CONTENIDO --}}
         <main class="sa-main">
             @yield('content')
@@ -129,5 +153,6 @@
     </div>
 
 </body>
+
 
 </html>

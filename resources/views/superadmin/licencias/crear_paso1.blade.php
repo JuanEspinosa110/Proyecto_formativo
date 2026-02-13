@@ -1,4 +1,4 @@
-@extends('superadmin.layouts.admin')
+@extends('layouts.admin')
 
 @section('title', 'Crear Licencia - Paso 1')
 

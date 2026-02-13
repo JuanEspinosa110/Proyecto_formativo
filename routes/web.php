@@ -113,6 +113,14 @@ Route::prefix('superadmin')
         Route::get('/licencias/configurar-plan', [LicenciaController::class, 'configurarPlan'])->name('licencias.configurar-plan');
         Route::get('/licencias/{id}/editar', [LicenciaController::class, 'edit'])->name('licencias.edit');
         
+
+         // Ruta para obtener ciudades por departamento (AJAX)
+        Route::get('/empresas/ciudades/{id_departamento}', [EmpresaController::class, 'getCiudadesByDepartamento'])
+        ->name('superadmin.empresas.ciudades');
+    
+        // Rutas CRUD de Empresas
+        Route::resource('empresas', EmpresaController::class);
+        
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
 
