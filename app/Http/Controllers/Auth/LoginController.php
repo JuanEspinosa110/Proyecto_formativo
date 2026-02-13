@@ -68,11 +68,7 @@ class LoginController extends Controller
             return redirect()->route('superadmin.dashboard');
         }
 
-        /*
-        |----------------------------------
-        | ❌ FALLÓ TODO
-        |----------------------------------
-        */
+        
         return back()->withErrors([
             'documento' => 'Documento o contraseña incorrectos',
         ]);

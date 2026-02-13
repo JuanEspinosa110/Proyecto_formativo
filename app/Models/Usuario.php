@@ -12,7 +12,7 @@ class Usuario extends Authenticatable
     protected $table = 'usuario';
     protected $primaryKey = 'doc_usuario';
     public $incrementing = false;
-    protected $keyType = 'string';
+    protected $keyType = 'integer';
     public $timestamps = false;
 
 
