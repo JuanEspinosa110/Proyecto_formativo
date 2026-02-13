@@ -199,7 +199,7 @@
                                 <tr>
                                     <td>{{ number_format($usuario->doc_usuario, 0, '', '.') }}</td>
                                     <td>{{ $usuario->primer_nombre }} {{ $usuario->primer_apellido }}</td>
-                                    <td>{{ $usuario->tipoUsuario->nombre_tipo ?? 'N/A' }}</td>
+                                    <td>{{ $usuario->id_tipo_usuario->nombre_tipo ?? 'N/A' }}</td>
                                     <td>{{ $usuario->telefono ?? 'N/A' }}</td>
                                     <td>
                                         @if($usuario->estado)
