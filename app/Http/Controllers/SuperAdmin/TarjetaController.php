@@ -38,7 +38,7 @@ class TarjetaController extends Controller
          * ============================
          */
 
-        return view('superadmin.tarjetas.index', compact(
+        return view('admin.tarjetas.index', compact(
             'totalTarjetas',
             'tarjetasActivas',
             'tarjetasBloqueadas',
@@ -56,7 +56,7 @@ class TarjetaController extends Controller
                 $usuario = null; 
                 $movimientos = []; 
 
-                return view('superadmin.tarjetas.show', compact(
+                return view('admin.tarjetas.show', compact(
                     'tarjeta',
                     'usuario',
                     'movimientos'
@@ -80,7 +80,7 @@ class TarjetaController extends Controller
             ]);
 
             return redirect()
-                ->route('superadmin.tarjetas.show', $tarjeta->id_tarjeta)
+                ->route('admin.tarjetas.show', $tarjeta->id_tarjeta)
                 ->with('success', 'Tarjeta actualizada correctamente');
 }
 

@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
+use App\Http\Controllers\Auth\RegistroController;
+use App\Http\Controllers\Auth\RecuperarPasswordController;
 
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
@@ -17,6 +19,7 @@ use App\Http\Controllers\SuperAdmin\{
     ConfiguracionController,
     TipoUsuarioController,
     PerfilSeguridadController,
+    PlanLicenciaController,
 };
 
 Route::get('/', function () {
@@ -33,6 +36,41 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::view('/register', 'auth.register')->name('register');
+Route::post('/register', [RegistroController::class, 'store'])
+    ->name('register.store');
+
+Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
+
+Route::post('/recuperar/enviar-codigo', 
+    [RecuperarPasswordController::class, 'enviarCodigo']
+)->name('password.send.code');
+
+Route::get('/codigo', function () {
+    return view('auth.codigo');
+})->name('password.codigo.form');
+
+Route::post('/codigo/verificar', [RecuperarPasswordController::class, 'verificarCodigo'])
+    ->name('password.verify.code');
+
+Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCodigo'])
+    ->name('password.resend.code');
+
+// Mostrar vista nueva contraseña
+Route::get('/nueva-password', function () {
+    if (!session('correo')) {
+        return redirect()->route('recuperar');
+    }
+
+    return view('auth.nueva_password');
+})->name('password.nueva.form');
+
+
+// Procesar actualización
+Route::post('/nueva-password', 
+    [RecuperarPasswordController::class, 'actualizarPassword']
+)->name('password.update');
+
+
 
 Route::middleware('auth:web')->group(function () {
 
@@ -112,6 +150,7 @@ Route::prefix('superadmin')
         Route::get('/licencias/crear', [LicenciaController::class, 'create'])->name('licencias.create');
         Route::get('/licencias/configurar-plan', [LicenciaController::class, 'configurarPlan'])->name('licencias.configurar-plan');
         Route::get('/licencias/{id}/editar', [LicenciaController::class, 'edit'])->name('licencias.edit');
+<<<<<<< HEAD
         
 
          // Ruta para obtener ciudades por departamento (AJAX)
@@ -121,15 +160,27 @@ Route::prefix('superadmin')
         // Rutas CRUD de Empresas
         Route::resource('empresas', EmpresaController::class);
         
+=======
+
+        // PLANES DE LICENCIA
+        Route::get('planes', [PlanLicenciaController::class, 'index'])->name('planes.index');
+        Route::get('planes/crear', [PlanLicenciaController::class, 'create'])->name('planes.create');
+        Route::post('planes', [PlanLicenciaController::class, 'store'])->name('planes.store');
+        Route::get('planes/{id}/editar', [PlanLicenciaController::class, 'edit'])->name('planes.edit');
+        Route::put('planes/{id}', [PlanLicenciaController::class, 'update'])->name('planes.update');
+        Route::delete('planes/{id}', [PlanLicenciaController::class, 'destroy'])->name('planes.destroy');
+        Route::post('planes/{id}/toggle-estado', [PlanLicenciaController::class, 'toggleEstado']);
+
+>>>>>>> origin/develop
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
 
         //Reportes 
-            Route::get('reportes', [ReporteController::class, 'index'])
-                ->name('reportes.index');
+        Route::get('reportes', [ReporteController::class, 'index'])
+            ->name('reportes.index');
 
-            Route::get('/reportes/pdf', [ReporteController::class, 'exportPdf'])
-                ->name('reportes.pdf');
+        Route::get('/reportes/pdf', [ReporteController::class, 'exportPdf'])
+            ->name('reportes.pdf');
 
         // Tarjetas
         Route::get('/tarjetas/{tarjeta}', [TarjetaController::class, 'show'])
@@ -137,7 +188,4 @@ Route::prefix('superadmin')
 
         Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
             ->name('tarjetas.update');
-
-
     });
-

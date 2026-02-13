@@ -10,14 +10,17 @@ class Usuario extends Authenticatable
     use Notifiable;
 
     protected $table = 'usuario';
-    protected $primaryKey = 'doc_us';
+    protected $primaryKey = 'doc_usuario';
     public $incrementing = false;
-    protected $keyType = 'string';
+    protected $keyType = 'integer';
+    public $timestamps = false;
+
 
     protected $fillable = [
-        'doc_us',
+        'doc_usuario',
         'NIT',
         'primer_nombre',
+        'segundo_nombre',
         'primer_apellido',
         'segundo_apellido',
         'correo',

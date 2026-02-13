@@ -8,6 +8,6 @@ use Illuminate\Http\Request;
 class AlertaController extends Controller
 {
     public function index(){
-        return view('superadmin.alertas.index');
+        return view('admin.alertas.index');
     }
 }
