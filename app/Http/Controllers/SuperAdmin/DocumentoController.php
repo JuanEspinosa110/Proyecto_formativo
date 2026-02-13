@@ -8,6 +8,6 @@ use Illuminate\Http\Request;
 class DocumentoController extends Controller
 {
     public function index(){
-        return view('superadmin.documentos.index');
+        return view('.documentos.index');
     }
 }

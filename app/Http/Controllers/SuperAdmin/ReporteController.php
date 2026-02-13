@@ -85,7 +85,7 @@ class ReporteController extends Controller
          * ============================
          */
 
-        return view('superadmin.reportes.index', compact(
+        return view('admin.reportes.index', compact(
             'totalVentas',
             'totalIngresos',
             'ventasHoy',
@@ -148,7 +148,7 @@ public function exportPdf()
      * ============================
      */
 
-    $pdf = Pdf::loadView('superadmin.reportes.pdf', compact(
+    $pdf = Pdf::loadView('admin.reportes.pdf', compact(
         'totalVentas',
         'totalIngresos',
         'ventasHoy',
