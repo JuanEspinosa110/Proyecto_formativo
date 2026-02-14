@@ -24,7 +24,7 @@ class TipoUsuarioController extends Controller
                 ->count();
         }
 
-        return view('superadmin.roles.index', compact('tiposUsuario'));
+        return view('admin.roles.index', compact('tiposUsuario'));
     }
 
     /**
@@ -32,7 +32,7 @@ class TipoUsuarioController extends Controller
      */
     public function create()
     {
-        return view('superadmin.roles.create');
+        return view('admin.roles.create');
     }
 
     /**
@@ -54,7 +54,7 @@ class TipoUsuarioController extends Controller
             ]);
 
             return redirect()
-                ->route('superadmin.roles.index')
+                ->route('admin.roles.index')
                 ->with('success', 'Tipo de usuario creado exitosamente');
 
         } catch (\Exception $e) {
@@ -75,13 +75,13 @@ class TipoUsuarioController extends Controller
 
         if (!$tipoUsuario) {
             return redirect()
-                ->route('superadmin.roles.index')
+                ->route('admin.roles.index')
                 ->with('error', 'Tipo de usuario no encontrado');
         }
 
 
 
-        return view('superadmin.roles.edit', compact('tipoUsuario'));
+        return view('admin.roles.edit', compact('tipoUsuario'));
     }
 
     /**
@@ -95,7 +95,7 @@ class TipoUsuarioController extends Controller
 
         if (!$tipoUsuario) {
             return redirect()
-                ->route('superadmin.roles.index')
+                ->route('admin.roles.index')
                 ->with('error', 'Tipo de usuario no encontrado');
         }
 
@@ -115,7 +115,7 @@ class TipoUsuarioController extends Controller
                 ]);
 
             return redirect()
-                ->route('superadmin.roles.index')
+                ->route('admin.roles.index')
                 ->with('success', 'Tipo de usuario actualizado exitosamente');
 
         } catch (\Exception $e) {
@@ -145,7 +145,7 @@ class TipoUsuarioController extends Controller
                 ->delete();
 
             return redirect()
-                ->route('superadmin.roles.index')
+                ->route('admin.roles.index')
                 ->with('success', 'Tipo de usuario eliminado exitosamente');
 
         } catch (\Exception $e) {
@@ -155,7 +155,6 @@ class TipoUsuarioController extends Controller
 
     /**
 
-    /**
      * Mostrar usuarios con tipo específico
      */
     public function users($id)
@@ -166,7 +165,7 @@ class TipoUsuarioController extends Controller
 
         if (!$tipoUsuario) {
             return redirect()
-                ->route('superadmin.roles.index')
+                ->route('admin.roles.index')
                 ->with('error', 'Tipo de usuario no encontrado');
         }
 
@@ -177,7 +176,7 @@ class TipoUsuarioController extends Controller
             ->select('usuario.*', 'estado.nombre_estado', 'ciudad.nombre_city')
             ->paginate(15);
 
-        return view('superadmin.roles.users', compact('tipoUsuario', 'usuarios'));
+        return view('admin.roles.users', compact('tipoUsuario', 'usuarios'));
     }
 
     

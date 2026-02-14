@@ -15,14 +15,15 @@
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
-    <!-- Font -->
+     <!-- Font -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <!-- CSS propio -->
-    <link rel="stylesheet" href="{{ asset('../css/super-admin.css') }}">
-    <link rel="stylesheet" href="{{ asset('../css/super-admin-roles.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/super-admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/super-admin-roles.css') }}">
     <link rel="stylesheet" href="{{ asset('css/perfil-seguridad.css') }}">
     <link rel="stylesheet" href="{{ asset('css/super-admin-licencia.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/empresas.css') }}">
 
 </head>
 
@@ -55,54 +56,22 @@
                     Dashboard
                 </a>
 
-                <a class="sa-dash-nav-link" href="{{ route('superadmin.roles.index') }}">
-                    <span class="material-symbols-outlined">shield_person</span>
-                    Roles y permisos
-                </a>
-
-                <a class="sa-dash-nav-link" href="{{ route('superadmin.usuarios.index') }}">
-                    <span class="material-symbols-outlined">group</span>
-                    Usuarios
-                </a>
 
                 <a class="sa-dash-nav-link" href="{{ route('superadmin.empresas.index') }}">
                     <span class="material-symbols-outlined">business</span>
                     Empresas
                 </a>
 
-                <a class="sa-dash-nav-link" href="{{ route('superadmin.documentos.index') }}">
-                    <span class="material-symbols-outlined">description</span>
-                    Documentación
-                </a>
-
-                <a class="sa-dash-nav-link" href="{{ route('superadmin.tarjetas.index') }}">
-                    <span class="material-symbols-outlined">credit_card</span>
-                    Tarjetas
-                </a>
 
                 <a class="sa-dash-nav-link" href="{{ route('superadmin.licencias.index') }}">
                     <span class="material-symbols-outlined">badge</span>
                     Licencias
                 </a>
 
-                <a class="sa-dash-nav-link" href="{{ route('superadmin.reportes.index') }}">
-                    <span class="material-symbols-outlined">analytics</span>
-                    Reportes
-                </a>
-
-                <a class="sa-dash-nav-link" href="{{ route('superadmin.alertas.index') }}">
-                    <span class="material-symbols-outlined">notifications</span>
-                    Alertas
-                </a>
 
                 <a class="sa-dash-nav-link" href="{{ route('superadmin.perfil.index') }}">
                     <span class="material-symbols-outlined">security</span>
                     Perfil y seguridad
-                </a>
-
-                <a class="sa-dash-nav-link" href="{{ route('superadmin.configuracion.index') }}">
-                    <span class="material-symbols-outlined">settings</span>
-                    Configuración
                 </a>
 
 
@@ -121,6 +90,29 @@
 
         </aside>
 
+        @if ($errors->any())
+                <div class="alert alert-danger">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
+
+
         {{-- CONTENIDO --}}
         <main class="sa-main">
             @yield('content')
@@ -129,5 +121,6 @@
     </div>
 
 </body>
+
 
 </html>

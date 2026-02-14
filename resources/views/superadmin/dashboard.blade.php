@@ -1,5 +1,7 @@
 @extends('superadmin.layouts.admin')
 
+
+
 @section('title', 'Dashboard Super Admin')
 
 @section('content')
@@ -17,8 +19,7 @@
     <h4>Acciones rápidas</h4>
 
     <div class="sa-dash-actions-buttons">
-        <a href="#" class="btn btn-primary">Crear Usuario</a>
-        <a href="#" class="btn btn-outline-primary">Registrar Empresa</a>
+        <a href="{{ route('superadmin.empresas.create') }}" class="btn btn-outline-primary">Registrar Empresa</a>
     </div>
 </section>
 
@@ -27,25 +28,8 @@
 <section class="sa-dash-charts">
 
     <div class="sa-dash-chart-card">
-        <h4>Usuarios</h4>
-        <canvas id="chartUsuarios"></canvas>
-    </div>
-
-    <div class="sa-dash-chart-card">
         <h4>Empresas</h4>
         <canvas id="chartEmpresas"></canvas>
-    </div>
-
-    <div class="sa-dash-chart-card">
-        <h4>Documentos</h4>
-        <canvas id="chartDocumentos"></canvas>
-    </div>
-
-    <div class="sa-dash-chart-card">
-        <h4>Tarjetas</h4>
-        <canvas id="chartTarjetas"></canvas>
-    </div>
-
 </section>
 
 </div>

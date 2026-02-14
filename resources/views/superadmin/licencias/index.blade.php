@@ -118,9 +118,9 @@
                     </select>
                 </div>
                 <div class="col-md-3 d-flex justify-content-end align-items-center gap-2">
-                    <a href="{{ route('superadmin.licencias.historial') }}" class="btn btn-outline-secondary">
+                    <!--<a href="{{ route('superadmin.licencias.historial') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-history me-1"></i> Historial
-                    </a>
+                    </a>-->
                     <button class="btn btn-outline-secondary" onclick="window.print()">
                         <i class="fas fa-download me-1"></i> Exportar
                     </button>

@@ -39,7 +39,7 @@
         </form>
 
         <div class="login-links mt-3">
-            <a href="#">¿Olvidaste tu contraseña?</a>
+            <a href=" {{route('recuperar')}}  ">¿Olvidaste tu contraseña?</a>
             <a href="#">Soporte técnico</a>
         </div>
     </div>

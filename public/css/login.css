@@ -145,3 +145,384 @@
     text-decoration: none;
 }
 
+
+/* ===========================
+   RECUPERAR CONTRASEÑA
+   =========================== */
+
+.recov-page {
+    font-family: 'Public Sans', sans-serif;
+}
+
+/* HEADER */
+.recov-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.recov-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.recov-logo span {
+    background: #137fec;
+    color: white;
+    padding: 6px;
+    border-radius: 8px;
+}
+
+.recov-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* CARD */
+.recov-card {
+    width: 100%;
+    max-width: 450px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.recov-card-header {
+    height: 120px;
+    background: rgba(19,127,236,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.recov-icon {
+    font-size: 40px;
+    color: #137fec;
+}
+
+.recov-card-body {
+    padding: 40px;
+}
+
+.recov-title {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.recov-description {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+/* FORM */
+.recov-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.recov-group label {
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.recov-group input {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+
+.recov-group input:focus {
+    border-color: #137fec;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(19,127,236,0.2);
+}
+
+/* BUTTON */
+.recov-btn {
+    width: 100%;
+    background: #137fec;
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.recov-btn:hover {
+    background: #0f6fd0;
+}
+
+/* SUCCESS */
+.recov-success {
+    background: #ecfdf5;
+    color: #047857;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+/* ERROR */
+.recov-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+/* BACK LINK */
+.recov-back {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.recov-back a {
+    color: #137fec;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.recov-back a:hover {
+    text-decoration: underline;
+}
+
+/* FOOTER */
+.recov-footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+
+/* ===============================
+   VERIFY CODE VIEW
+================================= */
+
+.verify-page {
+    min-height: 100vh;
+    background-color: #f6f7f8;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Public Sans', sans-serif;
+}
+
+.verify-header {
+    padding: 20px 40px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.verify-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    font-size: 18px;
+    color: #137fec;
+}
+
+.verify-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.verify-card {
+    width: 100%;
+    max-width: 450px;
+    background: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.verify-title-box {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.verify-title-box h1 {
+    margin-bottom: 10px;
+}
+
+.verify-title-box p {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.verify-group {
+    margin-bottom: 20px;
+}
+
+.verify-input {
+    width: 100%;
+    padding: 15px;
+    font-size: 24px;
+    text-align: center;
+    letter-spacing: 8px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+}
+
+.verify-input:focus {
+    outline: none;
+    border-color: #137fec;
+    box-shadow: 0 0 0 3px rgba(19,127,236,0.15);
+}
+
+.verify-btn {
+    width: 100%;
+    padding: 14px;
+    background: #137fec;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.verify-btn:hover {
+    background: #0f6fd0;
+}
+
+.verify-error {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.verify-footer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.verify-resend {
+    background: none;
+    border: none;
+    color: #137fec;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+
+/* ===============================
+   NUEVA PASSWORD (npw- prefix)
+=================================*/
+
+.npw-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f6f7f8;
+}
+
+.npw-header {
+    padding: 20px;
+    text-align: center;
+    font-weight: bold;
+    background: white;
+    border-bottom: 1px solid #ddd;
+}
+
+.npw-main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.npw-card {
+    width: 100%;
+    max-width: 450px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+.npw-card-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.npw-card-header h1 {
+    margin-bottom: 10px;
+}
+
+.npw-group {
+    margin-bottom: 15px;
+}
+
+.npw-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.npw-group input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.npw-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #137fec;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.npw-btn:hover {
+    background-color: #0f6cd4;
+}
+
+.npw-error-box {
+    background: #ffe5e5;
+    color: #b30000;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.npw-back {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.npw-back a {
+    text-decoration: none;
+    color: #137fec;
+}
+
+.npw-footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 12px;
+    color: #777;
+}
+
+

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
+use App\Http\Controllers\Auth\RecuperarPasswordController;
 
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
@@ -37,6 +38,39 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::view('/register', 'auth.register')->name('register');
 Route::post('/register', [RegistroController::class, 'store'])
     ->name('register.store');
+
+Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
+
+Route::post('/recuperar/enviar-codigo', 
+    [RecuperarPasswordController::class, 'enviarCodigo']
+)->name('password.send.code');
+
+Route::get('/codigo', function () {
+    return view('auth.codigo');
+})->name('password.codigo.form');
+
+Route::post('/codigo/verificar', [RecuperarPasswordController::class, 'verificarCodigo'])
+    ->name('password.verify.code');
+
+Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCodigo'])
+    ->name('password.resend.code');
+
+// Mostrar vista nueva contraseña
+Route::get('/nueva-password', function () {
+    if (!session('correo')) {
+        return redirect()->route('recuperar');
+    }
+
+    return view('auth.nueva_password');
+})->name('password.nueva.form');
+
+
+// Procesar actualización
+Route::post('/nueva-password', 
+    [RecuperarPasswordController::class, 'actualizarPassword']
+)->name('password.update');
+
+
 
 Route::middleware('auth:web')->group(function () {
 
@@ -117,6 +151,17 @@ Route::prefix('superadmin')
         Route::get('/licencias/configurar-plan', [LicenciaController::class, 'configurarPlan'])->name('licencias.configurar-plan');
         Route::get('/licencias/{id}/editar', [LicenciaController::class, 'edit'])->name('licencias.edit');
 
+        
+
+         // Ruta para obtener ciudades por departamento (AJAX)
+        Route::get('/empresas/ciudades/{id_departamento}', [EmpresaController::class, 'getCiudadesByDepartamento'])
+        ->name('superadmin.empresas.ciudades');
+    
+        // Rutas CRUD de Empresas
+        Route::resource('empresas', EmpresaController::class);
+        
+
+
         // PLANES DE LICENCIA
         Route::get('planes', [PlanLicenciaController::class, 'index'])->name('planes.index');
         Route::get('planes/crear', [PlanLicenciaController::class, 'create'])->name('planes.create');
@@ -125,6 +170,7 @@ Route::prefix('superadmin')
         Route::put('planes/{id}', [PlanLicenciaController::class, 'update'])->name('planes.update');
         Route::delete('planes/{id}', [PlanLicenciaController::class, 'destroy'])->name('planes.destroy');
         Route::post('planes/{id}/toggle-estado', [PlanLicenciaController::class, 'toggleEstado']);
+
 
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
