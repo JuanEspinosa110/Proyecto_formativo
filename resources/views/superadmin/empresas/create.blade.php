@@ -164,6 +164,7 @@
 
                 <div class="row g-3">
                     <div class="col-md-4">
+                        <label for="id_departamento" class="form-label required">Departamento</label>
                         <select name="id_departamento"
                             class="form-select @error('id_departamento') is-invalid @enderror" 
                                 id="id_departamento" required>

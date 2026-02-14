@@ -31,8 +31,13 @@ class LicenciaController extends Controller
             'total' => $licencias->count(),
             'activas' => $licencias->where('id_estado', 1)->count(),
             'proximas_vencer' => $licencias->filter(function ($lic) {
+                // Solo contamos si está activa
                 if ($lic->id_estado != 1) return false;
-                $dias = Carbon::parse($lic->fecha_vencimiento)->diffInDays(Carbon::now(), false);
+
+                // Calculamos días restantes (positivo = futuro, negativo = pasado)
+                $dias = \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($lic->fecha_vencimiento), false);
+
+                // Es próxima a vencer si vence hoy o en los próximos 30 días
                 return $dias >= 0 && $dias <= 30;
             })->count(),
             'vencidas' => $licencias->where('id_estado', 21)->count(),
@@ -119,7 +124,8 @@ class LicenciaController extends Controller
      */
     public function guardarPaso1(Request $request)
     {
-        $validated = $request->validate([
+        $validated = $request->validate(
+            [
             // Empresa
             'NIT' => 'required|numeric',
             'nombre_empresa' => 'required|string|max:150',
@@ -146,7 +152,28 @@ class LicenciaController extends Controller
             'telefono_admin' => 'nullable|string|max:20',
             'correo_admin' => 'required|email|max:150',
             'password_admin' => 'required|min:8',
-        ]);
+            ],
+            [
+                'NIT.required' => 'El NIT es obligatorio',
+                'NIT.numeric' => 'El NIT debe ser un número válido',
+                'nombre_empresa.required' => 'El nombre de la empresa es obligatorio',
+                'correo_corporativo.required' => 'El correo corporativo es obligatorio',
+                'correo_corporativo.email' => 'El correo corporativo debe ser un email válido',
+                'doc_representante.required' => 'El documento del representante es obligatorio',
+                'primer_nombre_repre.required' => 'El primer nombre del representante es obligatorio',
+                'primer_apellido_repre.required' => 'El primer apellido del representante es obligatorio',
+                'correo_representante.required' => 'El correo del representante es obligatorio',
+                'correo_representante.email' => 'El correo del representante debe ser válido',
+                'doc_admin.required' => 'El documento del administrador es obligatorio',
+                'primer_nombre_admin.required' => 'El primer nombre del administrador es obligatorio',
+                'primer_apellido_admin.required' => 'El primer apellido del administrador es obligatorio',
+                'correo_admin.required' => 'El correo del administrador es obligatorio',
+                'correo_admin.email' => 'El correo del administrador debe ser válido',
+                'password_admin.required' => 'La contraseña es obligatoria',
+                'password_admin.min' => 'La contraseña debe tener al menos 8 caracteres',
+                'id_ciudad.required' => 'La ciudad es obligatoria',
+            ]
+        );
 
         try {
             DB::beginTransaction();
@@ -255,14 +282,25 @@ class LicenciaController extends Controller
                 ->with('error', 'Sesión expirada. Inicie nuevamente.');
         }
 
-        $validated = $request->validate([
+        $validated = $request->validate(
+            [
             'id_plan' => 'required|exists:planes_licencia,id_plan',
             'fecha_inicio' => 'required|date|date_format:Y-m-d|after_or_equal:today',
             'fecha_vencimiento' => 'required|date|date_format:Y-m-d|after:fecha_inicio',
-        ], [
-            'fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser menor a la de hoy.',
-            'fecha_vencimiento.after' => 'La fecha de vencimiento debe ser posterior a la fecha de inicio.',
-        ]);
+            ], 
+            [
+                'id_plan.required' => 'Debe seleccionar un plan',
+                'id_plan.exists' => 'El plan seleccionado no es válido',
+                'fecha_inicio.required' => 'La fecha de inicio es obligatoria',
+                'fecha_inicio.date' => 'La fecha de inicio debe ser una fecha válida',
+                'fecha_inicio.date_format' => 'La fecha de inicio debe estar en formato YYYY-MM-DD',
+                'fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser menor a la de hoy',
+                'fecha_vencimiento.required' => 'La fecha de vencimiento es obligatoria',
+                'fecha_vencimiento.date' => 'La fecha de vencimiento debe ser una fecha válida',
+                'fecha_vencimiento.date_format' => 'La fecha de vencimiento debe estar en formato YYYY-MM-DD',
+                'fecha_vencimiento.after' => 'La fecha de vencimiento debe ser posterior a la fecha de inicio',
+            ]
+        );
 
         try {
             $datos = session('licencia_paso1');
@@ -338,12 +376,24 @@ class LicenciaController extends Controller
 
     public function actualizarEstado(Request $request, $id)
     {
-        $validated = $request->validate(['id_estado' => 'required|exists:estado,id_estado', 'motivo' => 'required|string|min:20|max:500']);
+        $validated = $request->validate(
+            [
+                'id_estado' => 'required|exists:estado,id_estado',
+                'motivo' => 'required|string|min:20|max:500'
+            ],
+            [
+                'id_estado.required' => 'Debe seleccionar un estado',
+                'id_estado.exists' => 'El estado seleccionado no es válido',
+                'motivo.required' => 'El motivo de la acción es obligatorio',
+                'motivo.min' => 'El motivo debe tener al menos 20 caracteres',
+                'motivo.max' => 'El motivo no puede exceder 500 caracteres'
+            ]
+        );
         try {
             DB::table('licencias')->where('id_licencia', $id)->update(['id_estado' => $validated['id_estado']]);
-            return redirect()->route('superadmin.licencias.index')->with('success', 'Estado actualizado');
+            return redirect()->route('superadmin.licencias.index')->with('success', 'Estado actualizado correctamente');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error: ' . $e->getMessage());
+            return back()->with('error', 'Error al actualizar el estado: ' . $e->getMessage());
         }
     }
 
@@ -360,12 +410,23 @@ class LicenciaController extends Controller
 
     public function procesarRenovacion(Request $request, $id)
     {
-        $validated = $request->validate(['nueva_fecha' => 'required|date|after:today', 'notas' => 'nullable|string|max:500']);
+        $validated = $request->validate(
+            [
+                'nueva_fecha' => 'required|date|after:today',
+                'notas' => 'nullable|string|max:500'
+            ],
+            [
+                'nueva_fecha.required' => 'La nueva fecha de vencimiento es obligatoria',
+                'nueva_fecha.date' => 'La fecha debe ser una fecha válida',
+                'nueva_fecha.after' => 'La fecha debe ser posterior a hoy',
+                'notas.max' => 'Las notas no pueden exceder 500 caracteres'
+            ]
+        );
         try {
             DB::table('licencias')->where('id_licencia', $id)->update(['fecha_vencimiento' => $validated['nueva_fecha'], 'id_estado' => 22]);
-            return redirect()->route('superadmin.licencias.index')->with('success', 'Renovada exitosamente');
+            return redirect()->route('superadmin.licencias.index')->with('success', 'Licencia renovada exitosamente');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error: ' . $e->getMessage());
+            return back()->with('error', 'Error al renovar la licencia: ' . $e->getMessage());
         }
     }
 
@@ -377,6 +438,76 @@ class LicenciaController extends Controller
             ->select('licencias.*', 'empresa.nombre_empresa', 'planes_licencia.nombre_plan', 'estado.nombre_estado')
             ->orderBy('licencias.fecha_creacion', 'desc')->get();
         return view('superadmin.licencias.historial', compact('licencias'));
+    }
+
+    /**
+     * Exportar listado de licencias como CSV
+     */
+    public function export()
+    {
+        $licencias = DB::table('licencias')
+            ->join('empresa', 'licencias.NIT', '=', 'empresa.NIT')
+            ->join('planes_licencia', 'licencias.id_plan', '=', 'planes_licencia.id_plan')
+            ->join('estado', 'licencias.id_estado', '=', 'estado.id_estado')
+            ->select(
+                'licencias.*',
+                'empresa.nombre_empresa',
+                'empresa.correo_corporativo',
+                'planes_licencia.nombre_plan',
+                'planes_licencia.precio',
+                'estado.nombre_estado'
+            )
+            ->orderBy('licencias.fecha_creacion', 'desc')
+            ->get();
+
+        $filename = 'licencias_' . now()->format('Ymd_His') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $columns = [
+            'ID Licencia',
+            'NIT',
+            'Empresa',
+            'Correo Corporativo',
+            'Plan',
+            'Precio',
+            'Estado',
+            'Fecha Inicio',
+            'Fecha Vencimiento',
+            'Fecha Creación',
+            'Días Restantes'
+        ];
+
+        $callback = function () use ($licencias, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($licencias as $lic) {
+                $diasRestantes = (int) Carbon::today()->diffInDays(Carbon::parse($lic->fecha_vencimiento), false);
+
+                $row = [
+                    $lic->id_licencia,
+                    $lic->NIT,
+                    $lic->nombre_empresa,
+                    $lic->correo_corporativo,
+                    $lic->nombre_plan,
+                    $lic->precio,
+                    $lic->nombre_estado,
+                    Carbon::parse($lic->fecha_inicio)->format('Y-m-d'),
+                    Carbon::parse($lic->fecha_vencimiento)->format('Y-m-d'),
+                    Carbon::parse($lic->fecha_creacion)->format('Y-m-d H:i'),
+                    $diasRestantes,
+                ];
+
+                fputcsv($file, $row);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**
