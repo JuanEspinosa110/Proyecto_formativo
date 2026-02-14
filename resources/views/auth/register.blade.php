@@ -72,7 +72,13 @@
                 <div class="regis-group">
                     <label>Contraseña</label>
                     <input type="password" name="password" class="regis-input" required>
+                    <small class="text-muted">
+                    La contraseña debe tener mínimo 8 caracteres, una mayúscula,
+                    un número y un símbolo.
+                    </small>
+
                 </div>
+
 
                 <div class="regis-group">
                     <label>Confirmar contraseña</label>

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
+use Illuminate\Validation\Rules\Password;
+
 
 class RegistroController extends Controller
 {
@@ -19,7 +21,15 @@ public function store(Request $request)
         'segundo_apellido' => 'nullable|string|max:100',
         'correo' => 'required|email|unique:usuario,correo',
         'telefono' => 'required|string|max:20',
-        'password' => 'required|confirmed|min:6'
+
+        'password' => [
+            'required', 
+            'confirmed',
+            password::min(8)
+                ->mixedCase()
+                ->numbers()
+                ->symbols()         
+            ]
     ]); 
 
     Usuario::create([
