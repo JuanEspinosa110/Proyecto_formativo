@@ -126,6 +126,7 @@ Route::prefix('superadmin')
 
         // Licencias
         Route::get('licencias', [LicenciaController::class, 'index'])->name('licencias.index');
+        Route::get('licencias/export', [LicenciaController::class, 'export'])->name('licencias.export');
         // PASO 1 creación de licencia
         Route::get('licencias/crear', [LicenciaController::class, 'create'])->name('licencias.create');
         Route::post('licencias/paso1', [LicenciaController::class, 'guardarPaso1'])->name('licencias.guardar-paso1');

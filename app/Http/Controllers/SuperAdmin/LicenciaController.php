@@ -12,6 +12,11 @@ class LicenciaController extends Controller
 {
     public function index()
     {
+        // 1. Consulta base para los conteos (necesitamos todos para las estadísticas)
+        $allLicencias = DB::table('licencias')
+            ->join('estado', 'licencias.id_estado', '=', 'estado.id_estado')
+            ->get();
+
         $licencias = DB::table('licencias')
             ->join('empresa', 'licencias.NIT', '=', 'empresa.NIT')
             ->join('planes_licencia', 'licencias.id_plan', '=', 'planes_licencia.id_plan')
@@ -25,22 +30,19 @@ class LicenciaController extends Controller
                 'estado.nombre_estado'
             )
             ->orderBy('licencias.fecha_creacion', 'desc')
-            ->get();
+            ->paginate(5); // <--- Paginación de 5 por página
 
         $stats = [
-            'total' => $licencias->count(),
-            'activas' => $licencias->where('id_estado', 1)->count(),
-            'proximas_vencer' => $licencias->filter(function ($lic) {
-                // Solo contamos si está activa
+            'total' => $allLicencias->count(),
+            'activas' => $allLicencias->where('id_estado', 1)->count(),
+            'proximas_vencer' => $allLicencias->filter(function ($lic) {
                 if ($lic->id_estado != 1) return false;
 
-                // Calculamos días restantes (positivo = futuro, negativo = pasado)
-                $dias = \Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($lic->fecha_vencimiento), false);
+                $diasRestantes = (int)\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($lic->fecha_vencimiento), false);
 
-                // Es próxima a vencer si vence hoy o en los próximos 30 días
-                return $dias >= 0 && $dias <= 30;
+                return $diasRestantes >= 0 && $diasRestantes <= 30;
             })->count(),
-            'vencidas' => $licencias->where('id_estado', 21)->count(),
+            'vencidas' => $allLicencias->where('id_estado', 21)->count(),
         ];
 
         return view('superadmin.licencias.index', compact('licencias', 'stats'));
@@ -126,32 +128,32 @@ class LicenciaController extends Controller
     {
         $validated = $request->validate(
             [
-            // Empresa
-            'NIT' => 'required|numeric',
-            'nombre_empresa' => 'required|string|max:150',
-            'id_departamento' => 'required|exists:departamento,id_departamento',
-            'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-            'telefono_empresa' => 'nullable|string|max:20',
-            'correo_corporativo' => 'required|email|max:150',
+                // Empresa
+                'NIT' => 'required|numeric',
+                'nombre_empresa' => 'required|string|max:150',
+                'id_departamento' => 'required|exists:departamento,id_departamento',
+                'id_ciudad' => 'required|exists:ciudad,id_ciudad',
+                'telefono_empresa' => 'nullable|string|max:20',
+                'correo_corporativo' => 'required|email|max:150',
 
-            // Representante Legal
-            'doc_representante' => 'required|numeric',
-            'primer_nombre_repre' => 'required|string|max:50',
-            'segundo_nombre_repre' => 'nullable|string|max:50',
-            'primer_apellido_repre' => 'required|string|max:50',
-            'segundo_apellido_repre' => 'nullable|string|max:50',
-            'telefono_representante' => 'nullable|string|max:20',
-            'correo_representante' => 'required|email|max:150',
+                // Representante Legal
+                'doc_representante' => 'required|numeric',
+                'primer_nombre_repre' => 'required|string|max:50',
+                'segundo_nombre_repre' => 'nullable|string|max:50',
+                'primer_apellido_repre' => 'required|string|max:50',
+                'segundo_apellido_repre' => 'nullable|string|max:50',
+                'telefono_representante' => 'nullable|string|max:20',
+                'correo_representante' => 'required|email|max:150',
 
-            // Usuario Administrador
-            'doc_admin' => 'required|numeric',
-            'primer_nombre_admin' => 'required|string|max:50',
-            'segundo_nombre_admin' => 'nullable|string|max:50',
-            'primer_apellido_admin' => 'required|string|max:50',
-            'segundo_apellido_admin' => 'nullable|string|max:50',
-            'telefono_admin' => 'nullable|string|max:20',
-            'correo_admin' => 'required|email|max:150',
-            'password_admin' => 'required|min:8',
+                // Usuario Administrador
+                'doc_admin' => 'required|numeric',
+                'primer_nombre_admin' => 'required|string|max:50',
+                'segundo_nombre_admin' => 'nullable|string|max:50',
+                'primer_apellido_admin' => 'required|string|max:50',
+                'segundo_apellido_admin' => 'nullable|string|max:50',
+                'telefono_admin' => 'nullable|string|max:20',
+                'correo_admin' => 'required|email|max:150',
+                'password_admin' => 'required|min:8',
             ],
             [
                 'NIT.required' => 'El NIT es obligatorio',
@@ -284,10 +286,10 @@ class LicenciaController extends Controller
 
         $validated = $request->validate(
             [
-            'id_plan' => 'required|exists:planes_licencia,id_plan',
-            'fecha_inicio' => 'required|date|date_format:Y-m-d|after_or_equal:today',
-            'fecha_vencimiento' => 'required|date|date_format:Y-m-d|after:fecha_inicio',
-            ], 
+                'id_plan' => 'required|exists:planes_licencia,id_plan',
+                'fecha_inicio' => 'required|date|date_format:Y-m-d|after_or_equal:today',
+                'fecha_vencimiento' => 'required|date|date_format:Y-m-d|after:fecha_inicio',
+            ],
             [
                 'id_plan.required' => 'Debe seleccionar un plan',
                 'id_plan.exists' => 'El plan seleccionado no es válido',
