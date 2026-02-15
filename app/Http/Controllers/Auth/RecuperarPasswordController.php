@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 use Illuminate\Support\Str;
-
+use App\Models\SuperAdministrador;
 
 class RecuperarPasswordController extends Controller
 {
@@ -22,10 +22,20 @@ class RecuperarPasswordController extends Controller
     public function enviarCodigo(Request $request)
 {
     $request->validate([
-        'email' => 'required|email|exists:usuario,correo'
-    ], [
-        'email.exists' => 'El correo no se encuentra registrado en el sistema.'
+        'email' => 'required|email'
     ]);
+
+    $correo = $request->email;
+
+    $usuario = Usuario::where('correo', $request->email)->first();
+    $superAdmin = SuperAdministrador::where('correo', $request->email)->first();
+
+    if (!$usuario && !$superAdmin) {
+        return back()->withErrors([
+            'email' => 'El correo no se encuentra registrado en el sistema.'
+        ]);
+}
+
 
     $codigo = random_int(100000, 999999);
 
@@ -80,20 +90,31 @@ class RecuperarPasswordController extends Controller
                         ]
                     ]);
 
-                   $usuario = Usuario::where('correo', $request->correo)->first();
+                    $correo = $request->correo;
 
-                    if (!$usuario) {
-                        return redirect()->route('recuperar');
+                   $usuario = Usuario::where('correo', $correo)->first();
+
+                    if ($usuario) {
+                        $usuario->update([
+                            'password' => Hash::make($request->password)
+                        ]);
+                    } else {
+                        $superadmin = SuperAdministrador::where('correo', $correo)->first();
+
+                        if ($superadmin) {
+                            $superadmin->update([
+                                'password' => Hash::make($request->password)
+                            ]);
+                        } else {
+                            return redirect()->route('recperar');
+                        }
                     }
 
-                    $usuario->update([
-                        'password' => Hash::make($request->password)
-                    ]);
-
-                    Cache::forget('recuperacion_'.$request->correo);
+                    Cache::forget('recuperacion_'.$correo);
 
                     return redirect()->route('login')
-                        ->with('success', 'Contraseña actualizada correctamente.');
+                        ->with('success', 'Contraseña actualizada correctamente');
+                    
                 }
 
     public function reenviarCodigo(Request $request)
