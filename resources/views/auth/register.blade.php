@@ -16,6 +16,13 @@
     <h1>Sistema de Gestión de Transporte</h1>
 </header>
 
+<div class="top-navigation">
+    <a href="{{ route('home') }}" class="btn-home">
+        Volver al inicio
+    </a>
+</div>
+
+
 <div class="regis-wrapper">
     <div class="regis-card">
 

@@ -27,6 +27,13 @@
         </div>
     </header>
 
+    <div class="top-navigation">
+    <a href="{{ route('login') }}" class="btn-home">
+        Volver al inicio
+    </a>
+</div>
+
+
     <!-- CARD -->
     <main class="verify-container">
         <div class="verify-card">
@@ -35,6 +42,12 @@
                 <h1>Verificar código</h1>
                 <p>Ingresa el código de 6 dígitos enviado a tu correo.</p>
             </div>
+
+            @if(session('success'))
+                <div class="verify-success" style="margin:15px 0;">
+                    {{ session('success') }}
+                </div>
+            @endif
 
             {{-- Mensaje de error --}}
             @if($errors->any())

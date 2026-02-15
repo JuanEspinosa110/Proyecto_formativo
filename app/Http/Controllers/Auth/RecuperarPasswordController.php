@@ -31,11 +31,8 @@ class RecuperarPasswordController extends Controller
     $superAdmin = SuperAdministrador::where('correo', $request->email)->first();
 
     if (!$usuario && !$superAdmin) {
-        return back()->withErrors([
-            'email' => 'El correo no se encuentra registrado en el sistema.'
-        ]);
+    return back()->withErrors('El correo no se encuentra registrado en el sistema.');
 }
-
 
     $codigo = random_int(100000, 999999);
 
@@ -59,61 +56,63 @@ class RecuperarPasswordController extends Controller
 
     public function verificarCodigo(Request $request)
         {
-                $request->validate([
-                    'correo' => 'required|email',
-                    'codigo' => 'required'
-                ]);
 
-                $codigoGuardado = Cache::get('recuperacion_'.$request->correo);
+            $request->validate([
+                'correo' => 'required|email',
+                'codigo' => 'required'
+            ]);
 
-                if (!$codigoGuardado || $codigoGuardado != $request->codigo) {
-                    return back()->withErrors([
-                        'codigo' => 'Código inválido o expirado'
-                    ]);
-            }
+            $codigoGuardado = Cache::get('recuperacion_'.$request->correo);
+
+            if (!$codigoGuardado || $codigoGuardado != $request->codigo) {
+                return back()
+                    ->withErrors('Código inválido o expirado.')
+                    ->with('correo', $request->correo);
+                }
 
             return redirect()->route('password.nueva.form')
                 ->with('correo', $request->correo);
         }
 
-            public function actualizarPassword(Request $request)
-                {
-                    $request->validate([
-                        'correo' => 'required|email',
-                        'password' => [
-                            'required',
-                            'confirmed',
-                            \Illuminate\Validation\Rules\Password::min(8)
-                                ->mixedCase()
-                                ->numbers()
-                                ->symbols()
-                        ]
+        public function actualizarPassword(Request $request)
+            {
+                $request->validate([
+                    'correo' => 'required|email',
+                    'password' => [
+                        'required',
+                        'confirmed',
+                        \Illuminate\Validation\Rules\Password::min(8)
+                            ->mixedCase()
+                            ->numbers()
+                            ->symbols()
+                    ]
+                ]);
+
+                $correo = $request->correo;
+
+                $usuario = Usuario::where('correo', $correo)->first();
+
+                if ($usuario) {
+                    $usuario->update([
+                        'password' => Hash::make($request->password)
                     ]);
+                } else {
+                    $superadmin = SuperAdministrador::where('correo', $correo)->first();
 
-                    $correo = $request->correo;
-
-                   $usuario = Usuario::where('correo', $correo)->first();
-
-                    if ($usuario) {
-                        $usuario->update([
+                    if ($superadmin) {
+                        $superadmin->update([
                             'password' => Hash::make($request->password)
                         ]);
                     } else {
-                        $superadmin = SuperAdministrador::where('correo', $correo)->first();
-
-                        if ($superadmin) {
-                            $superadmin->update([
-                                'password' => Hash::make($request->password)
-                            ]);
-                        } else {
-                            return redirect()->route('recperar');
-                        }
+                         return redirect()->route('recuperar')
+                            ->withErrors('No se encontró un usuario asociado a ese correo.');
                     }
+                }
 
-                    Cache::forget('recuperacion_'.$correo);
+                Cache::forget('recuperacion_'.$correo);
 
-                    return redirect()->route('login')
-                        ->with('success', 'Contraseña actualizada correctamente');
+                return redirect()->route('login')
+                    ->with('success', 'Contraseña actualizada correctamente');
                     
                 }
 

@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
+use Illuminate\Http\Request;
+
 
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
@@ -56,12 +58,10 @@ Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCo
     ->name('password.resend.code');
 
 // Mostrar vista nueva contraseña
-Route::get('/nueva-password', function () {
-    if (!session('correo')) {
-        return redirect()->route('recuperar');
-    }
-
-    return view('auth.nueva_password');
+Route::get('/nueva-password', function (Request $request) {
+    return view('auth.nueva_password', [
+        'correo' => session('correo')
+    ]);
 })->name('password.nueva.form');
 
 

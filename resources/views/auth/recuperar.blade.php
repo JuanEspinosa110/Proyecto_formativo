@@ -21,11 +21,17 @@
     <!-- HEADER -->
     <header class="recov-header">
         <div class="recov-logo">
-            <span class="material-symbols-outlined">directions_bus</span>
             <h2>Transporte Ibagué</h2>
         </div>
         <span class="recov-subtitle">Sistema de Gestión</span>
     </header>
+
+    <div class="top-navigation">
+    <a href="{{ route('home') }}" class="btn-home">
+        Volver al inicio
+    </a>
+</div>
+
 
     <!-- MAIN -->
     <main class="flex-grow flex items-center justify-center p-4">
@@ -51,15 +57,15 @@
                 @endif
 
                 <!-- Errores -->
-                @if($errors->any())
+                @if ($errors->any())
                     <div class="recov-error">
-                        <ul>
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                        <strong>Ha ocurrido un error:</strong>
+                        <div>
+                            {{ $errors->first() }}
+                        </div>
                     </div>
                 @endif
+
 
                 <form method="POST" action="{{ route('password.send.code') }}">
                     @csrf

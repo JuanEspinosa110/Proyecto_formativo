@@ -17,6 +17,13 @@
         <h2>Transporte Ibagué</h2>
     </header>
 
+    <div class="top-navigation">
+    <a href="{{ route('home') }}" class="btn-home">
+        Volver al inicio
+    </a>
+</div>
+
+
     <main class="npw-main">
         <div class="npw-card">
 
@@ -25,21 +32,23 @@
                 <p>Ingresa tu nueva clave para asegurar tu cuenta.</p>
             </div>
 
-            {{-- ERRORES --}}
             @if ($errors->any())
                 <div class="npw-error-box">
+                    <strong>Corrige los siguientes errores:</strong>
                     <ul>
                         @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
+                            <li>• {{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
             @endif
 
+
+
             <form method="POST" action="{{ route('password.update') }}">
                 @csrf
 
-                <input type="hidden" name="correo" value="{{ session('correo') }}">
+                <input type="hidden" name="correo" value="{{ old('correo', $correo) }}">
 
                 <div class="npw-group">
                     <label>Nueva contraseña</label>

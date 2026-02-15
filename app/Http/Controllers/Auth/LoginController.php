@@ -69,9 +69,8 @@ class LoginController extends Controller
         }
 
         
-        return back()->withErrors([
-            'documento' => 'Documento o contraseña incorrectos',
-        ]);
+        return back()->with([
+            'error' => 'Documento o contraseña incorrectos']);
     }
 
     public function logout(Request $request)
