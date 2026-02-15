@@ -70,8 +70,10 @@ class RecuperarPasswordController extends Controller
                     ->with('correo', $request->correo);
                 }
 
-            return redirect()->route('password.nueva.form')
-                ->with('correo', $request->correo);
+            session(['correo' => $request->correo]);
+            return redirect()->route('password.nueva.form');
+
+
         }
 
         public function actualizarPassword(Request $request)
@@ -86,7 +88,19 @@ class RecuperarPasswordController extends Controller
                             ->numbers()
                             ->symbols()
                     ]
-                ]);
+                ],
+                [
+                    'correo.required' => 'El correo es obligatorio.',
+                    'correo.email' => 'El correo debe ser una direccion valida.',
+
+                    'password.required' => 'La contraseña es obligatoria.',
+                    'password.confirmed'=> 'Las contraseñas no coinciden.',
+                    'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
+                    'password.mixed' => 'La contraseña debe contener mayusculas y minusculas.',
+                    'password.numbers' => 'La contraseña debe contener al menos un numero',
+                    'password.symbols' => 'La contraseña debe contener al menos un simbolo',
+                ]
+                );
 
                 $correo = $request->correo;
 
@@ -135,7 +149,21 @@ class RecuperarPasswordController extends Controller
 
             return back()->with('success', 'Nuevo código enviado');
         }
-    
+
+
+
+        public function mostrarNuevaPassword(Request $request)
+        {
+            if (!session()->has('correo')) {
+                return redirect()->route('recuperar')
+                    ->withErrors(['error' => 'Sesión inválida, inicia nuevamente el proceso.']);
+            }
+
+            return view('auth.nueva_password', [
+                'correo' => session('correo')
+            ]);
+        }
+
 
 
 
