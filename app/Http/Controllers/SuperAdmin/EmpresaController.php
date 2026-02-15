@@ -89,6 +89,8 @@ class EmpresaController extends Controller
 
         // Asignar tipo empresa automáticamente
         $validated['id_tipo_empresa'] = 1;
+        $validated['id_estado'] =1;
+
 
         Empresa::create($validated);
 

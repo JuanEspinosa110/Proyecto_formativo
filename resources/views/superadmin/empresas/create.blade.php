@@ -226,12 +226,14 @@
 </div>
 
 <script>
-// Cargar ciudades según departamento seleccionado
+
+// =============================
+// CARGAR CIUDADES POR DEPARTAMENTO
+// =============================
 document.getElementById('id_departamento').addEventListener('change', function() {
     const departamentoId = this.value;
     const ciudadSelect = document.getElementById('id_ciudad');
     
-    // Limpiar ciudades
     ciudadSelect.innerHTML = '<option value="">Cargando ciudades...</option>';
     
     if (departamentoId) {
@@ -246,8 +248,7 @@ document.getElementById('id_departamento').addEventListener('change', function()
                     ciudadSelect.appendChild(option);
                 });
             })
-            .catch(error => {
-                console.error('Error:', error);
+            .catch(() => {
                 ciudadSelect.innerHTML = '<option value="">Error al cargar ciudades</option>';
             });
     } else {
@@ -255,27 +256,62 @@ document.getElementById('id_departamento').addEventListener('change', function()
     }
 });
 
-// Validación de NIT
-document.getElementById('NIT').addEventListener('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');
-});
 
-// Validación de documento representante
-document.getElementById('doc_representante').addEventListener('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');
-});
+// =============================
+// FUNCIONES GENERALES
+// =============================
 
-// Solo letras
+// SOLO LETRAS
 function soloLetras(input) {
     input.value = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ\s]/g, '');
 }
 
-// Solo números
+// SOLO NÚMEROS
 function soloNumeros(input) {
     input.value = input.value.replace(/[^0-9]/g, '');
 }
 
+// VALIDAR CORREO
+function validarCorreo(input) {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z]+\.[a-zA-Z]{2,}$/;
+
+    if (!regex.test(input.value)) {
+        input.classList.add('is-invalid');
+    } else {
+        input.classList.remove('is-invalid');
+    }
+}
+
+
+// =============================
+// EVENTOS DE CAMPOS
+// =============================
+
+// NIT
+document.getElementById('NIT').addEventListener('input', function() {
+    soloNumeros(this);
+});
+
+// Documento representante
+document.getElementById('doc_representante').addEventListener('input', function() {
+    soloNumeros(this);
+});
+
+// Teléfonos
+document.getElementById('telefono_empresa').addEventListener('input', function() {
+    soloNumeros(this);
+});
+
+document.getElementById('telefono_representante').addEventListener('input', function() {
+    soloNumeros(this);
+});
+
+// Nombres y apellidos
 document.getElementById('primer_nombre_repre').addEventListener('input', function(){
+    soloLetras(this);
+});
+
+document.getElementById('segundo_nombre_repre').addEventListener('input', function(){
     soloLetras(this);
 });
 
@@ -283,14 +319,20 @@ document.getElementById('primer_apellido_repre').addEventListener('input', funct
     soloLetras(this);
 });
 
-document.getElementById('telefono_empresa').addEventListener('input', function(){
-    soloNumeros(this);
+document.getElementById('segundo_apellido_repre').addEventListener('input', function(){
+    soloLetras(this);
 });
 
-document.getElementById('telefono_representante').addEventListener('input', function(){
-    soloNumeros(this);
+// Correos
+document.getElementById('correo_corporativo').addEventListener('input', function(){
+    validarCorreo(this);
+});
+
+document.getElementById('correo_representante').addEventListener('input', function(){
+    validarCorreo(this);
 });
 
 </script>
+
 
 @endsection
