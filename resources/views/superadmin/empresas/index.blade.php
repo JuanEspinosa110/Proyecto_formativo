@@ -201,7 +201,7 @@
                                         <span class="material-symbols-outlined">edit</span>
                                     </a>
                                     <button type="button" class="btn-action delete" 
-                                            onclick="confirmarEliminacion({{ $empresa->NIT }})" 
+                                            onclick="confirmarEliminacion('{{ $empresa->NIT }}')" 
                                             title="Eliminar">
                                         <span class="material-symbols-outlined">delete</span>
                                     </button>

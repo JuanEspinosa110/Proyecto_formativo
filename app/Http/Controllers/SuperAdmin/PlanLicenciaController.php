@@ -130,13 +130,27 @@ class PlanLicenciaController extends Controller
                 ->with('error', 'Plan no encontrado');
         }
 
-        $validated = $request->validate([
-            'nombre_plan' => 'required|string|max:50|unique:planes_licencia,nombre_plan,' . $id . ',id_plan',
-            'duracion_meses' => 'required|integer|min:1|max:120',
-            'precio' => 'required|numeric|min:0|max:999999999.99',
-            'descripcion' => 'required|string|max:500',
-            'id_estado' => 'required|in:1,2', // 1=Activo, 2=Inactivo
-        ]);
+        $validated = $request->validate(
+            [
+                'nombre_plan' => 'required|string|max:50|unique:planes_licencia,nombre_plan,' . $id . ',id_plan',
+                'duracion_meses' => 'required|integer|min:1|max:120',
+                'precio' => 'required|numeric|min:0|max:999999999.99',
+                'descripcion' => 'required|string|max:500',
+                'id_estado' => 'required|in:1,2', // 1=Activo, 2=Inactivo
+            ],
+            [
+                'nombre_plan.required' => 'El nombre del plan es obligatorio',
+                'nombre_plan.unique' => 'Ya existe un plan con este nombre',
+                'duracion_meses.required' => 'La duración es obligatoria',
+                'duracion_meses.min' => 'La duración debe ser al menos 1 mes',
+                'duracion_meses.max' => 'La duración no puede superar 120 meses',
+                'precio.required' => 'El precio es obligatorio',
+                'precio.min' => 'El precio debe ser mayor a 0',
+                'descripcion.required' => 'La descripción es obligatoria',
+                'id_estado.required' => 'El estado es obligatorio',
+                'id_estado.in' => 'El estado seleccionado no es válido',
+            ]
+        );
 
         try {
             DB::table('planes_licencia')
@@ -156,7 +170,7 @@ class PlanLicenciaController extends Controller
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->with('error', 'Error al actualizar: ' . $e->getMessage());
+                ->with('error', 'Error al actualizar el plan: ' . $e->getMessage());
         }
     }
 
