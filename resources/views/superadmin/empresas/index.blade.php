@@ -200,11 +200,7 @@
                                        class="btn-action edit" title="Editar">
                                         <span class="material-symbols-outlined">edit</span>
                                     </a>
-                                    <button type="button" class="btn-action delete" 
-                                            onclick="confirmarEliminacion('{{ $empresa->NIT }}')" 
-                                            title="Eliminar">
-                                        <span class="material-symbols-outlined">delete</span>
-                                    </button>
+                                    
                                 </div>
                             </td>
                         </tr>
@@ -221,10 +217,7 @@
                 <span class="material-symbols-outlined">inbox</span>
                 <h3>No se encontraron empresas</h3>
                 <p>No hay empresas registradas que coincidan con los criterios de búsqueda.</p>
-                <a href="{{ route('superadmin.empresas.create') }}" class="btn-empresa-add">
-                    <span class="material-symbols-outlined">add_circle</span>
-                    Registrar Primera Empresa
-                </a>
+                
             </div>
         @endif
     </div>

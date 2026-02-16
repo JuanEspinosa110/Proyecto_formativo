@@ -40,13 +40,24 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="nombre_empresa" class="form-label required">Nombre de la Empresa</label>
-                        <input type="text" class="form-control @error('nombre_empresa') is-invalid @enderror" 
-                               id="nombre_empresa" name="nombre_empresa" 
-                               value="{{ old('nombre_empresa', $empresa->nombre_empresa) }}" required>
-                        @error('nombre_empresa')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <label for="nombre_empresa" class="form-label required">
+                            Nombre de la Empresa
+                        </label>
+
+                        {{-- Campo visible bloqueado --}}
+                        <input type="text"
+                            class="form-control bg-light"
+                            value="{{ $empresa->nombre_empresa }}"
+                            readonly>
+
+                        {{-- Campo hidden para que se envíe al backend --}}
+                        <input type="hidden"
+                            name="nombre_empresa"
+                            value="{{ $empresa->nombre_empresa }}">
+
+                        <small class="text-muted">
+                            El nombre de la empresa no se puede modificar.
+                        </small>
                     </div>
 
                     <div class="col-md-6">
