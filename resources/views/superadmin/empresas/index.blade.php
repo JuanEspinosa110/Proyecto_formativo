@@ -80,6 +80,13 @@
                     Filtrar
                 </button>
 
+                <a href="{{ route('superadmin.empresas.export.csv') }}" 
+                    class="btn btn-success mb-3">
+                        Descargar CSV
+                </a>
+
+
+
                 @if(request('search') || request('estado') || request('ciudad'))
                     <a href="{{ route('superadmin.empresas.index') }}" class="btn-clear">
                         <span class="material-symbols-outlined">clear</span>

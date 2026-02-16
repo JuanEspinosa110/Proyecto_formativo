@@ -8,6 +8,7 @@ use App\Models\Ciudad;
 use App\Models\Departamento;
 use App\Models\Estado;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class EmpresaController extends Controller
 {
@@ -58,7 +59,7 @@ class EmpresaController extends Controller
      * Guardar empresa
      */
     public function store(Request $request)
-{
+    {
     $validated = $request->validate([
 
     // EMPRESA
@@ -79,7 +80,7 @@ class EmpresaController extends Controller
     // UBICACIÓN
     'id_ciudad' => 'required|exists:ciudad,id_ciudad',
 
-], [
+    ], [
 
     // NIT
     'NIT.required' => 'El NIT es obligatorio.',
@@ -108,10 +109,10 @@ class EmpresaController extends Controller
     // Ubicación
     'id_ciudad.required' => 'Debe seleccionar una ciudad.',
     'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
-]);
+    ]);
 
 
-    // 🔥 ASIGNACIONES AUTOMÁTICAS
+    //  ASIGNACIONES AUTOMÁTICAS
     $validated['id_estado'] = 1;
     $validated['id_tipo_empresa'] = 1;
 
@@ -120,7 +121,7 @@ class EmpresaController extends Controller
     return redirect()
         ->route('superadmin.empresas.index')
         ->with('success', 'La empresa ha sido creada exitosamente.');
-}
+    }
 
 
 
@@ -191,11 +192,53 @@ class EmpresaController extends Controller
      * Cargar ciudades por departamento (AJAX)
      */
     public function getCiudadesByDepartamento($id_departamento)
-    {
-        $ciudades = Ciudad::where('id_departamento', $id_departamento)
-            ->orderBy('nombre_city')
-            ->get();
+        {
+            $ciudades = Ciudad::where('id_departamento', $id_departamento)
+                ->orderBy('nombre_city')
+                ->get();
 
-        return response()->json($ciudades);
+            return response()->json($ciudades);
+        }
+
+        public function exportCSV()
+    {
+        $fileName = 'empresas.csv';
+
+        $empresas = Empresa::with(['ciudad', 'estado'])->get();
+
+        $response = new StreamedResponse(function () use ($empresas) {
+
+            $handle = fopen('php://output', 'w');
+
+            // Encabezados
+            fputcsv($handle, [
+                'NIT',
+                'Nombre Empresa',
+                'Teléfono',
+                'Correo',
+                'Ciudad',
+                'Estado'
+            ]);
+
+            foreach ($empresas as $empresa) {
+                fputcsv($handle, [
+                    $empresa->NIT,
+                    $empresa->nombre_empresa,
+                    $empresa->telefono_empresa,
+                    $empresa->correo_corporativo,
+                    optional($empresa->ciudad)->nombre_city,
+                    optional($empresa->estado)->nombre_estado,
+                ]);
+            }
+
+            fclose($handle);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', "attachment; filename=$fileName");
+
+        return $response;
     }
+
+
 }
