@@ -186,9 +186,15 @@
                             </a>
                         </div>
                     </div>
-                </div>
+                    <div class="col-12">
+                        <a href="{{ route('superadmin.licencias.export', request()->all()) }}"
+                            class="btn btn-success">
+                            <i class="fas fa-file-csv me-1"></i>Exportar CSV
+                        </a>
+                    </div>
             </form>
         </div>
+
     </div>
 
     <!-- Información de filtros aplicados -->

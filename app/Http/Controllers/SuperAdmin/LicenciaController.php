@@ -494,13 +494,13 @@ class LicenciaController extends Controller
             ->orderBy('licencias.fecha_creacion', 'desc')->get();
         return view('superadmin.licencias.historial', compact('licencias'));
     }
-
     /**
-     * Exportar listado de licencias como CSV
+     * Exportar licencias a CSV respetando filtros
      */
-    public function export()
+    public function export(Request $request)
     {
-        $licencias = DB::table('licencias')
+        // Construir query base (igual que en index)
+        $query = DB::table('licencias')
             ->join('empresa', 'licencias.NIT', '=', 'empresa.NIT')
             ->join('planes_licencia', 'licencias.id_plan', '=', 'planes_licencia.id_plan')
             ->join('estado', 'licencias.id_estado', '=', 'estado.id_estado')
@@ -510,15 +510,32 @@ class LicenciaController extends Controller
                 'empresa.correo_corporativo',
                 'planes_licencia.nombre_plan',
                 'planes_licencia.precio',
+                'planes_licencia.duracion_meses',
                 'estado.nombre_estado'
-            )
-            ->orderBy('licencias.fecha_creacion', 'desc')
-            ->get();
+            );
 
-        $filename = 'licencias_' . now()->format('Ymd_His') . '.csv';
+        // Aplicar los MISMOS filtros que en index
+        $query = $this->applyFilters($query, $request);
+
+        // Obtener todas las licencias filtradas (sin paginación)
+        $licencias = $query->orderBy('licencias.fecha_creacion', 'desc')->get();
+
+        // Generar nombre de archivo
+        $filters = [];
+        if ($request->filled('filter')) $filters[] = $request->filter;
+        if ($request->filled('search')) $filters[] = 'busqueda';
+        if ($request->filled('estado')) $filters[] = 'estado';
+        if ($request->filled('plan')) $filters[] = 'plan';
+
+        $filterSuffix = !empty($filters) ? '_' . implode('_', $filters) : '';
+        $filename = 'licencias' . $filterSuffix . '_' . now()->format('Ymd_His') . '.csv';
+
         $headers = [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0'
         ];
 
         $columns = [
@@ -527,20 +544,34 @@ class LicenciaController extends Controller
             'Empresa',
             'Correo Corporativo',
             'Plan',
+            'Duración (meses)',
             'Precio',
             'Estado',
             'Fecha Inicio',
             'Fecha Vencimiento',
-            'Fecha Creación',
-            'Días Restantes'
+            'Días Restantes',
+            'Fecha Creación'
         ];
 
         $callback = function () use ($licencias, $columns) {
             $file = fopen('php://output', 'w');
+
+            // BOM para UTF-8 (para Excel)
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            // Encabezados
             fputcsv($file, $columns);
 
+            // Datos
             foreach ($licencias as $lic) {
                 $diasRestantes = (int) Carbon::today()->diffInDays(Carbon::parse($lic->fecha_vencimiento), false);
+
+                // Estado de días restantes
+                if ($diasRestantes < 0) {
+                    $diasRestantesTexto = 'VENCIDA';
+                } else {
+                    $diasRestantesTexto = $diasRestantes . ' días';
+                }
 
                 $row = [
                     $lic->id_licencia,
@@ -548,12 +579,13 @@ class LicenciaController extends Controller
                     $lic->nombre_empresa,
                     $lic->correo_corporativo,
                     $lic->nombre_plan,
-                    $lic->precio,
+                    $lic->duracion_meses,
+                    number_format($lic->precio, 2, '.', ''),
                     $lic->nombre_estado,
                     Carbon::parse($lic->fecha_inicio)->format('Y-m-d'),
                     Carbon::parse($lic->fecha_vencimiento)->format('Y-m-d'),
-                    Carbon::parse($lic->fecha_creacion)->format('Y-m-d H:i'),
-                    $diasRestantes,
+                    $diasRestantesTexto,
+                    Carbon::parse($lic->fecha_creacion)->format('Y-m-d H:i:s'),
                 ];
 
                 fputcsv($file, $row);
@@ -563,6 +595,50 @@ class LicenciaController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Aplicar filtros a la consulta (método compartido)
+     */
+    private function applyFilters($query, Request $request)
+    {
+        // Filtro de búsqueda
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('empresa.nombre_empresa', 'LIKE', "%{$search}%")
+                    ->orWhere('licencias.NIT', 'LIKE', "%{$search}%")
+                    ->orWhere('licencias.id_licencia', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Filtro de estado
+        if ($request->filled('estado')) {
+            $query->where('licencias.id_estado', $request->estado);
+        }
+
+        // Filtro de plan
+        if ($request->filled('plan')) {
+            $query->where('licencias.id_plan', $request->plan);
+        }
+
+        // Filtros rápidos (tabs)
+        if ($request->filled('filter')) {
+            switch ($request->filter) {
+                case 'activas':
+                    $query->where('licencias.id_estado', 1);
+                    break;
+                case 'por_vencer':
+                    $query->where('licencias.id_estado', 1)
+                        ->whereRaw('DATEDIFF(licencias.fecha_vencimiento, CURDATE()) BETWEEN 0 AND 30');
+                    break;
+                case 'vencidas':
+                    $query->where('licencias.id_estado', 21);
+                    break;
+            }
+        }
+
+        return $query;
     }
 
     /**
