@@ -3,6 +3,7 @@
 @section('title', 'Nueva Empresa')
 
 @section('content')
+
 <div class="empresa-container">
     
     {{-- HEADER --}}
@@ -20,6 +21,20 @@
 
     {{-- FORMULARIO --}}
     <div class="empresa-form-container">
+
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Se encontraron errores:</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+
         <form action="{{ route('superadmin.empresas.store') }}" method="POST" class="empresa-form">
             @csrf
 
@@ -190,21 +205,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-4">
-                        <label for="id_estado" class="form-label required">Estado</label>
-                        <select class="form-select @error('id_estado') is-invalid @enderror" 
-                                id="id_estado" name="id_estado" required>
-                            <option value="">Seleccione un estado</option>
-                            @foreach($estados as $estado)
-                                <option value="{{ $estado->id_estado }}" {{ old('id_estado') == $estado->id_estado ? 'selected' : '' }}>
-                                    {{ $estado->nombre_estado }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('id_estado')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                    
                 </div>
             </div>
 
@@ -226,12 +227,14 @@
 </div>
 
 <script>
-// Cargar ciudades según departamento seleccionado
+
+// =============================
+// CARGAR CIUDADES POR DEPARTAMENTO
+// =============================
 document.getElementById('id_departamento').addEventListener('change', function() {
     const departamentoId = this.value;
     const ciudadSelect = document.getElementById('id_ciudad');
     
-    // Limpiar ciudades
     ciudadSelect.innerHTML = '<option value="">Cargando ciudades...</option>';
     
     if (departamentoId) {
@@ -246,8 +249,7 @@ document.getElementById('id_departamento').addEventListener('change', function()
                     ciudadSelect.appendChild(option);
                 });
             })
-            .catch(error => {
-                console.error('Error:', error);
+            .catch(() => {
                 ciudadSelect.innerHTML = '<option value="">Error al cargar ciudades</option>';
             });
     } else {
@@ -255,42 +257,82 @@ document.getElementById('id_departamento').addEventListener('change', function()
     }
 });
 
-// Validación de NIT
-document.getElementById('NIT').addEventListener('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');
-});
 
-// Validación de documento representante
-document.getElementById('doc_representante').addEventListener('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');
-});
+// =============================
+// FUNCIONES GENERALES
+// =============================
 
-// Solo letras
+// SOLO LETRAS
 function soloLetras(input) {
     input.value = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ\s]/g, '');
 }
 
-// Solo números
+// SOLO NÚMEROS
 function soloNumeros(input) {
     input.value = input.value.replace(/[^0-9]/g, '');
 }
 
+
+
+// =============================
+// EVENTOS DE CAMPOS
+// =============================
+
+// NIT
+document.getElementById('NIT').addEventListener('input', function() {
+    soloNumeros(this);
+});
+
+// Documento representante
+document.getElementById('doc_representante').addEventListener('input', function() {
+    soloNumeros(this);
+});
+
+// Teléfonos
+document.getElementById('telefono_empresa').addEventListener('input', function() {
+    soloNumeros(this);
+});
+
+document.getElementById('telefono_representante').addEventListener('input', function() {
+    soloNumeros(this);
+});
+
+// Nombres y apellidos
 document.getElementById('primer_nombre_repre').addEventListener('input', function(){
     soloLetras(this);
 });
+
 
 document.getElementById('primer_apellido_repre').addEventListener('input', function(){
     soloLetras(this);
 });
 
-document.getElementById('telefono_empresa').addEventListener('input', function(){
-    soloNumeros(this);
-});
 
-document.getElementById('telefono_representante').addEventListener('input', function(){
-    soloNumeros(this);
-});
+function validarCorreo(input) {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        if (!regex.test(input.value)) {
+            input.classList.add('is-invalid');
+        } else {
+            input.classList.remove('is-invalid');
+        }
+
+        function validarCorreo(input) 
+        {
+            const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            if (!regex.test(input.value)) {
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        }
+
+}
+
+
 
 </script>
+
 
 @endsection
