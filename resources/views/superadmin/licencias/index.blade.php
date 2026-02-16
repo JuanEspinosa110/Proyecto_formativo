@@ -96,7 +96,7 @@
                 <div class="col-md-5">
                     <div class="input-group">
                         <span class="input-group-text bg-white"><i class="fas fa-search text-muted"></i></span>
-                        <input type="text" id="searchLicense" class="form-control border-start-0" placeholder="Filtrar por empresa, NIT o ID de licencia...">
+                        <input type="text" id="searchLicense" class="form-control border-start-0" placeholder="Filtrar por empresa, NIT, ID de licencia...">
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -121,9 +121,9 @@
                     <!--<a href="{{ route('superadmin.licencias.historial') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-history me-1"></i> Historial
                     </a>-->
-                    <button class="btn btn-outline-secondary" onclick="window.print()">
+                    <a href="{{ route('superadmin.licencias.export') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-download me-1"></i> Exportar
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -174,7 +174,6 @@
                             22 => 'badge bg-info text-dark',
                             default => 'badge bg-secondary'
                             };
-
                             $diasColor = $vencida ? 'text-danger fw-bold' : ($proximaVencer ? 'text-warning fw-bold' : 'text-success');
                             @endphp
                             <tr data-estado="{{ $lic->id_estado }}" data-plan="{{ $lic->id_plan }}" data-proxima="{{ $proximaVencer ? 'true' : 'false' }}">
@@ -220,12 +219,20 @@
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
+                                        @if($lic->id_estado != 1 && $lic->id_estado != 21)
                                         <a href="{{ route('superadmin.licencias.edit', $lic->id_licencia) }}"
                                             class="btn btn-sm text-primary"
                                             title="Editar licencia"
                                             data-bs-toggle="tooltip">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        @else
+                                        <button type="button" class="btn btn-sm text-secondary" disabled
+                                            title="No se puede editar licencias {{ $lic->id_estado == 1 ? 'activas' : 'vencidas' }}"
+                                            data-bs-toggle="tooltip">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        @endif
                                         <a href="{{ route('superadmin.licencias.gestionar-estado', $lic->id_licencia) }}"
                                             class="btn btn-sm text-warning"
                                             title="Gestionar estado"
@@ -334,11 +341,15 @@
             </table>
         </div>
 
-        @if($licencias->count() > 0)
+        @if($licencias->hasPages())
         <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
-            <span class="small text-muted">
-                Mostrando {{ $licencias->count() }} de {{ $stats['total'] }} licencias
-            </span>
+            <div class="small text-muted">
+                Mostrando {{ $licencias->firstItem() }} a {{ $licencias->lastItem() }}
+                de {{ $licencias->total() }} licencias
+            </div>
+            <div class="sa-pagination">
+                {{ $licencias->links() }}
+            </div>
         </div>
         @endif
     </div>
