@@ -34,61 +34,65 @@
 
     <div class="sa-dash-layout">
 
-        {{-- SIDEBAR --}}
-        <aside class="sa-dash-sidebar">
+        @if (!View::hasSection('noSidebar'))
+<div class="sa-dash-layout">
 
-            {{-- BRAND --}}
-            <div class="sa-dash-brand">
-                <span class="material-symbols-outlined sa-dash-brand-icon">
-                    admin_panel_settings
-                </span>
-                <div>
-                    <h1>Admin Panel</h1>
-                    <small>Public Transport System</small>
-                </div>
+    {{-- SIDEBAR --}}
+    <aside class="sa-dash-sidebar">
+
+        {{-- BRAND --}}
+        <div class="sa-dash-brand">
+            <span class="material-symbols-outlined sa-dash-brand-icon">
+                admin_panel_settings
+            </span>
+            <div>
+                <h1>Admin Panel</h1>
+                <small>Public Transport System</small>
             </div>
+        </div>
 
-            {{-- NAV --}}
-            <nav class="sa-dash-nav">
+        {{-- NAV --}}
+        <nav class="sa-dash-nav">
 
-                <a class="sa-dash-nav-link" href="{{ route('superadmin.dashboard') }}">
-                    <span class="material-symbols-outlined">dashboard</span>
-                    Dashboard
-                </a>
+            <a class="sa-dash-nav-link" href="{{ route('superadmin.dashboard') }}">
+                <span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
 
+            <a class="sa-dash-nav-link" href="{{ route('superadmin.empresas.index') }}">
+                <span class="material-symbols-outlined">business</span>
+                Empresas
+            </a>
 
-                <a class="sa-dash-nav-link" href="{{ route('superadmin.empresas.index') }}">
-                    <span class="material-symbols-outlined">business</span>
-                    Empresas
-                </a>
+            <a class="sa-dash-nav-link" href="{{ route('superadmin.licencias.index') }}">
+                <span class="material-symbols-outlined">badge</span>
+                Licencias
+            </a>
 
+            <a class="sa-dash-nav-link" href="{{ route('superadmin.perfil.index') }}">
+                <span class="material-symbols-outlined">security</span>
+                Perfil y seguridad
+            </a>
 
-                <a class="sa-dash-nav-link" href="{{ route('superadmin.licencias.index') }}">
-                    <span class="material-symbols-outlined">badge</span>
-                    Licencias
-                </a>
+        </nav>
 
+        {{-- FOOTER --}}
+        <div class="sa-dash-sidebar-footer">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="sa-dash-logout-btn">
+                    <span class="material-symbols-outlined">logout</span>
+                    Cerrar sesión
+                </button>
+            </form>
+        </div>
 
-                <a class="sa-dash-nav-link" href="{{ route('superadmin.perfil.index') }}">
-                    <span class="material-symbols-outlined">security</span>
-                    Perfil y seguridad
-                </a>
+    </aside>
 
+@else
+    <div>
+@endif
 
-            </nav>
-
-            {{-- FOOTER --}}
-            <div class="sa-dash-sidebar-footer">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="sa-dash-logout-btn">
-                        <span class="material-symbols-outlined">logout</span>
-                        Cerrar sesión
-                    </button>
-                </form>
-            </div>
-
-        </aside>
 
         {{-- CONTENIDO --}}
         <main class="sa-main">

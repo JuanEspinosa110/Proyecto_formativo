@@ -1,23 +1,195 @@
 /* =========================
-   RESET SOLO SUPER ADMIN
+   DASHBOARD MODERNO
 ========================= */
+
+.sa-dashboard {
+    padding: 20px;
+    width: 100%;
+}
+
+
+/* TOPBAR */
+
+.sa-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #1e293b, #2563eb);
+    color: white;
+    margin-bottom: 30px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sa-topbar-left h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.sa-topbar-left span {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.sa-topbar-nav {
+    display: flex;
+    gap: 25px;
+}
+
+.sa-topbar-nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    opacity: 0.8;
+    transition: 0.2s ease;
+}
+
+.sa-topbar-nav a:hover,
+.sa-topbar-nav a.active {
+    opacity: 1;
+    border-bottom: 2px solid white;
+}
+
+/* KPI SECTION */
+
+.sa-kpi-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 40px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sa-kpi-card {
+    background: white;
+    border-radius: 14px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    text-align: center;
+    border-left: 4px solid #2563eb;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sa-kpi-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+}
+
+.sa-kpi-card span {
+    font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: block;
+    font-weight: 600;
+}
+
+.sa-kpi-card strong {
+    display: block;
+    margin-top: 12px;
+    font-size: 28px;
+    color: #2563eb;
+    font-weight: 700;
+}
+
+
+/* =========================
+   CHARTS LIMPIOS Y ORDENADOS
+========================= */
+
+.sa-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sa-chart-card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+    transition: 0.2s ease;
+}
+
+.sa-chart-card:hover {
+    transform: translateY(-3px);
+}
+
+.sa-chart-card h4 {
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.sa-chart-card canvas {
+    max-height: 220px;
+}
+
+/* Las gráficas grandes ocupan toda la fila */
+.sa-chart-card.full {
+    grid-column: 1 / -1;
+}
+
+/* RESPONSIVE KPI */
+@media (max-width: 1024px) {
+    .sa-kpi-section {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .sa-chart-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .sa-kpi-section {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .sa-chart-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .sa-topbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .sa-topbar-nav {
+        width: 100%;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+}
+
+
+/* =====================================================
+   SIDEBAR LAYOUT RECUPERADO
+===================================================== */
+
 .sa-dash-body {
     margin: 0;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: #f8fafc;
 }
 
-/* =========================
-   LAYOUT
-========================= */
+/* LAYOUT */
 .sa-dash-layout {
     display: flex;
     min-height: 100vh;
 }
 
-/* =========================
-   SIDEBAR
-========================= */
+/* SIDEBAR */
 .sa-dash-sidebar {
     width: 260px;
     background: #ffffff;
@@ -49,9 +221,7 @@
     color: #64748b;
 }
 
-/* =========================
-   NAV
-========================= */
+/* NAV */
 .sa-dash-nav {
     flex: 1;
     padding: 1rem;
@@ -67,6 +237,7 @@
     color: #475569;
     font-weight: 500;
     margin-bottom: 0.25rem;
+    transition: all 0.2s ease;
 }
 
 .sa-dash-nav-link:hover {
@@ -78,9 +249,7 @@
     color: #2563eb;
 }
 
-/* =========================
-   FOOTER SIDEBAR
-========================= */
+/* FOOTER SIDEBAR */
 .sa-dash-sidebar-footer {
     padding: 1rem;
     border-top: 1px solid #e2e8f0;
@@ -98,117 +267,14 @@
     cursor: pointer;
 }
 
-/* =========================
-   MAIN CONTENT
-========================= */
-.sa-dash-main {
+/* MAIN CONTENT */
+.sa-main {
     flex: 1;
     padding: 2rem;
-}
-
-/* =========================
-   CONTENEDOR CENTRAL
-========================= */
-.sa-dash-container {
-    max-width: 1200px;
-    margin-left: 150px;
-    padding: 20px;
+    
 }
 
 
-/* =========================
-   HEADER
-========================= */
-.sa-dash-header {
-    text-align: center;
-    margin-bottom: 1rem;
-}
-
-.sa-dash-title {
-    margin: 0;
-    font-size: 28px;
-}
-
-.sa-dash-subtitle {
-    color: #64748b;
-    margin-top: 5px;
-}
-
-/* Línea separadora */
-.sa-divider {
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(to right, transparent, #2563eb, transparent);
-    margin: 25px 0;
-    border-radius: 10px;
-}
-/* =========================
-   KPIS
-========================= */
-.sa-dash-kpis {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.sa-dash-kpi {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 1.2rem;
-}
-
-.sa-dash-kpi span {
-    font-size: 28px;
-    color: #2563eb;
-}
-
-.sa-dash-kpi.alert span {
-    color: #dc2626;
-}
-
-/* =========================
-   ACTIONS
-========================= */
-.sa-dash-actions {
-    text-align: center;
-}
-
-.sa-dash-actions h4 {
-    margin-bottom: 15px;
-}
-
-.sa-dash-actions-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-/* =========================
-   CHARTS
-========================= */
-.sa-dash-charts {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-.sa-dash-chart-card {
-    background: #fff;
-    padding: 20px;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    text-align: center;
-}
-
-/* Control tamaño del canvas */
-.sa-dash-chart-card canvas {
-    max-height: 250px;
-}
 
 /* ===== CONTENEDOR GENERAL REPORTES ===== */
 .reporte-wrapper {
