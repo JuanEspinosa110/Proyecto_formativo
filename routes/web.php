@@ -5,8 +5,6 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
-use Illuminate\Http\Request;
-
 
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
@@ -30,7 +28,7 @@ Route::get('/', function () {
 
 
 Route::get('/superadmin/dashboard', function () {
-    return view('admin.dashboard');
+    return view('superadmin.dashboard'); 
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -58,10 +56,13 @@ Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCo
     ->name('password.resend.code');
 
 // Mostrar vista nueva contraseña
-Route::get('/nueva-password', 
-    [RecuperarPasswordController::class, 'mostrarNuevaPassword']
-)->name('password.nueva.form');
+Route::get('/nueva-password', function () {
+    if (!session('correo')) {
+        return redirect()->route('recuperar');
+    }
 
+    return view('auth.nueva_password');
+})->name('password.nueva.form');
 
 
 // Procesar actualización
@@ -125,7 +126,6 @@ Route::prefix('superadmin')
 
         // Licencias
         Route::get('licencias', [LicenciaController::class, 'index'])->name('licencias.index');
-        Route::get('licencias/export', [LicenciaController::class, 'export'])->name('licencias.export');
         // PASO 1 creación de licencia
         Route::get('licencias/crear', [LicenciaController::class, 'create'])->name('licencias.create');
         Route::post('licencias/paso1', [LicenciaController::class, 'guardarPaso1'])->name('licencias.guardar-paso1');
@@ -159,8 +159,7 @@ Route::prefix('superadmin')
     
         // Rutas CRUD de Empresas
         Route::resource('empresas', EmpresaController::class);
-        
-
+        Route::get('empresas/export/csv', [EmpresaController::class, 'exportCsv'])->name('empresas.export.csv');
 
         // PLANES DE LICENCIA
         Route::get('planes', [PlanLicenciaController::class, 'index'])->name('planes.index');
@@ -189,3 +188,5 @@ Route::prefix('superadmin')
         Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
             ->name('tarjetas.update');
     });
+
+
