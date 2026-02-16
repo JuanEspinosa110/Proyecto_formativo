@@ -36,7 +36,7 @@ class EmpresaController extends Controller
             $query->where('id_ciudad', $request->ciudad);
         }
 
-        $empresas = $query->orderBy('fecha_creacion', 'desc')->paginate(10);
+        $empresas = $query->orderBy('fecha_creacion', 'desc')->paginate(5);
         $estados = Estado::whereIn('id_estado', [1,2,3,6])->get();
         $ciudades = Ciudad::orderBy('nombre_city')->get();
 
