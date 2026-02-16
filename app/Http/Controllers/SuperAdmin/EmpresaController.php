@@ -58,46 +58,70 @@ class EmpresaController extends Controller
      * Guardar empresa
      */
     public function store(Request $request)
-    {
-        $validated = $request->validate([
+{
+    $validated = $request->validate([
 
-            // EMPRESA
-            'NIT' => 'required|numeric|unique:empresa,NIT',
-            'nombre_empresa' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'telefono_empresa' => 'required|numeric',
-            'correo_corporativo' => 'required|email',
+    // EMPRESA
+    'NIT' => 'required|digits:10|unique:empresa,NIT',
+    'nombre_empresa' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+    'telefono_empresa' => 'required|digits_between:7,15',
+    'correo_corporativo' => 'required|email',
 
-            // REPRESENTANTE
-            'doc_representante' => 'required|numeric',
-            'primer_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'segundo_nombre_repre' => ['','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'primer_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'segundo_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'telefono_representante' => 'required|numeric',
-            'correo_representante' => 'required|email',
+    // REPRESENTANTE
+    'doc_representante' => 'required|digits_between:6,15',
+    'primer_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+    'segundo_nombre_repre' => ['nullable','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+    'primer_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+    'segundo_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+    'telefono_representante' => 'required|digits_between:7,15',
+    'correo_representante' => 'required|email',
+
+    // UBICACIÓN
+    'id_ciudad' => 'required|exists:ciudad,id_ciudad',
+
+], [
+
+    // NIT
+    'NIT.required' => 'El NIT es obligatorio.',
+    'NIT.digits' => 'El NIT debe tener exactamente 10 dígitos.',
+    'NIT.unique' => 'Ya existe una empresa registrada con este NIT.',
+
+    // Empresa
+    'nombre_empresa.required' => 'El nombre de la empresa es obligatorio.',
+    'nombre_empresa.regex' => 'El nombre solo puede contener letras y espacios.',
+    'telefono_empresa.required' => 'El teléfono de la empresa es obligatorio.',
+    'telefono_empresa.digits_between' => 'El teléfono debe tener entre 7 y 15 números.',
+    'correo_corporativo.required' => 'El correo corporativo es obligatorio.',
+    'correo_corporativo.email' => 'El correo corporativo no es válido.',
+
+    // Representante
+    'doc_representante.required' => 'El documento del representante es obligatorio.',
+    'doc_representante.digits_between' => 'El documento debe tener solo números válidos.',
+    'primer_nombre_repre.required' => 'El primer nombre es obligatorio.',
+    'primer_apellido_repre.required' => 'El primer apellido es obligatorio.',
+    'segundo_apellido_repre.required' => 'El segundo apellido es obligatorio.',
+    'telefono_representante.required' => 'El teléfono del representante es obligatorio.',
+    'telefono_representante.digits_between' => 'El teléfono del representante no es válido.',
+    'correo_representante.required' => 'El correo del representante es obligatorio.',
+    'correo_representante.email' => 'El correo del representante no es válido.',
+
+    // Ubicación
+    'id_ciudad.required' => 'Debe seleccionar una ciudad.',
+    'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
+]);
 
 
-            // UBICACIÓN
-            'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-            'id_estado' => 'required|exists:estado,id_estado',
+    // 🔥 ASIGNACIONES AUTOMÁTICAS
+    $validated['id_estado'] = 1;
+    $validated['id_tipo_empresa'] = 1;
 
-        ], [
-            'required' => 'Este campo es obligatorio.',
-            'numeric' => 'Solo se permiten números.',
-            'correo_corporativo.regex' => 'Debe ser un correo válido @gmail.com',
-            'correo_representante.regex' => 'Debe ser un correo válido @gmail.com',
-        ]);
+    Empresa::create($validated);
 
-        // Asignar tipo empresa automáticamente
-        $validated['id_tipo_empresa'] = 1;
-        
+    return redirect()
+        ->route('superadmin.empresas.index')
+        ->with('success', 'La empresa ha sido creada exitosamente.');
+}
 
-        Empresa::create($validated);
-
-        return redirect()
-            ->route('superadmin.empresas.index')
-            ->with('success', 'La empresa ha sido creada exitosamente.');
-    }
 
 
     public function edit($nit)
