@@ -14,7 +14,7 @@
 <body class="login-body">
 
 <header class="login-header">
-    <h1>Transporte Ibague</h1>
+    <h1>SIGU</h1>
 </header>
 
 <div class="top-navigation">
@@ -26,7 +26,7 @@
 <main class="container d-flex justify-content-center align-items-center min-vh-100">
     <div class="login-card">
         <h2 class="text-center mb-3">Acceso al sistema</h2>
-        <p class="text-center text-muted mb-4">Plataforma institucional</p>
+        <p class="text-center text-muted mb-4">Sistema integral de gestión urbana</p>
 
         @include('components.alertas')
 

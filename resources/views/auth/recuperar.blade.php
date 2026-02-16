@@ -21,9 +21,9 @@
     <!-- HEADER -->
     <header class="recov-header">
         <div class="recov-logo">
-            <h2>Transporte Ibagué</h2>
+            <h2>SIGU</h2>
         </div>
-        <span class="recov-subtitle">Sistema de Gestión</span>
+        <span class="recov-subtitle">Sistema integral de gestión urbana</span>
     </header>
 
     <div class="top-navigation">
