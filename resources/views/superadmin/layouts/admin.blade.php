@@ -35,7 +35,6 @@
     <div class="sa-dash-layout">
 
         @if (!View::hasSection('noSidebar'))
-<div class="sa-dash-layout">
 
     {{-- SIDEBAR --}}
     <aside class="sa-dash-sidebar">
