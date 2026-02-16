@@ -190,21 +190,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-4">
-                        <label for="id_estado" class="form-label required">Estado</label>
-                        <select class="form-select @error('id_estado') is-invalid @enderror" 
-                                id="id_estado" name="id_estado" required>
-                            <option value="">Seleccione un estado</option>
-                            @foreach($estados as $estado)
-                                <option value="{{ $estado->id_estado }}" {{ old('id_estado') == $estado->id_estado ? 'selected' : '' }}>
-                                    {{ $estado->nombre_estado }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('id_estado')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                    
                 </div>
             </div>
 
@@ -271,16 +257,6 @@ function soloNumeros(input) {
     input.value = input.value.replace(/[^0-9]/g, '');
 }
 
-// VALIDAR CORREO
-function validarCorreo(input) {
-    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z]+\.[a-zA-Z]{2,}$/;
-
-    if (!regex.test(input.value)) {
-        input.classList.add('is-invalid');
-    } else {
-        input.classList.remove('is-invalid');
-    }
-}
 
 
 // =============================
@@ -311,26 +287,35 @@ document.getElementById('primer_nombre_repre').addEventListener('input', functio
     soloLetras(this);
 });
 
-document.getElementById('segundo_nombre_repre').addEventListener('input', function(){
-    soloLetras(this);
-});
 
 document.getElementById('primer_apellido_repre').addEventListener('input', function(){
     soloLetras(this);
 });
 
-document.getElementById('segundo_apellido_repre').addEventListener('input', function(){
-    soloLetras(this);
-});
 
-// Correos
-document.getElementById('correo_corporativo').addEventListener('input', function(){
-    validarCorreo(this);
-});
+function validarCorreo(input) {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-document.getElementById('correo_representante').addEventListener('input', function(){
-    validarCorreo(this);
-});
+        if (!regex.test(input.value)) {
+            input.classList.add('is-invalid');
+        } else {
+            input.classList.remove('is-invalid');
+        }
+
+        function validarCorreo(input) 
+        {
+            const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            if (!regex.test(input.value)) {
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        }
+
+}
+
+
 
 </script>
 

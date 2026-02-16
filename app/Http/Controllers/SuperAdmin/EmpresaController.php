@@ -65,16 +65,17 @@ class EmpresaController extends Controller
             'NIT' => 'required|numeric|unique:empresa,NIT',
             'nombre_empresa' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
             'telefono_empresa' => 'required|numeric',
-            'correo_corporativo' => ['required','regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/'],
+            'correo_corporativo' => 'required|email',
 
             // REPRESENTANTE
             'doc_representante' => 'required|numeric',
             'primer_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'segundo_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+            'segundo_nombre_repre' => ['','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
             'primer_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
             'segundo_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
             'telefono_representante' => 'required|numeric',
-            'correo_representante' => ['required','regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/'],
+            'correo_representante' => 'required|email',
+
 
             // UBICACIÓN
             'id_ciudad' => 'required|exists:ciudad,id_ciudad',
@@ -89,8 +90,7 @@ class EmpresaController extends Controller
 
         // Asignar tipo empresa automáticamente
         $validated['id_tipo_empresa'] = 1;
-        $validated['id_estado'] =1;
-
+        
 
         Empresa::create($validated);
 
@@ -99,20 +99,19 @@ class EmpresaController extends Controller
             ->with('success', 'La empresa ha sido creada exitosamente.');
     }
 
-    /**
-     * Editar empresa
-     */
+
     public function edit($nit)
     {
         $empresa = Empresa::with('ciudad')->findOrFail($nit);
 
         $departamentos = Departamento::orderBy('nombre_departamento')->get();
-
-        $ciudades = Ciudad::where('id_departamento', $empresa->ciudad->id_departamento)
-            ->orderBy('nombre_city')
-            ->get();
-
         $estados = Estado::whereIn('id_estado', [1,2,3,6])->get();
+
+        // Cargar ciudades del departamento actual
+        $ciudades = Ciudad::where(
+            'id_departamento',
+            optional($empresa->ciudad)->id_departamento
+        )->get();
 
         return view('superadmin.empresas.edit', compact(
             'empresa',
@@ -121,7 +120,6 @@ class EmpresaController extends Controller
             'estados'
         ));
     }
-
 
     /**
      * Actualizar empresa
