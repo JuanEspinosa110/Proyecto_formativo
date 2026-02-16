@@ -10,14 +10,13 @@ use Carbon\Carbon;
 
 class LicenciaController extends Controller
 {
-    public function index()
+    /**
+     * Index con filtros del lado del servidor
+     */
+    public function index(Request $request)
     {
-        // 1. Consulta base para los conteos (necesitamos todos para las estadísticas)
-        $allLicencias = DB::table('licencias')
-            ->join('estado', 'licencias.id_estado', '=', 'estado.id_estado')
-            ->get();
-
-        $licencias = DB::table('licencias')
+        // Construir query base
+        $query = DB::table('licencias')
             ->join('empresa', 'licencias.NIT', '=', 'empresa.NIT')
             ->join('planes_licencia', 'licencias.id_plan', '=', 'planes_licencia.id_plan')
             ->join('estado', 'licencias.id_estado', '=', 'estado.id_estado')
@@ -28,24 +27,78 @@ class LicenciaController extends Controller
                 'planes_licencia.nombre_plan',
                 'planes_licencia.precio',
                 'estado.nombre_estado'
-            )
-            ->orderBy('licencias.fecha_creacion', 'desc')
-            ->paginate(5); // <--- Paginación de 5 por página
+            );
+
+        // Aplicar filtro de búsqueda
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('empresa.nombre_empresa', 'LIKE', "%{$search}%")
+                    ->orWhere('licencias.NIT', 'LIKE', "%{$search}%")
+                    ->orWhere('licencias.id_licencia', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Aplicar filtro de estado
+        if ($request->filled('estado')) {
+            $query->where('licencias.id_estado', $request->estado);
+        }
+
+        // Aplicar filtro de plan
+        if ($request->filled('plan')) {
+            $query->where('licencias.id_plan', $request->plan);
+        }
+
+        // Aplicar filtro rápido (tabs)
+        if ($request->filled('filter')) {
+            switch ($request->filter) {
+                case 'activas':
+                    $query->where('licencias.id_estado', 1);
+                    break;
+                case 'por_vencer':
+                    $query->where('licencias.id_estado', 1)
+                        ->whereRaw('DATEDIFF(licencias.fecha_vencimiento, CURDATE()) BETWEEN 0 AND 30');
+                    break;
+                case 'vencidas':
+                    $query->where('licencias.id_estado', 21);
+                    break;
+            }
+        }
+
+        // Ordenar y paginar (manteniendo filtros en la URL)
+        $licencias = $query->orderBy('licencias.fecha_creacion', 'desc')
+            ->paginate(5)
+            ->appends($request->except('page'));
+
+        // Estadísticas globales (sin filtros)
+        $allLicencias = DB::table('licencias')
+            ->join('estado', 'licencias.id_estado', '=', 'estado.id_estado')
+            ->select('licencias.*', 'estado.nombre_estado')
+            ->get();
 
         $stats = [
             'total' => $allLicencias->count(),
             'activas' => $allLicencias->where('id_estado', 1)->count(),
             'proximas_vencer' => $allLicencias->filter(function ($lic) {
                 if ($lic->id_estado != 1) return false;
-
-                $diasRestantes = (int)\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($lic->fecha_vencimiento), false);
-
+                $diasRestantes = (int)Carbon::today()->diffInDays(Carbon::parse($lic->fecha_vencimiento), false);
                 return $diasRestantes >= 0 && $diasRestantes <= 30;
             })->count(),
             'vencidas' => $allLicencias->where('id_estado', 21)->count(),
         ];
 
-        return view('superadmin.licencias.index', compact('licencias', 'stats'));
+        // Obtener listas para filtros
+        $estados = DB::table('estado')
+            ->whereIn('id_estado', [1, 3, 21, 22]) // Solo estados relevantes
+            ->orderBy('nombre_estado')
+            ->get();
+
+        $planes = DB::table('planes_licencia')
+            ->where('id_estado', 1)
+            ->orderBy('nombre_plan')
+            ->get();
+
+        return view('superadmin.licencias.index', compact('licencias', 'stats', 'estados', 'planes'));
     }
 
     /**
