@@ -1,5 +1,10 @@
 @extends('superadmin.layouts.admin')
 
+@section('noSidebar')
+@endsection
+
+@section('content')
+
 @section('title', 'Dashboard Super Admin')
 
 @section('content')

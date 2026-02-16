@@ -27,6 +27,9 @@ async function cargarDashboard(url) {
             document.getElementById('kpiPlanes').textContent =
                 data.planes_populares.length;
 
+            console.log('Licencias estado:', data.licencias_estado);
+
+
 
             crearLineEmpresas('chartEmpresasMensual', data.empresas_crecimiento);
             crearBarEmpresasEstado('chartEmpresasEstado', data.empresas_estado);
@@ -110,14 +113,15 @@ function crearBarLicenciasEstado(id, data) {
     const ctx = document.getElementById(id)?.getContext('2d');
     if (!ctx) return;
 
+    const activas = Number(data?.activas ?? 0);
+    const porVencer = Number(data?.por_vencer ?? 0);
+    const vencidas = Number(data?.vencidas ?? 0);
+
     const labels = ['Activas', 'Por vencer', 'Vencidas'];
-    const valores = [
-        data.activas,
-        data.por_vencer,
-        data.vencidas
-    ];
+    const valores = [activas, porVencer, vencidas];
 
     if (charts[id]) {
+        charts[id].data.labels = labels;
         charts[id].data.datasets[0].data = valores;
         charts[id].update();
         return;
@@ -139,10 +143,16 @@ function crearBarLicenciasEstado(id, data) {
         },
         options: {
             responsive: true,
-            plugins: { legend: { display: false } }
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
         }
     });
 }
+
 
 function crearLineLicencias(id, data) {
 
