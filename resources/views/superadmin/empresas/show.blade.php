@@ -9,16 +9,16 @@
     <div class="empresa-header">
         <div class="empresa-header-title">
             <a href="{{ route('superadmin.empresas.index') }}" class="btn-back">
-                <span class="material-symbols-outlined">arrow_back</span>
+                <span class="material-symbols-outlined"><i class="fa fa-arrow-left" aria-hidden="true"></i></span>
             </a>
             <div>
-                <h1><span class="material-symbols-outlined">business</span> {{ $empresa->nombre_empresa }}</h1>
+                <h1><span class="material-symbols-outlined"><i class="fa fa-building" aria-hidden="true"></i></span> {{ $empresa->nombre_empresa }}</h1>
                 <p>NIT: {{ number_format($empresa->NIT, 0, '', '.') }}</p>
             </div>
         </div>
         <div class="empresa-header-actions">
             <a href="{{ route('superadmin.empresas.edit', $empresa->NIT) }}" class="btn btn-primary">
-                <span class="material-symbols-outlined">edit</span>
+                <span class="material-symbols-outlined"><i class="fa fa-pencil" aria-hidden="true"></i></span>
                 Editar
             </a>
         </div>
@@ -30,7 +30,7 @@
         <div class="col-md-6">
             <div class="detail-card">
                 <div class="detail-card-header">
-                    <span class="material-symbols-outlined">business</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-building" aria-hidden="true"></i></span>
                     <h3>Información de la Empresa</h3>
                 </div>
                 <div class="detail-card-body">
@@ -70,7 +70,7 @@
         <div class="col-md-6">
             <div class="detail-card">
                 <div class="detail-card-header">
-                    <span class="material-symbols-outlined">person</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-user" aria-hidden="true"></i></span>
                     <h3>Representante Legal</h3>
                 </div>
                 <div class="detail-card-body">
@@ -98,7 +98,7 @@
         <div class="col-md-12">
             <div class="detail-card">
                 <div class="detail-card-header">
-                    <span class="material-symbols-outlined">location_on</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-map" aria-hidden="true"></i></span>
                     <h3>Ubicación</h3>
                 </div>
                 <div class="detail-card-body">
@@ -124,7 +124,8 @@
         <div class="col-md-12">
             <div class="detail-card">
                 <div class="detail-card-header">
-                    <span class="material-symbols-outlined">analytics</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-line-chart" aria-hidden="true"></i>
+                        </span>
                     <h3>Estadísticas</h3>
                 </div>
                 <div class="detail-card-body">
@@ -132,14 +133,16 @@
                         <div class="col-md-3">
                             <div class="stat-box">
                                 <div class="stat-icon">
-                                    <span class="material-symbols-outlined">directions_bus</span>
+                                    <span class="material-symbols-outlined"><i class="fa fa-bus" aria-hidden="true"></i>
+                                    </span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="stat-box">
                                 <div class="stat-icon">
-                                    <span class="material-symbols-outlined">group</span>
+                                    <span class="material-symbols-outlined"><i class="fa fa-users" aria-hidden="true"></i>
+                                    </span>
                                 </div>
                                 <div class="stat-content">
                                     <h4>{{ $empresa->usuarios->count() }}</h4>
@@ -150,7 +153,8 @@
                         <div class="col-md-3">
                             <div class="stat-box">
                                 <div class="stat-icon">
-                                    <span class="material-symbols-outlined">route</span>
+                                    <span class="material-symbols-outlined"><i class="fa fa-map-marker" aria-hidden="true"></i>
+                                    </span>
                                 </div>
                                 <div class="stat-content">
                                     <h4>0</h4>
@@ -161,7 +165,8 @@
                         <div class="col-md-3">
                             <div class="stat-box">
                                 <div class="stat-icon">
-                                    <span class="material-symbols-outlined">confirmation_number</span>
+                                    <span class="material-symbols-outlined"><i class="fa fa-ticket" aria-hidden="true"></i>
+                                    </span>
                                 </div>
                                 <div class="stat-content">
                                     <h4>0</h4>
@@ -179,7 +184,7 @@
         <div class="col-md-12">
             <div class="detail-card">
                 <div class="detail-card-header">
-                    <span class="material-symbols-outlined">group</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-users" aria-hidden="true"></i></span>
                     <h3>Usuarios Registrados</h3>
                 </div>
                 <div class="detail-card-body">

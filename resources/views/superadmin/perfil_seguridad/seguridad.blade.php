@@ -18,7 +18,7 @@
             <p class="sa-perfil-subtitle">Configuración de seguridad de tu cuenta</p>
         </div>
         <a href="{{ route('superadmin.perfil.index') }}" class="sa-perfil-btn sa-perfil-btn-secondary">
-            <span class="material-symbols-outlined">arrow_back</span>
+            <span class="material-symbols-outlined"></span>
             Volver
         </a>
     </div>
@@ -28,7 +28,7 @@
     <div class="sa-perfil-card">
         <div class="sa-perfil-card-header">
             <h2 class="sa-perfil-card-title">
-                <span class="material-symbols-outlined">security</span>
+                <span class="material-symbols-outlined"></span>
                 Configuración de Seguridad
             </h2>
         </div>
@@ -59,7 +59,7 @@
     <div class="sa-perfil-card">
         <div class="sa-perfil-card-header">
             <h2 class="sa-perfil-card-title">
-                <span class="material-symbols-outlined">tips_and_updates</span>
+                <span class="material-symbols-outlined"></span>
                 Recomendaciones de Seguridad
             </h2>
         </div>

@@ -10,10 +10,12 @@
     <div class="empresa-header">
         <div class="empresa-header-title">
             <a href="{{ route('superadmin.empresas.index') }}" class="btn-back">
-                <span class="material-symbols-outlined">arrow_back</span>
+                <span class="material-symbols-outlined"><i class="fa fa-arrow-left" aria-hidden="true"></i>
+                </span>
             </a>
             <div>
-                <h1><span class="material-symbols-outlined">add_business</span> Crear Empresa</h1>
+                <h1><span class="material-symbols-outlined"><i class="fa fa-building" aria-hidden="true"></i>
+                    </span> Crear Empresa</h1>
                 <p>Complete el formulario con los datos de la empresa</p>
             </div>
         </div>
@@ -41,7 +43,7 @@
             {{-- INFORMACIÓN DE LA EMPRESA --}}
             <div class="form-section">
                 <div class="section-header">
-                    <span class="material-symbols-outlined">business</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-building" aria-hidden="true"></i></span>
                     <h3>Información de la Empresa</h3>
                 </div>
 
@@ -100,7 +102,7 @@
             {{-- INFORMACIÓN DEL REPRESENTANTE LEGAL --}}
             <div class="form-section">
                 <div class="section-header">
-                    <span class="material-symbols-outlined">person</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-user" aria-hidden="true"></i></span>
                     <h3>Representante Legal</h3>
                 </div>
 
@@ -173,7 +175,8 @@
             {{-- UBICACIÓN Y ESTADO --}}
             <div class="form-section">
                 <div class="section-header">
-                    <span class="material-symbols-outlined">location_on</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-map" aria-hidden="true"></i>
+                            </span>
                     <h3>Ubicación y Estado</h3>
                 </div>
 
@@ -212,11 +215,13 @@
             {{-- BOTONES --}}
             <div class="form-actions">
                 <a href="{{ route('superadmin.empresas.index') }}" class="btn btn-secondary">
-                    <span class="material-symbols-outlined">close</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-times" aria-hidden="true"></i>
+                        </span>
                     Cancelar
                 </a>
                 <button type="submit" class="btn btn-primary">
-                    <span class="material-symbols-outlined">save</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-file" aria-hidden="true"></i>
+                        </span>
                     Guardar Empresa
                 </button>
             </div>
