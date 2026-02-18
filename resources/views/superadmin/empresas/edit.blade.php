@@ -269,6 +269,4 @@ document.getElementById('doc_representante').addEventListener('input', function(
 });
 </script>
 
-
-
 @endsection

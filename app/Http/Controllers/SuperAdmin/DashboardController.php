@@ -62,12 +62,12 @@ public function superAdminStats()
         ->where('id_estado', 21)
         ->count();
 
-    // Por vencer (vigentes que vencen en próximos 7 días)
+    // Por vencer (vigentes que vencen en próximos 15 días)
     $licenciasPorVencer = DB::table('licencias')
         ->where('id_estado', 1)
         ->whereBetween('fecha_vencimiento', [
             $now,
-            $now->copy()->addDays(7)
+            $now->copy()->addDays(15)
         ])
         ->count();
 
