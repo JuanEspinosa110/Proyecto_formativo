@@ -108,7 +108,7 @@
                 </div>
                 <div class="d-flex justify-content-end gap-2">
                     <a href="{{ route('superadmin.perfil.index') }}" class="sa-perfil-btn sa-perfil-btn-secondary">
-                        <span class="material-symbols-outlined">close</span>
+                        <span class="material-symbols-outlined"></span>
                         Cancelar
                     </a>
                     <button type="submit" class="sa-perfil-btn sa-perfil-btn-success">

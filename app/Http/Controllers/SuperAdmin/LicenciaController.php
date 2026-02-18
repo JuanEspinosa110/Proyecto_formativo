@@ -206,7 +206,15 @@ class LicenciaController extends Controller
                 'segundo_apellido_admin' => 'nullable|string|max:50',
                 'telefono_admin' => 'nullable|string|max:20',
                 'correo_admin' => 'required|email|max:150',
-                'password_admin' => 'required|min:8',
+                'password_admin' => [
+                'required',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*#?&]/'
+            ],
+
             ],
             [
                 'NIT.required' => 'El NIT es obligatorio',
@@ -224,8 +232,9 @@ class LicenciaController extends Controller
                 'primer_apellido_admin.required' => 'El primer apellido del administrador es obligatorio',
                 'correo_admin.required' => 'El correo del administrador es obligatorio',
                 'correo_admin.email' => 'El correo del administrador debe ser válido',
-                'password_admin.required' => 'La contraseña es obligatoria',
-                'password_admin.min' => 'La contraseña debe tener al menos 8 caracteres',
+                'password_admin.required' => 'La contraseña del administrador es obligatoria.',
+                'password_admin.min' => 'La contraseña debe tener mínimo 8 caracteres.',
+                'password_admin.regex' => 'La contraseña debe incluir al menos una mayúscula, una minúscula, un número y un símbolo (@$!%*#?&).',
                 'id_ciudad.required' => 'La ciudad es obligatoria',
             ]
         );
