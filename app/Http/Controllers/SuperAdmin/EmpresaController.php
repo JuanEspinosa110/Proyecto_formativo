@@ -163,8 +163,9 @@ class EmpresaController extends Controller
             'segundo_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
             'telefono_representante' => 'required|numeric',
             'telefono_empresa' => 'required|numeric',
-            'correo_representante' => ['required','regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/'],
-            'correo_corporativo' => ['required','regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/'],
+            'correo_corporativo' => ['required','regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'],
+            'correo_representante' => ['required','regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'],
+
             'id_ciudad' => 'required|exists:ciudad,id_ciudad',
             'id_estado' => 'required|exists:estado,id_estado',
 
