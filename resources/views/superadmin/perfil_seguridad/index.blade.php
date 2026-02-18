@@ -48,7 +48,7 @@
                     <p>{{ $superAdmin->correo }}</p>
                     <div class="sa-perfil-foto-actions">
                         <label for="inputFoto" class="sa-perfil-file-label">
-                            <span class="material-symbols-outlined" style="font-size: 1.25rem;">upload</span>
+                            <span class="material-symbols-outlined" style="font-size: 1.25rem;"></span>
                             Cambiar Foto
                         </label>
                         <input type="file" 
@@ -60,7 +60,7 @@
                         <button type="button" 
                                 class="sa-perfil-btn sa-perfil-btn-danger"
                                 onclick="eliminarFoto()">
-                            <span class="material-symbols-outlined" style="font-size: 1.25rem;">delete</span>
+                            <span class="material-symbols-outlined" style="font-size: 1.25rem;"></span>
                             Eliminar Foto
                         </button>
                         @endif
@@ -74,11 +74,11 @@
     <div class="sa-perfil-card">
         <div class="sa-perfil-card-header">
             <h2 class="sa-perfil-card-title">
-                <span class="material-symbols-outlined">person</span>
+                <span class="material-symbols-outlined"></span>
                 Información Personal
             </h2>
             <a href="{{ route('superadmin.perfil.editar-informacion') }}" class="sa-perfil-btn sa-perfil-btn-primary">
-                <span class="material-symbols-outlined">edit</span>
+                <span class="material-symbols-outlined"></span>
                 Editar
             </a>
         </div>
@@ -111,7 +111,7 @@
             <div class="sa-perfil-card">
                 <div class="sa-perfil-card-header">
                     <h2 class="sa-perfil-card-title">
-                        <span class="material-symbols-outlined">security</span>
+                        <span class="material-symbols-outlined"></span>
                         Seguridad
                     </h2>
                 </div>
@@ -122,7 +122,7 @@
                             <p class="sa-perfil-seguridad-desc">Actualiza tu contraseña regularmente</p>
                         </div>
                         <span class="material-symbols-outlined" style="color: #007bff; font-size: 1.5rem;">
-                            arrow_forward
+                        
                         </span>
                     </a>
 
@@ -132,12 +132,12 @@
                             <p class="sa-perfil-seguridad-desc">Gestiona la seguridad de tu cuenta</p>
                         </div>
                         <span class="material-symbols-outlined" style="color: #007bff; font-size: 1.5rem;">
-                            arrow_forward
+                            
                         </span>
                     </a>
 
                     <div class="sa-perfil-alert sa-perfil-alert-info" style="margin-top: 1rem; margin-bottom: 0;">
-                        <span class="material-symbols-outlined">info</span>
+                        <span class="material-symbols-outlined"></span>
                         <div>
                             <small>Última actualización de seguridad hace 
                                 {{ \Carbon\Carbon::parse($superAdmin->updated_at)->diffForHumans() }}

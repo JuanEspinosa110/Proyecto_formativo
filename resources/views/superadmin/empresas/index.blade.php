@@ -17,11 +17,12 @@
     {{-- HEADER --}}
     <div class="empresa-header">
         <div class="empresa-header-title">
-            <h1><span class="material-symbols-outlined">business</span> Gestión de Empresas</h1>
+            <h1><span class="material-symbols-outlined">Gestión de Empresas</span> </h1>
             <p>Administra las empresas registradas en el sistema</p>
 
             <a href="{{ route('superadmin.empresas.create') }}" class="btn btn-success">
-                <span class="material-symbols-outlined">add</span>
+                <span class="material-symbols-outlined"><i class="fa fa-plus" aria-hidden="true"></i>
+                    </span>
                 Nueva Empresa
             </a>
 
@@ -49,7 +50,6 @@
         <form action="{{ route('superadmin.empresas.index') }}" method="GET" class="filters-form">
             <div class="filter-group">
                 <div class="search-box">
-                    <span class="material-symbols-outlined">search</span>
                     <input type="text" name="search" placeholder="Buscar por nombre, NIT o correo..." 
                            value="{{ request('search') }}" class="form-control">
                 </div>
@@ -77,7 +77,8 @@
                 </select>
 
                 <button type="submit" class="btn-filter">
-                    <span class="material-symbols-outlined">filter_list</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-filter" aria-hidden="true"></i>
+                        </span>
                     Filtrar
                 </button>
 
@@ -90,7 +91,8 @@
 
                 @if(request('search') || request('estado') || request('ciudad'))
                     <a href="{{ route('superadmin.empresas.index') }}" class="btn-clear">
-                        <span class="material-symbols-outlined">clear</span>
+                        <span class="material-symbols-outlined"><i class="fa fa-refresh" aria-hidden="true"></i>
+                        </span>
                         Limpiar
                     </a>
                 @endif
@@ -102,7 +104,7 @@
     <div class="empresa-stats">
         <div class="stat-card">
             <div class="stat-icon activo">
-                <span class="material-symbols-outlined">business_center</span>
+                <span class="material-symbols-outlined"><i class="fas fa-building "></i></span>
             </div>
             <div class="stat-info">
                 <h3>{{ $empresas->total() }}</h3>
@@ -112,7 +114,7 @@
 
         <div class="stat-card">
             <div class="stat-icon activo">
-                <span class="material-symbols-outlined">check_circle</span>
+                <span class="material-symbols-outlined"><i class="fas fa-check-circle"></i></span>
             </div>
             <div class="stat-info">
                 <h3>{{ \App\Models\Empresa::where('id_estado', 1)->count() }}</h3>
@@ -122,7 +124,7 @@
 
         <div class="stat-card">
             <div class="stat-icon proceso">
-                <span class="material-symbols-outlined">pending</span>
+                <span class="material-symbols-outlined"><i class="fa fa-spinner" aria-hidden="true"></i></span>
             </div>
             <div class="stat-info">
                 <h3>{{ \App\Models\Empresa::where('id_estado', 6)->count() }}</h3>
@@ -132,7 +134,8 @@
 
         <div class="stat-card">
             <div class="stat-icon inactivo">
-                <span class="material-symbols-outlined">cancel</span>
+                <span class="material-symbols-outlined"><i class="fa fa-times-circle" aria-hidden="true"></i>
+            </span>
             </div>
             <div class="stat-info">
                 <h3>{{ \App\Models\Empresa::where('id_estado', 2)->count() }}</h3>
@@ -202,11 +205,13 @@
                                 <div class="action-buttons">
                                     <a href="{{ route('superadmin.empresas.show', $empresa->NIT) }}" 
                                        class="btn-action view" title="Ver detalles">
-                                        <span class="material-symbols-outlined">visibility</span>
+                                        <span class="material-symbols-outlined"><i class="fa fa-eye" aria-hidden="true"></i>
+</span>
                                     </a>
                                     <a href="{{ route('superadmin.empresas.edit', $empresa->NIT) }}" 
                                        class="btn-action edit" title="Editar">
-                                        <span class="material-symbols-outlined">edit</span>
+                                        <span class="material-symbols-outlined"><i class="fa fa-pencil" aria-hidden="true"></i>
+</span>
                                     </a>
                                     
                                 </div>

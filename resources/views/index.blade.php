@@ -212,14 +212,14 @@
 
                         <!-- Características -->
                         <div class="plan-features">
-                            <div class="plan-feature-item">
+                            <!--<div class="plan-feature-item">
                                 <i class="fas fa-check-circle text-{{ $color }} me-2"></i>
                                 <span>Hasta {{ $plan->duracion_meses * 10 }} usuarios</span>
                             </div>
                             <div class="plan-feature-item">
                                 <i class="fas fa-check-circle text-{{ $color }} me-2"></i>
                                 <span>{{ $plan->duracion_meses * 5 }} buses registrados</span>
-                            </div>
+                            </div>-->
                             <div class="plan-feature-item">
                                 <i class="fas fa-check-circle text-{{ $color }} me-2"></i>
                                 <span>Soporte técnico incluido</span>
