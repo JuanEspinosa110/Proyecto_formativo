@@ -175,26 +175,25 @@
                     </div>
 
                     <div class="col-md-2">
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary flex-fill">
-                                <i class="fas fa-filter me-1"></i>Filtrar
-                            </button>
-                            <a href="{{ route('superadmin.licencias.index') }}"
-                                class="btn btn-outline-secondary"
-                                title="Limpiar filtros">
-                                <i class="fas fa-times"></i>
-                            </a>
-                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter me-2"></i>Filtrar
+                        </button>
                     </div>
-                    <div class="col-12">
-                        <a href="{{ route('superadmin.licencias.export', request()->all()) }}"
-                            class="btn btn-success">
-                            <i class="fas fa-file-csv me-1"></i>Exportar CSV
-                        </a>
-                    </div>
+                </div>
             </form>
-        </div>
 
+            <!-- Botones de Exportación -->
+            <div class="mt-3 pt-3 border-top d-flex gap-2">
+                <a href="{{ route('superadmin.licencias.export') }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                    class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-file-csv me-2"></i>Exportar CSV
+                </a>
+                <a href="{{ route('superadmin.licencias.exportExcel') }}{{ request()->getQueryString() ? '?' . request()->getQueryString() : '' }}"
+                    class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-file-excel me-2"></i>Exportar Excel
+                </a>
+            </div>
+        </div>
     </div>
 
     <!-- Información de filtros aplicados -->
@@ -298,25 +297,10 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-1 justify-content-center">
-                                    <!--<button class="btn btn-sm btn-outline-primary"
-                                        data-bs-toggle="tooltip"
-                                        title="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </button>-->
-                                    <!--<button class="btn btn-sm btn-outline-warning"
-                                        data-bs-toggle="tooltip"
-                                        title="Gestionar Estado">
-                                        <i class="fas fa-shield-alt"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-success"
-                                        data-bs-toggle="tooltip"
-                                        title="Renovar">
-                                        <i class="fas fa-sync-alt"></i>
-                                    </button>-->
                                     <button class="btn btn-sm btn-outline-info"
                                         data-bs-toggle="tooltip"
                                         title="Ver Detalles"
-                                        onclick="verDetalles({{ json_encode($licencia) }}, {{ $diasRestantes }})">
+                                        onclick='verDetalles({{ json_encode($licencia) }}, {{ $diasRestantes }})'>
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
@@ -329,10 +313,6 @@
 
             <!-- Paginación -->
             <div class="d-flex justify-content-between align-items-center mt-4">
-                <div class="text-muted">
-                    Mostrando {{ $licencias->firstItem() ?? 0 }} - {{ $licencias->lastItem() ?? 0 }}
-                    de {{ $licencias->total() }} licencias
-                </div>
                 <div>
                     {{ $licencias->links() }}
                 </div>
@@ -387,43 +367,157 @@
     function verDetalles(licencia, diasRestantes) {
         const modal = new bootstrap.Modal(document.getElementById('modalDetalles'));
         const body = document.getElementById('modalDetallesBody');
+        // Extraer el ID del objeto licencia
+        const idLicencia = licencia.id_licencia;
 
-        body.innerHTML = `
-        <div class="row g-3">
-            <div class="col-md-6">
-                <strong>Empresa:</strong><br>${licencia.nombre_empresa}
-            </div>
-            <div class="col-md-6">
-                <strong>NIT:</strong><br>${new Intl.NumberFormat('es-CO').format(licencia.NIT)}
-            </div>
-            <div class="col-md-6">
-                <strong>ID Licencia:</strong><br>${licencia.id_licencia}
-            </div>
-            <div class="col-md-6">
-                <strong>Plan:</strong><br>${licencia.nombre_plan}
-            </div>
-            <div class="col-md-6">
-                <strong>Precio:</strong><br>$${new Intl.NumberFormat('es-CO').format(licencia.precio)}
-            </div>
-            <div class="col-md-6">
-                <strong>Estado:</strong><br>${licencia.nombre_estado}
-            </div>
-            <div class="col-md-6">
-                <strong>Fecha Inicio:</strong><br>${new Date(licencia.fecha_inicio).toLocaleDateString('es-CO')}
-            </div>
-            <div class="col-md-6">
-                <strong>Fecha Vencimiento:</strong><br>${new Date(licencia.fecha_vencimiento).toLocaleDateString('es-CO')}
-            </div>
-            <div class="col-md-6">
-                <strong>Días Restantes:</strong><br>${diasRestantes > 0 ? diasRestantes + ' días' : 'Vencida'}
-            </div>
-            <div class="col-md-6">
-                <strong>Correo Corporativo:</strong><br>${licencia.correo_corporativo}
-            </div>
-        </div>
-    `;
+        // Mostrar loading
+        body.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Cargando detalles...</div>';
 
-        modal.show();
+        // Obtener detalles adicionales mediante AJAX
+        fetch(`/superadmin/licencias/${idLicencia}/detalles`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al cargar detalles');
+                }
+                return response.json();
+            })
+            .then(data => {
+                body.innerHTML = `
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Empresa</label>
+                                <div class="fw-bold">${licencia.nombre_empresa}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">NIT</label>
+                                <div class="fw-bold">${new Intl.NumberFormat('es-CO').format(licencia.NIT)}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">ID Licencia</label>
+                                <div class="fw-bold">${licencia.id_licencia}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Plan</label>
+                                <div class="fw-bold">${licencia.nombre_plan}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Precio</label>
+                                <div class="fw-bold">$${new Intl.NumberFormat('es-CO').format(licencia.precio)}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Estado</label>
+                                <div class="fw-bold">${licencia.nombre_estado}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Fecha Inicio</label>
+                                <div class="fw-bold">${new Date(licencia.fecha_inicio).toLocaleDateString('es-CO')}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Fecha Vencimiento</label>
+                                <div class="fw-bold">${new Date(licencia.fecha_vencimiento).toLocaleDateString('es-CO')}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Días Restantes</label>
+                                <div class="fw-bold">${diasRestantes > 0 ? diasRestantes + ' días' : 'Vencida'}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Correo Corporativo</label>
+                                <div class="fw-bold">${licencia.correo_corporativo}</div>
+                            </div>
+                        </div>
+                        ${data.representante ? `
+                        <div class="col-12">
+                            <hr>
+                            <h6 class="mb-3"><i class="fas fa-user-tie me-2"></i>Representante Legal</h6>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Nombre Completo</label>
+                                <div class="fw-bold">${data.representante.nombre_completo}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Documento</label>
+                                <div class="fw-bold">${data.representante.doc_representante}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Teléfono</label>
+                                <div class="fw-bold">${data.representante.telefono_representante || 'No registrado'}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Correo</label>
+                                <div class="fw-bold">${data.representante.correo_representante}</div>
+                            </div>
+                        </div>
+                        ` : ''}
+                        ${data.admin ? `
+                        <div class="col-12">
+                            <hr>
+                            <h6 class="mb-3"><i class="fas fa-user-shield me-2"></i>Administrador del Sistema</h6>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Nombre Completo</label>
+                                <div class="fw-bold">${data.admin.nombre_completo}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Documento</label>
+                                <div class="fw-bold">${data.admin.doc_admin}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Teléfono</label>
+                                <div class="fw-bold">${data.admin.telefono_admin || 'No registrado'}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Correo</label>
+                                <div class="fw-bold">${data.admin.correo_admin}</div>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                body.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Error al cargar los detalles. Intente nuevamente.
+                    </div>
+                `;
+                modal.show();
+            });
     }
 </script>
 @endsection
