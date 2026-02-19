@@ -1,25 +1,76 @@
 .login-body {
-    background-color: #f4f6f9;
+    background-color: #F4F4F6;
+    
+    height: 100vh;
+    overflow: hidden;
     font-family: system-ui, sans-serif;
+    height: 100vh;
 }
 
+
 .login-header {
-    position: relative;
-    top: 0;
-    width: 100%;
-    padding: 15px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 90px; /* altura fija */
     background-color: #ffffff;
     border-bottom: 1px solid #e0e0e0;
 }
 
+/* IZQUIERDA */
+.header-left .logo-icon {
+    width: 230px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* CENTRO */
+.header-center {
+    text-align: center;
+    flex: 1;
+}
+
+.logo-title {
+    font-size: 40px;
+    font-weight: bold;
+    margin: 0;
+    color: #1f3f6d; /* Azul principal del logo */
+    letter-spacing: 2px;
+}
+
+.logo-subtitle {
+    margin: 5px 0 0 0;
+    font-size: 16px;
+    color: #5f6f7f;
+}
+
+/* DERECHA */
+.header-right .btn-home {
+    text-decoration: none;
+    padding: 8px 15px;
+    background-color:#5E548E;
+    color: white;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: 0.3s ease;
+}
+
+.header-right .btn-home:hover {
+    background-color: #163257;
+}
+
 .login-card {
     width: 100%;
+    backdrop-filter: blur(6px);
     max-width: 420px;
-    background: #ffffff;
+    background: #FFFFFF;
     padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    border-radius: 12px;
+    border: 1px solid #DADDE1;
+    box-shadow: 0 15px 35px rgba(74,78,105,0.08);
 }
+
 
 .login-links {
     display: flex;
@@ -29,11 +80,13 @@
 
 .login-links a {
     text-decoration: none;
-    color: #0d6efd;
+    color: #5E548E;
+    font-weight: 500;
 }
 
 .login-links a:hover {
     text-decoration: underline;
+    color: #4A4E69;
 }
 
 /* ====== WRAPPER GENERAL ====== */
@@ -542,7 +595,7 @@
     font-size: 14px;
     padding: 8px 18px;
     border-radius: 8px;
-    background-color: #1f2937; /* gris oscuro elegante */
+    background-color:  #5E548E; /* gris oscuro elegante */
     color: #ffffff;
     transition: all 0.3s ease;
 }
@@ -551,5 +604,67 @@
     background-color: #111827;
     transform: translateY(-2px);
 }
+
+.btn-primary {
+    background-color: #5E548E !important;
+    border-color: #5E548E !important;
+}
+
+.btn-primary:hover {
+    background-color: #4A4E69 !important;
+    border-color: #4A4E69 !important;
+}
+
+.login-wrapper {
+    height: calc(100vh - 120px); /* respeta header */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #F4F4F6;
+}
+
+    .login-box {
+    width: 70%;
+    height: 80%;
+    background: #FFFFFF;
+    display: flex;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(74, 78, 105, 0.15);
+}
+
+.login-left {
+    flex: 1;
+    background:
+        linear-gradient(rgba(94,84,142,0.65), rgba(74,78,105,0.65)),
+        url('/imagenes/login-gb.png') center/cover no-repeat;
+}
+
+.login-card {
+    width: 80%;
+    max-width: 380px;
+}
+
+.form-control {
+    border: 1px solid #DADDE1;
+    border-radius: 8px;
+}
+
+.form-control:focus {
+    border-color: #5E548E;
+    box-shadow: 0 0 0 0.2rem rgba(94,84,142,0.15);
+}
+
+.login-right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #FFFFFF;
+}
+
+
+
+
 
 
