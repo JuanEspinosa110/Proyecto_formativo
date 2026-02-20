@@ -1,3 +1,10 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
 .login-body {
     background-color: #F4F4F6;
     
@@ -60,6 +67,23 @@
     background-color: #163257;
 }
 
+/* Utilities */
+.btn-home {
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    background-color:  #5E548E;
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.btn-home:hover { background-color:#111827; transform: translateY(-2px); }
+
+.btn-primary { background-color:#5E548E !important; border-color:#5E548E !important; }
+.btn-primary:hover { background-color:#4A4E69 !important; border-color:#4A4E69 !important; }
+
 .login-card {
     width: 100%;
     backdrop-filter: blur(6px);
@@ -71,23 +95,14 @@
     box-shadow: 0 15px 35px rgba(74,78,105,0.08);
 }
 
-
 .login-links {
     display: flex;
     justify-content: space-between;
     font-size: 0.85rem;
 }
 
-.login-links a {
-    text-decoration: none;
-    color: #5E548E;
-    font-weight: 500;
-}
-
-.login-links a:hover {
-    text-decoration: underline;
-    color: #4A4E69;
-}
+.login-links a { text-decoration:none; color:#5E548E; font-weight:500; }
+.login-links a:hover { text-decoration:underline; color:#4A4E69; }
 
 /* ====== WRAPPER GENERAL ====== */
 .regis-wrapper {
@@ -198,10 +213,117 @@
     text-decoration: none;
 }
 
+/* ------------------------------
+     RECORGANIZADO: SECCIONES POR VISTA
+     - Login
+     - Register
+     - Recuperar / Verificar / Nueva Contraseña
+ ------------------------------ */
+
+/* ========== LOGIN ========== */
+.login-body { background-color: #F4F4F6; height:100vh; font-family: 'Public Sans', sans-serif; }
+.login-wrapper { height: calc(100vh - 120px); display:flex; justify-content:center; align-items:center; background-color:#F4F4F6; }
+.login-box { width:70%; height:80%; background:#FFFFFF; display:flex; border-radius:16px; overflow:hidden; box-shadow:0 25px 60px rgba(74,78,105,0.15); }
+.login-left { flex:1; background: linear-gradient(rgba(94,84,142,0.65), rgba(74,78,105,0.65)), url('/imagenes/login-gb.png') center/cover no-repeat; }
+.login-right { flex:1; display:flex; justify-content:center; align-items:center; background:#FFFFFF; }
+.form-control { border:1px solid #DADDE1; border-radius:8px; }
+.form-control:focus { border-color:#5E548E; box-shadow:0 0 0 0.2rem rgba(94,84,142,0.15); }
+
+/* ========== REGISTER (regis-) ========== */
+.regis-wrapper { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:40px; background-color:#f6f7f8; font-family:'Public Sans',sans-serif; }
+.regis-card { width:100%; max-width:800px; background:#fff; padding:40px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.05); }
+.regis-header { text-align:center; margin-bottom:30px; }
+.regis-header h1 { margin:0; font-size:26px; }
+.regis-header p { color:#6c757d; }
+.regis-group { display:flex; flex-direction:column; margin-bottom:20px; }
+.regis-row { display:flex; gap:20px; }
+.regis-row .regis-group { flex:1; }
+.regis-input { padding:12px 14px; border-radius:8px; border:1px solid #d0d7de; font-size:14px; transition:0.2s; }
+.regis-input:focus { border-color:#137fec; outline:none; box-shadow:0 0 0 3px rgba(19,127,236,0.15); }
+.regis-btn { width:100%; background:#137fec; color:#fff; padding:14px; border-radius:8px; border:none; font-weight:bold; cursor:pointer; }
+.regis-btn:hover { background:#0f6fd0; }
+.regis-footer { text-align:center; margin-top:25px; font-size:14px; }
+
+/* ========== RECUPERAR / COMPARTIDO (recov-) ========== */
+.recov-body { min-height:100vh; font-family:'Public Sans',sans-serif; background: linear-gradient(rgba(31,63,109,0.75), rgba(31,63,109,0.75)), url('/imagenes/login-gb.png') center/cover no-repeat; display:flex; flex-direction:column; }
+.recov-wrapper { flex:1; display:flex; justify-content:center; align-items:center; }
+.recov-card { width:100%; max-width:460px; backdrop-filter:blur(12px); background:rgba(255,255,255,0.95); border-radius:18px; box-shadow:0 25px 60px rgba(0,0,0,0.2); overflow:hidden; border:1px solid rgba(255,255,255,0.3); transition:0.3s ease; }
+.recov-card:hover{ transform:translateY(-5px); }
+
+/* franja superior: solo el acento (pequeña banda) */
+.recov-card-header{ height:6px; background:linear-gradient(90deg, #1f3f6d, #5E548E); }
+.recov-header-accent{ height:100%; width:100%; }
+
+/* cuerpo del card */
+.recov-card-body{ padding:40px; }
+.recov-title{ font-size:22px; font-weight:700; text-align:center; }
+.recov-description{ font-size:14px; color:#6b7280; text-align:center; margin-bottom:18px; }
+
+.recov-group{ margin-bottom:20px; display:flex; flex-direction:column; }
+.recov-group label{ margin-bottom:6px; font-size:14px; font-weight:600; }
+.recov-group input{ padding:14px; border-radius:10px; border:1px solid #d1d5db; font-size:15px; transition:0.3s; }
+.recov-group input:focus{ border-color:#5E548E; box-shadow:0 0 0 4px rgba(94,84,142,0.15); outline:none; }
+
+.recov-btn{ width:100%; background:linear-gradient(135deg,#5E548E,#4A4E69); color:#fff; padding:14px; border-radius:10px; font-weight:600; transition:0.3s; border:none; }
+.recov-btn:hover{ transform:translateY(-2px); box-shadow:0 10px 25px rgba(94,84,142,0.4); }
+
+.recov-success{ background:#ecfdf5; color:#047857; padding:10px; border-radius:8px; margin-bottom:15px; font-size:14px; }
+.recov-error{ background:#fef2f2; color:#b91c1c; padding:10px; border-radius:8px; margin-bottom:15px; font-size:14px; }
+
+/* algunas vistas usan 'recov-error-box' (nueva_password) -> mapear al mismo estilo */
+.recov-error-box{ background:#fef2f2; color:#b91c1c; padding:10px; border-radius:8px; margin-bottom:15px; font-size:14px; }
+
+.recov-back{ margin-top:20px; text-align:center; }
+.recov-back a{ color:#137fec; font-weight:600; text-decoration:none; }
+.recov-back a:hover{ text-decoration:underline; }
+
+.recov-footer{ text-align:center; padding:20px; font-size:12px; color:#9ca3af; }
+
+/* ========== VERIFICAR CÓDIGO (parcial) ========== */
+.verify-input{ width:100%; padding:15px; font-size:24px; text-align:center; letter-spacing:8px; border-radius:8px; border:1px solid #d1d5db; }
+.verify-input:focus{ outline:none; border-color:#137fec; box-shadow:0 0 0 3px rgba(19,127,236,0.15); }
+.verify-btn{ width:100%; padding:14px; background:#137fec; color:#fff; border:none; border-radius:8px; font-weight:bold; cursor:pointer; }
+.verify-btn:hover{ background:#0f6fd0; }
+.verify-error{ background:#fee2e2; color:#b91c1c; padding:10px; border-radius:6px; margin-bottom:20px; font-size:14px; }
+.verify-resend{ background:none; border:none; color:#137fec; cursor:pointer; font-weight:600; }
+
+/* ========== NUEVA CONTRASEÑA (newpass-) ========== */
+.newpass-wrapper{ min-height: calc(100vh - 160px); display:flex; justify-content:center; align-items:center; padding:40px 20px; }
+.newpass-card{ width:100%; max-width:480px; background:#ffffff; border-radius:16px; padding:35px 30px; box-shadow:0 20px 45px rgba(0,0,0,0.15); position:relative; z-index:2; }
+
+/* personalización del acento dentro del card para newpass */
+.newpass-card .recov-header-accent{ width:50px; height:4px; background:linear-gradient(90deg,#4f46e5,#7c3aed); margin:0 auto 15px auto; border-radius:4px; }
+
+/* Header textual para newpass se utiliza dentro del cuerpo (recov-card-body) */
+.newpass-card .recov-title{ font-size:26px; font-weight:600; color:#2c2c2c; margin-bottom:8px; }
+.newpass-card .recov-description{ font-size:14px; color:#6c757d; margin:0 0 16px 0; }
+
+/* ========== UTILIDADES / VARIOS ========== */
+.top-navigation{ display:flex; justify-content:flex-end; padding:15px 40px 0 40px; }
+
+
 
 /* ===========================
    RECUPERAR CONTRASEÑA
    =========================== */
+
+.recov-body {
+    min-height: 100vh;
+    font-family: 'Public Sans', sans-serif;
+    background:
+        linear-gradient(rgba(31,63,109,0.75), rgba(31,63,109,0.75)),
+        url('/imagenes/login-gb.png') center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+}
+
+.recov-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 
 .recov-page {
     font-family: 'Public Sans', sans-serif;
@@ -239,20 +361,45 @@
 /* CARD */
 .recov-card {
     width: 100%;
-    max-width: 450px;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    max-width: 460px;
+    backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 18px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.2);
     overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: 0.3s ease;
 }
 
+.recov-card:hover {
+    transform: translateY(-5px);
+}
+
+
 .recov-card-header {
-    height: 120px;
-    background: rgba(19,127,236,0.1);
+    height: 6px;
+    background: linear-gradient(90deg, #1f3f6d, #5E548E);
     display: flex;
     align-items: center;
     justify-content: center;
 }
+
+.recov-header-accent {
+    height: 100%;
+    width: 100%;
+}
+
+.recov-card-body {
+    padding: 45px 40px;
+}
+
+.recov-icon {
+    font-size: 28px;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
 
 .recov-icon {
     font-size: 40px;
@@ -287,33 +434,36 @@
 }
 
 .recov-group input {
-    padding: 12px;
-    border-radius: 8px;
+    padding: 14px;
+    border-radius: 10px;
     border: 1px solid #d1d5db;
-    font-size: 14px;
+    font-size: 15px;
+    transition: 0.3s ease;
 }
 
 .recov-group input:focus {
-    border-color: #137fec;
+    border-color: #5E548E;
+    box-shadow: 0 0 0 4px rgba(94,84,142,0.15);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(19,127,236,0.2);
 }
+
 
 /* BUTTON */
 .recov-btn {
     width: 100%;
-    background: #137fec;
+    background: linear-gradient(135deg, #5E548E, #4A4E69);
     color: white;
-    padding: 12px;
-    border-radius: 8px;
+    padding: 14px;
+    border-radius: 10px;
     font-weight: 600;
-    transition: 0.3s;
-    cursor: pointer;
+    transition: 0.3s ease;
 }
 
 .recov-btn:hover {
-    background: #0f6fd0;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(94,84,142,0.4);
 }
+
 
 /* SUCCESS */
 .recov-success {
@@ -576,6 +726,69 @@
     padding: 15px;
     font-size: 12px;
     color: #777;
+}
+
+/* ===============================
+   NUEVA PASSWORD - ESTILOS PROPIOS
+================================= */
+
+.newpass-wrapper {
+    min-height: calc(100vh - 160px); /* Ajusta si tu header/footer cambian */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.newpass-card {
+    width: 100%;
+    max-width: 480px;
+}
+
+/* ===============================
+   NUEVA PASSWORD - CARD VISUAL
+================================= */
+
+.newpass-card {
+    width: 100%;
+    max-width: 480px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 35px 30px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 2;
+}
+
+/* ===============================
+   NUEVA PASSWORD - HEADER CARD
+================================= */
+
+.newpass-card .recov-card-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.newpass-card .recov-card-header h1 {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #2c2c2c;
+}
+
+.newpass-card .recov-card-header p {
+    font-size: 14px;
+    color: #6c757d;
+    margin: 0;
+}
+
+/* Ajuste visual del acento si lo usas */
+.newpass-card .recov-header-accent {
+    width: 50px;
+    height: 4px;
+    background: linear-gradient(90deg, #4f46e5, #7c3aed);
+    margin: 0 auto 15px auto;
+    border-radius: 4px;
 }
 
 
