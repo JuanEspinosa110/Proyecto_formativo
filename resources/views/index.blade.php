@@ -402,9 +402,6 @@
                             <a href="mailto:{{ $superAdmin->correo }}" class="btn-message">
                                 <i class="fas fa-envelope me-1"></i>Enviar Email
                             </a>
-                            <a href="tel:{{ str_replace([' ', '-'], '', $superAdmin->telefono) }}" class="btn-call">
-                                <i class="fas fa-phone me-1"></i>Llamar
-                            </a>
                         </div>
                     </div>
 
