@@ -19,9 +19,14 @@
 <!-- HEADER -->
 <nav class="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="#">
-            <i class="fas fa-bus text-primary me-2"></i>SIGU
-        </a>
+        <!-- Logo + Título (Específico para Index) -->
+        <div class="navbar-index-brand">
+            <img src="{{ asset('imagenes/logo-sigu.png') }}" alt="SIGU Logo" class="navbar-index-logo-img">
+            <div class="navbar-index-logo-text">
+                <h1 class="navbar-index-logo-title">SIGU</h1>
+                <p class="navbar-index-logo-subtitle">Sistema Integral de Gestión Urbana</p>
+            </div>
+        </div>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
             <span class="navbar-toggler-icon"></span>
@@ -50,41 +55,81 @@
 <section class="hero-section">
     <div class="container">
         <div class="row align-items-center">
+            <!-- LADO IZQUIERDO: Propuesta de valor -->
             <div class="col-lg-6">
                 <span class="badge bg-primary mb-3 px-3 py-2">
-                    <i class="fas fa-star me-2"></i>Nuevo sistema digital
+                    <i class="fas fa-star me-2"></i>Nueva forma de viajar
                 </span>
                 <h1 class="hero-title">
                     Viaja más <span class="text-primary">fácil</span>, rápido y seguro
                 </h1>
                 <p class="hero-text">
-                    Olvídate del efectivo. Usa tu tarjeta virtual o física para viajar sin filas.
+                    Olvídate del efectivo. Paga con tu tarjeta virtual o física desde tu teléfono. Sin filas, sin trámites.
                 </p>
-                <div class="d-flex gap-3 mt-4">
-                    <a href="{{ route('register') }}" class="btn btn-primary btn-lg">
-                        <i class="fas fa-user-plus me-2"></i>Crear cuenta
+
+                <!-- Stats/Datos relevantes -->
+                <div class="hero-stats mt-5">
+                    <div class="hero-stat">
+                        <div class="stat-number">+50K</div>
+                        <div class="stat-label">Usuarios activos</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Disponible siempre</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="stat-number">0%</div>
+                        <div class="stat-label">Comisión al registrar</div>
+                    </div>
+                </div>
+
+                <!-- CTA Buttons - Discretos -->
+                <div class="hero-cta mt-5">
+                    <a href="{{ route('register') }}" class="btn btn-primary">
+                        Crear cuenta gratis
                     </a>
-                    <a href="#planes" class="btn btn-outline-secondary btn-lg">
-                        Saber más
-                    </a>
+    
                 </div>
             </div>
-            <div class="col-lg-6 text-center mt-5 mt-lg-0">
-                <i class="fas fa-mobile-alt text-primary" style="font-size: 15rem; opacity: 0.1;"></i>
+
+            <!-- LADO DERECHO: Información visual -->
+            <div class="col-lg-6">
+                <div class="hero-card-visual">
+                    <div class="hero-card-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="hero-card-content">
+                        <h3>Tarjeta Digital</h3>
+                        <p>Acceso inmediato sin esperas</p>
+                        <ul class="hero-features">
+                            <li><i class="fas fa-check"></i> Recarga en segundos</li>
+                            <li><i class="fas fa-check"></i> Saldo en tiempo real</li>
+                            <li><i class="fas fa-check"></i> Seguridad garantizada</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- BENEFICIOS -->
-<section class="py-5 bg-light" id="beneficios">
-    <div class="container text-center">
-        <h2 class="fw-bold mb-4">Beneficios pensados para ti</h2>
+<section class="benefits-section" id="beneficios">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge bg-primary bg-opacity-10 text-primary mb-3 px-3 py-2">
+                <i class="fas fa-star me-2"></i>Lo que nos hace especial
+            </span>
+            <h2 class="display-5 fw-bold mb-2">Beneficios pensados para ti</h2>
+            <p class="text-muted fs-5">Disfruta de una experiencia sin complicaciones</p>
+        </div>
 
-        <div class="row g-4">
+        <div class="row g-4 align-items-stretch">
             <div class="col-md-6 col-lg-3">
                 <div class="benefit-card">
-                    <i class="fas fa-credit-card text-primary mb-3" style="font-size: 2.5rem;"></i>
+                    <div class="benefit-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
                     <h5>Pago sin efectivo</h5>
                     <p>Viaja usando tarjeta virtual o física.</p>
                 </div>
@@ -92,7 +137,9 @@
 
             <div class="col-md-6 col-lg-3">
                 <div class="benefit-card">
-                    <i class="fas fa-chart-line text-success mb-3" style="font-size: 2.5rem;"></i>
+                    <div class="benefit-icon benefit-icon-success">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
                     <h5>Control de saldo</h5>
                     <p>Consulta y recarga en segundos.</p>
                 </div>
@@ -100,7 +147,9 @@
 
             <div class="col-md-6 col-lg-3">
                 <div class="benefit-card">
-                    <i class="fas fa-clock text-warning mb-3" style="font-size: 2.5rem;"></i>
+                    <div class="benefit-icon benefit-icon-warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
                     <h5>Menos filas</h5>
                     <p>Accede rápido al transporte.</p>
                 </div>
@@ -108,7 +157,9 @@
 
             <div class="col-md-6 col-lg-3">
                 <div class="benefit-card">
-                    <i class="fas fa-shield-alt text-info mb-3" style="font-size: 2.5rem;"></i>
+                    <div class="benefit-icon benefit-icon-info">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
                     <h5>Seguridad</h5>
                     <p>Datos protegidos y confiables.</p>
                 </div>
@@ -272,15 +323,15 @@
             <div class="col-md-4">
                 <div class="text-center p-4">
                     <div class="step-number mb-3">1</div>
-                    <h5 class="fw-bold">Regístrate</h5>
-                    <p class="text-muted">Crea tu cuenta en menos de 2 minutos</p>
+                    <h5 class="fw-bold">Elige tu plan</h5>
+                    <p class="text-muted">Selecciona el que mejor se adapte a ti</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="text-center p-4">
                     <div class="step-number mb-3">2</div>
-                    <h5 class="fw-bold">Elige tu plan</h5>
-                    <p class="text-muted">Selecciona el que mejor se adapte a ti</p>
+                    <h5 class="fw-bold">Contacta con nosotros</h5>
+                    <p class="text-muted">Nos comunicaremos para obtener más información y activar tu plan</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -297,32 +348,95 @@
 <!-- FOOTER -->
 <footer class="footer">
     <div class="container">
+        <!-- Footer Main Content -->
         <div class="row py-5">
+            <!-- Sección 1: Branding -->
             <div class="col-md-4 mb-4 mb-md-0">
-                <h5 class="fw-bold mb-3">
-                    <i class="fas fa-bus text-primary me-2"></i>SIGU
-                </h5>
-                <p class="text-primary">Sistema de Gestión de Licencias para el Transporte Digital.</p>
+                <div class="footer-brand">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-bus me-2"></i>SIGU
+                    </h5>
+                    <p class="footer-description">
+                        Sistema integral de gestión para licencias de transporte. Solución completa y segura para conductores modernos.
+                    </p>
+                    <div class="social-links mt-4">
+                        <a href="#" class="social-link" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link" title="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
+
+            <!-- Sección 2: Navegación -->
             <div class="col-md-4 mb-4 mb-md-0">
-                <h6 class="fw-bold mb-3">Enlaces</h6>
-                <ul class="list-unstyled">
-                    <li><a href="#beneficios" class="text-primary text-decoration-none">Beneficios</a></li>
-                    <li><a href="#planes" class="text-primary text-decoration-none">Planes</a></li>
-                    <li><a href="#como-empezar" class="text-primary text-decoration-none">Cómo empezar</a></li>
-                    <li><a href="#" class="text-primary text-decoration-none" data-bs-toggle="modal" data-bs-target="#contactModal">Contacto</a></li>
-                </ul>
+                <div class="footer-section">
+                    <h6 class="footer-title">Navegación</h6>
+                    <ul class="footer-links">
+                        <li><a href="#beneficios"><i class="fas fa-arrow-right me-2"></i>Beneficios</a></li>
+                        <li><a href="#planes"><i class="fas fa-arrow-right me-2"></i>Planes</a></li>
+                        <li><a href="#como-empezar"><i class="fas fa-arrow-right me-2"></i>Cómo empezar</a></li>
+                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#contactModal"><i class="fas fa-arrow-right me-2"></i>Contacto</a></li>
+                    </ul>
+                </div>
             </div>
+
+            <!-- Sección 3: Contacto -->
             <div class="col-md-4">
-                <h6 class="fw-bold mb-3">Contacto Rápido</h6>
-                <p class="text-muted">
-                    <i class="fas fa-envelope me-2"></i><a href="mailto:contacto@sigu.com" class="text-decoration-none text-muted">contacto@sigu.com</a><br>
-                    <i class="fas fa-phone me-2"></i><a href="tel:+573001234567" class="text-decoration-none text-muted">+57 300 123 4567</a>
-                </p>
+                <div class="footer-section">
+                    <h6 class="footer-title">Contacto</h6>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <small>Email</small>
+                                <a href="mailto:contacto@sigu.com">contacto@sigu.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <small>Teléfono</small>
+                                <a href="tel:+573001234567">+57 300 123 4567</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <small>Ubicación</small>
+                                <span>Colombia, Latinoamérica</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="border-top pt-4 text-center">
-            <p class="mb-0 text-muted">© 2026 SIGU - Sistema de Gestión de Licencias</p>
+
+        <!-- Divider -->
+        <div class="footer-divider"></div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="copyright-text">© 2026 SIGU - Sistema de Gestión de Licencias. Todos los derechos reservados.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <ul class="footer-legal">
+                        <li><a href="#">Privacidad</a></li>
+                        <li><a href="#">Términos</a></li>
+                        <li><a href="#">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </footer>
