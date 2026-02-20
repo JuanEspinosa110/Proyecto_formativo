@@ -202,9 +202,9 @@
                         </div>
 
                         <!-- Botón de acción -->
-                        <a href="{{ route('register') }}" class="btn btn-{{ $esMasVendido ? 'dark' : 'outline-dark' }} w-100 mb-4">
-                            Elegir plan
-                        </a>
+                        <button type="button" class="btn btn-{{ $esMasVendido ? 'dark' : 'outline-dark' }} w-100 mb-4" data-bs-toggle="modal" data-bs-target="#contactModal">
+                            Contáctanos
+                        </button>
 
                         <div class="plan-offer-note text-center small text-muted mb-4">
                             Oferta por tiempo limitado
@@ -252,7 +252,7 @@
         <div class="text-center mt-5">
             <p class="text-muted">
                 ¿Necesitas un plan personalizado? 
-                <a href="{{ route('login') }}" class="text-primary text-decoration-none fw-bold">
+                <a href="#" class="text-primary text-decoration-none fw-bold" data-bs-toggle="modal" data-bs-target="#contactModal">
                     Contáctanos <i class="fas fa-arrow-right ms-1"></i>
                 </a>
             </p>
@@ -300,31 +300,161 @@
         <div class="row py-5">
             <div class="col-md-4 mb-4 mb-md-0">
                 <h5 class="fw-bold mb-3">
-                    <i class="fas fa-bus text-primary me-2"></i>ViajaFácil
+                    <i class="fas fa-bus text-primary me-2"></i>SIGU
                 </h5>
-                <p class="text-muted">Sistema de transporte digital para empresas modernas.</p>
+                <p class="text-primary">Sistema de Gestión de Licencias para el Transporte Digital.</p>
             </div>
             <div class="col-md-4 mb-4 mb-md-0">
                 <h6 class="fw-bold mb-3">Enlaces</h6>
                 <ul class="list-unstyled">
-                    <li><a href="#beneficios" class="text-muted text-decoration-none">Beneficios</a></li>
-                    <li><a href="#planes" class="text-muted text-decoration-none">Planes</a></li>
-                    <li><a href="#como-empezar" class="text-muted text-decoration-none">Cómo empezar</a></li>
+                    <li><a href="#beneficios" class="text-primary text-decoration-none">Beneficios</a></li>
+                    <li><a href="#planes" class="text-primary text-decoration-none">Planes</a></li>
+                    <li><a href="#como-empezar" class="text-primary text-decoration-none">Cómo empezar</a></li>
+                    <li><a href="#" class="text-primary text-decoration-none" data-bs-toggle="modal" data-bs-target="#contactModal">Contacto</a></li>
                 </ul>
             </div>
             <div class="col-md-4">
-                <h6 class="fw-bold mb-3">Contacto</h6>
+                <h6 class="fw-bold mb-3">Contacto Rápido</h6>
                 <p class="text-muted">
-                    <i class="fas fa-envelope me-2"></i>info@viajafacil.com<br>
-                    <i class="fas fa-phone me-2"></i>+57 300 000 0000
+                    <i class="fas fa-envelope me-2"></i><a href="mailto:contacto@sigu.com" class="text-decoration-none text-muted">contacto@sigu.com</a><br>
+                    <i class="fas fa-phone me-2"></i><a href="tel:+573001234567" class="text-decoration-none text-muted">+57 300 123 4567</a>
                 </p>
             </div>
         </div>
         <div class="border-top pt-4 text-center">
-            <p class="mb-0 text-muted">© 2026 ViajaFácil - Sistema de Transporte Digital</p>
+            <p class="mb-0 text-muted">© 2026 SIGU - Sistema de Gestión de Licencias</p>
         </div>
     </div>
 </footer>
+
+
+<!-- MODAL DE CONTACTO -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contactModalLabel">
+                    <i class="fas fa-headset me-2"></i>Equipo de Soporte
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="contact-card-container">
+                    @php
+                        // Obtener un super administrador aleatorio de la BD
+                        $superAdmin = DB::table('super_administrador')
+                            ->where('id_estado', 1)
+                            ->inRandomOrder()
+                            ->first();
+                        
+                        if (!$superAdmin) {
+                            // Si no hay, usar datos de ejemplo
+                            $superAdmin = (object) [
+                                'nombre' => 'Carlos Martínez',
+                                'correo' => 'carlos.martinez@sigu.com',
+                                'telefono' => '+57 320 123 4567',
+                            ];
+                        }
+                    @endphp
+
+                    <!-- Tarjeta de presentación del Super Admin -->
+                    <div class="contact-card">
+                        <div class="contact-card-header">
+                            <div class="contact-card-avatar">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <div class="contact-card-info">
+                                <h5>{{ $superAdmin->nombre }}</h5>
+                                <p>Super Administrador</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-card-body">
+                            <!-- Email -->
+                            <div class="contact-item">
+                                <div class="contact-item-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="contact-item-content">
+                                    <div class="contact-item-label">Correo Electrónico</div>
+                                    <div class="contact-item-value">
+                                        <a href="mailto:{{ $superAdmin->correo }}">{{ $superAdmin->correo }}</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Teléfono -->
+                            <div class="contact-item">
+                                <div class="contact-item-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="contact-item-content">
+                                    <div class="contact-item-label">Teléfono</div>
+                                    <div class="contact-item-value">
+                                        <a href="tel:{{ str_replace([' ', '-'], '', $superAdmin->telefono) }}">{{ $superAdmin->telefono }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <a href="mailto:{{ $superAdmin->correo }}" class="btn-message">
+                                <i class="fas fa-envelope me-1"></i>Enviar Email
+                            </a>
+                            <a href="tel:{{ str_replace([' ', '-'], '', $superAdmin->telefono) }}" class="btn-call">
+                                <i class="fas fa-phone me-1"></i>Llamar
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Divisor -->
+                    <div class="divider-text">O contacta al equipo general</div>
+
+                    <!-- Información de Contacto General -->
+                    <div class="company-contact-card">
+                        <div class="company-contact-card-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <h4>SIGU - Sistema de Gestión de Licencias</h4>
+                        <p style="margin-bottom: 0; opacity: 0.9;">Estamos disponibles para ayudarte</p>
+
+                        <div class="company-contact-info">
+                            <div class="company-contact-info-item">
+                                <i class="fas fa-envelope"></i>
+                                <label>Email General</label>
+                                <a href="mailto:contacto@sigu.com">contacto@sigu.com</a>
+                            </div>
+                            <div class="company-contact-info-item">
+                                <i class="fas fa-phone"></i>
+                                <label>Línea Directa</label>
+                                <a href="tel:+573001234567">+57 (300) 123-4567</a>
+                            </div>
+                            <div class="company-contact-info-item">
+                                <i class="fas fa-clock"></i>
+                                <label>Horario</label>
+                                <div style="font-weight: 600;">Lun - Vie: 8am - 6pm</div>
+                            </div>
+                            <div class="company-contact-info-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <label>Ubicación</label>
+                                <div style="font-weight: 600;">Bogotá, Colombia</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info adicional -->
+                    <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                        <p style="margin: 0; font-size: 0.9rem; color: #666;">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Tiempo de respuesta típico: <strong>2-4 horas</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
