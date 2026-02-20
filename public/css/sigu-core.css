@@ -874,11 +874,35 @@ body.sigu-body {
 .sa-licencia-stat-card:hover { box-shadow: var(--sh-sm) !important; transform: translateY(-2px); }
 .bg-blue-light { background: var(--p-light) !important; }
 
-.sa-licencia-plan-card { border-radius: var(--r-md) !important; }
-.sa-licencia-plan-recommended {
-    border-color: var(--p) !important;
-    box-shadow: 0 8px 24px rgba(94,84,142,.15) !important;
+.sa-licencia-plan-card { border-radius: var(--r-md) !important;transition: all 0.3s ease;
+    border: 2px solid #e9ecef; }
+
+.sa-licencia-plan-card:hover {
+    border-color: #198754;
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+.sa-licencia-plan-recommended {
+    border: 3px solid #198754 !important;
+    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+    background-color: #f8f9fa;
+    transform: scale(1.02);
+    transition: all 0.3s ease;;
+}
+
+/* Estado Seleccionado: Bordes verdes y sombra */
+.plan-seleccionado {
+        border-color: #28a745 !important; /* Verde */
+        box-shadow: 0 0 10px rgba(40, 167, 69, 0.2);
+        background-color: #f8fff9;
+}
+
+.plan-seleccionado .sa-licencia-btn-select {
+        background-color: #28a745;
+        color: white;
+        border-color: #28a745;
+}
+
 .sa-licencia-plan-recommended .sa-licencia-btn-select {
     background: var(--p) !important; border: none !important; color: #fff !important;
 }

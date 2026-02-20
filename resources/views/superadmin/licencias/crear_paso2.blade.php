@@ -17,7 +17,7 @@
                 </span>
             </div>
         </div>
-        
+
         <!-- Barra de progreso -->
         <div class="progress" style="height: 4px;">
             <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
@@ -48,7 +48,7 @@
         <div class="card sa-licencia-card mb-4">
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0">
-                    <i class="fas fa-layer-group me-2 text-primary"></i> 
+                    <i class="fas fa-layer-group me-2 text-primary"></i>
                     Planes Disponibles
                 </h5>
             </div>
@@ -57,32 +57,32 @@
                     @foreach($planes as $plan)
                     <div class="col-md-3">
                         <label class="w-100 h-100" style="cursor: pointer;">
-                            <input type="radio" 
-                                   name="id_plan" 
-                                   value="{{ $plan->id_plan }}" 
-                                   class="d-none plan-radio" 
-                                   {{ old('id_plan') == $plan->id_plan ? 'checked' : '' }}
-                                   required>
-                            <div class="card h-100 sa-licencia-plan-card {{ old('id_plan') == $plan->id_plan ? 'sa-licencia-plan-recommended' : '' }}">
+                            <input type="radio"
+                                name="id_plan"
+                                value="{{ $plan->id_plan }}"
+                                class="d-none plan-radio"
+                                {{ old('id_plan') == $plan->id_plan ? 'checked' : '' }}
+                                required>
+                            <div class="card h-100 sa-licencia-plan-card {{ old('id_plan') == $plan->id_plan ? 'plan-seleccionado' : '' }}">
                                 <div class="card-body text-center p-4">
                                     @if($plan->nombre_plan == 'PREMIUM')
-                                        <span class="badge bg-primary mb-3">RECOMENDADO</span>
+                                    <span class="badge bg-primary mb-3">RECOMENDADO</span>
                                     @endif
-                                    
+
                                     <h4 class="fw-bold mb-3">{{ $plan->nombre_plan }}</h4>
-                                    
+
                                     <div class="sa-licencia-plan-price mb-4">
                                         ${{ number_format($plan->precio, 0, ',', '.') }}
                                     </div>
-                                    
+
                                     <ul class="list-unstyled sa-licencia-feature-list text-start mb-4">
                                         <li><i class="fas fa-check text-primary me-2"></i> {{ $plan->duracion_meses }} meses de servicio</li>
                                         <li><i class="fas fa-check text-primary me-2"></i> Soporte técnico</li>
                                         <li><i class="fas fa-check text-primary me-2"></i> {{ $plan->descripcion }}</li>
                                     </ul>
-                                    
+
                                     <button type="button" class="btn w-100 sa-licencia-btn-select">
-                                        Seleccionar Plan
+                                        {{ old('id_plan') == $plan->id_plan ? 'Plan Seleccionado' : 'Seleccionar Plan' }}
                                     </button>
                                 </div>
                             </div>
@@ -98,7 +98,7 @@
         <div class="card sa-licencia-card mb-4">
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0">
-                    <i class="fas fa-calendar-alt me-2 text-primary"></i> 
+                    <i class="fas fa-calendar-alt me-2 text-primary"></i>
                     Vigencia de la Licencia
                 </h5>
             </div>
@@ -106,23 +106,23 @@
                 <div class="row">
                     <div class="col-md-6">
                         <label class="sa-licencia-label">Fecha de Inicio *</label>
-                        <input type="date" 
-                               name="fecha_inicio" 
-                               id="fecha_inicio"
-                               class="form-control sa-licencia-input @error('fecha_inicio') is-invalid @enderror" 
-                               value="{{ old('fecha_inicio', date('Y-m-d')) }}" 
-                               required>
+                        <input type="date"
+                            name="fecha_inicio"
+                            id="fecha_inicio"
+                            class="form-control sa-licencia-input @error('fecha_inicio') is-invalid @enderror"
+                            value="{{ old('fecha_inicio', date('Y-m-d')) }}"
+                            required>
                         <small class="form-text text-muted d-block mt-2">No puede ser menor a hoy</small>
                         @error('fecha_inicio')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
                         <label class="sa-licencia-label">Fecha de Vencimiento *</label>
-                        <input type="date" 
-                               name="fecha_vencimiento" 
-                               id="fecha_vencimiento"
-                               class="form-control sa-licencia-input @error('fecha_vencimiento') is-invalid @enderror" 
-                               value="{{ old('fecha_vencimiento') }}" 
-                               readonly>
+                        <input type="date"
+                            name="fecha_vencimiento"
+                            id="fecha_vencimiento"
+                            class="form-control sa-licencia-input @error('fecha_vencimiento') is-invalid @enderror"
+                            value="{{ old('fecha_vencimiento') }}"
+                            readonly>
                         <small class="form-text text-muted d-block mt-2">Se calcula automáticamente</small>
                         @error('fecha_vencimiento')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
@@ -131,17 +131,17 @@
                     <div class="col-md-6">
                         <label class="sa-licencia-label">Duración del Plan *</label>
                         <div class="input-group">
-                            <input type="number" 
-                                   id="duracion_meses"
-                                   class="form-control sa-licencia-input" 
-                                   value="0"
-                                   readonly>
+                            <input type="number"
+                                id="duracion_meses"
+                                class="form-control sa-licencia-input"
+                                value="0"
+                                readonly>
                             <span class="input-group-text">meses</span>
                         </div>
                     </div>
                 </div>
                 <div class="mt-3 small text-muted">
-                    <i class="fas fa-info-circle me-1"></i> 
+                    <i class="fas fa-info-circle me-1"></i>
                     La licencia se activará automáticamente en la fecha de inicio. La fecha de vencimiento se calcula automáticamente según la duración del plan seleccionado.
                 </div>
             </div>
@@ -160,171 +160,175 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const planRadios = document.querySelectorAll('.plan-radio');
-    const fechaInicio = document.querySelector('#fecha_inicio');
-    const fechaVencimiento = document.querySelector('#fecha_vencimiento');
-    const duracionMeses = document.querySelector('#duracion_meses');
-    const hoy = new Date().toISOString().split('T')[0];
-    
-    // Establecer el mínimo a hoy
-    fechaInicio.setAttribute('min', hoy);
-    
-    /**
-     * Valida que la fecha de inicio no sea menor a hoy
-     */
-    function validarFechaInicio() {
-        const fechaSeleccionada = fechaInicio.value;
-        if (fechaSeleccionada < hoy) {
-            fechaInicio.value = hoy;
-        }
-    }
-    
-    /**
-     * Obtiene los datos del plan mediante AJAX
-     */
-    async function obtenerDatosPlan(idPlan) {
-        try {
-            const response = await fetch(`/superadmin/licencias/plan/${idPlan}`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+    document.addEventListener('DOMContentLoaded', function() {
+        const planRadios = document.querySelectorAll('.plan-radio');
+        const fechaInicio = document.querySelector('#fecha_inicio');
+        const fechaVencimiento = document.querySelector('#fecha_vencimiento');
+        const duracionMeses = document.querySelector('#duracion_meses');
+        const hoy = new Date().toISOString().split('T')[0];
+
+        // Establecer el mínimo a hoy
+        fechaInicio.setAttribute('min', hoy);
+
+        /**
+         * Valida que la fecha de inicio no sea menor a hoy
+         */
+        function validarFechaInicio() {
+            const fechaSeleccionada = fechaInicio.value;
+            if (fechaSeleccionada < hoy) {
+                fechaInicio.value = hoy;
             }
-            const data = await response.json();
-            console.log('Datos del plan obtenidos:', data);
-            return data;
-        } catch (error) {
-            console.error('Error al obtener datos del plan:', error);
-            duracionMeses.value = 0;
-            fechaVencimiento.value = '';
-            return null;
         }
-    }
-    
-    /**
-     * Calcula la fecha de vencimiento basada en fecha de inicio + duración en meses
-     */
-    function calcularFechaVencimiento() {
-        // Validar que tengamos fecha inicio y duración
-        if (!fechaInicio.value || !duracionMeses.value || duracionMeses.value == 0) {
-            fechaVencimiento.value = '';
-            return false;
+
+        /**
+         * Obtiene los datos del plan mediante AJAX
+         */
+        async function obtenerDatosPlan(idPlan) {
+            try {
+                const response = await fetch(`/superadmin/licencias/plan/${idPlan}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log('Datos del plan obtenidos:', data);
+                return data;
+            } catch (error) {
+                console.error('Error al obtener datos del plan:', error);
+                duracionMeses.value = 0;
+                fechaVencimiento.value = '';
+                return null;
+            }
         }
-        
-        try {
-            const fecha = new Date(fechaInicio.value + 'T00:00:00');
-            const meses = parseInt(duracionMeses.value, 10);
-            
-            // Validar que sea un número válido
-            if (isNaN(meses) || meses <= 0) {
+
+        /**
+         * Calcula la fecha de vencimiento basada en fecha de inicio + duración en meses
+         */
+        function calcularFechaVencimiento() {
+            // Validar que tengamos fecha inicio y duración
+            if (!fechaInicio.value || !duracionMeses.value || duracionMeses.value == 0) {
                 fechaVencimiento.value = '';
                 return false;
             }
-            
-            // Sumar los meses
-            fecha.setMonth(fecha.getMonth() + meses);
-            
-            const year = fecha.getFullYear();
-            const month = String(fecha.getMonth() + 1).padStart(2, '0');
-            const day = String(fecha.getDate()).padStart(2, '0');
-            
-            const fechaCalculada = `${year}-${month}-${day}`;
-            fechaVencimiento.value = fechaCalculada;
-            
-            console.log(`Fecha de vencimiento calculada: ${fechaCalculada} (desde ${fechaInicio.value} + ${meses} meses)`);
-            return true;
-        } catch (error) {
-            console.error('Error al calcular fecha de vencimiento:', error);
-            fechaVencimiento.value = '';
-            return false;
+
+            try {
+                const fecha = new Date(fechaInicio.value + 'T00:00:00');
+                const meses = parseInt(duracionMeses.value, 10);
+
+                // Validar que sea un número válido
+                if (isNaN(meses) || meses <= 0) {
+                    fechaVencimiento.value = '';
+                    return false;
+                }
+
+                // Sumar los meses
+                fecha.setMonth(fecha.getMonth() + meses);
+
+                const year = fecha.getFullYear();
+                const month = String(fecha.getMonth() + 1).padStart(2, '0');
+                const day = String(fecha.getDate()).padStart(2, '0');
+
+                const fechaCalculada = `${year}-${month}-${day}`;
+                fechaVencimiento.value = fechaCalculada;
+
+                console.log(`Fecha de vencimiento calculada: ${fechaCalculada} (desde ${fechaInicio.value} + ${meses} meses)`);
+                return true;
+            } catch (error) {
+                console.error('Error al calcular fecha de vencimiento:', error);
+                fechaVencimiento.value = '';
+                return false;
+            }
         }
-    }
-    
-    /**
-     * Maneja el cambio de plan
-     */
-    async function manejarCambioPlan(radio) {
-        if (!radio || !radio.value) {
-            console.error('Radio button inválido');
-            return;
+
+        /**
+         * Maneja el cambio de plan
+         */
+        async function manejarCambioPlan(radio) {
+            if (!radio || !radio.value) return;
+
+            // 1. Limpiar todos los planes (volver al estado base)
+            document.querySelectorAll('.sa-licencia-plan-card').forEach(card => {
+                card.classList.remove('plan-seleccionado');
+                // Opcional: Cambiar el texto del botón de nuevo a original
+                const btn = card.querySelector('.sa-licencia-btn-select');
+                if (btn) btn.textContent = 'Seleccionar Plan';
+            });
+
+            // 2. Encontrar la tarjeta correspondiente al radio actual
+            // Como el radio está dentro del LABEL, buscamos el div de la tarjeta dentro de ese mismo LABEL
+            const labelPadre = radio.closest('label');
+            const card = labelPadre.querySelector('.sa-licencia-plan-card');
+
+            if (card) {
+                card.classList.add('plan-seleccionado');
+                const btn = card.querySelector('.sa-licencia-btn-select');
+                if (btn) btn.textContent = '✓ Seleccionado';
+            }
+
+            // 3. Tu lógica existente de obtener datos del plan...
+            const datosPlan = await obtenerDatosPlan(radio.value);
+            if (datosPlan && datosPlan.duracion_meses) {
+                duracionMeses.value = datosPlan.duracion_meses;
+                if (typeof calcularFechaVencimiento === "function") {
+                    calcularFechaVencimiento();
+                }
+            }
         }
-        
-        // Actualizar visual
-        document.querySelectorAll('.sa-licencia-plan-card').forEach(card => {
-            card.classList.remove('sa-licencia-plan-recommended');
+
+        // Event listeners para los radio buttons
+        planRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                console.log('Radio button changed:', this.value);
+                manejarCambioPlan(this);
+            });
         });
-        
-        const card = radio.closest('.sa-licencia-plan-card');
-        if (card) {
-            card.classList.add('sa-licencia-plan-recommended');
-        }
-        
-        // Obtener datos del plan
-        console.log(`Obteniendo datos para el plan: ${radio.value}`);
-        const datosPlan = await obtenerDatosPlan(radio.value);
-        
-        if (datosPlan && datosPlan.duracion_meses) {
-            duracionMeses.value = datosPlan.duracion_meses;
+
+        // Event listeners para los botones "Seleccionar Plan"
+        document.querySelectorAll('.sa-licencia-btn-select').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Encontrar el radio input más cercano
+                const label = this.closest('label');
+                if (!label) {
+                    console.error('No se encontró el label padre del botón');
+                    return;
+                }
+
+                const radio = label.querySelector('.plan-radio');
+                if (radio) {
+                    console.log('Seleccionando plan:', radio.value);
+                    radio.checked = true;
+                    // Disparar el evento change para que se ejecute la lógica
+                    radio.dispatchEvent(new Event('change', {
+                        bubbles: true
+                    }));
+                } else {
+                    console.error('No se encontró el radio button dentro del label');
+                }
+            });
+        });
+
+        // Event listener para cambio de fecha de inicio
+        fechaInicio.addEventListener('change', function() {
+            console.log('Fecha de inicio cambiada a:', this.value);
+            validarFechaInicio();
             calcularFechaVencimiento();
-        } else {
-            console.error('No se obtuvieron datos válidos del plan');
-            duracionMeses.value = 0;
-            fechaVencimiento.value = '';
+        });
+
+        // Event listener para cambio de duración (aunque es readonly, por si acaso)
+        duracionMeses.addEventListener('change', function() {
+            console.log('Duración de meses cambiada a:', this.value);
+            calcularFechaVencimiento();
+        });
+
+        // Validar y calcular al cargar si hay un plan pre-seleccionado
+        const planSeleccionado = document.querySelector('.plan-radio:checked');
+        if (planSeleccionado) {
+            console.log('Plan pre-seleccionado encontrado:', planSeleccionado.value);
+            manejarCambioPlan(planSeleccionado);
         }
-    }
-    
-    // Event listeners para los radio buttons
-    planRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            console.log('Radio button changed:', this.value);
-            manejarCambioPlan(this);
-        });
-    });
-    
-    // Event listeners para los botones "Seleccionar Plan"
-    document.querySelectorAll('.sa-licencia-btn-select').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            // Encontrar el radio input más cercano
-            const label = this.closest('label');
-            if (!label) {
-                console.error('No se encontró el label padre del botón');
-                return;
-            }
-            
-            const radio = label.querySelector('.plan-radio');
-            if (radio) {
-                console.log('Seleccionando plan:', radio.value);
-                radio.checked = true;
-                // Disparar el evento change para que se ejecute la lógica
-                radio.dispatchEvent(new Event('change', { bubbles: true }));
-            } else {
-                console.error('No se encontró el radio button dentro del label');
-            }
-        });
-    });
-    
-    // Event listener para cambio de fecha de inicio
-    fechaInicio.addEventListener('change', function() {
-        console.log('Fecha de inicio cambiada a:', this.value);
+
+        // Validar fecha inicial al cargar
         validarFechaInicio();
-        calcularFechaVencimiento();
     });
-    
-    // Event listener para cambio de duración (aunque es readonly, por si acaso)
-    duracionMeses.addEventListener('change', function() {
-        console.log('Duración de meses cambiada a:', this.value);
-        calcularFechaVencimiento();
-    });
-    
-    // Validar y calcular al cargar si hay un plan pre-seleccionado
-    const planSeleccionado = document.querySelector('.plan-radio:checked');
-    if (planSeleccionado) {
-        console.log('Plan pre-seleccionado encontrado:', planSeleccionado.value);
-        manejarCambioPlan(planSeleccionado);
-    }
-    
-    // Validar fecha inicial al cargar
-    validarFechaInicio();
-});
 </script>
 @endsection

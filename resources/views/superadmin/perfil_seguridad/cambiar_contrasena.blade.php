@@ -37,7 +37,7 @@
         <div class="sa-perfil-card">
             <div class="sa-perfil-card-header">
                 <h2 class="sa-perfil-card-title">
-                    <span class="material-symbols-outlined">lock</span>
+                    <span class="material-symbols-outlined"></span>
                     Nueva Contraseña
                 </h2>
             </div>
