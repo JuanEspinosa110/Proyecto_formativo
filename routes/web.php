@@ -28,7 +28,7 @@ Route::get('/', function () {
 
 
 Route::get('/superadmin/dashboard', function () {
-    return view('superadmin.dashboard'); 
+    return view('superadmin.dashboard');
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -39,9 +39,10 @@ Route::view('/register', 'auth.register')->name('register');
 Route::post('/register', [RegistroController::class, 'store'])
     ->name('register.store');
 
-Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
+Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
 
-Route::post('/recuperar/enviar-codigo', 
+Route::post(
+    '/recuperar/enviar-codigo',
     [RecuperarPasswordController::class, 'enviarCodigo']
 )->name('password.send.code');
 
@@ -66,7 +67,8 @@ Route::get('/nueva-password', function () {
 
 
 // Procesar actualización
-Route::post('/nueva-password', 
+Route::post(
+    '/nueva-password',
     [RecuperarPasswordController::class, 'actualizarPassword']
 )->name('password.update');
 
@@ -127,6 +129,8 @@ Route::prefix('superadmin')
         // Licencias
         Route::get('licencias', [LicenciaController::class, 'index'])->name('licencias.index');
         route::get('lincencias/export', [LicenciaController::class, 'export'])->name('licencias.export');
+        route::get('lincencias/exportExcel', [LicenciaController::class, 'exportExcel'])->name('licencias.exportExcel');
+        Route::get('licencias/{id}/detalles', [LicenciaController::class, 'getDetalles'])->name('detalles');
         // PASO 1 creación de licencia
         Route::get('licencias/crear', [LicenciaController::class, 'create'])->name('licencias.create');
         Route::post('licencias/paso1', [LicenciaController::class, 'guardarPaso1'])->name('licencias.guardar-paso1');
@@ -152,12 +156,12 @@ Route::prefix('superadmin')
         Route::get('/licencias/configurar-plan', [LicenciaController::class, 'configurarPlan'])->name('licencias.configurar-plan');
         Route::get('/licencias/{id}/editar', [LicenciaController::class, 'edit'])->name('licencias.edit');
 
-        
 
-         // Ruta para obtener ciudades por departamento (AJAX)
+
+        // Ruta para obtener ciudades por departamento (AJAX)
         Route::get('/empresas/ciudades/{id_departamento}', [EmpresaController::class, 'getCiudadesByDepartamento'])
-        ->name('superadmin.empresas.ciudades');
-    
+            ->name('superadmin.empresas.ciudades');
+
         // Rutas CRUD de Empresas
         Route::resource('empresas', EmpresaController::class);
         Route::get('empresas/export/csv', [EmpresaController::class, 'exportCsv'])->name('empresas.export.csv');
@@ -189,5 +193,3 @@ Route::prefix('superadmin')
         Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
             ->name('tarjetas.update');
     });
-
-
