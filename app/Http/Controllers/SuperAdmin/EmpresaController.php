@@ -9,6 +9,8 @@ use App\Models\Departamento;
 use App\Models\Estado;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class EmpresaController extends Controller
 {
@@ -201,7 +203,7 @@ class EmpresaController extends Controller
             return response()->json($ciudades);
         }
 
-        public function exportCSV()
+        public function exportCsv()
     {
         $fileName = 'empresas.csv';
 
@@ -239,6 +241,58 @@ class EmpresaController extends Controller
         $response->headers->set('Content-Disposition', "attachment; filename=$fileName");
 
         return $response;
+    }
+
+    /**
+     * Exportar empresas a Excel
+     */
+    public function exportExcel()
+    {
+        $fileName = 'empresas_' . date('Y-m-d_H-i-s') . '.xlsx';
+
+        $empresas = Empresa::with(['ciudad', 'estado'])->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Encabezados
+        $headers = ['NIT', 'Nombre Empresa', 'Teléfono', 'Correo', 'Ciudad', 'Estado'];
+        $sheet->fromArray($headers, NULL, 'A1');
+
+        // Estilos para encabezados
+        $headerStyle = $sheet->getStyle('A1:F1');
+        $headerStyle->getFont()->setBold(true);
+        $headerStyle->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFF'));
+        $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
+        $headerStyle->getFill()->getStartColor()->setARGB('FF5E548E'); // Color SIGU
+        $headerStyle->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        // Datos
+        $row = 2;
+        foreach ($empresas as $empresa) {
+            $sheet->setCellValue('A' . $row, $empresa->NIT);
+            $sheet->setCellValue('B' . $row, $empresa->nombre_empresa);
+            $sheet->setCellValue('C' . $row, $empresa->telefono_empresa);
+            $sheet->setCellValue('D' . $row, $empresa->correo_corporativo);
+            $sheet->setCellValue('E' . $row, optional($empresa->ciudad)->nombre_city);
+            $sheet->setCellValue('F' . $row, optional($empresa->estado)->nombre_estado);
+            $row++;
+        }
+
+        // Ajustar ancho de columnas
+        $sheet->getColumnDimension('A')->setWidth(15);
+        $sheet->getColumnDimension('B')->setWidth(25);
+        $sheet->getColumnDimension('C')->setWidth(15);
+        $sheet->getColumnDimension('D')->setWidth(25);
+        $sheet->getColumnDimension('E')->setWidth(20);
+        $sheet->getColumnDimension('F')->setWidth(15);
+
+        // Guardar en archivo temporal y descargar
+        $writer = new Xlsx($spreadsheet);
+        $temp = tempnam(sys_get_temp_dir(), 'xlsx');
+        $writer->save($temp);
+
+        return response()->download($temp, $fileName)->deleteFileAfterSend(true);
     }
 
 

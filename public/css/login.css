@@ -5,13 +5,23 @@
 }
 
 
+:root {
+    /* Tokens SIGU específicos para auth */
+    --sigu-primary: #5E548E;
+    --sigu-primary-mid: #7c5ba3;
+    --sigu-primary-dark: #4A4270;
+    --sigu-muted: #6b7280;
+    --sigu-bg: #f6f7f8;
+    --sigu-border: #d0d7de;
+    --sigu-shadow: 0 12px 30px rgba(74,78,105,0.08);
+}
+
+
 .login-body {
     background-color: #F4F4F6;
-    
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow: auto;
     font-family: system-ui, sans-serif;
-    height: 100vh;
 }
 
 
@@ -27,15 +37,54 @@
 
 /* IZQUIERDA */
 .header-left .logo-icon {
-    width: 230px;
+    width: 140px;
     height: auto;
     object-fit: contain;
+    transition: transform 0.25s ease;
+}
+
+/* Clase específica para el header en el registro (si aplica) */
+.regis-header .logo-icon {
+    width: 140px;
 }
 
 /* CENTRO */
 .header-center {
     text-align: center;
     flex: 1;
+}
+
+/* Replicar estilos del brand del index para uso en registro (clases específicas) */
+.navbar-index-brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.navbar-index-logo-img {
+    width: 65px;
+    height: 65px;
+    object-fit: contain;
+}
+
+.navbar-index-logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.navbar-index-logo-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--sigu-primary);
+    margin: 0;
+}
+
+.navbar-index-logo-subtitle {
+    font-size: 0.7rem;
+    color: var(--sigu-muted);
+    margin: 0;
+    text-transform: uppercase;
 }
 
 .logo-title {
@@ -118,11 +167,27 @@
 /* ====== CARD ====== */
 .regis-card {
     width: 100%;
-    max-width: 800px;
-    background: #ffffff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    max-width: 720px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfbfd 100%);
+    padding: 36px;
+    border-radius: 14px;
+    box-shadow: var(--sigu-shadow);
+    border: 1px solid var(--sigu-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.regis-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 6px;
+    background: linear-gradient(90deg, var(--sigu-primary), var(--sigu-primary-mid));
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
 }
 
 /* ====== HEADER ====== */
@@ -145,11 +210,14 @@
 
 .regis-header h1 {
     margin: 0;
-    font-size: 26px;
+    font-size: 28px;
+    color: var(--sigu-primary-dark);
+    font-weight: 800;
 }
 
 .regis-header p {
-    color: #6c757d;
+    color: var(--sigu-muted);
+    margin-top: 6px;
 }
 
 /* ====== FORMULARIO ====== */
@@ -168,36 +236,45 @@
     flex: 1;
 }
 
+@media (max-width: 768px) {
+    .regis-row { flex-direction: column; }
+    .regis-card { padding: 28px; max-width: 95%; }
+    .header-left .logo-icon { width: 120px; }
+}
+
 /* ====== INPUTS ====== */
 .regis-input {
     padding: 12px 14px;
-    border-radius: 8px;
-    border: 1px solid #d0d7de;
+    border-radius: 10px;
+    border: 1px solid var(--sigu-border);
     font-size: 14px;
-    transition: 0.2s ease-in-out;
+    transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
 }
 
 .regis-input:focus {
-    border-color: #137fec;
+    border-color: var(--sigu-primary);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(19,127,236,0.15);
+    box-shadow: 0 6px 20px rgba(94,84,142,0.08);
+    transform: translateY(-1px);
 }
 
 /* ====== BOTÓN ====== */
 .regis-btn {
     width: 100%;
-    background-color: #137fec;
+    background: linear-gradient(90deg, var(--sigu-primary), var(--sigu-primary-mid));
     color: white;
     padding: 14px;
     border: none;
-    border-radius: 8px;
-    font-weight: bold;
+    border-radius: 10px;
+    font-weight: 700;
     cursor: pointer;
-    transition: 0.3s;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    box-shadow: 0 8px 20px rgba(94,84,142,0.12);
 }
 
 .regis-btn:hover {
-    background-color: #0f6fd0;
+    transform: translateY(-3px);
+    box-shadow: 0 14px 36px rgba(94,84,142,0.18);
 }
 
 /* ====== FOOTER ====== */
@@ -221,7 +298,7 @@
  ------------------------------ */
 
 /* ========== LOGIN ========== */
-.login-body { background-color: #F4F4F6; height:100vh; font-family: 'Public Sans', sans-serif; }
+.login-body { background-color: #F4F4F6; min-height:100vh; font-family: 'Public Sans', sans-serif; overflow:auto; }
 .login-wrapper { height: calc(100vh - 120px); display:flex; justify-content:center; align-items:center; background-color:#F4F4F6; }
 .login-box { width:70%; height:80%; background:#FFFFFF; display:flex; border-radius:16px; overflow:hidden; box-shadow:0 25px 60px rgba(74,78,105,0.15); }
 .login-left { flex:1; background: linear-gradient(rgba(94,84,142,0.65), rgba(74,78,105,0.65)), url('/imagenes/login-gb.png') center/cover no-repeat; }
