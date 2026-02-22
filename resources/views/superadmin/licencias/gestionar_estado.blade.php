@@ -61,18 +61,16 @@
         @method('PATCH')
 
         @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
         @endif
+
         @if(session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
-        @if($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
 
@@ -135,16 +133,26 @@
                 <div class="d-flex justify-content-between mb-2">
                     <label class="fw-bold">Motivo de la acción <span class="badge bg-danger-soft text-danger ms-2">OBLIGATORIO</span></label>
                 </div>
-                <textarea name="motivo" class="form-control" rows="4" placeholder="Proporcione una explicación detallada de por qué se está realizando este cambio de estado (mín. 20 caracteres)...">{{ old('motivo') }}</textarea>
+                <textarea name="motivo" 
+                    class="form-control @error('motivo') is-invalid @enderror" 
+                    rows="4" 
+                    placeholder="Proporcione una explicación detallada de por qué se está realizando este cambio de estado (mín. 20 caracteres)...">{{ old('motivo') }}</textarea>
+                @error('motivo')
+                    <div class="invalid-feedback d-block">
+                        <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
+                    </div>
+                @enderror
                 <div class="text-end small text-muted mt-1">{{ strlen(old('motivo', '')) }} / 500 caracteres</div>
             </div>
         </div>
 
-        <div class="alert alert-warning border-warning d-flex align-items-center mb-4 p-3 rounded-3">
-            <i class="fas fa-exclamation-triangle fs-4 me-3"></i>
-            <div>
-                <strong class="d-block mb-1">Aviso de Riesgo Administrativo</strong>
-                <p class="small mb-0 text-muted">Está a punto de modificar el acceso de {{ $licencia->nombre_empresa }}. Esta acción enviará una notificación automática al contacto administrativo del cliente.</p>
+        <div class="alert alert-warning border-warning mb-4 p-3 rounded-3">
+            <div class="d-flex align-items-start gap-2">
+                <i class="fas fa-exclamation-triangle fs-5 mt-1 flex-shrink-0"></i>
+                <div>
+                    <strong>Aviso de Riesgo Administrativo</strong><br>
+                    <small class="text-muted">Está a punto de modificar el acceso de {{ $licencia->nombre_empresa }}. Esta acción enviará una notificación automática al contacto administrativo del cliente.</small>
+                </div>
             </div>
         </div>
 

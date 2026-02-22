@@ -18,8 +18,8 @@
             <p class="sa-perfil-subtitle">Actualiza tu contraseña de acceso al sistema</p>
         </div>
         <a href="{{ route('superadmin.perfil.index') }}" class="sa-perfil-btn sa-perfil-btn-secondary">
-            <span class="material-symbols-outlined">arrow_back</span>
-            Volver
+            <span class="material-symbols-outlined"></span>
+        Volver
         </a>
     </div>
 
@@ -37,7 +37,7 @@
         <div class="sa-perfil-card">
             <div class="sa-perfil-card-header">
                 <h2 class="sa-perfil-card-title">
-                    <span class="material-symbols-outlined">lock</span>
+                    <span class="material-symbols-outlined"></span>
                     Nueva Contraseña
                 </h2>
             </div>
@@ -101,18 +101,18 @@
         <div class="sa-perfil-card">
             <div class="sa-perfil-card-body">
                 <div class="sa-perfil-alert sa-perfil-alert-warning">
-                    <span class="material-symbols-outlined">warning</span>
+                    <span class="material-symbols-outlined"></span>
                     <div>
                         <strong>Importante:</strong> Al cambiar tu contraseña, deberás iniciar sesión nuevamente.
                     </div>
                 </div>
                 <div class="d-flex justify-content-end gap-2">
                     <a href="{{ route('superadmin.perfil.index') }}" class="sa-perfil-btn sa-perfil-btn-secondary">
-                        <span class="material-symbols-outlined">close</span>
+                        <span class="material-symbols-outlined"></span>
                         Cancelar
                     </a>
                     <button type="submit" class="sa-perfil-btn sa-perfil-btn-success">
-                        <span class="material-symbols-outlined">lock_reset</span>
+                        <span class="material-symbols-outlined"></span>
                         Cambiar Contraseña
                     </button>
                 </div>

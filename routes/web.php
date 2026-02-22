@@ -8,7 +8,6 @@ use App\Http\Controllers\Auth\RecuperarPasswordController;
 use Illuminate\Http\Request;
 
 
-
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
     RolController,
@@ -44,6 +43,7 @@ Route::view('/register', 'auth.register')->name('register');
 Route::post('/register', [RegistroController::class, 'store'])
     ->name('register.store');
 
+Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
 
 Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
 
@@ -142,7 +142,9 @@ Route::prefix('superadmin')
 
         // Licencias
         Route::get('licencias', [LicenciaController::class, 'index'])->name('licencias.index');
-        Route::get('licencias/export', [LicenciaController::class, 'export'])->name('licencias.export');
+        route::get('lincencias/export', [LicenciaController::class, 'export'])->name('licencias.export');
+        route::get('lincencias/exportExcel', [LicenciaController::class, 'exportExcel'])->name('licencias.exportExcel');
+        Route::get('licencias/{id}/detalles', [LicenciaController::class, 'getDetalles'])->name('detalles');
         // PASO 1 creación de licencia
         Route::get('licencias/crear', [LicenciaController::class, 'create'])->name('licencias.create');
         Route::post('licencias/paso1', [LicenciaController::class, 'guardarPaso1'])->name('licencias.guardar-paso1');
@@ -172,14 +174,12 @@ Route::prefix('superadmin')
 
         // Ruta para obtener ciudades por departamento (AJAX)
         Route::get('/empresas/ciudades/{id_departamento}', [EmpresaController::class, 'getCiudadesByDepartamento'])
-            ->name('superadmin.empresas.ciudades');
-
-
-
+        ->name('superadmin.empresas.ciudades');
+    
         // Rutas CRUD de Empresas
         Route::resource('empresas', EmpresaController::class);
-
-
+        Route::get('empresas/export/csv', [EmpresaController::class, 'exportCsv'])->name('empresas.export.csv');
+        Route::get('empresas/export/excel', [EmpresaController::class, 'exportExcel'])->name('empresas.export.excel');
 
         // PLANES DE LICENCIA
         Route::get('planes', [PlanLicenciaController::class, 'index'])->name('planes.index');

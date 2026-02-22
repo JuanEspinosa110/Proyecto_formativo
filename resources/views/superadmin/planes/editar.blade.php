@@ -16,10 +16,10 @@
     </div>
 
     @if($plan->total_licencias > 0)
-    <div class="alert alert-warning">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        <strong>Atención:</strong> Este plan tiene {{ $plan->total_licencias }} licencia(s) asociada(s). 
-        Los cambios afectarán las nuevas licencias, no las existentes.
+    <div class="alert alert-danger">
+        <i class="fas fa-lock me-2"></i>
+        <strong>No se puede editar:</strong> Este plan tiene {{ $plan->total_licencias }} licencia(s) asociada(s). 
+        Los planes con licencias activas no pueden ser modificados.
     </div>
     @endif
 
@@ -30,7 +30,7 @@
     </div>
     @endif
 
-    <form action="{{ route('superadmin.planes.update', $plan->id_plan) }}" method="POST">
+    <form action="{{ route('superadmin.planes.update', $plan->id_plan) }}" method="POST" {{ $plan->total_licencias > 0 ? 'disabled' : '' }}>
         @csrf
         @method('PUT')
         
@@ -49,6 +49,7 @@
                                name="nombre_plan" 
                                class="form-control sa-licencia-input @error('nombre_plan') is-invalid @enderror" 
                                value="{{ old('nombre_plan', $plan->nombre_plan) }}" 
+                               {{ $plan->total_licencias > 0 ? 'readonly' : '' }}
                                required>
                         @error('nombre_plan')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
@@ -61,6 +62,7 @@
                                value="{{ old('duracion_meses', $plan->duracion_meses) }}" 
                                min="1" 
                                max="120" 
+                               {{ $plan->total_licencias > 0 ? 'readonly' : '' }}
                                required>
                         @error('duracion_meses')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
@@ -75,6 +77,7 @@
                                    value="{{ old('precio', $plan->precio) }}" 
                                    min="0" 
                                    step="0.01" 
+                                   {{ $plan->total_licencias > 0 ? 'readonly' : '' }}
                                    required>
                         </div>
                         @error('precio')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -85,13 +88,14 @@
                         <textarea name="descripcion" 
                                   rows="4" 
                                   class="form-control sa-licencia-input @error('descripcion') is-invalid @enderror" 
+                                  {{ $plan->total_licencias > 0 ? 'readonly' : '' }}
                                   required>{{ old('descripcion', $plan->descripcion) }}</textarea>
                         @error('descripcion')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="col-md-6">
                         <label class="sa-licencia-label">Estado *</label>
-                        <select name="id_estado" class="form-select sa-licencia-input" required>
+                        <select name="id_estado" class="form-select sa-licencia-input" {{ $plan->total_licencias > 0 ? 'disabled' : '' }} required>
                             <option value="1" {{ $plan->id_estado == 1 ? 'selected' : '' }}>Activo</option>
                             <option value="2" {{ $plan->id_estado == 2 ? 'selected' : '' }}>Inactivo</option>
                         </select>
@@ -143,7 +147,7 @@
             <a href="{{ route('superadmin.planes.index') }}" class="btn btn-light sa-licencia-btn-cancel">
                 <i class="fas fa-times me-2"></i>Cancelar
             </a>
-            <button type="submit" class="btn btn-success">
+            <button type="submit" class="btn btn-success" {{ $plan->total_licencias > 0 ? 'disabled' : '' }}>
                 <i class="fas fa-save me-2"></i>Guardar Cambios
             </button>
         </div>

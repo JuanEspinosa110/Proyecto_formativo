@@ -35,7 +35,8 @@
 .empresa-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
+    gap: 2rem;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid var(--border-color);
@@ -43,8 +44,9 @@
 
 .empresa-header-title {
     display: flex;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
 }
 
 .empresa-header-title h1 {
@@ -64,8 +66,15 @@
 
 .empresa-header-title p {
     color: var(--text-secondary);
-    margin: 0.25rem 0 0 0;
+    margin: 0;
     font-size: 0.875rem;
+}
+
+.empresa-header-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 .btn-back {
@@ -87,31 +96,31 @@
     transform: translateX(-2px);
 }
 
-.empresa-header-actions {
-    display: flex;
-    gap: 0.75rem;
-}
-
 .btn-empresa-add {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: var(--primary-color);
-    color: white;
-    border: none;
+    background: var(--primary-color) !important;
+    color: white !important;
+    border: none !important;
     border-radius: 8px;
     font-weight: 600;
-    text-decoration: none;
+    text-decoration: none !important;
     transition: all 0.3s;
     box-shadow: var(--shadow-sm);
+    white-space: nowrap;
 }
 
-.btn-empresa-add:hover {
-    background: var(--primary-dark);
+.btn-empresa-add:hover,
+.btn-empresa-add:focus,
+.btn-empresa-add:active {
+    background: var(--primary-dark) !important;
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
-    color: white;
+    color: white !important;
+    text-decoration: none !important;
 }
 
 .btn-empresa-add .material-symbols-outlined {
@@ -205,6 +214,78 @@
 .btn-clear:hover {
     background: var(--light-color);
     color: var(--text-primary);
+}
+
+/* =====================================================
+   BOTONES DE EXPORTACIÓN
+   ===================================================== */
+.empresa-export-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+a.btn-export {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    padding: 0.625rem 1.25rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    text-decoration: none !important;
+    transition: all 0.3s !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+}
+
+a.btn-export:hover,
+a.btn-export:focus,
+a.btn-export:active,
+a.btn-export:visited {
+    text-decoration: none !important;
+}
+
+a.btn-export .material-symbols-outlined {
+    font-size: 1.125rem !important;
+}
+
+a.btn-export.csv-btn {
+    background: white !important;
+    color: var(--primary-color) !important;
+    border: 1px solid var(--primary-color) !important;
+}
+
+a.btn-export.csv-btn:hover,
+a.btn-export.csv-btn:focus,
+a.btn-export.csv-btn:active,
+a.btn-export.csv-btn:visited {
+    background: var(--primary-color) !important;
+    color: white !important;
+    border-color: var(--primary-color) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+    text-decoration: none !important;
+}
+
+a.btn-export.excel-btn {
+    background: var(--primary-color) !important;
+    color: white !important;
+    border: 1px solid var(--primary-color) !important;
+}
+
+a.btn-export.excel-btn:hover,
+a.btn-export.excel-btn:focus,
+a.btn-export.excel-btn:active,
+a.btn-export.excel-btn:visited {
+    background: var(--primary-dark) !important;
+    color: white !important;
+    border-color: var(--primary-dark) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+    text-decoration: none !important;
 }
 
 /* =====================================================
@@ -722,6 +803,24 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
+    }
+
+    .empresa-header-actions {
+        width: 100%;
+    }
+
+    .btn-empresa-add {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .empresa-export-buttons {
+        flex-direction: column;
+    }
+
+    .btn-export {
+        width: 100%;
+        justify-content: center;
     }
 
     .filter-group {

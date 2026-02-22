@@ -70,6 +70,11 @@
                     class="sigu-nl {{ request()->routeIs('superadmin.configuracion.tipo_empresa.*') ? 'active' : '' }}">
                     <span class="material-symbols-rounded">badge</span>
                     <span>Tipo Empresa</span>
+                <a href="{{ route('superadmin.planes.index') }}"
+                    class="sigu-nl {{ request()->routeIs('superadmin.planes.*') ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">layers</span>
+                    <span>Planes</span>
+                </a>
             </nav>
             <!-- Dropdown usuario -->
             <div class="dropdown">
@@ -129,6 +134,9 @@
             <a href="{{ route('superadmin.configuracion.ciudades.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.configuracion.ciudades.*') ? 'active' : '' }}"><span class="material-symbols-rounded">map</span>Ciudades</a>
             <a href="{{ route('superadmin.configuracion.tipo_empresa.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.configuracion.tipo_empresa.*') ? 'active' : '' }}"><span class="material-symbols-rounded">badge</span>Tipo Empresa</a
             <div class="sigu-drawer-footer">
+
+            {{-- FOOTER --}}
+            <div class="sa-dash-sidebar-footer">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="sigu-drawer-logout">
