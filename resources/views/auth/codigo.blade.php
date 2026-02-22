@@ -15,53 +15,63 @@
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 </head>
 
-<body>
-
-<div class="verify-page">
+<body class="recov-body">
 
     <!-- HEADER -->
-    <header class="verify-header">
-        <div class="verify-logo">
-            <span class="material-symbols-outlined">mark_email_read</span>
-            <h2>Transporte Ibagué</h2>
-        </div>
-    </header>
+    <header class="login-header">
+    
+    <div class="header-left">
+        <img src="{{ asset('imagenes/logo-sigu.png') }}" alt="SIGU Logo" class="logo-icon">
+    </div>
 
-    <div class="top-navigation">
-    <a href="{{ route('login') }}" class="btn-home">
-        Volver al inicio
-    </a>
-</div>
+    <div class="header-center">
+        <h1 class="logo-title">SIGU</h1>
+        <p class="logo-subtitle">Sistema Integral de Gestión Urbana</p>
+    </div>
 
+    <div class="header-right">
+        <a href="{{ route('home') }}" class="btn-home">
+            Volver al inicio
+        </a>
+    </div>
+
+</header>
 
     <!-- CARD -->
-    <main class="verify-container">
-        <div class="verify-card">
+    <main class="recov-wrapper">
 
-            <div class="verify-title-box">
-                <h1>Verificar código</h1>
-                <p>Ingresa el código de 6 dígitos enviado a tu correo.</p>
+        <div class="recov-card">
+
+            <div class="recov-card-header"></div>
+
+             <div class="recov-card-body">
+
+                <div class="text-center mb-8">
+                <h1 class="recov-title">Verificar código</h1>
+                <p class="recov-description">
+                    Ingresa el código de 6 dígitos enviado a tu correo.
+                </p>
             </div>
 
-            @if(session('success'))
-                <div class="verify-success" style="margin:15px 0;">
-                    {{ session('success') }}
-                </div>
-            @endif
+                @if(session('success'))
+                    <div class="verify-success" style="margin:15px 0;">
+                        {{ session('success') }}
+                    </div>
+                @endif
 
-            {{-- Mensaje de error --}}
-            @if($errors->any())
-                <div class="verify-error">
-                    {{ $errors->first() }}
-                </div>
-            @endif
+                {{-- Mensaje de error --}}
+                @if($errors->any())
+                    <div class="verify-error">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
 
             <form method="POST" action="{{ route('password.verify.code') }}">
                 @csrf
 
                 <input type="hidden" name="correo" value="{{ session('correo') }}">
 
-                <div class="verify-group">
+                <div class="recov-group">
                     <input 
                         type="text"
                         name="codigo"
@@ -73,12 +83,12 @@
                     >
                 </div>
 
-                <button type="submit" class="verify-btn">
+                <button type="submit" class="recov-btn">
                     Verificar código
                 </button>
             </form>
 
-            <div class="verify-footer">
+            <div class="recov-back">
                 <form method="POST" action="{{ route('password.resend.code') }}">
                     @csrf
                     <input type="hidden" name="correo" value="{{ session('correo') }}">

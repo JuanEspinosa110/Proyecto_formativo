@@ -8,7 +8,6 @@ use App\Http\Controllers\Auth\RecuperarPasswordController;
 use Illuminate\Http\Request;
 
 
-
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
     RolController,
@@ -36,7 +35,7 @@ Route::get('/', function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
-    Route::get('/superadmin/dashboard', function () {
+Route::get('/superadmin/dashboard', function () {
     return view('admin.dashboard');
 });
 
@@ -44,12 +43,11 @@ Route::get('/', function () {
     Route::post('/register', [RegistroController::class, 'store'])
         ->name('register.store');
 
+Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
 
-    Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
-
-    Route::post('/recuperar/enviar-codigo', 
-        [RecuperarPasswordController::class, 'enviarCodigo']
-    )->name('password.send.code');
+Route::post('/recuperar/enviar-codigo', 
+    [RecuperarPasswordController::class, 'enviarCodigo']
+)->name('password.send.code');
 
     Route::get('/codigo', function () {
         return view('auth.codigo');
@@ -76,15 +74,12 @@ Route::get('/nueva-password',
     [RecuperarPasswordController::class, 'mostrarNuevaPassword']
 )->name('password.nueva.form');
 
-        return view('auth.nueva_password');
-    })->name('password.nueva.form');
 
 
-
-    // Procesar actualización
-    Route::post('/nueva-password', 
-        [RecuperarPasswordController::class, 'actualizarPassword']
-    )->name('password.update');
+// Procesar actualización
+Route::post('/nueva-password', 
+    [RecuperarPasswordController::class, 'actualizarPassword']
+)->name('password.update');
 
 
 
@@ -140,7 +135,9 @@ Route::get('/superadmin/dashboard/stats',[DashboardController::class, 'superAdmi
 
         // Licencias
         Route::get('licencias', [LicenciaController::class, 'index'])->name('licencias.index');
-        Route::get('licencias/export', [LicenciaController::class, 'export'])->name('licencias.export');
+        route::get('lincencias/export', [LicenciaController::class, 'export'])->name('licencias.export');
+        route::get('lincencias/exportExcel', [LicenciaController::class, 'exportExcel'])->name('licencias.exportExcel');
+        Route::get('licencias/{id}/detalles', [LicenciaController::class, 'getDetalles'])->name('detalles');
         // PASO 1 creación de licencia
         Route::get('licencias/crear', [LicenciaController::class, 'create'])->name('licencias.create');
         Route::post('licencias/paso1', [LicenciaController::class, 'guardarPaso1'])->name('licencias.guardar-paso1');
@@ -166,18 +163,16 @@ Route::get('/superadmin/dashboard/stats',[DashboardController::class, 'superAdmi
         Route::get('/licencias/configurar-plan', [LicenciaController::class, 'configurarPlan'])->name('licencias.configurar-plan');
         Route::get('/licencias/{id}/editar', [LicenciaController::class, 'edit'])->name('licencias.edit');
 
-        
 
-         // Ruta para obtener ciudades por departamento (AJAX)
+
+        // Ruta para obtener ciudades por departamento (AJAX)
         Route::get('/empresas/ciudades/{id_departamento}', [EmpresaController::class, 'getCiudadesByDepartamento'])
         ->name('superadmin.empresas.ciudades');
-        
- 
     
         // Rutas CRUD de Empresas
         Route::resource('empresas', EmpresaController::class);
-        
-
+        Route::get('empresas/export/csv', [EmpresaController::class, 'exportCsv'])->name('empresas.export.csv');
+        Route::get('empresas/export/excel', [EmpresaController::class, 'exportExcel'])->name('empresas.export.excel');
 
         // PLANES DE LICENCIA
         Route::get('planes', [PlanLicenciaController::class, 'index'])->name('planes.index');

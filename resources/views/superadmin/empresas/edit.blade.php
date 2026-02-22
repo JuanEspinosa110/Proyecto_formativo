@@ -9,10 +9,10 @@
     <div class="empresa-header">
         <div class="empresa-header-title">
             <a href="{{ route('superadmin.empresas.index') }}" class="btn-back">
-                <span class="material-symbols-outlined">arrow_back</span>
+                <span class="material-symbols-outlined"><i class="fa fa-arrow-left" aria-hidden="true"></i></span>
             </a>
             <div>
-                <h1><span class="material-symbols-outlined">edit</span> Editar Empresa</h1>
+                <h1><span class="material-symbols-outlined"><i class="fa fa-edit" aria-hidden="true"></i></span> Editar Empresa</h1>
                 <p>Actualice la información de {{ $empresa->nombre_empresa }}</p>
             </div>
         </div>
@@ -27,7 +27,7 @@
             {{-- INFORMACIÓN DE LA EMPRESA --}}
             <div class="form-section">
                 <div class="section-header">
-                    <span class="material-symbols-outlined">business</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-building" aria-hidden="true"></i></span>
                     <h3>Información de la Empresa</h3>
                 </div>
 
@@ -40,13 +40,24 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="nombre_empresa" class="form-label required">Nombre de la Empresa</label>
-                        <input type="text" class="form-control @error('nombre_empresa') is-invalid @enderror" 
-                               id="nombre_empresa" name="nombre_empresa" 
-                               value="{{ old('nombre_empresa', $empresa->nombre_empresa) }}" required>
-                        @error('nombre_empresa')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <label for="nombre_empresa" class="form-label required">
+                            Nombre de la Empresa
+                        </label>
+
+                        {{-- Campo visible bloqueado --}}
+                        <input type="text"
+                            class="form-control bg-light"
+                            value="{{ $empresa->nombre_empresa }}"
+                            readonly>
+
+                        {{-- Campo hidden para que se envíe al backend --}}
+                        <input type="hidden"
+                            name="nombre_empresa"
+                            value="{{ $empresa->nombre_empresa }}">
+
+                        <small class="text-muted">
+                            El nombre de la empresa no se puede modificar.
+                        </small>
                     </div>
 
                     <div class="col-md-6">
@@ -74,7 +85,7 @@
             {{-- INFORMACIÓN DEL REPRESENTANTE LEGAL --}}
             <div class="form-section">
                 <div class="section-header">
-                    <span class="material-symbols-outlined">person</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-user" aria-hidden="true"></i></span>
                     <h3>Representante Legal</h3>
                 </div>
 
@@ -154,7 +165,7 @@
             {{-- UBICACIÓN Y ESTADO --}}
             <div class="form-section">
                 <div class="section-header">
-                    <span class="material-symbols-outlined">location_on</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-map" aria-hidden="true"></i></span>
                     <h3>Ubicación y Estado</h3>
                 </div>
 
@@ -209,11 +220,11 @@
             {{-- BOTONES --}}
             <div class="form-actions">
                 <a href="{{ route('superadmin.empresas.index') }}" class="btn btn-secondary">
-                    <span class="material-symbols-outlined">close</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-times" aria-hidden="true"></i></span>
                     Cancelar
                 </a>
                 <button type="submit" class="btn btn-primary">
-                    <span class="material-symbols-outlined">save</span>
+                    <span class="material-symbols-outlined"><i class="fa fa-save" aria-hidden="true"></i></span>
                     Actualizar Empresa
                 </button>
             </div>

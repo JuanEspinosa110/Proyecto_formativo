@@ -10,14 +10,13 @@ use Carbon\Carbon;
 
 class LicenciaController extends Controller
 {
-    public function index()
+    /**
+     * Index con filtros del lado del servidor
+     */
+    public function index(Request $request)
     {
-        // 1. Consulta base para los conteos (necesitamos todos para las estadísticas)
-        $allLicencias = DB::table('licencias')
-            ->join('estado', 'licencias.id_estado', '=', 'estado.id_estado')
-            ->get();
-
-        $licencias = DB::table('licencias')
+        // Construir query base
+        $query = DB::table('licencias')
             ->join('empresa', 'licencias.NIT', '=', 'empresa.NIT')
             ->join('planes_licencia', 'licencias.id_plan', '=', 'planes_licencia.id_plan')
             ->join('estado', 'licencias.id_estado', '=', 'estado.id_estado')
@@ -28,24 +27,78 @@ class LicenciaController extends Controller
                 'planes_licencia.nombre_plan',
                 'planes_licencia.precio',
                 'estado.nombre_estado'
-            )
-            ->orderBy('licencias.fecha_creacion', 'desc')
-            ->paginate(5); // <--- Paginación de 5 por página
+            );
+
+        // Aplicar filtro de búsqueda
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('empresa.nombre_empresa', 'LIKE', "%{$search}%")
+                    ->orWhere('licencias.NIT', 'LIKE', "%{$search}%")
+                    ->orWhere('licencias.id_licencia', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Aplicar filtro de estado
+        if ($request->filled('estado')) {
+            $query->where('licencias.id_estado', $request->estado);
+        }
+
+        // Aplicar filtro de plan
+        if ($request->filled('plan')) {
+            $query->where('licencias.id_plan', $request->plan);
+        }
+
+        // Aplicar filtro rápido (tabs)
+        if ($request->filled('filter')) {
+            switch ($request->filter) {
+                case 'activas':
+                    $query->where('licencias.id_estado', 1);
+                    break;
+                case 'por_vencer':
+                    $query->where('licencias.id_estado', 1)
+                        ->whereRaw('DATEDIFF(licencias.fecha_vencimiento, CURDATE()) BETWEEN 0 AND 30');
+                    break;
+                case 'vencidas':
+                    $query->where('licencias.id_estado', 21);
+                    break;
+            }
+        }
+
+        // Ordenar y paginar (manteniendo filtros en la URL)
+        $licencias = $query->orderBy('licencias.fecha_creacion', 'desc')
+            ->paginate(5)
+            ->appends($request->except('page'));
+
+        // Estadísticas globales (sin filtros)
+        $allLicencias = DB::table('licencias')
+            ->join('estado', 'licencias.id_estado', '=', 'estado.id_estado')
+            ->select('licencias.*', 'estado.nombre_estado')
+            ->get();
 
         $stats = [
             'total' => $allLicencias->count(),
             'activas' => $allLicencias->where('id_estado', 1)->count(),
             'proximas_vencer' => $allLicencias->filter(function ($lic) {
                 if ($lic->id_estado != 1) return false;
-
-                $diasRestantes = (int)\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($lic->fecha_vencimiento), false);
-
+                $diasRestantes = (int)Carbon::today()->diffInDays(Carbon::parse($lic->fecha_vencimiento), false);
                 return $diasRestantes >= 0 && $diasRestantes <= 30;
             })->count(),
             'vencidas' => $allLicencias->where('id_estado', 21)->count(),
         ];
 
-        return view('superadmin.licencias.index', compact('licencias', 'stats'));
+        // Obtener listas para filtros
+        $estados = DB::table('estado')
+            ->whereIn('id_estado', [1, 3, 21, 22]) // Solo estados relevantes
+            ->orderBy('nombre_estado')
+            ->get();
+
+        $planes = DB::table('planes_licencia')
+            ->where('id_estado', 1)
+            ->orderBy('nombre_plan')
+            ->get();
+
+        return view('superadmin.licencias.index', compact('licencias', 'stats', 'estados', 'planes'));
     }
 
     /**
@@ -64,8 +117,8 @@ class LicenciaController extends Controller
     {
         // Verificar si el NIT existe
         $empresa = DB::table('empresa')
-            ->leftJoin('ciudad', 'empresa.id_ciudad', '=', 'ciudad.id_ciudad')
-            ->leftJoin('departamento', 'ciudad.id_departamento', '=', 'departamento.id_departamento')
+            ->join('ciudad', 'empresa.id_ciudad', '=', 'ciudad.id_ciudad')
+            ->join('departamento', 'ciudad.id_departamento', '=', 'departamento.id_departamento')
             ->where('empresa.NIT', $nit)
             ->select(
                 'empresa.*',
@@ -109,14 +162,6 @@ class LicenciaController extends Controller
                 'nombre_departamento' => $empresa->nombre_departamento,
                 'id_ciudad' => $empresa->id_ciudad,
                 'nombre_city' => $empresa->nombre_city,
-                // Datos del representante
-                'doc_representante' => $empresa->doc_representante,
-                'primer_nombre_repre' => $empresa->primer_nombre_repre,
-                'segundo_nombre_repre' => $empresa->segundo_nombre_repre,
-                'primer_apellido_repre' => $empresa->primer_apellido_repre,
-                'segundo_apellido_repre' => $empresa->segundo_apellido_repre,
-                'telefono_representante' => $empresa->telefono_representante,
-                'correo_representante' => $empresa->correo_representante,
             ]
         ]);
     }
@@ -126,100 +171,56 @@ class LicenciaController extends Controller
      */
     public function guardarPaso1(Request $request)
     {
-        $validated = $request->validate(
-            [
-                // Empresa
-                'NIT' => 'required|numeric',
-                'nombre_empresa' => 'required|string|max:150',
-                'id_departamento' => 'required|exists:departamento,id_departamento',
-                'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-                'telefono_empresa' => 'nullable|string|max:20',
-                'correo_corporativo' => 'required|email|max:150',
+        $validated = $request->validate([
+            // Empresa
+            'NIT' => 'required|numeric',
+            'nombre_empresa' => 'required|string|max:150',
+            'id_departamento' => 'required|exists:departamento,id_departamento',
+            'id_ciudad' => 'required|exists:ciudad,id_ciudad',
+            'telefono_empresa' => 'nullable|string|max:20',
+            'correo_corporativo' => 'required|email|max:150',
 
-                // Representante Legal
-                'doc_representante' => 'required|numeric',
-                'primer_nombre_repre' => 'required|string|max:50',
-                'segundo_nombre_repre' => 'nullable|string|max:50',
-                'primer_apellido_repre' => 'required|string|max:50',
-                'segundo_apellido_repre' => 'nullable|string|max:50',
-                'telefono_representante' => 'nullable|string|max:20',
-                'correo_representante' => 'required|email|max:150',
-
-                // Usuario Administrador
-                'doc_admin' => 'required|numeric',
-                'primer_nombre_admin' => 'required|string|max:50',
-                'segundo_nombre_admin' => 'nullable|string|max:50',
-                'primer_apellido_admin' => 'required|string|max:50',
-                'segundo_apellido_admin' => 'nullable|string|max:50',
-                'telefono_admin' => 'nullable|string|max:20',
-                'correo_admin' => 'required|email|max:150',
-                'password_admin' => 'required|min:8',
+            // Usuario Administrador
+            'doc_admin' => 'required|numeric',
+            'primer_nombre_admin' => 'required|string|max:50',
+            'segundo_nombre_admin' => 'nullable|string|max:50',
+            'primer_apellido_admin' => 'required|string|max:50',
+            'segundo_apellido_admin' => 'nullable|string|max:50',
+            'telefono_admin' => 'nullable|string|max:20',
+            'correo_admin' => 'required|email|max:150',
+            'password_admin' => [
+                'required',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
             ],
-            [
-                'NIT.required' => 'El NIT es obligatorio',
-                'NIT.numeric' => 'El NIT debe ser un número válido',
-                'nombre_empresa.required' => 'El nombre de la empresa es obligatorio',
-                'correo_corporativo.required' => 'El correo corporativo es obligatorio',
-                'correo_corporativo.email' => 'El correo corporativo debe ser un email válido',
-                'doc_representante.required' => 'El documento del representante es obligatorio',
-                'primer_nombre_repre.required' => 'El primer nombre del representante es obligatorio',
-                'primer_apellido_repre.required' => 'El primer apellido del representante es obligatorio',
-                'correo_representante.required' => 'El correo del representante es obligatorio',
-                'correo_representante.email' => 'El correo del representante debe ser válido',
-                'doc_admin.required' => 'El documento del administrador es obligatorio',
-                'primer_nombre_admin.required' => 'El primer nombre del administrador es obligatorio',
-                'primer_apellido_admin.required' => 'El primer apellido del administrador es obligatorio',
-                'correo_admin.required' => 'El correo del administrador es obligatorio',
-                'correo_admin.email' => 'El correo del administrador debe ser válido',
-                'password_admin.required' => 'La contraseña es obligatoria',
-                'password_admin.min' => 'La contraseña debe tener al menos 8 caracteres',
-                'id_ciudad.required' => 'La ciudad es obligatoria',
-            ]
-        );
+        ]);
 
         try {
             DB::beginTransaction();
 
             $empresaExiste = DB::table('empresa')->where('NIT', $validated['NIT'])->exists();
 
+            // Datos básicos de la empresa a insertar/actualizar
+            $datosEmpresa = [
+                'nombre_empresa' => $validated['nombre_empresa'],
+                'telefono_empresa' => $validated['telefono_empresa'],
+                'correo_corporativo' => $validated['correo_corporativo'],
+                'id_ciudad' => $validated['id_ciudad'],
+            ];
+
             if ($empresaExiste) {
-                // Actualizar datos de la empresa
-                DB::table('empresa')
-                    ->where('NIT', $validated['NIT'])
-                    ->update([
-                        'nombre_empresa' => $validated['nombre_empresa'],
-                        'doc_representante' => $validated['doc_representante'],
-                        'primer_nombre_repre' => $validated['primer_nombre_repre'],
-                        'segundo_nombre_repre' => $validated['segundo_nombre_repre'],
-                        'primer_apellido_repre' => $validated['primer_apellido_repre'],
-                        'segundo_apellido_repre' => $validated['segundo_apellido_repre'],
-                        'telefono_representante' => $validated['telefono_representante'],
-                        'correo_representante' => $validated['correo_representante'],
-                        'telefono_empresa' => $validated['telefono_empresa'],
-                        'correo_corporativo' => $validated['correo_corporativo'],
-                        'id_ciudad' => $validated['id_ciudad'],
-                    ]);
+                DB::table('empresa')->where('NIT', $validated['NIT'])->update($datosEmpresa);
             } else {
-                // Crear nueva empresa
-                DB::table('empresa')->insert([
-                    'NIT' => $validated['NIT'],
-                    'nombre_empresa' => $validated['nombre_empresa'],
-                    'doc_representante' => $validated['doc_representante'],
-                    'primer_nombre_repre' => $validated['primer_nombre_repre'],
-                    'segundo_nombre_repre' => $validated['segundo_nombre_repre'],
-                    'primer_apellido_repre' => $validated['primer_apellido_repre'],
-                    'segundo_apellido_repre' => $validated['segundo_apellido_repre'],
-                    'telefono_representante' => $validated['telefono_representante'],
-                    'correo_representante' => $validated['correo_representante'],
-                    'telefono_empresa' => $validated['telefono_empresa'],
-                    'correo_corporativo' => $validated['correo_corporativo'],
-                    'id_ciudad' => $validated['id_ciudad'],
-                    'id_estado' => 1,
-                    'fecha_creacion' => now(),
-                ]);
+                $datosEmpresa['NIT'] = $validated['NIT'];
+                $datosEmpresa['id_estado'] = 1;
+                $datosEmpresa['fecha_creacion'] = now();
+                // Si la base de datos exige representante, añade valores vacíos o nulos aquí:
+                DB::table('empresa')->insert($datosEmpresa);
             }
 
-            // Verificar/Crear usuario administrador
+            // Usuario Administrador
             $usuarioExiste = DB::table('usuario')->where('doc_usuario', $validated['doc_admin'])->exists();
 
             if (!$usuarioExiste) {
@@ -233,7 +234,7 @@ class LicenciaController extends Controller
                     'correo' => $validated['correo_admin'],
                     'password' => Hash::make($validated['password_admin']),
                     'telefono' => $validated['telefono_admin'],
-                    'id_tipo_usuario' => 1, // Admin de empresa
+                    'id_tipo_usuario' => 1,
                     'id_ciudad' => $validated['id_ciudad'],
                     'id_estado' => 1,
                 ]);
@@ -241,7 +242,6 @@ class LicenciaController extends Controller
 
             DB::commit();
 
-            // Guardar en sesión para el paso 2
             session([
                 'licencia_paso1' => [
                     'NIT' => $validated['NIT'],
@@ -254,7 +254,7 @@ class LicenciaController extends Controller
             DB::rollBack();
             return back()
                 ->withInput()
-                ->with('error', 'Error al guardar: ' . $e->getMessage());
+                ->with('error', 'Error al procesar los datos: ' . $e->getMessage());
         }
     }
 
@@ -441,13 +441,13 @@ class LicenciaController extends Controller
             ->orderBy('licencias.fecha_creacion', 'desc')->get();
         return view('superadmin.licencias.historial', compact('licencias'));
     }
-
     /**
-     * Exportar listado de licencias como CSV
+     * Exportar licencias a CSV respetando filtros
      */
-    public function export()
+    public function export(Request $request)
     {
-        $licencias = DB::table('licencias')
+        // Construir query base (igual que en index)
+        $query = DB::table('licencias')
             ->join('empresa', 'licencias.NIT', '=', 'empresa.NIT')
             ->join('planes_licencia', 'licencias.id_plan', '=', 'planes_licencia.id_plan')
             ->join('estado', 'licencias.id_estado', '=', 'estado.id_estado')
@@ -457,15 +457,32 @@ class LicenciaController extends Controller
                 'empresa.correo_corporativo',
                 'planes_licencia.nombre_plan',
                 'planes_licencia.precio',
+                'planes_licencia.duracion_meses',
                 'estado.nombre_estado'
-            )
-            ->orderBy('licencias.fecha_creacion', 'desc')
-            ->get();
+            );
 
-        $filename = 'licencias_' . now()->format('Ymd_His') . '.csv';
+        // Aplicar los MISMOS filtros que en index
+        $query = $this->applyFilters($query, $request);
+
+        // Obtener todas las licencias filtradas (sin paginación)
+        $licencias = $query->orderBy('licencias.fecha_creacion', 'desc')->get();
+
+        // Generar nombre de archivo
+        $filters = [];
+        if ($request->filled('filter')) $filters[] = $request->filter;
+        if ($request->filled('search')) $filters[] = 'busqueda';
+        if ($request->filled('estado')) $filters[] = 'estado';
+        if ($request->filled('plan')) $filters[] = 'plan';
+
+        $filterSuffix = !empty($filters) ? '_' . implode('_', $filters) : '';
+        $filename = 'licencias' . $filterSuffix . '_' . now()->format('Ymd_His') . '.csv';
+
         $headers = [
-            'Content-Type' => 'text/csv',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0'
         ];
 
         $columns = [
@@ -474,20 +491,34 @@ class LicenciaController extends Controller
             'Empresa',
             'Correo Corporativo',
             'Plan',
+            'Duración (meses)',
             'Precio',
             'Estado',
             'Fecha Inicio',
             'Fecha Vencimiento',
-            'Fecha Creación',
-            'Días Restantes'
+            'Días Restantes',
+            'Fecha Creación'
         ];
 
         $callback = function () use ($licencias, $columns) {
             $file = fopen('php://output', 'w');
+
+            // BOM para UTF-8 (para Excel)
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            // Encabezados
             fputcsv($file, $columns);
 
+            // Datos
             foreach ($licencias as $lic) {
                 $diasRestantes = (int) Carbon::today()->diffInDays(Carbon::parse($lic->fecha_vencimiento), false);
+
+                // Estado de días restantes
+                if ($diasRestantes < 0) {
+                    $diasRestantesTexto = 'VENCIDA';
+                } else {
+                    $diasRestantesTexto = $diasRestantes . ' días';
+                }
 
                 $row = [
                     $lic->id_licencia,
@@ -495,12 +526,13 @@ class LicenciaController extends Controller
                     $lic->nombre_empresa,
                     $lic->correo_corporativo,
                     $lic->nombre_plan,
-                    $lic->precio,
+                    $lic->duracion_meses,
+                    number_format($lic->precio, 2, '.', ''),
                     $lic->nombre_estado,
                     Carbon::parse($lic->fecha_inicio)->format('Y-m-d'),
                     Carbon::parse($lic->fecha_vencimiento)->format('Y-m-d'),
-                    Carbon::parse($lic->fecha_creacion)->format('Y-m-d H:i'),
-                    $diasRestantes,
+                    $diasRestantesTexto,
+                    Carbon::parse($lic->fecha_creacion)->format('Y-m-d H:i:s'),
                 ];
 
                 fputcsv($file, $row);
@@ -510,6 +542,214 @@ class LicenciaController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Exportar licencias a Excel respetando filtros
+     */
+    public function exportExcel(Request $request)
+    {
+        // Construir query base (igual que en index)
+        $query = DB::table('licencias')
+            ->join('empresa', 'licencias.NIT', '=', 'empresa.NIT')
+            ->join('planes_licencia', 'licencias.id_plan', '=', 'planes_licencia.id_plan')
+            ->join('estado', 'licencias.id_estado', '=', 'estado.id_estado')
+            ->select(
+                'licencias.*',
+                'empresa.nombre_empresa',
+                'empresa.correo_corporativo',
+                'planes_licencia.nombre_plan',
+                'planes_licencia.precio',
+                'planes_licencia.duracion_meses',
+                'estado.nombre_estado'
+            );
+
+        // Aplicar los MISMOS filtros que en index
+        $query = $this->applyFilters($query, $request);
+
+        // Obtener todas las licencias filtradas (sin paginación)
+        $licencias = $query->orderBy('licencias.fecha_creacion', 'desc')->get();
+
+        // Generar nombre de archivo
+        $filters = [];
+        if ($request->filled('filter')) $filters[] = $request->filter;
+        if ($request->filled('search')) $filters[] = 'busqueda';
+        if ($request->filled('estado')) $filters[] = 'estado';
+        if ($request->filled('plan')) $filters[] = 'plan';
+
+        $filterSuffix = !empty($filters) ? '_' . implode('_', $filters) : '';
+        $filename = 'licencias' . $filterSuffix . '_' . now()->format('Ymd_His') . '.xlsx';
+
+        // Crear spreadsheet
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Establecer encabezados
+        $headers = [
+            'A' => 'ID Licencia',
+            'B' => 'NIT',
+            'C' => 'Empresa',
+            'D' => 'Correo Corporativo',
+            'E' => 'Plan',
+            'F' => 'Duración (meses)',
+            'G' => 'Precio',
+            'H' => 'Estado',
+            'I' => 'Fecha Inicio',
+            'J' => 'Fecha Vencimiento',
+            'K' => 'Días Restantes',
+            'L' => 'Fecha Creación'
+        ];
+
+        foreach ($headers as $col => $header) {
+            $sheet->setCellValue($col . '1', $header);
+            $sheet->getStyle($col . '1')->getFont()->setBold(true);
+            $sheet->getStyle($col . '1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FF4472C4');
+            $sheet->getStyle($col . '1')->getFont()->getColor()->setARGB('FFFFFFFF');
+        }
+
+        // Agregar datos
+        $row = 2;
+        foreach ($licencias as $lic) {
+            $diasRestantes = (int) Carbon::today()->diffInDays(Carbon::parse($lic->fecha_vencimiento), false);
+            $diasRestantesTexto = $diasRestantes < 0 ? 'VENCIDA' : $diasRestantes . ' días';
+
+            $sheet->setCellValue('A' . $row, $lic->id_licencia);
+            $sheet->setCellValue('B' . $row, $lic->NIT);
+            $sheet->setCellValue('C' . $row, $lic->nombre_empresa);
+            $sheet->setCellValue('D' . $row, $lic->correo_corporativo);
+            $sheet->setCellValue('E' . $row, $lic->nombre_plan);
+            $sheet->setCellValue('F' . $row, $lic->duracion_meses);
+            $sheet->setCellValue('G' . $row, $lic->precio);
+            $sheet->setCellValue('H' . $row, $lic->nombre_estado);
+            $sheet->setCellValue('I' . $row, Carbon::parse($lic->fecha_inicio)->format('Y-m-d'));
+            $sheet->setCellValue('J' . $row, Carbon::parse($lic->fecha_vencimiento)->format('Y-m-d'));
+            $sheet->setCellValue('K' . $row, $diasRestantesTexto);
+            $sheet->setCellValue('L' . $row, Carbon::parse($lic->fecha_creacion)->format('Y-m-d H:i:s'));
+
+            $row++;
+        }
+
+        // Ajustar anchos de columna
+        $sheet->getColumnDimension('A')->setAutoSize(true);
+        $sheet->getColumnDimension('B')->setAutoSize(true);
+        $sheet->getColumnDimension('C')->setAutoSize(true);
+        $sheet->getColumnDimension('D')->setAutoSize(true);
+        $sheet->getColumnDimension('E')->setAutoSize(true);
+        $sheet->getColumnDimension('F')->setAutoSize(true);
+        $sheet->getColumnDimension('G')->setAutoSize(true);
+        $sheet->getColumnDimension('H')->setAutoSize(true);
+        $sheet->getColumnDimension('I')->setAutoSize(true);
+        $sheet->getColumnDimension('J')->setAutoSize(true);
+        $sheet->getColumnDimension('K')->setAutoSize(true);
+        $sheet->getColumnDimension('L')->setAutoSize(true);
+
+        // Guardar y descargar
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        ob_start();
+        $writer->save('php://output');
+        $content = ob_get_clean();
+
+        return response($content, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ]);
+    }
+
+
+    /**
+     * Aplicar filtros a la consulta (método compartido)
+     */
+    private function applyFilters($query, Request $request)
+    {
+        // Filtro de búsqueda
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('empresa.nombre_empresa', 'LIKE', "%{$search}%")
+                    ->orWhere('licencias.NIT', 'LIKE', "%{$search}%")
+                    ->orWhere('licencias.id_licencia', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Filtro de estado
+        if ($request->filled('estado')) {
+            $query->where('licencias.id_estado', $request->estado);
+        }
+
+        // Filtro de plan
+        if ($request->filled('plan')) {
+            $query->where('licencias.id_plan', $request->plan);
+        }
+
+        // Filtros rápidos (tabs)
+        if ($request->filled('filter')) {
+            switch ($request->filter) {
+                case 'activas':
+                    $query->where('licencias.id_estado', 1);
+                    break;
+                case 'por_vencer':
+                    $query->where('licencias.id_estado', 1)
+                        ->whereRaw('DATEDIFF(licencias.fecha_vencimiento, CURDATE()) BETWEEN 0 AND 30');
+                    break;
+                case 'vencidas':
+                    $query->where('licencias.id_estado', 21);
+                    break;
+            }
+        }
+
+        return $query;
+    }
+
+    /**
+     * AJAX: Obtener detalles completos de una licencia
+     */
+    public function getDetalles($id_licencia)
+    {
+        try {
+            // 1. Obtener el NIT de la licencia (El id_licencia es char(14))
+            $licencia = DB::table('licencias')
+                ->where('id_licencia', $id_licencia)
+                ->first();
+
+            if (!$licencia) {
+                return response()->json(['error' => 'Licencia no encontrada'], 404);
+            }
+
+            // 2. Obtener representante legal (Tabla: empresa)
+            // Las columnas aquí coinciden con tu SQL: primer_nombre_repre, etc.
+            $representante = DB::table('empresa')
+                ->where('NIT', $licencia->NIT)
+                ->select(
+                    DB::raw("CONCAT(COALESCE(primer_nombre_repre, ''), ' ', COALESCE(segundo_nombre_repre, ''), ' ', COALESCE(primer_apellido_repre, ''), ' ', COALESCE(segundo_apellido_repre, '')) as nombre_completo"),
+                    'doc_representante',
+                    'telefono_representante',
+                    'correo_representante'
+                )
+                ->first();
+
+            // 3. Obtener administrador (Tabla: usuario)
+            // CORRECCIÓN: Nombres de columnas según tu archivo .sql
+            $admin = DB::table('usuario') // Tu tabla se llama 'usuario'
+                ->where('NIT', $licencia->NIT)
+                ->where('id_tipo_usuario', 1) // Filtramos por tipo Admin
+                ->select(
+                    DB::raw("CONCAT(COALESCE(primer_nombre, ''), ' ', COALESCE(segundo_nombre, ''), ' ', COALESCE(primer_apellido, ''), ' ', COALESCE(segundo_apellido, '')) as nombre_completo"),
+                    'doc_usuario as doc_admin',
+                    'telefono as telefono_admin',
+                    'correo as correo_admin'
+                )
+                ->first();
+
+            return response()->json([
+                'representante' => $representante,
+                'admin' => $admin,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error interno del servidor',
+                'detalle' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
