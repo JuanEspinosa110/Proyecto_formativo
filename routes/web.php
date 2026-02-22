@@ -31,86 +31,88 @@ Route::get('/', function () {
     return view('index');
 })->name('home');
 
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login'])->name('login.post');
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
-    Route::get('/superadmin/dashboard', function () {
+Route::get('/superadmin/dashboard', function () {
     return view('admin.dashboard');
 });
 
-    Route::view('/register', 'auth.register')->name('register');
-    Route::post('/register', [RegistroController::class, 'store'])
-        ->name('register.store');
+Route::view('/register', 'auth.register')->name('register');
+Route::post('/register', [RegistroController::class, 'store'])
+    ->name('register.store');
 
 
-    Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
+Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
 
-    Route::post('/recuperar/enviar-codigo', 
-        [RecuperarPasswordController::class, 'enviarCodigo']
-    )->name('password.send.code');
+Route::post(
+    '/recuperar/enviar-codigo',
+    [RecuperarPasswordController::class, 'enviarCodigo']
+)->name('password.send.code');
 
-    Route::get('/codigo', function () {
-        return view('auth.codigo');
-    })->name('password.codigo.form');
+Route::get('/codigo', function () {
+    return view('auth.codigo');
+})->name('password.codigo.form');
 
-    Route::post('/codigo/verificar', [RecuperarPasswordController::class, 'verificarCodigo'])
-        ->name('password.verify.code');
-
-    Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCodigo'])
-        ->name('password.resend.code');
-
-    // Mostrar vista nueva contraseña
-    Route::get('/nueva-password', function () {
-        if (!session('correo')) {
-            return redirect()->route('recuperar');
-        }
-
+Route::post('/codigo/verificar', [RecuperarPasswordController::class, 'verificarCodigo'])
+    ->name('password.verify.code');
 
 Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCodigo'])
     ->name('password.resend.code');
 
 // Mostrar vista nueva contraseña
-Route::get('/nueva-password', 
-    [RecuperarPasswordController::class, 'mostrarNuevaPassword']
-)->name('password.nueva.form');
-
-        return view('auth.nueva_password');
-    })->name('password.nueva.form');
+Route::get('/nueva-password', function () {
+    if (!session('correo')) {
+        return redirect()->route('recuperar');
+    }
 
 
+    Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCodigo'])
+        ->name('password.resend.code');
 
-    // Procesar actualización
-    Route::post('/nueva-password', 
-        [RecuperarPasswordController::class, 'actualizarPassword']
-    )->name('password.update');
+    // Mostrar vista nueva contraseña
+    Route::get(
+        '/nueva-password',
+        [RecuperarPasswordController::class, 'mostrarNuevaPassword']
+    )->name('password.nueva.form');
+
+    return view('auth.nueva_password');
+})->name('password.nueva.form');
 
 
 
-    Route::middleware('auth:web')->group(function () {
+// Procesar actualización
+Route::post(
+    '/nueva-password',
+    [RecuperarPasswordController::class, 'actualizarPassword']
+)->name('password.update');
 
-        Route::get('/pasajero/dashboard', fn() => view('pasajeros.index'))
-            ->name('pasajero.dashboard');
 
-        Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
-            ->name('empresa.dashboard');
-    });
 
-    Route::middleware('auth:superadmin')->group(function () {
+Route::middleware('auth:web')->group(function () {
 
-        Route::get('/superadmin/dashboard', fn() => view('superadmin.dashboard'))
-            ->name('superadmin.dashboard');
+    Route::get('/pasajero/dashboard', fn() => view('pasajeros.index'))
+        ->name('pasajero.dashboard');
+
+    Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
+        ->name('empresa.dashboard');
+});
+
+Route::middleware('auth:superadmin')->group(function () {
+
+    Route::get('/superadmin/dashboard', fn() => view('superadmin.dashboard'))
+        ->name('superadmin.dashboard');
 });
 
 
-Route::get('/superadmin/dashboard/stats',[DashboardController::class, 'superAdminStats'])->name('superadmin.dashboard.stats');
+Route::get('/superadmin/dashboard/stats', [DashboardController::class, 'superAdminStats'])->name('superadmin.dashboard.stats');
 
-    Route::prefix('superadmin')
+Route::prefix('superadmin')
     ->name('superadmin.')
     ->middleware(['auth:superadmin'])
-    ->group(function () 
-    {
+    ->group(function () {
 
         // Tipos de Usuario (Roles)
         Route::get('roles', [TipoUsuarioController::class, 'index'])->name('roles.index');
@@ -166,17 +168,17 @@ Route::get('/superadmin/dashboard/stats',[DashboardController::class, 'superAdmi
         Route::get('/licencias/configurar-plan', [LicenciaController::class, 'configurarPlan'])->name('licencias.configurar-plan');
         Route::get('/licencias/{id}/editar', [LicenciaController::class, 'edit'])->name('licencias.edit');
 
-        
 
-         // Ruta para obtener ciudades por departamento (AJAX)
+
+        // Ruta para obtener ciudades por departamento (AJAX)
         Route::get('/empresas/ciudades/{id_departamento}', [EmpresaController::class, 'getCiudadesByDepartamento'])
-        ->name('superadmin.empresas.ciudades');
-        
- 
-    
+            ->name('superadmin.empresas.ciudades');
+
+
+
         // Rutas CRUD de Empresas
         Route::resource('empresas', EmpresaController::class);
-        
+
 
 
         // PLANES DE LICENCIA
@@ -192,6 +194,16 @@ Route::get('/superadmin/dashboard/stats',[DashboardController::class, 'superAdmi
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
 
+        //configuracion
+        Route::prefix('configuracion')->name('configuracion.')->group(function () {
+            Route::prefix('ciudades')->name('ciudades.')->group(function () {
+                Route::get('/', [CiudadController::class, 'index'])->name('index');
+            });
+            Route::prefix('tipo_empresa')->name('tipo_empresa.')->group(function () {
+                Route::get('/', [TipoEmpresaController::class, 'index'])->name('index');
+            });
+        });
+
         //Reportes 
         Route::get('reportes', [ReporteController::class, 'index'])
             ->name('reportes.index');
@@ -206,7 +218,7 @@ Route::get('/superadmin/dashboard/stats',[DashboardController::class, 'superAdmi
         Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
             ->name('tarjetas.update');
 
-         Route::get('ciudades', [CiudadController::class, 'index'])
+        Route::get('ciudades', [CiudadController::class, 'index'])
             ->name('ciudades.index');
 
         Route::post('ciudades', [CiudadController::class, 'store'])
@@ -217,8 +229,8 @@ Route::get('/superadmin/dashboard/stats',[DashboardController::class, 'superAdmi
 
         Route::post('departamentos', [CiudadController::class, 'storeDepartamento'])
             ->name('departamentos.store');
-    
-    
+
+
 
         Route::get('tipo-empresa', [TipoEmpresaController::class, 'index'])
             ->name('tipo-empresa.index');
@@ -228,6 +240,4 @@ Route::get('/superadmin/dashboard/stats',[DashboardController::class, 'superAdmi
 
         Route::put('tipo-empresa/{id}', [TipoEmpresaController::class, 'update'])
             ->name('tipo-empresa.update');
-
-
     });
