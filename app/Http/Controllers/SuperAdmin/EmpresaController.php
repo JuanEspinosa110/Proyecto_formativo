@@ -13,7 +13,7 @@ class EmpresaController extends Controller
 {
     /**
      * Listado de empresas
-     */
+     */ 
     public function index(Request $request)
     {
         $query = Empresa::with(['ciudad.departamento', 'estado']);
@@ -36,7 +36,7 @@ class EmpresaController extends Controller
             $query->where('id_ciudad', $request->ciudad);
         }
 
-        $empresas = $query->orderBy('fecha_creacion', 'desc')->paginate(10);
+        $empresas = $query->orderBy('fecha_creacion', 'desc')->paginate(5);
         $estados = Estado::whereIn('id_estado', [1,2,3,6])->get();
         $ciudades = Ciudad::orderBy('nombre_city')->get();
 
@@ -59,13 +59,13 @@ class EmpresaController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+    $validated = $request->validate([
 
-            // EMPRESA
-            'NIT' => 'required|numeric|unique:empresa,NIT',
-            'nombre_empresa' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'telefono_empresa' => 'required|numeric',
-            'correo_corporativo' => ['required','regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/'],
+    // EMPRESA
+    'NIT' => 'required|digits:10|unique:empresa,NIT',
+    'nombre_empresa' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+    'telefono_empresa' => 'required|digits_between:7,15',
+    'correo_corporativo' => 'required|email',
 
             // REPRESENTANTE
             'doc_representante' => 'required|numeric',
@@ -76,19 +76,44 @@ class EmpresaController extends Controller
             'telefono_representante' => 'required|numeric',
             'correo_representante' => ['required','regex:/^[a-zA-Z0-9._%+-]+@gmail\.com$/'],
 
-            // UBICACIÓN
-            'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-            'id_estado' => 'required|exists:estado,id_estado',
+    // UBICACIÓN
+    'id_ciudad' => 'required|exists:ciudad,id_ciudad',
 
-        ], [
-            'required' => 'Este campo es obligatorio.',
-            'numeric' => 'Solo se permiten números.',
-            'correo_corporativo.regex' => 'Debe ser un correo válido @gmail.com',
-            'correo_representante.regex' => 'Debe ser un correo válido @gmail.com',
-        ]);
+    ], [
 
-        // Asignar tipo empresa automáticamente
-        $validated['id_tipo_empresa'] = 1;
+    // NIT
+    'NIT.required' => 'El NIT es obligatorio.',
+    'NIT.digits' => 'El NIT debe tener exactamente 10 dígitos.',
+    'NIT.unique' => 'Ya existe una empresa registrada con este NIT.',
+
+    // Empresa
+    'nombre_empresa.required' => 'El nombre de la empresa es obligatorio.',
+    'nombre_empresa.regex' => 'El nombre solo puede contener letras y espacios.',
+    'telefono_empresa.required' => 'El teléfono de la empresa es obligatorio.',
+    'telefono_empresa.digits_between' => 'El teléfono debe tener entre 7 y 15 números.',
+    'correo_corporativo.required' => 'El correo corporativo es obligatorio.',
+    'correo_corporativo.email' => 'El correo corporativo no es válido.',
+
+    // Representante
+    'doc_representante.required' => 'El documento del representante es obligatorio.',
+    'doc_representante.digits_between' => 'El documento debe tener solo números válidos.',
+    'primer_nombre_repre.required' => 'El primer nombre es obligatorio.',
+    'primer_apellido_repre.required' => 'El primer apellido es obligatorio.',
+    'segundo_apellido_repre.required' => 'El segundo apellido es obligatorio.',
+    'telefono_representante.required' => 'El teléfono del representante es obligatorio.',
+    'telefono_representante.digits_between' => 'El teléfono del representante no es válido.',
+    'correo_representante.required' => 'El correo del representante es obligatorio.',
+    'correo_representante.email' => 'El correo del representante no es válido.',
+
+    // Ubicación
+    'id_ciudad.required' => 'Debe seleccionar una ciudad.',
+    'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
+    ]);
+
+
+    //  ASIGNACIONES AUTOMÁTICAS
+    $validated['id_estado'] = 1;
+    $validated['id_tipo_empresa'] = 1;
 
         Empresa::create($validated);
 
