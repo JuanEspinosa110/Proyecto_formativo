@@ -165,6 +165,7 @@ Route::prefix('superadmin')
         // Rutas CRUD de Empresas
         Route::resource('empresas', EmpresaController::class);
         Route::get('empresas/export/csv', [EmpresaController::class, 'exportCsv'])->name('empresas.export.csv');
+        Route::get('empresas/export/excel', [EmpresaController::class, 'exportExcel'])->name('empresas.export.excel');
 
         // PLANES DE LICENCIA
         Route::get('planes', [PlanLicenciaController::class, 'index'])->name('planes.index');

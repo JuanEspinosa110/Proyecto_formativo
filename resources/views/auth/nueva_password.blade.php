@@ -9,70 +9,80 @@
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 </head>
 
-<body>
+<body class="recov-body">
 
-<div class="npw-page">
+    <header class="login-header">
+    
+    <div class="header-left">
+        <img src="{{ asset('imagenes/logo-sigu.png') }}" alt="SIGU Logo" class="logo-icon">
+    </div>
 
-    <header class="npw-header">
-        <h2>Transporte Ibagué</h2>
-    </header>
+    <div class="header-center">
+        <h1 class="logo-title">SIGU</h1>
+        <p class="logo-subtitle">Sistema Integral de Gestión Urbana</p>
+    </div>
 
-    <div class="top-navigation">
-    <a href="{{ route('home') }}" class="btn-home">
-        Volver al inicio
-    </a>
-</div>
+    <div class="header-right">
+        <a href="{{ route('home') }}" class="btn-home">
+            Volver al inicio
+        </a>
+    </div>
+
+    </header>    
+
+    <main class="newpass-wrapper">
+        <div class="newpass-card">
+
+                <div class="recov-card-header">
+                    <div class="recov-header-accent"></div>
+                </div>
+            <div class="recov-card-body">
+                <div class="text-center mb-8">
+                    <h1 class="recov-title">Nueva contraseña</h1>
+                    <p class="recov-description">Ingresa tu nueva clave para asegurar tu cuenta.</p>
+                </div>
+                @if ($errors->any())
+                    <div class="recov-error-box">
+                        <strong>Corrige los siguientes errores:</strong>
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
 
-    <main class="npw-main">
-        <div class="npw-card">
 
-            <div class="npw-card-header">
-                <h1>Nueva contraseña</h1>
-                <p>Ingresa tu nueva clave para asegurar tu cuenta.</p>
+                <form method="POST" action="{{ route('password.update') }}">
+                    @csrf
+
+                    <input type="hidden" name="correo" value="{{ old('correo', session('correo')) }}">
+
+                    <div class="recov-group">
+                        <label>Nueva contraseña</label>
+                        <input type="password" name="password" required>
+                    </div>
+
+                    <div class="recov-group">
+                        <label>Confirmar contraseña</label>
+                        <input type="password" name="password_confirmation" required>
+                    </div>
+
+                    <button type="submit" class="recov-btn">
+                        Restablecer contraseña
+                    </button>
+                </form>
+
+                <div class="recov-back">
+                    <a href="{{ route('login') }}">Volver al login</a>
+                </div>
+
             </div>
-
-            @if ($errors->any())
-                <div class="npw-error-box">
-                    <strong>Corrige los siguientes errores:</strong>
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-
-
-            <form method="POST" action="{{ route('password.update') }}">
-                @csrf
-
-                <input type="hidden" name="correo" value="{{ old('correo', $correo) }}">
-
-                <div class="npw-group">
-                    <label>Nueva contraseña</label>
-                    <input type="password" name="password" required>
-                </div>
-
-                <div class="npw-group">
-                    <label>Confirmar contraseña</label>
-                    <input type="password" name="password_confirmation" required>
-                </div>
-
-                <button type="submit" class="npw-btn">
-                    Restablecer contraseña
-                </button>
-            </form>
-
-            <div class="npw-back">
-                <a href="{{ route('login') }}">Volver al login</a>
-            </div>
-
         </div>
     </main>
 
-    <footer class="npw-footer">
+    <footer class="recov-footer">
         © 2026 Sistema de Gestión de Transporte - Ibagué
     </footer>
 

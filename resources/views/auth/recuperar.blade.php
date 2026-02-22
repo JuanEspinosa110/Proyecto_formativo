@@ -15,31 +15,41 @@
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 </head>
 
-<body>
-<div class="recov-page min-h-screen flex flex-col bg-background-light dark:bg-background-dark">
+<body class="recov-body">
+
+
 
     <!-- HEADER -->
-    <header class="recov-header">
-        <div class="recov-logo">
-            <h2>SIGU</h2>
-        </div>
-        <span class="recov-subtitle">Sistema integral de gestión urbana</span>
-    </header>
+    <header class="login-header">
+    
+    <div class="header-left">
+        <img src="{{ asset('imagenes/logo-sigu.png') }}" alt="SIGU Logo" class="logo-icon">
+    </div>
 
-    <div class="top-navigation">
-    <a href="{{ route('home') }}" class="btn-home">
-        Volver al inicio
-    </a>
-</div>
+    <div class="header-center">
+        <h1 class="logo-title">SIGU</h1>
+        <p class="logo-subtitle">Sistema Integral de Gestión Urbana</p>
+    </div>
+
+    <div class="header-right">
+        <a href="{{ route('home') }}" class="btn-home">
+            Volver al inicio
+        </a>
+    </div>
+
+</header>
+
 
 
     <!-- MAIN -->
-    <main class="flex-grow flex items-center justify-center p-4">
+    <main class="recov-wrapper">
+
         <div class="recov-card">
 
             <div class="recov-card-header">
-                <span class="material-symbols-outlined recov-icon">Recuperar contraseña</span>
+                <div class="recov-header-accent"></div>
             </div>
+
 
             <div class="recov-card-body">
                 <div class="text-center mb-8">

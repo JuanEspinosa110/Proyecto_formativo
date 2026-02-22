@@ -13,14 +13,20 @@
 <body class="login-body">
 
 <header class="login-header">
-    <h1>Sistema integral de gestion urbana</h1>
-</header>
+    <div class="navbar-index-brand">
+        <img src="{{ asset('imagenes/logo-sigu.png') }}" alt="SIGU Logo" class="navbar-index-logo-img">
+        <div class="navbar-index-logo-text">
+            <h1 class="navbar-index-logo-title">SIGU</h1>
+            <p class="navbar-index-logo-subtitle">Sistema Integral de Gestión Urbana</p>
+        </div>
+    </div>
 
-<div class="top-navigation">
-    <a href="{{ route('home') }}" class="btn-home">
-        Volver al inicio
-    </a>
-</div>
+    <div class="header-right top-navigation">
+        <a href="{{ route('home') }}" class="btn-home">
+            Volver al inicio
+        </a>
+    </div>
+</header>
 
 <div class="regis-wrapper">
     <div class="regis-card">

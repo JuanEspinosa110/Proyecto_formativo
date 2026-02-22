@@ -16,18 +16,16 @@
     
     {{-- HEADER --}}
     <div class="empresa-header">
-        <div class="empresa-header-title">
+        <div class="empresa-header-title" style="flex: 1;">
             <h1><span class="material-symbols-outlined">Gestión de Empresas</span> </h1>
             <p>Administra las empresas registradas en el sistema</p>
-
-            <a href="{{ route('superadmin.empresas.create') }}" class="btn btn-success">
-                <span class="material-symbols-outlined"><i class="fa fa-plus" aria-hidden="true"></i>
-                    </span>
+        </div>
+        <div class="empresa-header-actions" style="display: flex; gap: 0.75rem; margin-left: auto; flex-shrink: 0;">
+            <a href="{{ route('superadmin.empresas.create') }}" class="btn-empresa-add" style="display: inline-flex !important; align-items: center !important; gap: 0.5rem !important; padding: 0.75rem 1.5rem !important; background: #2563eb !important; color: white !important; border: none !important; border-radius: 8px !important; font-weight: 600 !important; text-decoration: none !important; white-space: nowrap !important;">
+                <span class="material-symbols-outlined"><i class="fa fa-plus" aria-hidden="true"></i></span>
                 Nueva Empresa
             </a>
-
         </div>
-        
     </div>
 
     {{-- ALERTAS --}}
@@ -82,11 +80,6 @@
                     Filtrar
                 </button>
 
-                <a href="{{ route('superadmin.empresas.export.csv') }}" 
-                    class="btn btn-success mb-3">
-                        Descargar CSV
-                </a>
-
 
 
                 @if(request('search') || request('estado') || request('ciudad'))
@@ -98,6 +91,18 @@
                 @endif
             </div>
         </form>
+    </div>
+
+    {{-- BOTONES DE EXPORTACIÓN --}}
+    <div class="empresa-export-buttons">
+        <a href="{{ route('superadmin.empresas.export.csv') }}" class="btn-export csv-btn" style="background: white !important; color: #2563eb !important; border: 1px solid #2563eb !important; padding: 0.625rem 1.25rem !important; border-radius: 8px !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; gap: 0.5rem !important;">
+            <span class="material-symbols-outlined"><i class="fa fa-file-csv" aria-hidden="true"></i></span>
+            CSV
+        </a>
+        <a href="{{ route('superadmin.empresas.export.excel') }}" class="btn-export excel-btn" style="background: #2563eb !important; color: white !important; border: 1px solid #2563eb !important; padding: 0.625rem 1.25rem !important; border-radius: 8px !important; font-weight: 600 !important; text-decoration: none !important; display: inline-flex !important; align-items: center !important; gap: 0.5rem !important;">
+            <span class="material-symbols-outlined"><i class="fa fa-file-excel" aria-hidden="true"></i></span>
+            Excel
+        </a>
     </div>
 
     {{-- ESTADÍSTICAS --}}
@@ -163,7 +168,7 @@
                     @foreach($empresas as $empresa)
                         <tr>
                             <td>
-                                <strong>{{ number_format($empresa->NIT, 0, '', '.') }}</strong>
+                                <strong>{{ $empresa->NIT }}</strong>
                             </td>
                             <td>
                                 <div class="empresa-info">
