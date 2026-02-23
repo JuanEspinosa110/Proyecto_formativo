@@ -23,6 +23,7 @@ use App\Http\Controllers\SuperAdmin\{
     PlanLicenciaController,
     CiudadController,
     TipoEmpresaController,
+    TipoDocumentoController
 };
 
 Route::get('/', function () {
@@ -254,4 +255,13 @@ Route::prefix('superadmin')
 
         Route::put('tipo-empresa/{id}', [TipoEmpresaController::class, 'update'])
             ->name('tipo-empresa.update');
-    });
+
+        Route::get('tipo-documento', [TipoDocumentoController::class, 'index'])
+            ->name('tipo_documento.index');
+
+        Route::post('tipo-documento', [TipoDocumentoController::class, 'store'])
+            ->name('tipo_documento.store');
+
+        Route::put('tipo-documento/{id}', [TipoDocumentoController::class, 'update'])
+            ->name('tipo_documento.update');
+            });

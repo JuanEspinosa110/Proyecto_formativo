@@ -124,6 +124,13 @@
                         <i class="bi bi-toggle-on"></i> Estados
                     </a>
                 </li>
+                {{-- TIPO DE DOCUMENTOS --}}
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.tipo_documento.index') }}">
+                        <i class="bi bi-file-earmark-text"></i> Tipos de Documento
+                    </a>
+                </li>
 
             </ul>
         </div>
