@@ -177,17 +177,17 @@ class LicenciaController extends Controller
             'nombre_empresa' => 'required|string|max:150',
             'id_departamento' => 'required|exists:departamento,id_departamento',
             'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-            'telefono_empresa' => 'nullable|string|max:20',
+            'telefono_empresa' => 'nullable|digits_between:7,15',
             'correo_corporativo' => 'required|email|max:150',
 
             // Usuario Administrador
-            'doc_admin' => 'required|numeric',
-            'primer_nombre_admin' => 'required|string|max:50',
-            'segundo_nombre_admin' => 'nullable|string|max:50',
-            'primer_apellido_admin' => 'required|string|max:50',
-            'segundo_apellido_admin' => 'nullable|string|max:50',
-            'telefono_admin' => 'nullable|string|max:20',
-            'correo_admin' => 'required|email|max:150',
+            'doc_admin' => 'required|digits_between:8,12',
+            'primer_nombre_admin' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
+            'segundo_nombre_admin' => ['nullable', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
+            'primer_apellido_admin' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
+            'segundo_apellido_admin' => ['nullable', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
+            'telefono_admin' => 'nullable|digits_between:7,15',
+            'correo_admin' => ['required', 'email', 'regex:/^.+@.+\..+$/', 'max:150'],
             'password_admin' => [
                 'required',
                 'min:8',
@@ -195,6 +195,36 @@ class LicenciaController extends Controller
                 'regex:/[A-Z]/',
                 'regex:/[0-9]/',
             ],
+        ], [
+            // Mensajes para Empresa
+            'id_departamento.required' => 'Debe seleccionar un departamento.',
+            'id_departamento.exists'   => 'El departamento seleccionado no es válido.',
+
+            'id_ciudad.required' => 'Debe seleccionar una ciudad.',
+            'id_ciudad.exists'   => 'La ciudad seleccionada no es válida.',
+            // Mensajes para el Documento
+            'doc_admin.required' => 'El documento de identidad es obligatorio.',
+            'doc_admin.digits_between' => 'El documento debe tener entre 8 y 12 dígitos numéricos.',
+
+            // Mensajes para Nombres y Apellidos
+            'primer_nombre_admin.required' => 'El primer nombre es obligatorio.',
+            'primer_nombre_admin.regex' => 'El nombre solo puede contener letras y sin espacios.',
+            'segundo_nombre_admin.regex' => 'El segundo nombre solo puede contener letras y sin espacios.',
+            'primer_apellido_admin.required' => 'El primer apellido es obligatorio.',
+            'primer_apellido_admin.regex' => 'El apellido solo puede contener letras y sin espacios.',
+            'segundo_apellido_admin.regex' => 'El segundo apellido solo puede contener letras y sin espacios.',
+
+            // Mensajes para Teléfono y Correo
+            'telefono_admin.digits_between' => 'El teléfono debe tener entre 7 y 15 dígitos.',
+            'correo_admin.required' => 'El correo electrónico es obligatorio.',
+            'correo_admin.email' => 'Ingrese una dirección de correo válida.',
+            'correo_admin.regex' => 'El correo debe tener un dominio válido.',
+            'correo_admin.max' => 'El correo no puede exceder los 150 caracteres.',
+
+            // Mensajes para la Contraseña
+            'password_admin.required' => 'La contraseña es obligatoria.',
+            'password_admin.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'password_admin.regex' => 'La contraseña debe incluir al menos una mayúscula, una minúscula y un número.',
         ]);
 
         try {

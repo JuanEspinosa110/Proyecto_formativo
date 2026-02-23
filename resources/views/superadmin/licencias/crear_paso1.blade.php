@@ -73,7 +73,7 @@
                     <div class="col-md-4">
                         <label class="sa-licencia-label">NIT / Identificación Tributaria *</label>
                         <div class="input-group">
-                            <input type="text"
+                            <input type="number"
                                 id="nitInput"
                                 name="NIT"
                                 class="form-control sa-licencia-input @error('NIT') is-invalid @enderror"
