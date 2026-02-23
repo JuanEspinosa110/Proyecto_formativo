@@ -16,7 +16,7 @@ class TipoUsuarioController extends Controller
         $query->where('nombre_tipo', 'like', '%' . $request->buscar . '%');
     }
 
-    $tipos = $query->orderBy('nombre_tipo')
+    $tipos = $query->orderBy('id_tipo_usuario', 'asc')
                    ->paginate(5);
 
     return view('superadmin.configuracion.tipo_usuario.index', compact('tipos'));

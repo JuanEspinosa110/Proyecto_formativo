@@ -10,7 +10,7 @@ class TipoEmpresaController extends Controller
 {
     public function index(Request $request)
     {
-        $query = TipoEmpresa::orderBy('nombre_tipo');
+        $query = TipoEmpresa::orderBy('id_tipo_empresa', 'asc');
 
         if ($request->filled('buscar')) {
             $query->where('nombre_tipo', 'LIKE', '%' . $request->buscar . '%');

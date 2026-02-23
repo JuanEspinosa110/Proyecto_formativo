@@ -13,7 +13,7 @@ public function index(Request $request)
        $estados = Estado::when($request->buscar, function ($query, $buscar) {
             return $query->where('nombre_estado', 'like', "%{$buscar}%");
         })
-        ->orderBy('nombre_estado', 'asc')
+        ->orderBy('id_estado', 'asc')
         ->paginate(5)
         ->withQueryString();
 

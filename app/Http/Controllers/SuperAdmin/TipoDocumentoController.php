@@ -15,7 +15,7 @@ class TipoDocumentoController extends Controller
             ->when($request->buscar, function ($query, $buscar) {
                 return $query->where('nombre', 'like', "%{$buscar}%");
             })
-            ->orderBy('nombre')
+            ->orderBy('id_tipo_documento', 'asc')
             ->paginate(5)
             ->withQueryString();
 
