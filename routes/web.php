@@ -6,8 +6,7 @@ use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
 use Illuminate\Http\Request;
-
-
+use App\Http\Controllers\SuperAdmin\EstadoController;
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
     RolController,
@@ -112,8 +111,13 @@ Route::get('/superadmin/dashboard/stats', [DashboardController::class, 'superAdm
 Route::prefix('superadmin')
     ->name('superadmin.')
     ->middleware(['auth:superadmin'])
-    ->group(function () {
+    ->group(function () 
+    {
 
+        // En web.php, dentro del grupo superadmin
+        Route::get('tipo-usuario', [TipoUsuarioController::class, 'index'])->name('tipo_usuario.index');
+        Route::post('tipo-usuario', [TipoUsuarioController::class, 'store'])->name('tipo_usuario.store');
+        Route::put('tipo-usuario/{id}', [TipoUsuarioController::class, 'update'])->name('tipo_usuario.update');    
         // Tipos de Usuario (Roles)
         Route::get('roles', [TipoUsuarioController::class, 'index'])->name('roles.index');
         Route::get('roles/create', [TipoUsuarioController::class, 'create'])->name('roles.create');
@@ -193,6 +197,16 @@ Route::prefix('superadmin')
 
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+
+
+        Route::get('estados', [EstadoController::class, 'index'])
+            ->name('estados.index');
+
+        Route::post('estados', [EstadoController::class, 'store'])
+            ->name('estados.store');
+
+        Route::put('estados/{id}', [EstadoController::class, 'update'])
+            ->name('estados.update');
 
         //configuracion
         Route::prefix('configuracion')->name('configuracion.')->group(function () {
