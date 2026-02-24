@@ -105,16 +105,16 @@
 
                     <div class="col-md-4">
                         <label class="sa-licencia-label">Departamento *</label>
-                        <input type="text" id="nombre_departamento" class="form-control sa-licencia-input" readonly placeholder="Carga automática...">
-                        <input type="hidden" name="id_departamento" id="id_departamento_id">
+                        <input type="text" id="nombre_departamento" class="form-control sa-licencia-input" readonly value="{{ old('nombre_departamento') }}" placeholder="Carga automática...">
+                        <input type="hidden" name="id_departamento" id="id_departamento" value="{{ old('id_departamento') }}">
                         @error('id_departamento')<div class="text-danger small">{{ $message }}</div>@enderror
                         <small class="text-muted">Se carga automáticamente con la búsqueda del NIT</small>
                     </div>
 
                     <div class="col-md-4">
                         <label class="sa-licencia-label">Ciudad *</label>
-                        <input type="text" id="nombre_ciudad" class="form-control sa-licencia-input" readonly placeholder="Carga automática...">
-                        <input type="hidden" name="id_ciudad" id="id_ciudad_id">
+                        <input type="text" id="nombre_ciudad" class="form-control sa-licencia-input" readonly value="{{ old('nombre_ciudad') }}" placeholder="Carga automática...">
+                        <input type="hidden" name="id_ciudad" id="id_ciudad" value="{{ old('id_ciudad') }}">
                         @error('id_ciudad')<div class="text-danger small">{{ $message }}</div>@enderror
                         <small class="text-muted">Se carga automáticamente con la búsqueda del NIT</small>
                     </div>
@@ -164,7 +164,7 @@
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label class="sa-licencia-label">Documento de Identidad *</label>
-                        <input type="text"
+                        <input type="number"
                             id="doc_admin"
                             name="doc_admin"
                             class="form-control sa-licencia-input @error('doc_admin') is-invalid @enderror"
@@ -222,7 +222,7 @@
 
                     <div class="col-md-3">
                         <label class="sa-licencia-label">Teléfono</label>
-                        <input type="text"
+                        <input type="number"
                             id="telefono_admin"
                             name="telefono_admin"
                             class="form-control sa-licencia-input"
@@ -319,11 +319,50 @@
                 });
         });
 
+        /**
+         * Validación de solo letras en campos de nombres
+         */
+        const camposLetras = [
+            'primer_nombre_admin',
+            'primer_apellido_admin',
+            'segundo_apellido_admin'
+        ];
+
+        camposLetras.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    // Reemplaza cualquier cosa que NO sea letra (incluyendo tildes y ñ) por vacío
+                    this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g, '');
+                });
+            }
+        });
+
+        const campotercernombre = [
+            'segundo_nombre_admin'
+        ];
+
+        campotercernombre.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    // Reemplaza cualquier cosa que NO sea letra (incluyendo tildes y ñ) por vacío
+                    this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+                });
+            }
+        });
+
+        /**
+         * Mostrar/ocultar alerta
+         */
         function showAlert(type, message) {
             nitAlert.className = `alert alert-${type} d-block`;
             nitAlertMessage.innerHTML = message;
         }
 
+        /**
+         * Llenar formulario con datos de la empresa
+         */
         function llenarFormulario(datos) {
             // Llenar campos de texto
             document.getElementById('nombre_empresa').value = datos.nombre_empresa || '';
@@ -335,15 +374,17 @@
             document.getElementById('nombre_ciudad').value = datos.nombre_city || '';
 
             // Llenar IDs ocultos para el envío del formulario
-            document.getElementById('id_departamento_id').value = datos.id_departamento || '';
-            document.getElementById('id_ciudad_id').value = datos.id_ciudad || '';
+            document.getElementById('id_departamento').value = datos.id_departamento || '';
+            document.getElementById('id_ciudad').value = datos.id_ciudad || '';
         }
 
+        /**
+         * Limpiar formulario
+         */
         function limpiarFormulario() {
             const campos = [
                 'nombre_empresa', 'telefono_empresa', 'correo_corporativo',
-                'nombre_departamento', 'nombre_ciudad',
-                'id_departamento_id', 'id_ciudad_id'
+                'nombre_departamento', 'nombre_ciudad', 'id_departamento', 'id_ciudad'
             ];
             campos.forEach(id => {
                 const el = document.getElementById(id);
