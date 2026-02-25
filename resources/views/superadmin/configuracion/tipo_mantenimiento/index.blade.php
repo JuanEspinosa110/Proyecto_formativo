@@ -25,12 +25,12 @@
 
             {{-- HEADER Y BOTONES --}}
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3 mb-0 text-gray-800">Tipos de Usuario</h1>
+                <h1 class="h3 mb-0 text-gray-800">Tipos de Mantenimiento</h1>
                 <div>
                     <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#crearModal">
                         <i class="fas fa-plus me-1"></i> Crear Nuevo
                     </button>
-                    <a href="{{ route('superadmin.configuracion.tipo-usuario.export', ['buscar' => request('buscar')]) }}" class="btn btn-success shadow-sm ms-2">
+                    <a href="{{ route('superadmin.configuracion.tipo-mantenimiento.export', ['buscar' => request('buscar')]) }}" class="btn btn-success shadow-sm ms-2">
                         <i class="fas fa-file-excel me-1"></i> Exportar Excel
                     </a>
                 </div>
@@ -39,7 +39,7 @@
             {{-- BUSCADOR --}}
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
-                    <form method="GET" action="{{ route('superadmin.configuracion.tipo-usuario.index') }}" class="row g-3">
+                    <form method="GET" action="{{ route('superadmin.configuracion.tipo-mantenimiento.index') }}" class="row g-3">
                         <div class="col-md-6 col-lg-4">
                             <div class="input-group">
                                 <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
@@ -51,7 +51,7 @@
                         </div>
                         @if(request('buscar'))
                         <div class="col-md-2">
-                            <a href="{{ route('superadmin.configuracion.tipo-usuario.index') }}" class="btn btn-outline-secondary w-100">Limpiar</a>
+                            <a href="{{ route('superadmin.configuracion.tipo-mantenimiento.index') }}" class="btn btn-outline-secondary w-100">Limpiar</a>
                         </div>
                         @endif
                     </form>
@@ -73,16 +73,16 @@
                             <tbody class="border-top-0">
                                 @forelse($tipos as $tipo)
                                 <tr>
-                                    <td class="px-4 fw-bold text-dark">{{ $tipo->id_tipo_usuario }}</td>
-                                    <td>{{ $tipo->nombre_tipo }}</td>
+                                    <td class="px-4 fw-bold text-dark">{{ $tipo->id_tipo_mantenimiento }}</td>
+                                    <td>{{ $tipo->nombre }}</td>
                                     <td class="text-end px-4">
                                         <button 
                                             type="button"
                                             class="btn btn-outline-warning btn-sm border-0"
                                             data-bs-toggle="modal"
                                             data-bs-target="#editarModal"
-                                            data-id="{{ $tipo->id_tipo_usuario }}"
-                                            data-nombre="{{ $tipo->nombre_tipo }}">
+                                            data-id="{{ $tipo->id_tipo_mantenimiento }}"
+                                            data-nombre="{{ $tipo->nombre }}">
                                             <i class="fas fa-edit me-1"></i> Editar
                                         </button>
                                     </td>
@@ -116,16 +116,16 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title fw-bold" id="crearModalLabel">Nuevo Tipo de Usuario</h5>
+                <h5 class="modal-title fw-bold" id="crearModalLabel">Nuevo Tipo de Mantenimiento</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('superadmin.configuracion.tipo-usuario.store') }}" method="POST">
+            <form action="{{ route('superadmin.configuracion.tipo-mantenimiento.store') }}" method="POST">
                 @csrf
                 <div class="modal-body py-4">
                     <div class="mb-0">
                         <label class="form-label fw-semibold">Nombre del Tipo <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_tipo" class="form-control @error('nombre_tipo') is-invalid @enderror" placeholder="Ej: Super Admin" required value="{{ old('nombre_tipo') }}">
-                        @error('nombre_tipo')
+                        <input type="text" name="nombre" class="form-control @error('nombre') is-invalid @enderror" placeholder="Ej: Preventivo" required value="{{ old('nombre') }}">
+                        @error('nombre')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -153,8 +153,8 @@
                 <div class="modal-body py-4">
                     <div class="mb-0">
                         <label class="form-label fw-semibold">Nombre del Tipo <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_tipo" id="editNombre" class="form-control @error('nombre_tipo') is-invalid @enderror" required value="{{ old('nombre_tipo') }}">
-                        @error('nombre_tipo')
+                        <input type="text" name="nombre" id="editNombre" class="form-control @error('nombre') is-invalid @enderror" required value="{{ old('nombre') }}">
+                        @error('nombre')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -180,22 +180,22 @@ document.addEventListener('DOMContentLoaded', function () {
             var nombre = button.getAttribute('data-nombre');
 
             var form = document.getElementById('formEditar');
-            form.action = "{{ url('superadmin/configuracion/tipo-usuario') }}/" + id;
+            form.action = "{{ url('superadmin/configuracion/tipo-mantenimiento') }}/" + id;
 
             document.getElementById('editNombre').value = nombre;
 
             // Save ID for reopening on validation error
-            sessionStorage.setItem('last_edit_id_tipo_usuario', id);
+            sessionStorage.setItem('last_edit_id_tipo_mant', id);
         });
     }
 
     // Redirect error to correct modal
     @if($errors->any())
         @if(old('_method') == 'PUT')
-            var lastEditId = sessionStorage.getItem('last_edit_id_tipo_usuario');
+            var lastEditId = sessionStorage.getItem('last_edit_id_tipo_mant');
             if (lastEditId) {
                 var form = document.getElementById('formEditar');
-                form.action = "{{ url('superadmin/configuracion/tipo-usuario') }}/" + lastEditId;
+                form.action = "{{ url('superadmin/configuracion/tipo-mantenimiento') }}/" + lastEditId;
                 var myModal = new bootstrap.Modal(document.getElementById('editarModal'));
                 myModal.show();
             }
