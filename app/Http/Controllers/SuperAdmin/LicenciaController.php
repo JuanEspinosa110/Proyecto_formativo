@@ -181,7 +181,7 @@ class LicenciaController extends Controller
             'correo_corporativo' => 'required|email|max:150',
 
             // Usuario Administrador
-            'doc_admin' => 'required|digits_between:8,12',
+            'doc_admin' => 'required|digits_between:8,10',
             'primer_nombre_admin' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
             'segundo_nombre_admin' => ['nullable', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
             'primer_apellido_admin' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
@@ -204,7 +204,7 @@ class LicenciaController extends Controller
             'id_ciudad.exists'   => 'La ciudad seleccionada no es válida.',
             // Mensajes para el Documento
             'doc_admin.required' => 'El documento de identidad es obligatorio.',
-            'doc_admin.digits_between' => 'El documento debe tener entre 8 y 12 dígitos numéricos.',
+            'doc_admin.digits_between' => 'El documento debe tener entre 8 y 10 dígitos numéricos.',
 
             // Mensajes para Nombres y Apellidos
             'primer_nombre_admin.required' => 'El primer nombre es obligatorio.',

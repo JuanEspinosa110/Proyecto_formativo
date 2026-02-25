@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\TipoUsuario;
 
 class Usuario extends Authenticatable
 {
@@ -33,5 +34,9 @@ class Usuario extends Authenticatable
     ];
 
     protected $hidden = ['password'];
-}
 
+    public function tipoUsuario()
+    {
+        return $this->belongsTo(TipoUsuario::class, 'id_tipo_usuario', 'id_tipo_usuario');
+    }
+}

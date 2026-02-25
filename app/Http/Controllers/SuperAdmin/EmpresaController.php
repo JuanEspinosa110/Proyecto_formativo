@@ -69,9 +69,9 @@ class EmpresaController extends Controller
     'nombre_empresa' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
     'telefono_empresa' => 'required|digits_between:7,15',
     'correo_corporativo' => 'required|email',
-
+    
     // REPRESENTANTE
-    'doc_representante' => 'required|digits_between:6,15',
+    'doc_representante' => 'required|digits_between:8,10',
     'primer_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
     'segundo_nombre_repre' => ['nullable','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
     'primer_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
@@ -185,7 +185,7 @@ class EmpresaController extends Controller
      */
     public function show($nit)
     {
-        $empresa = Empresa::with(['ciudad.departamento','estado','usuarios'])
+        $empresa = Empresa::with(['ciudad.departamento','estado','usuarios.tipoUsuario'])
             ->findOrFail($nit);
 
         return view('superadmin.empresas.show', compact('empresa'));
