@@ -278,7 +278,6 @@ function soloNumeros(input) {
 }
 
 
-
 // =============================
 // EVENTOS DE CAMPOS
 // =============================
@@ -307,8 +306,15 @@ document.getElementById('primer_nombre_repre').addEventListener('input', functio
     soloLetras(this);
 });
 
+document.getElementById('segundo_nombre_repre').addEventListener('input', function(){
+    soloLetras(this);
+});
 
 document.getElementById('primer_apellido_repre').addEventListener('input', function(){
+    soloLetras(this);
+});
+
+document.getElementById('segundo_apellido_repre').addEventListener('input', function(){
     soloLetras(this);
 });
 

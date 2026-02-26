@@ -624,6 +624,13 @@ body.sigu-body {
     display: block; font-size: .8rem; font-weight: 600;
     color: var(--p-mid); margin-bottom: .38rem; letter-spacing: .01em;
 }
+.sa-licencia-input[readonly] {
+    background-color: #84a4c3; /* Un gris claro estándar de Bootstrap */
+    border-color: #3e5266;
+    color: #6c757d;           /* Texto un poco más tenue */
+    cursor: not-allowed;      /* Cambia el cursor a un círculo rojo de "prohibido" */
+    opacity: 1;               /* Asegura que en iOS no se vea semitransparente */
+}
 .form-label.required::after, .sa-perfil-form-label.required::after {
     content: " *"; color: var(--err);
 }
