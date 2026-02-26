@@ -185,7 +185,7 @@ class EmpresaController extends Controller
      */
     public function show($nit)
     {
-        $empresa = Empresa::with(['ciudad.departamento','estado','usuarios'])
+        $empresa = Empresa::with(['ciudad.departamento','estado','usuarios.tipoUsuario'])
             ->findOrFail($nit);
 
         return view('superadmin.empresas.show', compact('empresa'));
