@@ -71,7 +71,7 @@ class EmpresaController extends Controller
     'correo_corporativo' => 'required|email',
 
     // REPRESENTANTE
-    'doc_representante' => 'required|digits_between:6,15',
+    'doc_representante' => 'required|digits_between:7,10',
     'primer_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
     'segundo_nombre_repre' => ['nullable','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
     'primer_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
@@ -99,7 +99,7 @@ class EmpresaController extends Controller
 
     // Representante
     'doc_representante.required' => 'El documento del representante es obligatorio.',
-    'doc_representante.digits_between' => 'El documento debe tener solo números válidos.',
+    'doc_representante.digits_between' => 'El documento debe tener entre 7 y 10 dígitos.',
     'primer_nombre_repre.required' => 'El primer nombre es obligatorio.',
     'primer_apellido_repre.required' => 'El primer apellido es obligatorio.',
     'segundo_apellido_repre.required' => 'El segundo apellido es obligatorio.',

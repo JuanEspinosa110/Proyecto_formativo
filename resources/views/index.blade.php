@@ -270,11 +270,11 @@
                             <div class="plan-feature-item">
                                 <i class="fas fa-check-circle text-{{ $color }} me-2"></i>
                                 <span>{{ $plan->duracion_meses * 5 }} buses registrados</span>
-                            </div>-->
+                            </div>
                             <div class="plan-feature-item">
                                 <i class="fas fa-check-circle text-{{ $color }} me-2"></i>
                                 <span>Soporte técnico incluido</span>
-                            </div>
+                            </div>-->
                             <div class="plan-feature-item">
                                 <i class="fas fa-check-circle text-{{ $color }} me-2"></i>
                                 <span>{{ $plan->descripcion }}</span>

@@ -256,7 +256,7 @@
                                 </div>
                             </td>
                             <td>
-                                <div><strong>{{ number_format($licencia->NIT, 0, ',', '.') }}</strong></div>
+                                <div><strong>{{ number_format($licencia->NIT, 0, ',', '') }}</strong></div>
                                 <small class="text-muted">{{ $licencia->id_licencia }}</small>
                             </td>
                             <td>
