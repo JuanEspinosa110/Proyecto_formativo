@@ -39,8 +39,11 @@ class BusRequest extends FormRequest
             'id_estado' => 'required|exists:estado,id_estado',
             'linc_transito' => 'nullable|numeric',
             'numero_chasis' => 'nullable|string|max:17',
-            'numero_motro' => 'nullable|string|max:14',
-            'doc_propietario' => 'nullable|numeric',
+            'numero_motor' => 'nullable|string|max:14',
+            'doc_propietario'    => 'nullable|numeric',
+            'nombre_propietario' => 'required|string|max:100',
+            'telefono'           => 'nullable|string|max:20',
+            'correo'             => 'nullable|email|max:100',
         ];
     }
 

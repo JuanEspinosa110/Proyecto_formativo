@@ -283,7 +283,7 @@
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Origen <span class="text-danger">*</span></label>
                             <select name="id_barrio_origen" id="edit_id_barrio_origen" class="form-select bg-light border-0 py-2" required>
                                 @foreach($barrios as $bar)
-                                    <option value="{{ $bar->id_barrio }}">{{ $bar->nombre_barrio }}</option>
+                                    <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_origen"></div>
@@ -297,7 +297,7 @@
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Destino <span class="text-danger">*</span></label>
                             <select name="id_barrio_destino" id="edit_id_barrio_destino" class="form-select bg-light border-0 py-2" required>
                                 @foreach($barrios as $bar)
-                                    <option value="{{ $bar->id_barrio }}">{{ $bar->nombre_barrio }}</option>
+                                    <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_destino"></div>

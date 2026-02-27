@@ -12,13 +12,8 @@ class Ruta extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'NIT',
-        'id_ciudad',
-        'id_barrio_origen',
-        'origen',
-        'id_barrio_destino',
-        'destino',
-        'id_estado'
+        'NIT', 'id_ciudad', 'id_barrio_origen', 
+        'origen', 'id_barrio_destino', 'destino', 'id_estado'
     ];
 
     public function empresa()
