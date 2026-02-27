@@ -234,14 +234,26 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Origen <span class="text-danger">*</span></label>
                             <select name="id_barrio_origen" id="edit_id_barrio_origen" class="form-select bg-light border-0 py-2" required>
+<<<<<<< HEAD
                                 <option value="" selected disabled>Seleccionar...</option>
+=======
+                                @foreach($barrios as $bar)
+                                    <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
+                                @endforeach
+>>>>>>> 46a0f22cc73e44ddec95c253bea0afad04e6f84e
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_origen"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Destino <span class="text-danger">*</span></label>
                             <select name="id_barrio_destino" id="edit_id_barrio_destino" class="form-select bg-light border-0 py-2" required>
+<<<<<<< HEAD
                                 <option value="" selected disabled>Seleccionar...</option>
+=======
+                                @foreach($barrios as $bar)
+                                    <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
+                                @endforeach
+>>>>>>> 46a0f22cc73e44ddec95c253bea0afad04e6f84e
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_destino"></div>
                         </div>

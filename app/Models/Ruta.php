@@ -13,11 +13,16 @@ class Ruta extends Model
     public $timestamps = false;
 
     protected $fillable = [
+<<<<<<< HEAD
         'id_ruta',
         'id_ciudad',
         'id_barrio_origen',
         'id_barrio_destino',
         'id_estado'
+=======
+        'NIT', 'id_ciudad', 'id_barrio_origen', 
+        'origen', 'id_barrio_destino', 'destino', 'id_estado'
+>>>>>>> 46a0f22cc73e44ddec95c253bea0afad04e6f84e
     ];
 
     public function estado()

@@ -38,7 +38,7 @@
             <div class="kpi-left">
                 <span class="kpi-title">Documentos</span>
                 <span class="kpi-value" id="kpiDocumentos">—</span>
-            </div>
+            </div> 
             <div class="kpi-right">
                 <div class="kpi-trend negative">-1% <span class="material-symbols-rounded" style="font-size:14px">trending_down</span></div>
                 <svg class="kpi-sparkline" viewBox="0 0 100 28" preserveAspectRatio="none"><polyline points="0,12 20,16 40,20 60,22 80,20 100,24" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>

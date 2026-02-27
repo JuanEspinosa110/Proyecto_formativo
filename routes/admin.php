@@ -12,11 +12,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
 
         // Módulo de Buses
-        Route::get('/buses', [BusController::class, 'index'])->name('buses.index');
-        Route::post('/buses', [BusController::class, 'store'])->name('buses.store');
-        Route::put('/buses/{bus}', [BusController::class, 'update'])->name('buses.update');
-        Route::get('/buses/export', [BusController::class, 'export'])->name('buses.export');
-
+        Route::get('buses', [BusController::class, 'index'])->name('buses.index');
+        Route::post('buses', [BusController::class, 'store'])->name('buses.store');
+        Route::put('buses/{bus:placa}', [BusController::class, 'update'])->name('buses.update');
+        Route::get('buses/export', [BusController::class, 'export'])->name('buses.export');
 
         // Otros módulos
         Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');

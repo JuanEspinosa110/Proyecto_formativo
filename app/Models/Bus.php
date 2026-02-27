@@ -21,20 +21,20 @@ class Bus extends Model
         'id_estado',
         'linc_transito',
         'numero_chasis',
-        'numero_motro',
+        'numero_motor',
         'doc_propietario',
         'nombre_propietario',
         'telefono',
         'correo'
     ];
 
+    public function estado()
+    {
+        return $this->belongsTo(Estado::class, 'id_estado');
+    }
+
     public function empresa()
     {
         return $this->belongsTo(Empresa::class, 'NIT', 'NIT');
-    }
-
-    public function estado()
-    {
-        return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
     }
 }
