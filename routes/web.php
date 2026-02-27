@@ -203,4 +203,5 @@ Route::prefix('superadmin')
         Route::post('/rutas', [RutaController::class, 'store'])->name('rutas.store');
         Route::put('/rutas/{ruta}', [RutaController::class, 'update'])->name('rutas.update');
         Route::get('/rutas/export', [RutaController::class, 'export'])->name('rutas.export');
+        Route::get('/rutas/barrios/{id_ciudad}', [RutaController::class, 'getBarriosByCiudad'])->name('rutas.barrios');
     });
