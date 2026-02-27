@@ -34,26 +34,12 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">dashboard</span></span>
                     <span>Dashboard</span>
                 </a>
-                <a href="{{ url('admin/usuarios') }}" class="sigu-sb-link {{ request()->is('admin/usuarios*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
-                    <span>Usuarios</span>
-                </a>
+                
                 <a href="{{ url('admin/buses') }}" class="sigu-sb-link {{ request()->is('admin/buses*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">directions_bus</span></span>
                     <span>Buses</span>
                 </a>
-                <a href="{{ url('admin/documentos') }}" class="sigu-sb-link {{ request()->is('admin/documentos*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">file_upload</span></span>
-                    <span>Documentos</span>
-                </a>
-                <a href="{{ url('admin/reportes') }}" class="sigu-sb-link {{ request()->is('admin/reportes*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">insert_chart</span></span>
-                    <span>Reportes</span>
-                </a>
-                <a href="{{ url('admin/perfil') }}" class="sigu-sb-link {{ request()->is('admin/perfil*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">badge</span></span>
-                    <span>Perfil</span>
-                </a>
+                
             </nav>
 
             <div class="sigu-sidebar-footer">

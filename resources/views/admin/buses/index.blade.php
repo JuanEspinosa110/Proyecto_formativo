@@ -454,6 +454,24 @@
     manageAjax('formEditBus', 'edit-errors-alert');
 </script>
 
+<script>
+document.getElementById('placa').addEventListener('input', function(e) {
+
+    let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+    if (value.length <= 3) {
+        // Solo permitir letras en los primeros 3
+        value = value.replace(/[^A-Z]/g, '');
+    } else {
+        let letters = value.substring(0,3).replace(/[^A-Z]/g, '');
+        let numbers = value.substring(3).replace(/[^0-9]/g, '');
+        value = letters + numbers;
+    }
+
+    e.target.value = value.substring(0,6);
+});
+</script>
+
 <style>
     .fs-xs {
         font-size: 0.75rem;
