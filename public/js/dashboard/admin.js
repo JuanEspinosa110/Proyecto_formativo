@@ -1,4 +1,4 @@
-(function(){
+(function () {
   if (typeof window === 'undefined') return;
   const STATS_URL = window.ADMIN_STATS_URL || '/admin/dashboard/stats';
 
@@ -6,24 +6,26 @@
   let donutChart = null;
   const sparkCharts = [];
 
-  function numberFormat(n){ return (n===null||n===undefined)?'—':String(n); }
+  function numberFormat(n) { return (n === null || n === undefined) ? '—' : String(n); }
 
-  function updateKPIs(data){
+  function updateKPIs(data) {
     const empresaName = data.empresa?.nombre ?? (data.empresa?.nombre_empresa ?? '—');
     const totales = data.totales || {};
 
     const elEmpresa = document.getElementById('kpiEmpresa');
     const elUsuarios = document.getElementById('kpiUsuarios');
     const elDocumentos = document.getElementById('kpiDocumentos');
+    const elBuses = document.getElementById('kpiBuses');
     if (elEmpresa) elEmpresa.textContent = empresaName;
     if (elUsuarios) elUsuarios.textContent = numberFormat(totales.usuarios ?? 0);
     if (elDocumentos) elDocumentos.textContent = numberFormat(totales.documentos ?? 0);
+    if (elBuses) elBuses.textContent = numberFormat(totales.buses ?? 0);
 
     // Trends — preferimos mostrar porcentajes reales; si previous == 0 and current > 0
     // el backend devuelve pct = null. En ese caso mostramos el cambio absoluto.
     const trends = data.trends || {};
     const cards = Array.from(document.querySelectorAll('.sa-kpi-card'));
-    if (cards.length >= 3){
+    if (cards.length >= 3) {
       // usuarios trend: backend may not provide series, so we use trends.usuarios
       const usuarioTrend = trends.usuarios || {};
       const docTrend = trends.documentos || {};
@@ -31,7 +33,7 @@
       const userTrendEl = cards[1].querySelector('.kpi-trend');
       const docTrendEl = cards[2].querySelector('.kpi-trend');
 
-      if (userTrendEl){
+      if (userTrendEl) {
         if (usuarioTrend.pct === null) {
           // previous was zero — show absolute current value instead of %
           userTrendEl.textContent = `+${usuarioTrend.current ?? 0}`;
@@ -44,7 +46,7 @@
         }
       }
 
-      if (docTrendEl){
+      if (docTrendEl) {
         if (docTrend.pct === null) {
           docTrendEl.textContent = `+${docTrend.current ?? 0}`;
           docTrendEl.classList.add('positive');
@@ -58,11 +60,11 @@
     }
   }
 
-  function getSeriesArray(series, key){
+  function getSeriesArray(series, key) {
     return series.map(s => Number(s[key] || 0));
   }
 
-  function renderDonut(data){
+  function renderDonut(data) {
     const ctx = document.getElementById('chartUsersDocs');
     if (!ctx) return;
     const totals = data.totales || {};
@@ -71,12 +73,12 @@
 
     const chartData = [users, docs];
 
-    if (!donutChart){
+    if (!donutChart) {
       donutChart = new Chart(ctx.getContext('2d'), {
         type: 'doughnut',
         data: {
-          labels: ['Usuarios','Documentos'],
-          datasets: [{ data: chartData, backgroundColor: ['#6A4CC5','#9B84E3'] }]
+          labels: ['Usuarios', 'Documentos'],
+          datasets: [{ data: chartData, backgroundColor: ['#6A4CC5', '#9B84E3'] }]
         },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
       });
@@ -86,7 +88,7 @@
     }
   }
 
-  function ensureSparkCanvases(){
+  function ensureSparkCanvases() {
     const svgs = Array.from(document.querySelectorAll('.kpi-sparkline'));
     svgs.forEach((svg, idx) => {
       // if we already created a canvas, skip
@@ -98,7 +100,7 @@
     });
   }
 
-  function renderSparklines(data){
+  function renderSparklines(data) {
     const series = data.series || [];
     // arrays
     const usuarios = getSeriesArray(series, 'usuarios');
@@ -111,24 +113,24 @@
 
     // Map: if there are 3 canvases, use 0->empresa (usuarios series), 1->usuarios (usuarios series), 2->documentos
     const map = [];
-    if (canvases.length >= 3){
-      map.push({canvas: canvases[0], data: usuarios, color: '#9B84E3'});
-      map.push({canvas: canvases[1], data: usuarios, color: '#6A4CC5'});
-      map.push({canvas: canvases[2], data: documentos, color: '#ff6b6b'});
+    if (canvases.length >= 3) {
+      map.push({ canvas: canvases[0], data: usuarios, color: '#9B84E3' });
+      map.push({ canvas: canvases[1], data: usuarios, color: '#6A4CC5' });
+      map.push({ canvas: canvases[2], data: documentos, color: '#ff6b6b' });
     } else {
       // Fallback: fill first with usuarios, second with documentos
-      map.push({canvas: canvases[0], data: usuarios, color: '#6A4CC5'});
-      if (canvases[1]) map.push({canvas: canvases[1], data: documentos, color: '#9B84E3'});
+      map.push({ canvas: canvases[0], data: usuarios, color: '#6A4CC5' });
+      if (canvases[1]) map.push({ canvas: canvases[1], data: documentos, color: '#9B84E3' });
     }
 
     map.forEach((m, i) => {
       const ctx = m.canvas.getContext('2d');
       // create or update Chart in sparkCharts
-      if (!sparkCharts[i]){
+      if (!sparkCharts[i]) {
         sparkCharts[i] = new Chart(ctx, {
           type: 'line',
           data: { labels: series.map(s => s.day), datasets: [{ data: m.data, borderColor: m.color, backgroundColor: 'rgba(0,0,0,0)', tension: 0.3, pointRadius: 0 }] },
-          options: { responsive: false, maintainAspectRatio: false, plugins: { legend:{display:false} }, scales: { x:{ display:false }, y:{ display:false } }, elements: { line: { borderWidth: 2 } } }
+          options: { responsive: false, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } }, elements: { line: { borderWidth: 2 } } }
         });
       } else {
         sparkCharts[i].data.labels = series.map(s => s.day);
@@ -138,10 +140,10 @@
     });
   }
 
-  async function fetchStats(){
-    try{
+  async function fetchStats() {
+    try {
       const res = await fetch(STATS_URL, { credentials: 'same-origin' });
-      if (!res.ok) throw new Error('HTTP '+res.status);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       // Exponer para depuración y futuras visualizaciones
       window.ADMIN_STATS = data;
@@ -149,7 +151,7 @@
       updateKPIs(data);
       renderDonut(data);
       renderSparklines(data);
-    }catch(err){
+    } catch (err) {
       console.error('Error fetching admin stats', err);
     }
   }

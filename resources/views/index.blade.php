@@ -195,13 +195,6 @@
 
         <!-- Tarjetas de planes -->
         <div class="row g-4 justify-content-center">
-            @php
-                $planesPublicos = DB::table('planes_licencia')
-                    ->where('id_estado', 1)
-                    ->orderBy('precio', 'asc')
-                    ->get();
-            @endphp
-
             @forelse($planesPublicos as $index => $plan)
             @php
                 // Calcular descuento ficticio
@@ -454,23 +447,6 @@
             </div>
             <div class="modal-body">
                 <div class="contact-card-container">
-                    @php
-                        // Obtener un super administrador aleatorio de la BD
-                        $superAdmin = DB::table('super_administrador')
-                            ->where('id_estado', 1)
-                            ->inRandomOrder()
-                            ->first();
-                        
-                        if (!$superAdmin) {
-                            // Si no hay, usar datos de ejemplo
-                            $superAdmin = (object) [
-                                'nombre' => 'Carlos Martínez',
-                                'correo' => 'carlos.martinez@sigu.com',
-                                'telefono' => '+57 320 123 4567',
-                            ];
-                        }
-                    @endphp
-
                     <!-- Tarjeta de presentación del Super Admin -->
                     <div class="contact-card">
                         <div class="contact-card-header">
