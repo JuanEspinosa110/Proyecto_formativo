@@ -7,6 +7,9 @@ use App\Http\Requests\SuperAdmin\Configuracion\CiudadRequest;
 use App\Services\SuperAdmin\Configuracion\CiudadService;
 use Illuminate\Http\Request;
 
+use App\Models\Ciudad;
+use App\Models\Departamento;
+
 class CiudadController extends Controller
 {
     protected $service;
@@ -18,8 +21,36 @@ class CiudadController extends Controller
 
     public function index(Request $request)
     {
-        $ciudades = $this->service->paginate(4, $request->buscar);
-        $departamentos = $this->service->getDepartamentos();
+        // Capturamos los filtros por separado
+        $filtroCiudad = $request->get('filtro_ciudad');
+        $filtroDepto = $request->get('filtro_depto');
+
+        $ciudades = Ciudad::with('departamento')
+            ->when($filtroCiudad, function ($query) use ($filtroCiudad) {
+                // Busca por nombre o ID de ciudad
+                return $query->where(function ($q) use ($filtroCiudad) {
+                    $q->where('nombre_city', 'like', "%{$filtroCiudad}%")
+                        ->orWhere('id_ciudad', 'like', "%{$filtroCiudad}%");
+                });
+            })
+            ->when($filtroDepto, function ($query) use ($filtroDepto) {
+                // Busca por nombre o ID de departamento dentro de la relación
+                return $query->whereHas('departamento', function ($q) use ($filtroDepto) {
+                    $q->where('nombre_departamento', 'like', "%{$filtroDepto}%")
+                        ->orWhere('id_departamento', 'like', "%{$filtroDepto}%");
+                });
+            })
+            ->orderBy('id_ciudad', 'asc')
+            ->paginate(10);
+
+        // mantenemos AMBOS filtros en la paginación
+        $ciudades->appends([
+            'filtro_ciudad' => $filtroCiudad,
+            'filtro_depto' => $filtroDepto
+        ]);
+
+        $departamentos = Departamento::orderBy('nombre_departamento')->get();
+
         return view('superadmin.configuracion.ciudades.index', compact('ciudades', 'departamentos'));
     }
 
@@ -47,6 +78,10 @@ class CiudadController extends Controller
 
     public function exportExcel(Request $request)
     {
-        return $this->service->exportExcel($request->buscar);
+        // Captura los filtros de la URL
+        $filtroCiudad = $request->query('filtro_ciudad');
+        $filtroDepto = $request->query('filtro_depto');
+
+        return $this->service->exportExcel($filtroCiudad, $filtroDepto);
     }
 }

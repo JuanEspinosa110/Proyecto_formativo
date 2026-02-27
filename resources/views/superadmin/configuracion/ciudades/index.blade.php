@@ -17,7 +17,7 @@
             <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
                 <i class="fas fa-exclamation-circle me-2"></i>
                 @foreach ($errors->all() as $error)
-                    {{ $error }}
+                {{ $error }}
                 @endforeach
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -33,7 +33,8 @@
                     <button type="button" class="btn btn-primary shadow-sm ms-2" data-bs-toggle="modal" data-bs-target="#crearModal">
                         <i class="fas fa-plus me-1"></i> Crear Ciudad
                     </button>
-                    <a href="{{ route('superadmin.configuracion.ciudades.export', ['buscar' => request('buscar')]) }}" class="btn btn-success shadow-sm ms-2">
+                    <a href="{{ route('superadmin.configuracion.ciudades.export', ['filtro_ciudad' => request('filtro_ciudad'), 'filtro_depto' => request('filtro_depto')]) }}"
+                        class="btn btn-success shadow-sm ms-2">
                         <i class="fas fa-file-excel me-1"></i> Exportar Excel
                     </a>
                 </div>
@@ -43,20 +44,20 @@
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
                     <form method="GET" action="{{ route('superadmin.configuracion.ciudades.index') }}" class="row g-3">
-                        <div class="col-md-6 col-lg-4">
-                            <div class="input-group">
-                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
-                                <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control border-start-0" placeholder="Buscar por ciudad o depto...">
-                            </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted text-uppercase fw-bold">Ciudad / ID</label>
+                            <input type="text" name="filtro_ciudad" value="{{ request('filtro_ciudad') }}" class="form-control" placeholder="Ej: Medellín o 05001">
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-4">
+                            <label class="small text-muted text-uppercase fw-bold">Departamento / ID</label>
+                            <input type="text" name="filtro_depto" value="{{ request('filtro_depto') }}" class="form-control" placeholder="Ej: Antioquia o 05">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
                             <button type="submit" class="btn btn-secondary w-100">Filtrar</button>
                         </div>
-                        @if(request('buscar'))
-                        <div class="col-md-2">
+                        <div class="col-md-2 d-flex align-items-end">
                             <a href="{{ route('superadmin.configuracion.ciudades.index') }}" class="btn btn-outline-secondary w-100">Limpiar</a>
                         </div>
-                        @endif
                     </form>
                 </div>
             </div>
@@ -79,9 +80,9 @@
                                 <tr>
                                     <td class="px-4 py-2 fw-bold text-dark">{{ $ciudad->id_ciudad }}</td>
                                     <td class="py-2">{{ $ciudad->nombre_city }}</td>
-                                    <td class="py-2">{{ $ciudad->departamento->nombre_departamento ?? 'N/A' }}</td>
+                                    <td class="py-2">{{ $ciudad->departamento->nombre_departamento ?? 'Sin Departamento' }}</td>
                                     <td class="text-end px-4 py-2">
-                                        <button 
+                                        <button
                                             type="button"
                                             class="btn btn-outline-warning btn-sm border-0"
                                             data-bs-toggle="modal"
@@ -108,7 +109,7 @@
                 @if($ciudades->hasPages())
                 <div class="card-footer bg-white border-0 py-3">
                     <div class="d-flex justify-content-center">
-                        {{ $ciudades->links() }}
+                        {{ $ciudades->appends(request()->query())->links() }}
                     </div>
                 </div>
                 @endif
@@ -132,7 +133,7 @@
                         <label class="form-label fw-semibold">Nombre del Departamento <span class="text-danger">*</span></label>
                         <input type="text" name="nombre_departamento" class="form-control @error('nombre_departamento') is-invalid @enderror" placeholder="Ej: Antioquia" required value="{{ old('nombre_departamento') }}">
                         @error('nombre_departamento')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
@@ -160,7 +161,7 @@
                         <label class="form-label fw-semibold">Nombre de la Ciudad <span class="text-danger">*</span></label>
                         <input type="text" name="nombre_city" class="form-control @error('nombre_city') is-invalid @enderror" placeholder="Ej: Medellín" required value="{{ old('nombre_city') }}">
                         @error('nombre_city')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="mb-0">
@@ -168,13 +169,13 @@
                         <select name="id_departamento" class="form-select @error('id_departamento') is-invalid @enderror" required>
                             <option value="">Seleccione...</option>
                             @foreach($departamentos as $depto)
-                                <option value="{{ $depto->id_departamento }}" {{ old('id_departamento') == $depto->id_departamento ? 'selected' : '' }}>
-                                    {{ $depto->nombre_departamento }}
-                                </option>
+                            <option value="{{ $depto->id_departamento }}" {{ old('id_departamento') == $depto->id_departamento ? 'selected' : '' }}>
+                                {{ $depto->nombre_departamento }}
+                            </option>
                             @endforeach
                         </select>
                         @error('id_departamento')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
@@ -203,18 +204,18 @@
                         <label class="form-label fw-semibold">Nombre de la Ciudad <span class="text-danger">*</span></label>
                         <input type="text" name="nombre_city" id="editNombre" class="form-control @error('nombre_city') is-invalid @enderror" required value="{{ old('nombre_city') }}">
                         @error('nombre_city')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="mb-0">
                         <label class="form-label fw-semibold">Departamento <span class="text-danger">*</span></label>
                         <select name="id_departamento" id="editDepto" class="form-select @error('id_departamento') is-invalid @enderror" required>
                             @foreach($departamentos as $depto)
-                                <option value="{{ $depto->id_departamento }}">{{ $depto->nombre_departamento }}</option>
+                            <option value="{{ $depto->id_departamento }}">{{ $depto->nombre_departamento }}</option>
                             @endforeach
                         </select>
                         @error('id_departamento')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
@@ -228,47 +229,47 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    var editarModal = document.getElementById('editarModal');
-    if (editarModal) {
-        editarModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            if (!button) return;
+    document.addEventListener('DOMContentLoaded', function() {
+        var editarModal = document.getElementById('editarModal');
+        if (editarModal) {
+            editarModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                if (!button) return;
 
-            var id = button.getAttribute('data-id');
-            var nombre = button.getAttribute('data-nombre');
-            var depto = button.getAttribute('data-depto');
+                var id = button.getAttribute('data-id');
+                var nombre = button.getAttribute('data-nombre');
+                var depto = button.getAttribute('data-depto');
 
-            var form = document.getElementById('formEditar');
-            form.action = "{{ url('superadmin/configuracion/ciudades') }}/" + id;
-
-            document.getElementById('editNombre').value = nombre;
-            document.getElementById('editDepto').value = depto;
-
-            // Save ID for reopening on validation error
-            sessionStorage.setItem('last_edit_id_ciudad', id);
-        });
-    }
-
-    // Redirect error to correct modal
-    @if($errors->any())
-        @if(old('_method') == 'PUT')
-            var lastEditId = sessionStorage.getItem('last_edit_id_ciudad');
-            if (lastEditId) {
                 var form = document.getElementById('formEditar');
-                form.action = "{{ url('superadmin/configuracion/ciudades') }}/" + lastEditId;
-                var myModal = new bootstrap.Modal(document.getElementById('editarModal'));
-                myModal.show();
-            }
+                form.action = "{{ url('superadmin/configuracion/ciudades') }}/" + id;
+
+                document.getElementById('editNombre').value = nombre;
+                document.getElementById('editDepto').value = depto;
+
+                // Save ID for reopening on validation error
+                sessionStorage.setItem('last_edit_id_ciudad', id);
+            });
+        }
+
+        // Redirect error to correct modal
+        @if($errors->any())
+        @if(old('_method') == 'PUT')
+        var lastEditId = sessionStorage.getItem('last_edit_id_ciudad');
+        if (lastEditId) {
+            var form = document.getElementById('formEditar');
+            form.action = "{{ url('superadmin/configuracion/ciudades') }}/" + lastEditId;
+            var myModal = new bootstrap.Modal(document.getElementById('editarModal'));
+            myModal.show();
+        }
         @elseif(old('nombre_departamento'))
-            var myModal = new bootstrap.Modal(document.getElementById('deptoModal'));
-            myModal.show();
+        var myModal = new bootstrap.Modal(document.getElementById('deptoModal'));
+        myModal.show();
         @else
-            var myModal = new bootstrap.Modal(document.getElementById('crearModal'));
-            myModal.show();
+        var myModal = new bootstrap.Modal(document.getElementById('crearModal'));
+        myModal.show();
         @endif
-    @endif
-});
+        @endif
+    });
 </script>
 
 @endsection

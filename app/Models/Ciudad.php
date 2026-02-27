@@ -9,6 +9,7 @@ class Ciudad extends Model
     protected $table = 'ciudad';
     protected $primaryKey = 'id_ciudad';
     public $timestamps = false;
+    protected $keyType = 'string'; // Forza a que se trate como texto
 
     protected $fillable = [
         'nombre_city',
