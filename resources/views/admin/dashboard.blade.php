@@ -44,6 +44,15 @@
                 <svg class="kpi-sparkline" viewBox="0 0 100 28" preserveAspectRatio="none"><polyline points="0,12 20,16 40,20 60,22 80,20 100,24" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
             </div>
         </div>
+        <a href="{{ route('admin.buses.index') }}" class="sa-kpi-card text-decoration-none">
+            <div class="kpi-left">
+                <span class="kpi-title">Flota de Buses</span>
+                <span class="kpi-value" id="kpiBuses">—</span>
+            </div>
+            <div class="kpi-right">
+                <span class="material-symbols-rounded text-primary" style="font-size: 2.5rem; opacity: 0.2;">directions_bus</span>
+            </div>
+        </a>
     </section>
 
     <section style="margin-top:1rem;">
