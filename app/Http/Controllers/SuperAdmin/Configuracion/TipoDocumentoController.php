@@ -19,7 +19,10 @@ class TipoDocumentoController extends Controller
     public function index(Request $request)
     {
         $tipos = $this->service->paginate(5, $request->buscar);
-        return view('superadmin.configuracion.tipo_documento.index', compact('tipos'));
+        $estados = \App\Models\Estado::whereIn('id_estado', [1, 2])
+            ->orderBy('id_estado', 'asc') 
+            ->get();
+        return view('superadmin.configuracion.tipo_documento.index', compact('tipos', 'estados'));
     }
 
     public function store(TipoDocumentoRequest $request)
@@ -32,6 +35,18 @@ class TipoDocumentoController extends Controller
     {
         $this->service->update($id, $request->validated());
         return redirect()->back()->with('success', 'Tipo de documento actualizado correctamente.');
+    }
+
+    public function destroy($id)
+    {
+        $tipo = TipoDocumentoRequest::findOrFail($id);
+
+        if ($tipo->usuarios()->count() > 0) {
+            return redirect()->back()->with('error', 'No se puede eliminar este tipo de documento porque hay usuarios asociados a él.');
+        }
+
+        $tipo->delete();
+        return redirect()->back()->with('success', 'Tipo de documento eliminado correctamente.');
     }
 
     public function exportExcel(Request $request)

@@ -15,4 +15,14 @@ class TipoDocumento extends Model
         'descripcion',
         'id_estado'
     ];
+
+    public function documentos()
+    {
+        return $this->hasMany(Documento::class, 'id_tipo_documento', 'id_tipo_documento');
+    }
+
+    public function estado()
+    {
+        return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
+    }
 }

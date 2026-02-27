@@ -23,12 +23,12 @@ class TipoEmpresaRequest extends FormRequest
                 'required',
                 'string',
                 'min:3',
-                'max:100',
+                'max:50',
 
                 // Solo letras y espacios con tildes
                 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/',
 
-                Rule::unique('tipo_empresas', 'nombre_tipo')
+                Rule::unique('tipo_empresa', 'nombre_tipo')
                     ->ignore($id, 'id_tipo_empresa'),
             ],
         ];
@@ -40,7 +40,7 @@ class TipoEmpresaRequest extends FormRequest
             'nombre_tipo.required' => 'El nombre del tipo de empresa es obligatorio.',
             'nombre_tipo.string' => 'El nombre debe ser texto.',
             'nombre_tipo.min' => 'El nombre debe tener mínimo 3 caracteres.',
-            'nombre_tipo.max' => 'El nombre no puede superar los 100 caracteres.',
+            'nombre_tipo.max' => 'El nombre no puede superar los 50 caracteres.',
             'nombre_tipo.regex' => 'El nombre solo puede contener letras y espacios.',
             'nombre_tipo.unique' => 'Ya existe un tipo de empresa con ese nombre.',
         ];
@@ -50,7 +50,7 @@ class TipoEmpresaRequest extends FormRequest
     {
         if ($this->nombre_tipo) {
 
-            $nombre = trim($this->nombre_tipo);
+            $nombre = strip_tags(trim($this->nombre_tipo));
 
             // Elimina espacios múltiples
             $nombre = preg_replace('/\s+/', ' ', $nombre);
@@ -71,7 +71,7 @@ class TipoEmpresaRequest extends FormRequest
             $id = $this->route('id');
             $nombre = strtolower($this->nombre_tipo);
 
-            $existe = DB::table('tipo_empresas')
+            $existe = DB::table('tipo_empresa')
                 ->whereRaw('LOWER(nombre_tipo) = ?', [$nombre])
                 ->when($id, function ($query) use ($id) {
                     $query->where('id_tipo_empresa', '!=', $id);

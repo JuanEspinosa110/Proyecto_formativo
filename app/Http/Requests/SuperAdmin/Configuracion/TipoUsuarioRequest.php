@@ -28,7 +28,7 @@ class TipoUsuarioRequest extends FormRequest
                 // Solo letras y espacios con tildes
                 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/',
 
-                Rule::unique('tipo_usuarios', 'nombre_tipo')
+                Rule::unique('tipo_usuario', 'nombre_tipo')
                     ->ignore($id, 'id_tipo_usuario'),
             ],
         ];
@@ -71,7 +71,7 @@ class TipoUsuarioRequest extends FormRequest
             $id = $this->route('id');
             $nombre = strtolower($this->nombre_tipo);
 
-            $existe = DB::table('tipo_usuarios')
+            $existe = DB::table('tipo_usuario')
                 ->whereRaw('LOWER(nombre_tipo) = ?', [$nombre])
                 ->when($id, function ($query) use ($id) {
                     $query->where('id_tipo_usuario', '!=', $id);
@@ -81,7 +81,7 @@ class TipoUsuarioRequest extends FormRequest
             if ($existe) {
                 $validator->errors()->add(
                     'nombre_tipo',
-                    'Ya existe un tipo de usuario con ese nombre (validación estricta).'
+                    'Ya existe un tipo de usuario con ese nombre.'
                 );
             }
         });

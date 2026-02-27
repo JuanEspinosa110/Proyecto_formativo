@@ -28,7 +28,7 @@ class TipoMantenimientoRequest extends FormRequest
                 // Solo letras y espacios con tildes
                 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/',
 
-                Rule::unique('tipo_mantenimientos', 'nombre')
+                Rule::unique('tipo_mantenimiento', 'nombre')
                     ->ignore($id, 'id_tipo_mantenimiento'),
             ],
         ];
@@ -71,7 +71,7 @@ class TipoMantenimientoRequest extends FormRequest
             $id = $this->route('id');
             $nombre = strtolower($this->nombre);
 
-            $existe = DB::table('tipo_mantenimientos')
+            $existe = DB::table('tipo_mantenimiento')
                 ->whereRaw('LOWER(nombre) = ?', [$nombre])
                 ->when($id, function ($query) use ($id) {
                     $query->where('id_tipo_mantenimiento', '!=', $id);
@@ -81,7 +81,7 @@ class TipoMantenimientoRequest extends FormRequest
             if ($existe) {
                 $validator->errors()->add(
                     'nombre',
-                    'Ya existe un tipo de mantenimiento con ese nombre (validación estricta).'
+                    'Ya existe un tipo de mantenimiento con ese nombre.'
                 );
             }
         });

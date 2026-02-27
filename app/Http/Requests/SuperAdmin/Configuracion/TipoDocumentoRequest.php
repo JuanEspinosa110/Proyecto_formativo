@@ -26,7 +26,7 @@ class TipoDocumentoRequest extends FormRequest
                 'max:100',
                 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/',
 
-                Rule::unique('tipo_documentos', 'nombre')
+                Rule::unique('tipo_documento', 'nombre')
                     ->ignore($id, 'id_tipo_documento'),
             ],
 
@@ -39,7 +39,7 @@ class TipoDocumentoRequest extends FormRequest
             'id_estado' => [
                 'required',
                 'integer',
-                'exists:estados,id_estado',
+                'exists:estado,id_estado',
             ],
         ];
     }
@@ -92,7 +92,7 @@ class TipoDocumentoRequest extends FormRequest
             $id = $this->route('id');
             $nombre = strtolower($this->nombre);
 
-            $existe = DB::table('tipo_documentos')
+            $existe = DB::table('tipo_documento')
                 ->whereRaw('LOWER(nombre) = ?', [$nombre])
                 ->when($id, function ($query) use ($id) {
                     $query->where('id_tipo_documento', '!=', $id);
@@ -102,7 +102,7 @@ class TipoDocumentoRequest extends FormRequest
             if ($existe) {
                 $validator->errors()->add(
                     'nombre',
-                    'Ya existe un tipo de documento con ese nombre (validación estricta).'
+                    'Ya existe un tipo de documento con ese nombre.'
                 );
             }
         });

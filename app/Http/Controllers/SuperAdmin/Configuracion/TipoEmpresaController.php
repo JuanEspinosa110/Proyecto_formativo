@@ -34,6 +34,19 @@ class TipoEmpresaController extends Controller
         return redirect()->back()->with('success', 'Tipo de empresa actualizado correctamente.');
     }
 
+    public function destroy($id)
+    {
+        $tipo = TipoEmpresaRequest::findOrFail($id);
+
+        // Comprobar si tiene empresas asociadas
+        if ($tipo->empresa()->count() > 0) {
+            return redirect()->back()->with('error', 'No se puede eliminar el tipo de empresa porque ya tiene empresas vinculadas.');
+        }
+
+        $tipo->delete();
+        return redirect()->back()->with('success', 'Tipo de empresa eliminado correctamente.');
+    }
+
     public function exportExcel(Request $request)
     {
         return $this->service->exportExcel($request->buscar);
