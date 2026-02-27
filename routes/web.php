@@ -62,13 +62,10 @@ Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCo
     ->name('password.resend.code');
 
 // Mostrar vista nueva contraseña
-Route::get('/nueva-password', function () {
-    if (!session('correo')) {
-        return redirect()->route('recuperar');
-    }
-
-    return view('auth.nueva_password');
-})->name('password.nueva.form');
+Route::get(
+    '/nueva-password',
+    [RecuperarPasswordController::class, 'mostrarNuevaPassword']
+)->name('password.nueva.form');
 
 
 // Procesar actualización
