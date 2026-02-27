@@ -3,6 +3,7 @@
 namespace App\Http\Requests\SuperAdmin\Configuracion;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CiudadRequest extends FormRequest
 {
@@ -11,11 +12,32 @@ class CiudadRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+{
+    $this->merge([
+        'nombre_city' => trim($this->nombre_city)
+    ]);
+}
+
+
     public function rules()
     {
         return [
-            'nombre_city' => 'required|string|max:100',
-            'id_departamento' => 'required|exists:departamento,id_departamento'
+            'nombre_city' => [
+                'bail',
+                'required',
+                'string',
+                'min:3',
+                'max:100',
+                Rule::unique('ciudad', 'nombre_city')
+            ],
+
+            'id_departamento' => [
+                'bail',
+                'required',
+                'integer',
+                'exists:departamento,id_departamento'
+            ],
         ];
     }
 
