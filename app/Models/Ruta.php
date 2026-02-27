@@ -8,23 +8,17 @@ class Ruta extends Model
 {
     protected $table = 'ruta';
     protected $primaryKey = 'id_ruta';
-    public $incrementing = true;
+    public $incrementing = false;
+    protected $keyType = 'int';
     public $timestamps = false;
 
     protected $fillable = [
-        'NIT',
+        'id_ruta',
         'id_ciudad',
         'id_barrio_origen',
-        'origen',
         'id_barrio_destino',
-        'destino',
         'id_estado'
     ];
-
-    public function empresa()
-    {
-        return $this->belongsTo(Empresa::class, 'NIT', 'NIT');
-    }
 
     public function estado()
     {
@@ -46,9 +40,11 @@ class Ruta extends Model
         return $this->belongsTo(Barrio::class, 'id_barrio_destino', 'id_barrio');
     }
 
-    // El nombre de la ruta se puede deducir de origen - destino
+    // El nombre de la ruta se deduce de los barrios
     public function getNombreRutaAttribute()
     {
-        return ($this->origen ?? 'N/A') . ' - ' . ($this->destino ?? 'N/A');
+        $origen = $this->barrioOrigen->nombre ?? 'N/A';
+        $destino = $this->barrioDestino->nombre ?? 'N/A';
+        return $origen . ' - ' . $destino;
     }
 }

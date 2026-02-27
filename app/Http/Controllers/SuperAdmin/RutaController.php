@@ -4,7 +4,7 @@ namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ruta;
-use App\Models\Empresa;
+// use App\Models\Empresa;
 use App\Services\RutaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,11 +28,10 @@ class RutaController extends Controller
     {
         $rutas = $this->rutaService->getRutas($request);
         $estados = $this->rutaService->getEstadosOperativos();
-        $empresas = Empresa::orderBy('nombre_empresa')->get();
         $ciudades = \App\Models\Ciudad::orderBy('nombre_city')->get();
         $barrios = \App\Models\Barrio::orderBy('nombre')->get();
 
-        return view('superadmin.rutas.index', compact('rutas', 'estados', 'empresas', 'ciudades', 'barrios'));
+        return view('superadmin.rutas.index', compact('rutas', 'estados', 'ciudades', 'barrios'));
     }
 
     /**
@@ -53,6 +52,18 @@ class RutaController extends Controller
         $this->rutaService->updateRuta($ruta, $request->validated());
 
         return response()->json(['message' => 'La ruta ha sido actualizada correctamente.']);
+    }
+
+    /**
+     * Obtener barrios por ciudad (AJAX)
+     */
+    public function getBarriosByCiudad($id_ciudad)
+    {
+        $barrios = \App\Models\Barrio::where('id_ciudad', $id_ciudad)
+            ->orderBy('nombre')
+            ->get(['id_barrio', 'nombre']);
+
+        return response()->json($barrios);
     }
 
     /**

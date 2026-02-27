@@ -17,21 +17,20 @@ class RutaService
      */
     public function getRutas(Request $request)
     {
-        $query = Ruta::with(['estado', 'empresa', 'ciudad', 'barrioOrigen', 'barrioDestino']);
+        $query = Ruta::with(['estado', 'ciudad', 'barrioOrigen', 'barrioDestino']);
 
-        // Filtro por NIT (Empresa)
-        if ($request->filled('NIT')) {
-            $query->where('NIT', $request->NIT);
-        }
-
-        // Búsqueda por origen o destino o ciudad
+        // Búsqueda por ciudad o barrios
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('origen', 'like', "%{$search}%")
-                  ->orWhere('destino', 'like', "%{$search}%")
-                  ->orWhereHas('ciudad', function($sq) use ($search) {
+                $q->whereHas('ciudad', function($sq) use ($search) {
                       $sq->where('nombre_city', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('barrioOrigen', function($sq) use ($search) {
+                      $sq->where('nombre', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('barrioDestino', function($sq) use ($search) {
+                      $sq->where('nombre', 'like', "%{$search}%");
                   });
             });
         }
@@ -51,9 +50,7 @@ class RutaService
     {
         return Estado::whereIn('nombre_estado', [
             'ACTIVO', 
-            'INACTIVO', 
-            'HABILITADA', 
-            'DESHABILITADA'
+            'INACTIVO'
         ])->get();
     }
 
@@ -62,13 +59,16 @@ class RutaService
      */
     public function storeRuta(array $data)
     {
+        // Generar ID aleatorio de 6 dígitos único
+        do {
+            $id = random_int(100000, 999999);
+        } while (Ruta::where('id_ruta', $id)->exists());
+
         return Ruta::create([
-            'NIT'               => $data['NIT'],
+            'id_ruta'           => $id,
             'id_ciudad'         => $data['id_ciudad'],
             'id_barrio_origen'  => $data['id_barrio_origen'],
             'id_barrio_destino' => $data['id_barrio_destino'],
-            'origen'            => strtoupper(trim($data['origen'])),
-            'destino'           => strtoupper(trim($data['destino'])),
             'id_estado'         => $data['id_estado'],
         ]);
     }
@@ -79,12 +79,9 @@ class RutaService
     public function updateRuta(Ruta $ruta, array $data)
     {
         return $ruta->update([
-            'NIT'               => $data['NIT'] ?? $ruta->NIT,
             'id_ciudad'         => $data['id_ciudad'] ?? $ruta->id_ciudad,
             'id_barrio_origen'  => $data['id_barrio_origen'] ?? $ruta->id_barrio_origen,
             'id_barrio_destino' => $data['id_barrio_destino'] ?? $ruta->id_barrio_destino,
-            'origen'            => strtoupper(trim($data['origen'])),
-            'destino'           => strtoupper(trim($data['destino'])),
             'id_estado'         => $data['id_estado'],
         ]);
     }
@@ -94,17 +91,20 @@ class RutaService
      */
     public function exportExcel(Request $request)
     {
-        $query = Ruta::with(['estado', 'empresa', 'ciudad', 'barrioOrigen', 'barrioDestino']);
-
-        if ($request->filled('NIT')) {
-            $query->where('NIT', $request->NIT);
-        }
+        $query = Ruta::with(['estado', 'ciudad', 'barrioOrigen', 'barrioDestino']);
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('origen', 'like', "%{$search}%")
-                  ->orWhere('destino', 'like', "%{$search}%");
+                $q->whereHas('ciudad', function($sq) use ($search) {
+                      $sq->where('nombre_city', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('barrioOrigen', function($sq) use ($search) {
+                      $sq->where('nombre', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('barrioDestino', function($sq) use ($search) {
+                      $sq->where('nombre', 'like', "%{$search}%");
+                  });
             });
         }
 
@@ -118,8 +118,8 @@ class RutaService
         $sheet = $spreadsheet->getActiveSheet();
 
         // Encabezados Estándar
-        $headers = ['ID Ruta', 'Empresa', 'Ciudad', 'Barrio Origen', 'Punto Origen', 'Barrio Destino', 'Punto Destino', 'Estado'];
-        $cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        $headers = ['ID Ruta', 'Ciudad', 'Barrio Origen', 'Barrio Destino', 'Estado'];
+        $cols = ['A', 'B', 'C', 'D', 'E'];
 
         foreach ($cols as $index => $col) {
             $sheet->setCellValue($col . '1', $headers[$index]);
@@ -131,13 +131,10 @@ class RutaService
         $row = 2;
         foreach ($rutas as $ruta) {
             $sheet->setCellValue('A' . $row, $ruta->id_ruta);
-            $sheet->setCellValue('B' . $row, optional($ruta->empresa)->nombre_empresa ?? $ruta->NIT);
-            $sheet->setCellValue('C' . $row, optional($ruta->ciudad)->nombre_city ?? '—');
-            $sheet->setCellValue('D' . $row, optional($ruta->barrioOrigen)->nombre ?? '—');
-            $sheet->setCellValue('E' . $row, $ruta->origen);
-            $sheet->setCellValue('F' . $row, optional($ruta->barrioDestino)->nombre ?? '—');
-            $sheet->setCellValue('G' . $row, $ruta->destino);
-            $sheet->setCellValue('H' . $row, optional($ruta->estado)->nombre_estado ?? '—');
+            $sheet->setCellValue('B' . $row, optional($ruta->ciudad)->nombre_city ?? '—');
+            $sheet->setCellValue('C' . $row, optional($ruta->barrioOrigen)->nombre ?? '—');
+            $sheet->setCellValue('D' . $row, optional($ruta->barrioDestino)->nombre ?? '—');
+            $sheet->setCellValue('E' . $row, optional($ruta->estado)->nombre_estado ?? '—');
             $row++;
         }
 
@@ -145,7 +142,7 @@ class RutaService
         foreach ($cols as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
-        $sheet->getStyle('A1:H' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+        $sheet->getStyle('A1:E' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
         $writer = new Xlsx($spreadsheet);
         $filename = 'Reporte_Rutas_' . date('Ymd_His') . '.xlsx';

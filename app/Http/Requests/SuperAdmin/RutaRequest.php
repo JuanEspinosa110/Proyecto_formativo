@@ -4,6 +4,7 @@ namespace App\Http\Requests\SuperAdmin;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
+use App\Models\Barrio;
 
 class RutaRequest extends FormRequest
 {
@@ -19,36 +20,61 @@ class RutaRequest extends FormRequest
             $idRuta = $idRuta->id_ruta;
         }
 
-        $nit = $this->input('NIT');
+        $idCiudad = $this->input('id_ciudad');
 
         return [
-            'NIT' => 'required|exists:empresa,NIT',
-            'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-            'id_barrio_origen' => 'required|exists:barrio,id_barrio',
-            'id_barrio_destino' => 'required|exists:barrio,id_barrio|different:id_barrio_origen',
-            'origen' => [
+            'id_ciudad' => [
                 'required',
                 'string',
-                'max:150',
-                function ($attribute, $value, $fail) use ($idRuta, $nit) {
-                    if (!$nit) return; 
-                    
-                    $exists = DB::table('ruta')
-                        ->where('NIT', $nit)
-                        ->where('origen', strtoupper(trim($value)))
-                        ->where('destino', strtoupper(trim($this->destino)))
-                        ->where('id_ciudad', $this->id_ciudad)
-                        ->when($idRuta, function ($q) use ($idRuta) {
-                            return $q->where('id_ruta', '!=', $idRuta);
-                        })
-                        ->exists();
-
-                    if ($exists) {
-                        $fail("Ya existe una ruta con el mismo origen, destino y ciudad para esta empresa.");
+                'size:6',
+                'regex:/^[0-9]+$/',
+                'exists:ciudad,id_ciudad'
+            ],
+            'id_barrio_origen' => [
+                'required',
+                'integer',
+                'min:1',
+                'regex:/^[0-9]+$/',
+                'exists:barrio,id_barrio',
+                function ($attribute, $value, $fail) use ($idCiudad, $idRuta) {
+                    if ($idCiudad) {
+                        $barrio = Barrio::where('id_barrio', $value)->first();
+                        if ($barrio && $barrio->id_ciudad !== $idCiudad) {
+                            $fail('El barrio de origen debe pertenecer a la ciudad seleccionada.');
+                        }
+                        
+                        // Check for duplicate route
+                        $exists = DB::table('ruta')
+                            ->where('id_ciudad', $idCiudad)
+                            ->where('id_barrio_origen', $value)
+                            ->where('id_barrio_destino', $this->id_barrio_destino)
+                            ->when($idRuta, function ($q) use ($idRuta) {
+                                return $q->where('id_ruta', '!=', $idRuta);
+                            })
+                            ->exists();
+                        
+                        if ($exists) {
+                            $fail("Esta ruta (mismo origen y destino en esta ciudad) ya está registrada.");
+                        }
                     }
                 }
             ],
-            'destino' => 'required|string|max:150',
+            'id_barrio_destino' => [
+                'required',
+                'integer',
+                'min:1',
+                'regex:/^[0-9]+$/',
+                'exists:barrio,id_barrio',
+                'different:id_barrio_origen',
+                function ($attribute, $value, $fail) use ($idCiudad) {
+                    if ($idCiudad) {
+                        $barrio = Barrio::where('id_barrio', $value)->first();
+                        if ($barrio && $barrio->id_ciudad !== $idCiudad) {
+                            $fail('El barrio de destino debe pertenecer a la ciudad seleccionada.');
+                        }
+                    }
+                }
+            ],
             'id_estado' => 'required|exists:estado,id_estado',
         ];
     }
@@ -56,25 +82,21 @@ class RutaRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'NIT.required' => 'La empresa es obligatoria.',
-            'NIT.exists' => 'La empresa seleccionada no es válida.',
             'id_ciudad.required' => 'La ciudad es obligatoria.',
+            'id_ciudad.size' => 'La ciudad debe tener exactamente 6 caracteres.',
+            'id_ciudad.regex' => 'La ciudad solo puede contener números.',
             'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
             'id_barrio_origen.required' => 'El barrio de origen es obligatorio.',
-            'id_barrio_origen.exists' => 'El barrio de origen no es válido.',
+            'id_barrio_origen.integer' => 'El barrio de origen debe ser un número entero.',
+            'id_barrio_origen.min' => 'El barrio de origen no es válido.',
+            'id_barrio_origen.regex' => 'El barrio de origen solo puede contener números.',
+            'id_barrio_origen.exists' => 'El barrio de origen no existe.',
             'id_barrio_destino.required' => 'El barrio de destino es obligatorio.',
             'id_barrio_destino.different' => 'El barrio de destino debe ser diferente al de origen.',
-            'origen.required' => 'El punto de origen es obligatorio.',
-            'destino.required' => 'El punto de destino es obligatorio.',
+            'id_barrio_destino.regex' => 'El barrio de destino solo puede contener números.',
+            'id_barrio_destino.exists' => 'El barrio de destino no existe.',
             'id_estado.required' => 'El estado es obligatorio.',
+            'id_estado.exists' => 'El estado seleccionado no es válido.',
         ];
-    }
-
-    protected function prepareForValidation()
-    {
-        $this->merge([
-            'origen' => $this->origen ? strtoupper(trim($this->origen)) : null,
-            'destino' => $this->destino ? strtoupper(trim($this->destino)) : null,
-        ]);
     }
 }

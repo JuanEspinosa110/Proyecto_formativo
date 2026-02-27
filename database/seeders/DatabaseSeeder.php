@@ -15,13 +15,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-
         $this->call(InitialDataSeeder::class);
+
+        // User::create([
+        //     'doc_usuario' => 1000000000,
+        //     'primer_nombre' => 'Test',
+        //     'primer_apellido' => 'User',
+        //     'correo' => 'test@example.com',
+        //     'password' => \Illuminate\Support\Facades\Hash::make('password'),
+        //     'id_tipo_usuario' => 1,
+        //     'id_estado' => 1
+        // ]);
     }
 }
