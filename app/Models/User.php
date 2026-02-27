@@ -61,4 +61,30 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Relación con la Empresa (por el NIT del usuario)
+     */
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class, 'NIT', 'NIT');
+    }
+
+    /**
+     * Obtener el NIT real de operación para este usuario.
+     * Prioriza el NIT de la empresa donde el usuario es representante legal.
+     * Si no es representante, usa el NIT almacenado en su perfil de usuario (Empleado).
+     */
+    public function getActiveNit()
+    {
+        // 1. Verificar si el usuario es representante legal de alguna empresa
+        $empresaRepresentada = Empresa::where('doc_representante', $this->doc_usuario)->first();
+        
+        if ($empresaRepresentada) {
+            return $empresaRepresentada->NIT;
+        }
+
+        // 2. Fallback al NIT de la tabla usuario (para empleados o si no se encontró representación)
+        return $this->NIT;
+    }
 }

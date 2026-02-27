@@ -21,11 +21,15 @@ use App\Http\Controllers\SuperAdmin\{
     TipoUsuarioController,
     PerfilSeguridadController,
     PlanLicenciaController,
+    RutaController,
 };
 
-Route::get('/', function () {
-    return view('index');
-})->name('home');
+// Rutas Administrativas (Panel Empresas)
+require base_path('routes/admin.php');
+
+use App\Http\Controllers\LandingController;
+
+Route::get('/', [LandingController::class, 'index'])->name('home');
 
 
 Route::get('/superadmin/dashboard', function () {
@@ -84,23 +88,7 @@ Route::middleware('auth:web')->group(function () {
         ->name('empresa.dashboard');
 });
 
-// Admin routes (sidebar layout)
-Route::prefix('admin')
-    ->name('admin.')
-    ->middleware(['auth:web'])
-    ->group(function () {
-        Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
-            ->name('dashboard');
 
-        // Estadísticas AJAX para dashboard
-        Route::get('/dashboard/stats', [App\Http\Controllers\Admin\DashboardController::class, 'stats'])
-            ->name('dashboard.stats');
-
-        // Ejemplo: rutas administrativas adicionales (usar nombres con prefijo)
-        Route::get('/empresas', fn() => view('admin.empresas.index'))->name('empresas.index');
-        Route::get('/usuarios', [App\Http\Controllers\Admin\UsuarioController::class, 'index'])
-            ->name('usuarios.index');
-    });
 
 Route::middleware('auth:superadmin')->group(function () {
 
@@ -212,4 +200,10 @@ Route::prefix('superadmin')
 
         Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
             ->name('tarjetas.update');
+
+        // Módulo de Rutas (SuperAdmin)
+        Route::get('/rutas', [RutaController::class, 'index'])->name('rutas.index');
+        Route::post('/rutas', [RutaController::class, 'store'])->name('rutas.store');
+        Route::put('/rutas/{ruta}', [RutaController::class, 'update'])->name('rutas.update');
+        Route::get('/rutas/export', [RutaController::class, 'export'])->name('rutas.export');
     });

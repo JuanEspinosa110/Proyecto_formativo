@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
+use App\Http\Requests\SuperAdmin\EmpresaRequest;
+
 class EmpresaController extends Controller
 {
     /**
@@ -60,69 +62,19 @@ class EmpresaController extends Controller
     /**
      * Guardar empresa
      */
-    public function store(Request $request)
+    public function store(EmpresaRequest $request)
     {
-    $validated = $request->validate([
-
-    // EMPRESA
-    'NIT' => 'required|digits:10|unique:empresa,NIT',
-    'nombre_empresa' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-    'telefono_empresa' => 'required|digits_between:7,15',
-    'correo_corporativo' => 'required|email',
+        $validated = $request->validated();
     
-    // REPRESENTANTE
-    'doc_representante' => 'required|digits_between:8,10',
-    'primer_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-    'segundo_nombre_repre' => ['nullable','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-    'primer_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-    'segundo_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-    'telefono_representante' => 'required|digits_between:7,15',
-    'correo_representante' => 'required|email',
-
-    // UBICACIÓN
-    'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-
-    ], [
-
-    // NIT
-    'NIT.required' => 'El NIT es obligatorio.',
-    'NIT.digits' => 'El NIT debe tener exactamente 10 dígitos.',
-    'NIT.unique' => 'Ya existe una empresa registrada con este NIT.',
-
-    // Empresa
-    'nombre_empresa.required' => 'El nombre de la empresa es obligatorio.',
-    'nombre_empresa.regex' => 'El nombre solo puede contener letras y espacios.',
-    'telefono_empresa.required' => 'El teléfono de la empresa es obligatorio.',
-    'telefono_empresa.digits_between' => 'El teléfono debe tener entre 7 y 15 números.',
-    'correo_corporativo.required' => 'El correo corporativo es obligatorio.',
-    'correo_corporativo.email' => 'El correo corporativo no es válido.',
-
-    // Representante
-    'doc_representante.required' => 'El documento del representante es obligatorio.',
-    'doc_representante.digits_between' => 'El documento debe tener solo números válidos.',
-    'primer_nombre_repre.required' => 'El primer nombre es obligatorio.',
-    'primer_apellido_repre.required' => 'El primer apellido es obligatorio.',
-    'segundo_apellido_repre.required' => 'El segundo apellido es obligatorio.',
-    'telefono_representante.required' => 'El teléfono del representante es obligatorio.',
-    'telefono_representante.digits_between' => 'El teléfono del representante no es válido.',
-    'correo_representante.required' => 'El correo del representante es obligatorio.',
-    'correo_representante.email' => 'El correo del representante no es válido.',
-
-    // Ubicación
-    'id_ciudad.required' => 'Debe seleccionar una ciudad.',
-    'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
-    ]);
-
-
-    //  ASIGNACIONES AUTOMÁTICAS
-    $validated['id_estado'] = 1;
-    $validated['id_tipo_empresa'] = 1;
-
-    Empresa::create($validated);
-
-    return redirect()
-        ->route('superadmin.empresas.index')
-        ->with('success', 'La empresa ha sido creada exitosamente.');
+        //  ASIGNACIONES AUTOMÁTICAS
+        $validated['id_estado'] = 1;
+        $validated['id_tipo_empresa'] = 1;
+    
+        Empresa::create($validated);
+    
+        return redirect()
+            ->route('superadmin.empresas.index')
+            ->with('success', 'La empresa ha sido creada exitosamente.');
     }
 
 
@@ -151,29 +103,10 @@ class EmpresaController extends Controller
     /**
      * Actualizar empresa
      */
-    public function update(Request $request, $nit)
+    public function update(EmpresaRequest $request, $nit)
     {
         $empresa = Empresa::findOrFail($nit);
-
-        $validated = $request->validate([
-
-            'nombre_empresa' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'doc_representante' => 'required|numeric',
-            'primer_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'segundo_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'primer_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'segundo_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'telefono_representante' => 'required|numeric',
-            'telefono_empresa' => 'required|numeric',
-            'correo_corporativo' => ['required','regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'],
-            'correo_representante' => ['required','regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'],
-
-            'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-            'id_estado' => 'required|exists:estado,id_estado',
-
-        ]);
-
-        $empresa->update($validated);
+        $empresa->update($request->validated());
 
         return redirect()
             ->route('superadmin.empresas.index')
