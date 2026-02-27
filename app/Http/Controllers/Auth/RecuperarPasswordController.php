@@ -47,8 +47,9 @@ class RecuperarPasswordController extends Controller
                 ->subject('Código de recuperación');
     });
 
+    session(['correo' => $request->email]);
+
     return redirect()->route('password.codigo.form')
-        ->with('correo', $request->email)
         ->with('success', 'Se envió un código al correo '.$request->email);
 
 }
@@ -132,7 +133,12 @@ class RecuperarPasswordController extends Controller
 
     public function reenviarCodigo(Request $request)
         {
-            $correo = $request->correo;
+            $correo = session('correo');
+
+            if (!$correo) {
+                return redirect()->route('recuperar')
+                    ->withErrors('Sesión expirada. Inicia nuevamente el proceso.');
+            }
 
             $codigo = random_int(100000, 999999);
 

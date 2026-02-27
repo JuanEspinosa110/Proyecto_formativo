@@ -261,7 +261,7 @@ class LicenciaController extends Controller
             'correo_corporativo' => 'required|email|max:150',
 
             // Usuario Administrador
-            'doc_admin' => 'required|digits_between:8,12',
+            'doc_admin' => 'required|digits_between:8,10',
             'primer_nombre_admin' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
             'segundo_nombre_admin' => ['nullable', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
             'primer_apellido_admin' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
