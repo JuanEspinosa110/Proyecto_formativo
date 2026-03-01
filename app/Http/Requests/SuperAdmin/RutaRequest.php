@@ -23,6 +23,28 @@ class RutaRequest extends FormRequest
         $idCiudad = $this->input('id_ciudad');
 
         return [
+
+            'codigo_ruta' => [
+                'required',
+                'regex:/^[1-9][0-9]*$/',
+                'unique:ruta,codigo_ruta,' . $idRuta . ',id_ruta',
+                'integer',
+                'min:1',
+                'max:99',
+                function ($attribute, $value, $fail) use ($idRuta) {
+                    $exists = DB::table('ruta')
+                        ->where('codigo_ruta', $value)
+                        ->when($idRuta, function ($q) use ($idRuta) {
+                            return $q->where('id_ruta', '!=', $idRuta);
+                        })
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('Este código de ruta ya está registrado.');
+                    }
+                }
+            ],
+
             'id_ciudad' => [
                 'required',
                 'string',
@@ -82,6 +104,12 @@ class RutaRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'codigo_ruta.required' => 'El código de ruta es obligatorio.',
+            'codigo_ruta.integer' => 'El código debe ser numérico.',
+            'codigo_ruta.regex' => 'El código debe ser numérico y no puede iniciar en 0.',
+            'codigo_ruta.unique' => 'Este código de ruta ya está registrado.',
+            'codigo_ruta.max' => 'El código de ruta no puede ser mayor a 99.',
+            'codigo_ruta.min' => 'El código debe ser mayor a 0.',
             'id_ciudad.required' => 'La ciudad es obligatoria.',
             'id_ciudad.size' => 'La ciudad debe tener exactamente 6 caracteres.',
             'id_ciudad.regex' => 'La ciudad solo puede contener números.',

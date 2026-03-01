@@ -29,10 +29,10 @@ class EmpresaRequest extends FormRequest
 
             // REPRESENTANTE
             'doc_representante' => 'required|digits_between:7,10',
-            'primer_nombre_repre' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'segundo_nombre_repre' => ['nullable', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'primer_apellido_repre' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'segundo_apellido_repre' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+            'primer_nombre_repre' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
+            'segundo_nombre_repre' => ['nullable', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
+            'primer_apellido_repre' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
+            'segundo_apellido_repre' => ['required', 'string', 'max:50', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
             'telefono_representante' => 'required|digits_between:7,15',
             'correo_representante' => 'required|email',
 

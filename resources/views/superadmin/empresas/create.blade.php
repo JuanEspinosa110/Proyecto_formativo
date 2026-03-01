@@ -269,7 +269,7 @@ document.getElementById('id_departamento').addEventListener('change', function()
 
 // SOLO LETRAS
 function soloLetras(input) {
-    input.value = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ\s]/g, '');
+    input.value = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ]/g, '');
 }
 
 // SOLO NÚMEROS

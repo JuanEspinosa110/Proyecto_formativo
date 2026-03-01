@@ -72,7 +72,7 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th class="ps-4 py-3 text-uppercase small fw-bold text-muted border-0">ID</th>
+                        <th class="ps-4 py-3 text-uppercase small fw-bold text-muted border-0">CODIGO</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Ciudad</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Barrio Origen</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Barrio Destino</th>
@@ -83,7 +83,7 @@
                 <tbody>
                     @forelse($rutas as $ruta)
                         <tr class="border-top">
-                            <td class="ps-4 text-muted small fw-bold">#{{ $ruta->id_ruta }}</td>
+                            <td class="ps-4 text-muted small fw-bold">#{{ $ruta->codigo_ruta }}</td>
                             <td class="text-uppercase small fw-medium text-muted">
                                 {{ optional($ruta->ciudad)->nombre_city ?? '—' }}
                             </td>
@@ -158,6 +158,15 @@
 
                     <div class="row g-3">
                         <div class="col-12">
+                            <label class="form-label small fw-bold text-muted text-uppercase">
+                                Código de Ruta <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" name="codigo_ruta" 
+                                class="form-control bg-light border-0 py-2" 
+                                required>
+                            <div class="invalid-feedback feedback-codigo_ruta"></div>
+                        </div>
+                        <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Ciudad <span class="text-danger">*</span></label>
                             <select name="id_ciudad" class="form-select bg-light border-0 py-2" required>
                                 @foreach($ciudades as $ciu)
@@ -220,6 +229,15 @@
                     <div id="edit-errors-alert" class="alert alert-danger d-none shadow-sm py-2 small mb-4"></div>
 
                     <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-muted text-uppercase">
+                                Código de Ruta <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" name="codigo_ruta" 
+                                class="form-control bg-light border-0 py-2" 
+                                required>
+                            <div class="invalid-feedback feedback-codigo_ruta"></div>
+                        </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Ciudad <span class="text-danger">*</span></label>
                             <select name="id_ciudad" id="edit_id_ciudad" class="form-select bg-light border-0 py-2" required>
@@ -284,6 +302,7 @@
         document.querySelectorAll('.edit-ruta').forEach(btn => {
             btn.addEventListener('click', async function() {
                 const data = JSON.parse(this.dataset.json);
+                form.querySelector('[name="codigo_ruta"]').value = data.codigo_ruta || '';
                 const form = document.getElementById('formEditRuta');
                 
                 form.querySelector('[name="id_ciudad"]').value = data.id_ciudad || '';
@@ -437,6 +456,20 @@
             });
         }
     });
+
+
+        // No permitir caracteres no numéricos 
+        document.addEventListener('input', function(e) {
+            if (e.target.name === 'codigo_ruta') {
+                // Eliminar todo lo que no sea número
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+
+                // Evitar que empiece con 0
+                if (e.target.value.startsWith('0')) {
+                    e.target.value = e.target.value.replace(/^0+/, '');
+                }
+            }
+        });
 </script>
 
 <style>
