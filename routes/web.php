@@ -22,6 +22,7 @@ use App\Http\Controllers\SuperAdmin\{
     PerfilSeguridadController,
     PlanLicenciaController,
     RutaController,
+    BarrioController,
 };
 
 // Rutas Administrativas (Panel Empresas)
@@ -207,4 +208,10 @@ Route::prefix('superadmin')
         Route::put('/rutas/{ruta}', [RutaController::class, 'update'])->name('rutas.update');
         Route::get('/rutas/export', [RutaController::class, 'export'])->name('rutas.export');
         Route::get('/rutas/barrios/{id_ciudad}', [RutaController::class, 'getBarriosByCiudad'])->name('rutas.barrios');
+
+        // Módulo de Barrios (SuperAdmin)
+        Route::get('/barrios', [BarrioController::class, 'index'])->name('barrios.index');
+        Route::post('/barrios', [BarrioController::class, 'store'])->name('barrios.store');
+        Route::put('/barrios/{id}', [BarrioController::class, 'update'])->name('barrios.update');
+        Route::get('/barrios/export', [BarrioController::class, 'export'])->name('barrios.export');
     });

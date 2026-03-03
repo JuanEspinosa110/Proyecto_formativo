@@ -71,6 +71,11 @@
                     <span class="material-symbols-rounded">map</span>
                     <span>Rutas</span>
                 </a>
+                <a href="{{ route('superadmin.barrios.index') }}"
+                    class="sigu-nl {{ request()->routeIs('superadmin.barrios.*') ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">location_city</span>
+                    <span>Barrios</span>
+                </a>
             </nav>
 
             <!-- ▸ ACCIONES DERECHA -->
@@ -131,6 +136,7 @@
             <a href="{{ route('superadmin.licencias.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.licencias.*') ? 'active' : '' }}"><span class="material-symbols-rounded">verified</span>Licencias</a>
             <a href="{{ route('superadmin.planes.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.planes.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">layers</span>Planes</a>
             <a href="{{ route('superadmin.rutas.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.rutas.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">map</span>Rutas</a>
+            <a href="{{ route('superadmin.barrios.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.barrios.*') ? 'active' : '' }}"><span class="material-symbols-rounded">location_city</span>Barrios</a>
             <a href="{{ route('superadmin.perfil.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.perfil.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">badge</span>Perfil</a>
             <div class="sigu-drawer-footer">
                 <form method="POST" action="{{ route('logout') }}">
