@@ -19,7 +19,7 @@ class TipoDocumentoController extends Controller
             ->paginate(5)
             ->withQueryString();
 
-        $estados = Estado::all();
+        $estados = Estado::whereIn('id_estado', [1, 2])->get();
 
         return view('superadmin.configuracion.tipo_documento.index',
             compact('tipos', 'estados'));
@@ -27,13 +27,24 @@ class TipoDocumentoController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required|max:100|unique:tipo_documento,nombre',
-            'descripcion' => 'nullable|max:255',
-            'id_estado' => 'required'
+        $validated = $request->validate([
+            'nombre'               => 'required|string|max:100|unique:tipo_documento,nombre',
+            'descripcion'          => 'nullable|string|max:255',
+            'id_estado'            => 'required|in:1,2'
+        ], [
+            'nombre.required'      => 'El nombre del tipo de documento es obligatorio.',
+            'nombre.unique'        => 'Ya existe un tipo de documento con este nombre.',
+            'id_estado.required'   => 'El estado es obligatorio.',
+            'id_estado.in'         => 'El estado seleccionado no es válido (solo Activo/Inactivo).'
         ]);
 
-        TipoDocumento::create($request->all());
+        TipoDocumento::create([
+            'nombre'               => $validated['nombre'],
+            'descripcion'          => $validated['descripcion'],
+            'requiere_doc_usuario' => $request->has('requiere_doc_usuario'),
+            'requiere_placa'       => $request->has('requiere_placa'),
+            'id_estado'            => $validated['id_estado'],
+        ]);
 
         return redirect()
             ->route('superadmin.tipo_documento.index')
@@ -44,13 +55,24 @@ class TipoDocumentoController extends Controller
     {
         $tipo = TipoDocumento::findOrFail($id);
 
-        $request->validate([
-            'nombre' => 'required|max:100|unique:tipo_documento,nombre,' . $id . ',id_tipo_documento',
-            'descripcion' => 'nullable|max:255',
-            'id_estado' => 'required'
+        $validated = $request->validate([
+            'nombre'               => 'required|string|max:100|unique:tipo_documento,nombre,' . $id . ',id_tipo_documento',
+            'descripcion'          => 'nullable|string|max:255',
+            'id_estado'            => 'required|in:1,2'
+        ], [
+            'nombre.required'      => 'El nombre del tipo de documento es obligatorio.',
+            'nombre.unique'        => 'Ese nombre ya está en uso por otro tipo.',
+            'id_estado.required'   => 'El estado es obligatorio.',
+            'id_estado.in'         => 'El estado seleccionado no es válido (solo Activo/Inactivo).'
         ]);
 
-        $tipo->update($request->all());
+        $tipo->update([
+            'nombre'               => $validated['nombre'],
+            'descripcion'          => $validated['descripcion'],
+            'requiere_doc_usuario' => $request->has('requiere_doc_usuario'),
+            'requiere_placa'       => $request->has('requiere_placa'),
+            'id_estado'            => $validated['id_estado'],
+        ]);
 
         return redirect()
             ->route('superadmin.tipo_documento.index')
