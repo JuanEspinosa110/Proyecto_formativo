@@ -18,7 +18,7 @@ class Ruta extends Model
         'codigo_ruta',
         'id_barrio_origen',
         'id_barrio_destino',
-        'id_estado'
+        'id_estado',
     ];
 
     public function estado()

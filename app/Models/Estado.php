@@ -11,10 +11,9 @@ class Estado extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_estado',
-        'nombre_estado',
-        'descripcion',
+        'nombre_estado'
     ];
+
 
     /**
      * Relación con SuperAdministrador
