@@ -75,6 +75,7 @@ class RutaRequest extends FormRequest
                     }
                 }
             ],
+            'codigo_ruta' => 'required|numeric|digits_between:1,10',
             'id_estado' => 'required|exists:estado,id_estado',
         ];
     }
@@ -86,6 +87,9 @@ class RutaRequest extends FormRequest
             'id_ciudad.size' => 'La ciudad debe tener exactamente 6 caracteres.',
             'id_ciudad.regex' => 'La ciudad solo puede contener números.',
             'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
+            'codigo_ruta.required' => 'El código de ruta es obligatorio.',
+            'codigo_ruta.numeric' => 'El código de ruta debe ser numérico.',
+            'codigo_ruta.digits_between' => 'El código de ruta debe tener entre 1 y 10 dígitos.',
             'id_barrio_origen.required' => 'El barrio de origen es obligatorio.',
             'id_barrio_origen.integer' => 'El barrio de origen debe ser un número entero.',
             'id_barrio_origen.min' => 'El barrio de origen no es válido.',
