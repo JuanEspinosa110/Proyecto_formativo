@@ -18,7 +18,6 @@ use App\Http\Controllers\SuperAdmin\{
     ReporteController,
     AlertaController,
     ConfiguracionController,
-    TipoUsuarioController,
     PerfilSeguridadController,
     PlanLicenciaController,
     RutaController,
@@ -31,18 +30,20 @@ use App\Http\Controllers\LandingController;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
-
-Route::get('/superadmin/dashboard', function () {
-    return view('superadmin.dashboard');
-});
-
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+
+Route::get('/superadmin/dashboard', function () {
+    return view('admin.dashboard');
+});
+
 Route::view('/register', 'auth.register')->name('register');
 Route::post('/register', [RegistroController::class, 'store'])
     ->name('register.store');
+
+Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
 
 Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
 
@@ -66,6 +67,7 @@ Route::get(
     '/nueva-password',
     [RecuperarPasswordController::class, 'mostrarNuevaPassword']
 )->name('password.nueva.form');
+
 
 
 // Procesar actualización
@@ -94,25 +96,14 @@ Route::middleware('auth:superadmin')->group(function () {
 });
 
 
-Route::get(
-    '/superadmin/dashboard/stats',
-    [DashboardController::class, 'superAdminStats']
-)->name('superadmin.dashboard.stats');
+Route::get('/superadmin/dashboard/stats', [DashboardController::class, 'superAdminStats'])->name('superadmin.dashboard.stats');
 
 Route::prefix('superadmin')
     ->name('superadmin.')
     ->middleware(['auth:superadmin'])
-    ->group(function () {
+    ->group(function () 
+    {
 
-        // Tipos de Usuario (Roles)
-        Route::get('roles', [TipoUsuarioController::class, 'index'])->name('roles.index');
-        Route::get('roles/create', [TipoUsuarioController::class, 'create'])->name('roles.create');
-        Route::post('roles', [TipoUsuarioController::class, 'store'])->name('roles.store');
-        Route::get('roles/{id}/edit', [TipoUsuarioController::class, 'edit'])->name('roles.edit');
-        Route::put('roles/{id}', [TipoUsuarioController::class, 'update'])->name('roles.update');
-        Route::delete('roles/{id}', [TipoUsuarioController::class, 'destroy'])->name('roles.destroy');
-        Route::get('roles/{id}/permissions', [TipoUsuarioController::class, 'showPermissions'])->name('roles.permissions.show');
-        Route::get('roles/{id}/usuarios', [TipoUsuarioController::class, 'users'])->name('roles.users');
 
         // Perfil y Seguridad
         Route::get('perfil_seguridad', [PerfilSeguridadController::class, 'index'])->name('perfil.index');
@@ -164,8 +155,8 @@ Route::prefix('superadmin')
 
         // Ruta para obtener ciudades por departamento (AJAX)
         Route::get('/empresas/ciudades/{id_departamento}', [EmpresaController::class, 'getCiudadesByDepartamento'])
-            ->name('superadmin.empresas.ciudades');
-
+        ->name('superadmin.empresas.ciudades');
+    
         // Rutas CRUD de Empresas
         Route::resource('empresas', EmpresaController::class);
         Route::get('empresas/export/csv', [EmpresaController::class, 'exportCsv'])->name('empresas.export.csv');
@@ -183,6 +174,9 @@ Route::prefix('superadmin')
 
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+
+
+
 
         //Reportes 
         Route::get('reportes', [ReporteController::class, 'index'])

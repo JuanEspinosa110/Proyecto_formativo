@@ -4,11 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>@yield('title', 'Super Admin')</title>
     <title>@yield('title', 'SIGU') — Sistema Integral de Seguimiento Urbano</title>
 
     <!-- Tipografías: Sora (display) + Inter Tight (body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+
+    <title>@yield('title', 'SIGU') — Sistema Integral de Seguimiento Urbano</title>
+
+    <!-- Tipografías: Sora (display) + Inter Tight (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/superadmin_congif.css') }}">
+
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -19,7 +29,7 @@
 
     <!-- SIGU — Sistema de estilos unificado -->
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/empresa.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/empresas.css') }}">
     <link rel="stylesheet" href="{{ asset('css/perfil-seguridad.css') }}">
 
     @stack('styles')
@@ -72,7 +82,73 @@
                     <span>Rutas</span>
                 </a>
             </nav>
+            <div class="dropdown">
+            <a href="#"
+            class="sigu-nl dropdown-toggle 
+            {{ request()->routeIs('superadmin.configuracion.*') ? 'active' : '' }}"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
 
+                <span class="material-symbols-rounded">settings</span>
+                <span>Configuración</span>
+            </a>
+
+            <ul class="dropdown-menu">
+
+                {{-- CIUDADES --}}
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.ciudades.index') }}">
+                        <i class="bi bi-geo-alt"></i> Ciudades
+                    </a>
+                </li>
+
+                {{-- TIPOS DE EMPRESA --}}
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.tipo-empresa.index') }}">
+                        <i class="bi bi-building"></i> Tipos de Empresa
+                    </a>
+                </li>
+
+                {{-- TIPOS DE USUARIO --}}
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.tipo-usuario.index') }}">
+                        <i class="bi bi-people"></i> Tipos de Usuario
+                    </a>
+                </li>
+
+                {{-- ESTADOS --}}
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.estados.index') }}">
+                        <i class="bi bi-toggle-on"></i> Estados
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.tipo-mantenimiento.index') }}">
+                        <i class="bi bi-tools"></i> Tipo de Mantenimiento
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.tipo-documento.index') }}">
+                        <i class="bi bi-file-earmark-text"></i> Tipo de Documento
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.tipo-asignacion.index') }}">
+                        <i class="bi bi-journal-check"></i> Tipo de Asignación
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+            {{-- FOOTER --}}
+            <div class="sa-dash-sidebar-footer">
             <!-- ▸ ACCIONES DERECHA -->
             <div class="sigu-nb-end">
 

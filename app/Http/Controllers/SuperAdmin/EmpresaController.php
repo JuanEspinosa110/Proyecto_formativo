@@ -9,16 +9,21 @@ use App\Models\Departamento;
 use App\Models\Estado;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+
+// Excel
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 use App\Http\Requests\SuperAdmin\EmpresaRequest;
 
 class EmpresaController extends Controller
 {
-    /**
-     * Listado de empresas
-     */
+    /* ================================
+        LISTADO
+    ================================= */
     public function index(Request $request)
     {
         $query = Empresa::with(['ciudad.departamento', 'estado']);
@@ -48,9 +53,9 @@ class EmpresaController extends Controller
         return view('superadmin.empresas.index', compact('empresas','estados','ciudades'));
     }
 
-    /**
-     * Formulario crear empresa
-     */
+    /* ================================
+        CREAR
+    ================================= */
     public function create()
     {
         $departamentos = Departamento::orderBy('nombre_departamento')->get();
@@ -77,26 +82,22 @@ class EmpresaController extends Controller
             ->with('success', 'La empresa ha sido creada exitosamente.');
     }
 
-
-
+    /* ================================
+        EDITAR
+    ================================= */
     public function edit($nit)
     {
         $empresa = Empresa::with('ciudad')->findOrFail($nit);
-
         $departamentos = Departamento::orderBy('nombre_departamento')->get();
         $estados = Estado::whereIn('id_estado', [1,2,3,6])->get();
 
-        // Cargar ciudades del departamento actual
         $ciudades = Ciudad::where(
             'id_departamento',
             optional($empresa->ciudad)->id_departamento
         )->get();
 
         return view('superadmin.empresas.edit', compact(
-            'empresa',
-            'departamentos',
-            'ciudades',
-            'estados'
+            'empresa','departamentos','ciudades','estados'
         ));
     }
 
@@ -139,22 +140,13 @@ class EmpresaController extends Controller
         public function exportCsv()
     {
         $fileName = 'empresas.csv';
-
         $empresas = Empresa::with(['ciudad', 'estado'])->get();
 
         $response = new StreamedResponse(function () use ($empresas) {
 
             $handle = fopen('php://output', 'w');
 
-            // Encabezados
-            fputcsv($handle, [
-                'NIT',
-                'Nombre Empresa',
-                'Teléfono',
-                'Correo',
-                'Ciudad',
-                'Estado'
-            ]);
+            fputcsv($handle, ['NIT','Nombre Empresa','Teléfono','Correo','Ciudad','Estado']);
 
             foreach ($empresas as $empresa) {
                 fputcsv($handle, [
@@ -176,51 +168,42 @@ class EmpresaController extends Controller
         return $response;
     }
 
-    /**
-     * Exportar empresas a Excel
-     */
+    /* ================================
+        EXPORTAR EXCEL
+    ================================= */
     public function exportExcel()
     {
         $fileName = 'empresas_' . date('Y-m-d_H-i-s') . '.xlsx';
-
         $empresas = Empresa::with(['ciudad', 'estado'])->get();
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Encabezados
-        $headers = ['NIT', 'Nombre Empresa', 'Teléfono', 'Correo', 'Ciudad', 'Estado'];
-        $sheet->fromArray($headers, NULL, 'A1');
+        $headers = ['NIT','Nombre Empresa','Teléfono','Correo','Ciudad','Estado'];
+        $sheet->fromArray($headers, null, 'A1');
 
-        // Estilos para encabezados
         $headerStyle = $sheet->getStyle('A1:F1');
         $headerStyle->getFont()->setBold(true);
-        $headerStyle->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('FFFFFF'));
-        $headerStyle->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID);
-        $headerStyle->getFill()->getStartColor()->setARGB('FF5E548E'); // Color SIGU
-        $headerStyle->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $headerStyle->getFont()->setColor(new Color(Color::COLOR_WHITE));
+        $headerStyle->getFill()->setFillType(Fill::FILL_SOLID);
+        $headerStyle->getFill()->getStartColor()->setARGB('FF5E548E');
+        $headerStyle->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Datos
         $row = 2;
         foreach ($empresas as $empresa) {
-            $sheet->setCellValue('A' . $row, $empresa->NIT);
-            $sheet->setCellValue('B' . $row, $empresa->nombre_empresa);
-            $sheet->setCellValue('C' . $row, $empresa->telefono_empresa);
-            $sheet->setCellValue('D' . $row, $empresa->correo_corporativo);
-            $sheet->setCellValue('E' . $row, optional($empresa->ciudad)->nombre_city);
-            $sheet->setCellValue('F' . $row, optional($empresa->estado)->nombre_estado);
+            $sheet->setCellValue('A'.$row, $empresa->NIT);
+            $sheet->setCellValue('B'.$row, $empresa->nombre_empresa);
+            $sheet->setCellValue('C'.$row, $empresa->telefono_empresa);
+            $sheet->setCellValue('D'.$row, $empresa->correo_corporativo);
+            $sheet->setCellValue('E'.$row, optional($empresa->ciudad)->nombre_city);
+            $sheet->setCellValue('F'.$row, optional($empresa->estado)->nombre_estado);
             $row++;
         }
 
-        // Ajustar ancho de columnas
-        $sheet->getColumnDimension('A')->setWidth(15);
-        $sheet->getColumnDimension('B')->setWidth(25);
-        $sheet->getColumnDimension('C')->setWidth(15);
-        $sheet->getColumnDimension('D')->setWidth(25);
-        $sheet->getColumnDimension('E')->setWidth(20);
-        $sheet->getColumnDimension('F')->setWidth(15);
+        foreach (range('A','F') as $column) {
+            $sheet->getColumnDimension($column)->setAutoSize(true);
+        }
 
-        // Guardar en archivo temporal y descargar
         $writer = new Xlsx($spreadsheet);
         $temp = tempnam(sys_get_temp_dir(), 'xlsx');
         $writer->save($temp);
@@ -228,5 +211,6 @@ class EmpresaController extends Controller
         return response()->download($temp, $fileName)->deleteFileAfterSend(true);
     }
 
-
+    
+    
 }

@@ -11,10 +11,9 @@ class Estado extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id_estado',
-        'nombre_estado',
-        'descripcion',
+        'nombre_estado'
     ];
+
 
     /**
      * Relación con SuperAdministrador
@@ -38,5 +37,13 @@ class Estado extends Model
     public function empresas()
     {
         return $this->hasMany(Empresa::class, 'id_estado', 'id_estado');
+    }
+
+    /**
+     * Relación con TipoDocumento
+     */
+    public function tipoDocumentos()
+    {
+        return $this->hasMany(TipoDocumento::class, 'id_estado', 'id_estado');
     }
 }
