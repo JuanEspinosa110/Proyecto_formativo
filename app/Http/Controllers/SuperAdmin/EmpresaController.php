@@ -83,20 +83,13 @@ class EmpresaController extends Controller
         $validated['id_estado'] = 1;
         $validated['id_tipo_empresa'] = 1;
 
-<<<<<<< HEAD
-        Empresa::create($validated);
-
-        return redirect()
-            ->route('superadmin.empresas.index')
-            ->with('success', 'La empresa ha sido creada exitosamente.');
-=======
     // REPRESENTANTE
-    'doc_representante' => 'required|digits_between:7,10',
+    'doc_representante' => ['required','digits_between:7,10'],
     'primer_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
     'segundo_nombre_repre' => ['nullable','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
     'primer_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
     'segundo_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-    'telefono_representante' => 'required|digits_between:7,15',
+    'telefono_representante' => ['required','digits_between:7,15'],
     'correo_representante' => 'required|email',
 
     // UBICACIÓN
@@ -143,7 +136,6 @@ class EmpresaController extends Controller
     return redirect()
         ->route('superadmin.empresas.index')
         ->with('success', 'La empresa ha sido creada exitosamente.');
->>>>>>> develop
     }
 
     /* ================================
@@ -191,12 +183,6 @@ class EmpresaController extends Controller
             ->with('success', 'Empresa actualizada correctamente.');
     }
 
-<<<<<<< HEAD
-    /* ================================
-        EXPORTAR CSV
-    ================================= */
-    public function exportCsv()
-=======
     /**
      * Mostrar detalles
      */
@@ -221,7 +207,6 @@ class EmpresaController extends Controller
         }
 
         public function exportCsv()
->>>>>>> develop
     {
         $fileName = 'empresas.csv';
         $empresas = Empresa::with(['ciudad', 'estado'])->get();
