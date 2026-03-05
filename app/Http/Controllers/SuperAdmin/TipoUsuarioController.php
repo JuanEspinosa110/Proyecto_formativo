@@ -27,15 +27,23 @@ class TipoUsuarioController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            // Corregido: Debe coincidir con el 'name' del input en tu index.blade.php
-            'nombre_tipo' => 'required|regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'
+            'nombre_tipo' => [
+                'required',
+                'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/',
+                function ($attribute, $value, $fail) {
+                    $exists = TipoUsuario::whereRaw('LOWER(nombre_tipo) = ?', [strtolower($value)])->exists();
+                    if ($exists) {
+                        $fail('El tipo de usuario "' . $value . '" ya se encuentra registrado.');
+                    }
+                }
+            ]
         ], [
             'nombre_tipo.required' => 'El nombre del tipo de usuario es obligatorio.',
             'nombre_tipo.regex' => 'Solo se permiten letras y espacios.'
         ]);
 
         TipoUsuario::create([
-            'nombre_tipo' => $request->nombre_tipo 
+            'nombre_tipo' => strtoupper($request->nombre_tipo) 
         ]);
 
         return redirect()
@@ -46,8 +54,18 @@ class TipoUsuarioController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            // Corregido: Consistencia en el nombre del campo
-            'nombre_tipo' => 'required|regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'
+            'nombre_tipo' => [
+                'required',
+                'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/',
+                function ($attribute, $value, $fail) use ($id) {
+                    $exists = TipoUsuario::whereRaw('LOWER(nombre_tipo) = ?', [strtolower($value)])
+                        ->where('id_tipo_usuario', '!=', $id)
+                        ->exists();
+                    if ($exists) {
+                        $fail('El tipo de usuario "' . $value . '" ya existe.');
+                    }
+                }
+            ]
         ], [
             'nombre_tipo.required' => 'El nombre del tipo de usuario es obligatorio.',
             'nombre_tipo.regex' => 'Solo se permiten letras y espacios.'
@@ -55,9 +73,8 @@ class TipoUsuarioController extends Controller
 
         $tipo = TipoUsuario::findOrFail($id);
         
-        // Es mejor asignar el campo específico para evitar fallos de seguridad
         $tipo->update([
-            'nombre_tipo' => $request->nombre_tipo
+            'nombre_tipo' => strtoupper($request->nombre_tipo)
         ]);
 
         return redirect()

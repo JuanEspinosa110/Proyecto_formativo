@@ -23,11 +23,25 @@ public function index(Request $request)
     public function store(Request $request)
     {
         $request->validate([
-            'nombre_estado' => 'required|string|max:100|unique:estado,nombre_estado'
+            'nombre_estado' => [
+                'required',
+                'string',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    $exists = Estado::whereRaw('LOWER(nombre_estado) = ?', [strtolower($value)])->exists();
+                    if ($exists) {
+                        $fail('El estado "' . $value . '" ya se encuentra registrado en el sistema.');
+                    }
+                }
+            ]
+        ], [
+            'nombre_estado.required' => 'El nombre del estado es obligatorio.',
+            'nombre_estado.string'   => 'El nombre debe ser una cadena de texto.',
+            'nombre_estado.max'      => 'El nombre no puede superar los 100 caracteres.'
         ]);
 
         Estado::create([
-            'nombre_estado' => $request->nombre_estado
+            'nombre_estado' => strtoupper($request->nombre_estado)
         ]);
 
         return redirect()
@@ -40,11 +54,27 @@ public function index(Request $request)
         $estado = Estado::findOrFail($id);
 
         $request->validate([
-            'nombre_estado' => 'required|string|max:100|unique:estado,nombre_estado,' . $id . ',id_estado'
+            'nombre_estado' => [
+                'required',
+                'string',
+                'max:100',
+                function ($attribute, $value, $fail) use ($id) {
+                    $exists = Estado::whereRaw('LOWER(nombre_estado) = ?', [strtolower($value)])
+                        ->where('id_estado', '!=', $id)
+                        ->exists();
+                    if ($exists) {
+                        $fail('El estado "' . $value . '" ya existe registrado en el sistema.');
+                    }
+                }
+            ]
+        ], [
+            'nombre_estado.required' => 'El nombre del estado es obligatorio.',
+            'nombre_estado.string'   => 'El nombre debe ser una cadena de texto.',
+            'nombre_estado.max'      => 'El nombre no puede superar los 100 caracteres.'
         ]);
 
         $estado->update([
-            'nombre_estado' => $request->nombre_estado
+            'nombre_estado' => strtoupper($request->nombre_estado)
         ]);
 
         return redirect()
