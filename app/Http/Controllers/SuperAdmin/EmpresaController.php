@@ -17,6 +17,8 @@ use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
+use App\Http\Requests\SuperAdmin\EmpresaRequest;
+
 class EmpresaController extends Controller
 {
     /* ================================
@@ -62,29 +64,19 @@ class EmpresaController extends Controller
         return view('superadmin.empresas.create', compact('departamentos','estados'));
     }
 
-    public function store(Request $request)
+    /**
+     * Guardar empresa
+     */
+    public function store(EmpresaRequest $request)
     {
-        $validated = $request->validate([
-            'nombre_empresa' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'doc_representante' => 'required|numeric',
-            'primer_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'segundo_nombre_repre' => ['nullable','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'primer_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'segundo_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'telefono_representante' => 'required|numeric',
-            'telefono_empresa' => 'required|numeric',
-            'correo_corporativo' => 'required|email',
-            'correo_representante' => 'required|email',
-            'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-            'id_estado' => 'required|exists:estado,id_estado',
-            'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-        ]);
-
+        $validated = $request->validated();
+    
+        //  ASIGNACIONES AUTOMÁTICAS
         $validated['id_estado'] = 1;
         $validated['id_tipo_empresa'] = 1;
-
+    
         Empresa::create($validated);
-
+    
         return redirect()
             ->route('superadmin.empresas.index')
             ->with('success', 'La empresa ha sido creada exitosamente.');
@@ -109,36 +101,43 @@ class EmpresaController extends Controller
         ));
     }
 
-    public function update(Request $request, $nit)
+    /**
+     * Actualizar empresa
+     */
+    public function update(EmpresaRequest $request, $nit)
     {
         $empresa = Empresa::findOrFail($nit);
-
-        $validated = $request->validate([
-            'nombre_empresa' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'doc_representante' => 'required|numeric',
-            'primer_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'segundo_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'primer_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'segundo_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'telefono_representante' => 'required|numeric',
-            'telefono_empresa' => 'required|numeric',
-            'correo_corporativo' => 'required|email',
-            'correo_representante' => 'required|email',
-            'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-            'id_estado' => 'required|exists:estado,id_estado',
-        ]);
-
-        $empresa->update($validated);
+        $empresa->update($request->validated());
 
         return redirect()
             ->route('superadmin.empresas.index')
             ->with('success', 'Empresa actualizada correctamente.');
     }
 
-    /* ================================
-        EXPORTAR CSV
-    ================================= */
-    public function exportCsv()
+    /**
+     * Mostrar detalles
+     */
+    public function show($nit)
+    {
+        $empresa = Empresa::with(['ciudad.departamento','estado','usuarios.tipoUsuario'])
+            ->findOrFail($nit);
+
+        return view('superadmin.empresas.show', compact('empresa'));
+    }
+
+    /**
+     * Cargar ciudades por departamento (AJAX)
+     */
+    public function getCiudadesByDepartamento($id_departamento)
+        {
+            $ciudades = Ciudad::where('id_departamento', $id_departamento)
+                ->orderBy('nombre_city')
+                ->get();
+
+            return response()->json($ciudades);
+        }
+
+        public function exportCsv()
     {
         $fileName = 'empresas.csv';
         $empresas = Empresa::with(['ciudad', 'estado'])->get();

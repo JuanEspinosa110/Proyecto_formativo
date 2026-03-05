@@ -5,7 +5,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
+
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
     RolController,
@@ -18,12 +19,16 @@ use App\Http\Controllers\SuperAdmin\{
     AlertaController,
     ConfiguracionController,
     PerfilSeguridadController,
-    PlanLicenciaController
+    PlanLicenciaController,
+    RutaController,
 };
 
-Route::get('/', function () {
-    return view('index');
-})->name('home');
+// Rutas Administrativas (Panel Empresas)
+require base_path('routes/admin.php');
+
+use App\Http\Controllers\LandingController;
+
+Route::get('/', [LandingController::class, 'index'])->name('home');
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
@@ -58,23 +63,10 @@ Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCo
     ->name('password.resend.code');
 
 // Mostrar vista nueva contraseña
-Route::get('/nueva-password', function () {
-    if (!session('correo')) {
-        return redirect()->route('recuperar');
-    }
-
-
-    Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCodigo'])
-        ->name('password.resend.code');
-
-    // Mostrar vista nueva contraseña
-    Route::get(
-        '/nueva-password',
-        [RecuperarPasswordController::class, 'mostrarNuevaPassword']
-    )->name('password.nueva.form');
-
-    return view('auth.nueva_password');
-})->name('password.nueva.form');
+Route::get(
+    '/nueva-password',
+    [RecuperarPasswordController::class, 'mostrarNuevaPassword']
+)->name('password.nueva.form');
 
 
 
@@ -94,6 +86,8 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
         ->name('empresa.dashboard');
 });
+
+
 
 Route::middleware('auth:superadmin')->group(function () {
 
@@ -198,8 +192,15 @@ Route::prefix('superadmin')
         Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
             ->name('tarjetas.update');
 
-
+        // Módulo de Rutas (SuperAdmin)
+        Route::get('/rutas', [RutaController::class, 'index'])->name('rutas.index');
+        Route::post('/rutas', [RutaController::class, 'store'])->name('rutas.store');
+        Route::put('/rutas/{ruta}', [RutaController::class, 'update'])->name('rutas.update');
+        Route::get('/rutas/export', [RutaController::class, 'export'])->name('rutas.export');
+        Route::get('/rutas/barrios/{id_ciudad}', [RutaController::class, 'getBarriosByCiudad'])->name('rutas.barrios');
     });
 
-require __DIR__.'/superadmin.php';
-
+    Route::patch(
+    'usuarios/{doc}/inactivar',
+    [UsuarioController::class, 'inactivar']
+)->name('admin.usuarios.inactivar');

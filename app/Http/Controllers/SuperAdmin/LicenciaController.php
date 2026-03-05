@@ -150,6 +150,19 @@ class LicenciaController extends Controller
             ]);
         }
 
+        // Guardar datos verificados en sesión
+        // Esto será usado para validar que no haya cambios
+        session([
+            'nit_verificado' => $nit,
+            'datos_verificados' => [
+                'nombre_empresa' => $empresa->nombre_empresa,
+                'telefono_empresa' => $empresa->telefono_empresa,
+                'correo_corporativo' => $empresa->correo_corporativo,
+                'id_departamento' => $empresa->id_departamento,
+                'id_ciudad' => $empresa->id_ciudad,
+            ]
+        ]);
+
         // Empresa existe pero no tiene licencia activa
         return response()->json([
             'existe' => true,
@@ -171,23 +184,90 @@ class LicenciaController extends Controller
      */
     public function guardarPaso1(Request $request)
     {
+        // VALIDACIÓN 1: Verificar que exista NIT verificado en sesión
+        if (!session('nit_verificado')) {
+            return redirect()->back()
+                ->withErrors(['NIT' => 'Debe verificar el NIT antes de continuar. Por favor, complete el proceso nuevamente.'])
+                ->withInput();
+        }
+
+        // VALIDACIÓN 2: Verificar que el NIT no haya sido alterado
+        $nitVerificado = session('nit_verificado');
+        if ($request->NIT != $nitVerificado) {
+            return redirect()->back()
+                ->withErrors(['NIT' => 'El NIT ha sido modificado después de la verificación. Verifique el NIT nuevamente.'])
+                ->withInput();
+        }
+
+        // VALIDACIÓN 3: Verificar datos de empresa no hayan sido alterados
+        $datosVerificados = session('datos_verificados');
+        $erroresIntegridad = [];
+
+        if ($request->nombre_empresa !== $datosVerificados['nombre_empresa']) {
+            $erroresIntegridad['nombre_empresa'] = 'El nombre de la empresa fue modificado. Verifique el NIT nuevamente.';
+        }
+
+        if ($request->telefono_empresa !== $datosVerificados['telefono_empresa']) {
+            $erroresIntegridad['telefono_empresa'] = 'El teléfono de la empresa fue modificado. Verifique el NIT nuevamente.';
+        }
+
+        if ($request->correo_corporativo !== $datosVerificados['correo_corporativo']) {
+            $erroresIntegridad['correo_corporativo'] = 'El correo corporativo fue modificado. Verifique el NIT nuevamente.';
+        }
+
+        if (!empty($erroresIntegridad)) {
+            return redirect()->back()
+                ->withErrors($erroresIntegridad)
+                ->withInput();
+        }
+
+        // ✅ VALIDACIÓN 4: Verificar que departamento y ciudad correspondan con el NIT
+        $empresa = DB::table('empresa')
+            ->where('NIT', $nitVerificado)
+            ->first();
+
+        if ($request->id_departamento != $datosVerificados['id_departamento']) {
+            return redirect()->back()
+                ->withErrors(['id_departamento' => 'El departamento seleccionado no corresponde con el NIT verificado. Seleccione el departamento correcto.'])
+                ->withInput();
+        }
+
+        if ($request->id_ciudad != $datosVerificados['id_ciudad']) {
+            return redirect()->back()
+                ->withErrors(['id_ciudad' => 'La ciudad seleccionada no corresponde con el NIT verificado. Seleccione la ciudad correcta.'])
+                ->withInput();
+        }
+
+        // ✅ VALIDACIÓN 5: Verificar que la ciudad pertenece al departamento seleccionado
+        $ciudadValida = DB::table('ciudad')
+            ->where('id_ciudad', $request->id_ciudad)
+            ->where('id_departamento', $request->id_departamento)
+            ->exists();
+
+        if (!$ciudadValida) {
+            return redirect()->back()
+                ->withErrors(['id_ciudad' => 'La ciudad seleccionada no pertenece al departamento indicado.'])
+                ->withInput();
+        }
+
+        // Ahora proceder con las validaciones normales
         $validated = $request->validate([
             // Empresa
             'NIT' => 'required|numeric',
             'nombre_empresa' => 'required|string|max:150',
             'id_departamento' => 'required|exists:departamento,id_departamento',
             'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-            'telefono_empresa' => 'nullable|string|max:20',
+            'telefono_empresa' => 'nullable|digits_between:7,15',
             'correo_corporativo' => 'required|email|max:150',
 
             // Usuario Administrador
-            'doc_admin' => 'required|numeric',
-            'primer_nombre_admin' => 'required|string|max:50',
-            'segundo_nombre_admin' => 'nullable|string|max:50',
-            'primer_apellido_admin' => 'required|string|max:50',
-            'segundo_apellido_admin' => 'nullable|string|max:50',
-            'telefono_admin' => 'nullable|string|max:20',
-            'correo_admin' => 'required|email|max:150',
+            'doc_admin' => 'required|digits_between:8,10',
+            'primer_nombre_admin' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
+            'segundo_nombre_admin' => ['nullable', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+            'primer_apellido_admin' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
+            'segundo_apellido_admin' => ['nullable', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+            'telefono_admin' => 'nullable|digits_between:7,15',
+            'correo_admin' => ['required', 'email', 'regex:/^.+@.+\..+$/', 'max:150'],
             'password_admin' => [
                 'required',
                 'min:8',
@@ -195,8 +275,60 @@ class LicenciaController extends Controller
                 'regex:/[A-Z]/',
                 'regex:/[0-9]/',
             ],
+        ], [
+            // Mensajes para Empresa
+            'id_departamento.required' => 'Debe seleccionar un departamento.',
+            'id_departamento.exists'   => 'El departamento seleccionado no es válido.',
+            'id_ciudad.required' => 'Debe seleccionar una ciudad.',
+            'id_ciudad.exists'   => 'La ciudad seleccionada no es válida.',
+
+            // Mensajes para el Documento
+            'doc_admin.required' => 'El documento de identidad es obligatorio.',
+            'doc_admin.digits_between' => 'El documento debe tener entre 8 y 12 dígitos.',
+
+            // Mensajes para nombres
+            'primer_nombre_admin.required' => 'El primer nombre es obligatorio.',
+            'primer_nombre_admin.regex' => 'El primer nombre solo debe contener letras.',
+            'segundo_nombre_admin.regex' => 'El segundo nombre solo debe contener letras.',
+            'primer_apellido_admin.required' => 'El primer apellido es obligatorio.',
+            'primer_apellido_admin.regex' => 'El primer apellido solo debe contener letras.',
+            'segundo_apellido_admin.regex' => 'El segundo apellido solo debe contener letras.',
+
+            // Mensajes para teléfono
+            'telefono_admin.digits_between' => 'El teléfono debe tener entre 7 y 15 dígitos.',
+
+            // Mensajes para correo
+            'correo_admin.required' => 'El correo electrónico es obligatorio.',
+            'correo_admin.email' => 'El correo electrónico debe ser válido.',
+            'correo_admin.regex' => 'El correo electrónico debe tener un formato válido.',
+
+            // Mensajes para contraseña
+            'password_admin.required' => 'La contraseña es obligatoria.',
+            'password_admin.min' => 'La contraseña debe tener al menos 8 caracteres.',
+            'password_admin.regex' => 'La contraseña debe contener mayúsculas, minúsculas y números.',
         ]);
 
+        // ✅ Validación adicional: Documento de admin único
+        $docAdminExiste = DB::table('usuario')
+            ->where('doc_usuario', $validated['doc_admin'])
+            ->exists();
+
+        if ($docAdminExiste) {
+            return redirect()->back()
+                ->withErrors(['doc_admin' => 'Este documento de identidad ya está registrado en el sistema.'])
+                ->withInput();
+        }
+
+        // ✅ Validación adicional: Correo de admin único
+        $correoAdminExiste = DB::table('usuario')
+            ->where('correo', $validated['correo_admin'])
+            ->exists();
+
+        if ($correoAdminExiste) {
+            return redirect()->back()
+                ->withErrors(['correo_admin' => 'Este correo electrónico ya está registrado como administrador en el sistema.'])
+                ->withInput();
+        }
         try {
             DB::beginTransaction();
 
@@ -216,7 +348,6 @@ class LicenciaController extends Controller
                 $datosEmpresa['NIT'] = $validated['NIT'];
                 $datosEmpresa['id_estado'] = 1;
                 $datosEmpresa['fecha_creacion'] = now();
-                // Si la base de datos exige representante, añade valores vacíos o nulos aquí:
                 DB::table('empresa')->insert($datosEmpresa);
             }
 
@@ -728,8 +859,7 @@ class LicenciaController extends Controller
                 ->first();
 
             // 3. Obtener administrador (Tabla: usuario)
-            // CORRECCIÓN: Nombres de columnas según tu archivo .sql
-            $admin = DB::table('usuario') // Tu tabla se llama 'usuario'
+            $admin = DB::table('usuario')
                 ->where('NIT', $licencia->NIT)
                 ->where('id_tipo_usuario', 1) // Filtramos por tipo Admin
                 ->select(

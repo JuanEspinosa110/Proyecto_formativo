@@ -269,14 +269,13 @@ document.getElementById('id_departamento').addEventListener('change', function()
 
 // SOLO LETRAS
 function soloLetras(input) {
-    input.value = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ\s]/g, '');
+    input.value = input.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑ]/g, '');
 }
 
 // SOLO NÚMEROS
 function soloNumeros(input) {
     input.value = input.value.replace(/[^0-9]/g, '');
 }
-
 
 
 // =============================
@@ -307,8 +306,15 @@ document.getElementById('primer_nombre_repre').addEventListener('input', functio
     soloLetras(this);
 });
 
+document.getElementById('segundo_nombre_repre').addEventListener('input', function(){
+    soloLetras(this);
+});
 
 document.getElementById('primer_apellido_repre').addEventListener('input', function(){
+    soloLetras(this);
+});
+
+document.getElementById('segundo_apellido_repre').addEventListener('input', function(){
     soloLetras(this);
 });
 

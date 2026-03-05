@@ -240,7 +240,7 @@
         }
 
         /**
-         * Maneja el cambio de plan
+         * Manejo del cambio de plan
          */
         async function manejarCambioPlan(radio) {
             if (!radio || !radio.value) return;
@@ -264,7 +264,7 @@
                 if (btn) btn.textContent = '✓ Seleccionado';
             }
 
-            // 3. Tu lógica existente de obtener datos del plan...
+            // 3. obtener datos del plan...
             const datosPlan = await obtenerDatosPlan(radio.value);
             if (datosPlan && datosPlan.duracion_meses) {
                 duracionMeses.value = datosPlan.duracion_meses;
@@ -305,6 +305,25 @@
                     console.error('No se encontró el radio button dentro del label');
                 }
             });
+        });
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const planChecked = document.querySelector('input[name="id_plan"]:checked');
+
+            if (!planChecked) {
+                e.preventDefault(); // Detiene el envío
+
+                // Si usas SweetAlert2 (que es lo más común en Laravel):
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Atención',
+                    text: 'Debes seleccionar un plan de licencia para continuar.',
+                    confirmButtonColor: '#3085d6'
+                });
+
+                // Si usas alertas simples:
+                // alert("Debes seleccionar un plan de licencia para continuar.");
+            }
         });
 
         // Event listener para cambio de fecha de inicio
