@@ -5,7 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
-use App\Http\Controllers\Admin\suarioController;
+use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
@@ -205,3 +205,8 @@ Route::prefix('superadmin')
         Route::get('/rutas/export', [RutaController::class, 'export'])->name('rutas.export');
         Route::get('/rutas/barrios/{id_ciudad}', [RutaController::class, 'getBarriosByCiudad'])->name('rutas.barrios');
     });
+
+    Route::patch(
+    'usuarios/{doc}/inactivar',
+    [UsuarioController::class, 'inactivar']
+)->name('admin.usuarios.inactivar');

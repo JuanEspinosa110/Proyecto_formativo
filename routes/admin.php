@@ -19,5 +19,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Otros módulos
         Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
+
+        Route::post('/usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
     });
 });
