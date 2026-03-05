@@ -185,7 +185,7 @@
             <div class="detail-card">
                 <div class="detail-card-header">
                     <span class="material-symbols-outlined"><i class="fa fa-users" aria-hidden="true"></i></span>
-                    <h3>Usuarios Registrados</h3>
+                    <h3>Administrador Registrado</h3>
                 </div>
                 <div class="detail-card-body">
                     <div class="table-responsive">
@@ -204,7 +204,7 @@
                                 <tr>
                                     <td>{{ number_format($usuario->doc_usuario, 0, '', '.') }}</td>
                                     <td>{{ $usuario->primer_nombre }} {{ $usuario->primer_apellido }}</td>
-                                    <td>{{ $usuario->id_tipo_usuario->nombre_tipo ?? 'N/A' }}</td>
+                                    <td>{{ $usuario->tipoUsuario->nombre_tipo ?? 'N/A' }}</td>
                                     <td>{{ $usuario->telefono ?? 'N/A' }}</td>
                                     <td>
                                         @if($usuario->estado)

@@ -5,8 +5,13 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
+<<<<<<< HEAD
 use Illuminate\Http\Request;
 use App\Http\Controllers\SuperAdmin\EstadoController;
+=======
+use App\Http\Controllers\Admin\suarioController;
+
+>>>>>>> develop
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
     RolController,
@@ -99,6 +104,24 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
         ->name('empresa.dashboard');
 });
+
+// Admin routes (sidebar layout)
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth:web'])
+    ->group(function () {
+        Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
+            ->name('dashboard');
+
+        // Estadísticas AJAX para dashboard
+        Route::get('/dashboard/stats', [App\Http\Controllers\Admin\DashboardController::class, 'stats'])
+            ->name('dashboard.stats');
+
+        // Ejemplo: rutas administrativas adicionales (usar nombres con prefijo)
+        Route::get('/empresas', fn() => view('admin.empresas.index'))->name('empresas.index');
+        Route::get('/usuarios', [App\Http\Controllers\Admin\UsuarioController::class, 'index'])
+            ->name('usuarios.index');
+    });
 
 Route::middleware('auth:superadmin')->group(function () {
 

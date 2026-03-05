@@ -83,11 +83,67 @@ class EmpresaController extends Controller
         $validated['id_estado'] = 1;
         $validated['id_tipo_empresa'] = 1;
 
+<<<<<<< HEAD
         Empresa::create($validated);
 
         return redirect()
             ->route('superadmin.empresas.index')
             ->with('success', 'La empresa ha sido creada exitosamente.');
+=======
+    // REPRESENTANTE
+    'doc_representante' => 'required|digits_between:7,10',
+    'primer_nombre_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+    'segundo_nombre_repre' => ['nullable','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+    'primer_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+    'segundo_apellido_repre' => ['required','regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+    'telefono_representante' => 'required|digits_between:7,15',
+    'correo_representante' => 'required|email',
+
+    // UBICACIÓN
+    'id_ciudad' => 'required|exists:ciudad,id_ciudad',
+
+    ], [
+
+    // NIT
+    'NIT.required' => 'El NIT es obligatorio.',
+    'NIT.digits' => 'El NIT debe tener exactamente 10 dígitos.',
+    'NIT.unique' => 'Ya existe una empresa registrada con este NIT.',
+
+    // Empresa
+    'nombre_empresa.required' => 'El nombre de la empresa es obligatorio.',
+    'nombre_empresa.regex' => 'El nombre solo puede contener letras y espacios.',
+    'telefono_empresa.required' => 'El teléfono de la empresa es obligatorio.',
+    'telefono_empresa.digits_between' => 'El teléfono debe tener entre 7 y 15 números.',
+    'correo_corporativo.required' => 'El correo corporativo es obligatorio.',
+    'correo_corporativo.email' => 'El correo corporativo no es válido.',
+
+    // Representante
+    'doc_representante.required' => 'El documento del representante es obligatorio.',
+    'doc_representante.digits_between' => 'El documento debe tener entre 7 y 10 dígitos.',
+    'primer_nombre_repre.required' => 'El primer nombre es obligatorio.',
+    'primer_apellido_repre.required' => 'El primer apellido es obligatorio.',
+    'segundo_apellido_repre.required' => 'El segundo apellido es obligatorio.',
+    'telefono_representante.required' => 'El teléfono del representante es obligatorio.',
+    'telefono_representante.digits_between' => 'El teléfono del representante no es válido.',
+    'correo_representante.required' => 'El correo del representante es obligatorio.',
+    'correo_representante.email' => 'El correo del representante no es válido.',
+
+    // Ubicación
+    'id_ciudad.required' => 'Debe seleccionar una ciudad.',
+    'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
+    ]);
+
+
+    //  ASIGNACIONES AUTOMÁTICAS
+    $validated['id_estado'] = 1;
+    $validated['id_tipo_empresa'] = 1;
+
+    Empresa::create($validated);
+
+    return redirect()
+        ->route('superadmin.empresas.index')
+        ->with('success', 'La empresa ha sido creada exitosamente.');
+>>>>>>> develop
     }
 
     /* ================================
@@ -135,10 +191,37 @@ class EmpresaController extends Controller
             ->with('success', 'Empresa actualizada correctamente.');
     }
 
+<<<<<<< HEAD
     /* ================================
         EXPORTAR CSV
     ================================= */
     public function exportCsv()
+=======
+    /**
+     * Mostrar detalles
+     */
+    public function show($nit)
+    {
+        $empresa = Empresa::with(['ciudad.departamento','estado','usuarios.tipoUsuario'])
+            ->findOrFail($nit);
+
+        return view('superadmin.empresas.show', compact('empresa'));
+    }
+
+    /**
+     * Cargar ciudades por departamento (AJAX)
+     */
+    public function getCiudadesByDepartamento($id_departamento)
+        {
+            $ciudades = Ciudad::where('id_departamento', $id_departamento)
+                ->orderBy('nombre_city')
+                ->get();
+
+            return response()->json($ciudades);
+        }
+
+        public function exportCsv()
+>>>>>>> develop
     {
         $fileName = 'empresas.csv';
         $empresas = Empresa::with(['ciudad', 'estado'])->get();

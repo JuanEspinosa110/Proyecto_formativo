@@ -73,7 +73,7 @@
                     <div class="col-md-4">
                         <label class="sa-licencia-label">NIT / Identificación Tributaria *</label>
                         <div class="input-group">
-                            <input type="text"
+                            <input type="number"
                                 id="nitInput"
                                 name="NIT"
                                 class="form-control sa-licencia-input @error('NIT') is-invalid @enderror"
@@ -103,20 +103,54 @@
                         @error('nombre_empresa')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
+                    <!-- SELECT DEPARTAMENTO -->
                     <div class="col-md-4">
                         <label class="sa-licencia-label">Departamento *</label>
-                        <input type="text" id="nombre_departamento" class="form-control sa-licencia-input" readonly placeholder="Carga automática...">
-                        <input type="hidden" name="id_departamento" id="id_departamento_id">
-                        @error('id_departamento')<div class="text-danger small">{{ $message }}</div>@enderror
-                        <small class="text-muted">Se carga automáticamente con la búsqueda del NIT</small>
+                        <select 
+                            id="id_departamento"
+                            name="id_departamento"
+                            class="form-select sa-licencia-input @error('id_departamento') is-invalid @enderror"
+                            required>
+                            <option value="">-- Seleccione Departamento --</option>
+                            {{-- Cargar todos los departamentos al página --}}
+                            @foreach($departamentos as $dept)
+                                <option value="{{ $dept->id_departamento }}" 
+                                    {{ old('id_departamento') == $dept->id_departamento ? 'selected' : '' }}>
+                                    {{ $dept->nombre_departamento }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('id_departamento')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <small class="text-muted">Se selecciona automáticamente con la búsqueda del NIT</small>
                     </div>
 
+                    <!-- SELECT CIUDAD -->
                     <div class="col-md-4">
                         <label class="sa-licencia-label">Ciudad *</label>
-                        <input type="text" id="nombre_ciudad" class="form-control sa-licencia-input" readonly placeholder="Carga automática...">
-                        <input type="hidden" name="id_ciudad" id="id_ciudad_id">
-                        @error('id_ciudad')<div class="text-danger small">{{ $message }}</div>@enderror
-                        <small class="text-muted">Se carga automáticamente con la búsqueda del NIT</small>
+                        <select 
+                            id="id_ciudad"
+                            name="id_ciudad"
+                            class="form-select sa-licencia-input @error('id_ciudad') is-invalid @enderror"
+                            required>
+                            <option value="">-- Primero seleccione Departamento --</option>
+                            {{-- Las ciudades se cargan dinámicamente --}}
+                            @if(old('id_departamento'))
+                                @php
+                                    $ciudades = DB::table('ciudad')
+                                        ->where('id_departamento', old('id_departamento'))
+                                        ->orderBy('nombre_city')
+                                        ->get();
+                                @endphp
+                                @foreach($ciudades as $ciudad)
+                                    <option value="{{ $ciudad->id_ciudad }}" 
+                                        {{ old('id_ciudad') == $ciudad->id_ciudad ? 'selected' : '' }}>
+                                        {{ $ciudad->nombre_city }}
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                        @error('id_ciudad')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <small class="text-muted">Las ciudades se cargan según el departamento</small>
                     </div>
 
                     <div class="col-md-4">
@@ -164,7 +198,7 @@
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label class="sa-licencia-label">Documento de Identidad *</label>
-                        <input type="text"
+                        <input type="number"
                             id="doc_admin"
                             name="doc_admin"
                             class="form-control sa-licencia-input @error('doc_admin') is-invalid @enderror"
@@ -204,7 +238,7 @@
                             name="primer_apellido_admin"
                             class="form-control sa-licencia-input @error('primer_apellido_admin') is-invalid @enderror"
                             value="{{ old('primer_apellido_admin') }}"
-                            placeholder="González"
+                            placeholder="García"
                             required>
                         @error('primer_apellido_admin')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
@@ -216,39 +250,41 @@
                             name="segundo_apellido_admin"
                             class="form-control sa-licencia-input @error('segundo_apellido_admin') is-invalid @enderror"
                             value="{{ old('segundo_apellido_admin') }}"
-                            placeholder="Martínez">
+                            placeholder="López">
                         @error('segundo_apellido_admin')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="col-md-3">
                         <label class="sa-licencia-label">Teléfono</label>
-                        <input type="text"
+                        <input type="number"
                             id="telefono_admin"
                             name="telefono_admin"
-                            class="form-control sa-licencia-input"
+                            class="form-control sa-licencia-input @error('telefono_admin') is-invalid @enderror"
                             value="{{ old('telefono_admin') }}"
-                            placeholder="320 123 4567">
+                            placeholder="300 000 0000">
+                        @error('telefono_admin')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
-                    <div class="col-md-3">
-                        <label class="sa-licencia-label">Correo de Acceso *</label>
+                    <div class="col-md-6">
+                        <label class="sa-licencia-label">Correo Electrónico *</label>
                         <input type="email"
                             id="correo_admin"
                             name="correo_admin"
                             class="form-control sa-licencia-input @error('correo_admin') is-invalid @enderror"
                             value="{{ old('correo_admin') }}"
-                            placeholder="admin@empresa.com"
+                            placeholder="juan.garcia@empresa.com"
                             required>
+                        <small class="text-muted">Será el usuario de inicio de sesión</small>
                         @error('correo_admin')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label class="sa-licencia-label">Contraseña *</label>
                         <input type="password"
                             id="password_admin"
                             name="password_admin"
                             class="form-control sa-licencia-input @error('password_admin') is-invalid @enderror"
-                            placeholder="Mínimo 8 caracteres"
+                            placeholder="••••••••••••"
                             required>
                         <small class="text-muted">Mín 8 caracteres, mayús, minús, números</small>
                         @error('password_admin')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -277,6 +313,50 @@
         const nitAlert = document.getElementById('nitAlert');
         const nitAlertMessage = document.getElementById('nitAlertMessage');
         const formPaso1 = document.getElementById('formPaso1');
+        const selectDepartamento = document.getElementById('id_departamento');
+        const selectCiudad = document.getElementById('id_ciudad');
+
+        // ========================
+        // EVENTO: Al cambiar departamento, cargar ciudades
+        // ========================
+        selectDepartamento.addEventListener('change', function() {
+            const idDepartamento = this.value;
+            
+            // Limpiar select de ciudades
+            selectCiudad.innerHTML = '<option value="">-- Cargando ciudades... --</option>';
+            selectCiudad.disabled = true;
+
+            if (!idDepartamento) {
+                selectCiudad.innerHTML = '<option value="">-- Primero seleccione Departamento --</option>';
+                selectCiudad.disabled = true;
+                return;
+            }
+
+            // Obtener ciudades del servidor
+            fetch(`/superadmin/licencias/ciudades/${idDepartamento}`)
+                .then(response => response.json())
+                .then(ciudades => {
+                    selectCiudad.innerHTML = '<option value="">-- Seleccione Ciudad --</option>';
+                    
+                    if (ciudades.length === 0) {
+                        selectCiudad.innerHTML += '<option disabled>No hay ciudades disponibles</option>';
+                    } else {
+                        ciudades.forEach(ciudad => {
+                            const option = document.createElement('option');
+                            option.value = ciudad.id_ciudad;
+                            option.textContent = ciudad.nombre_city;
+                            selectCiudad.appendChild(option);
+                        });
+                    }
+                    
+                    selectCiudad.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error cargando ciudades:', error);
+                    selectCiudad.innerHTML = '<option value="">Error al cargar ciudades</option>';
+                    selectCiudad.disabled = true;
+                });
+        });
 
         // Verificar NIT
         btnVerificar.addEventListener('click', function() {
@@ -297,13 +377,10 @@
                         formPaso1.querySelector('button[type="submit"]').disabled = true;
                         limpiarFormulario();
                     } else if (data.existe) {
-                        // REQUISITO: Si existe pero tiene licencia, el controlador ya manda error.
-                        // Si existe y no tiene licencia, llenamos todo.
                         showAlert('success', '✓ Empresa encontrada. Datos de ubicación vinculados.');
                         llenarFormulario(data.datos);
                         formPaso1.querySelector('button[type="submit"]').disabled = false;
                     } else {
-                        // Si el NIT no existe en la tabla empresa
                         showAlert('danger', 'El NIT ingresado no existe en el sistema. Debe registrar la empresa primero.');
                         limpiarFormulario();
                         formPaso1.querySelector('button[type="submit"]').disabled = true;
@@ -319,36 +396,78 @@
                 });
         });
 
+        /**
+         * Validación de solo letras en campos de nombres
+         */
+        const camposLetras = [
+            'primer_nombre_admin',
+            'primer_apellido_admin',
+            'segundo_apellido_admin'
+        ];
+
+        camposLetras.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g, '');
+                });
+            }
+        });
+
+        const campotercernombre = ['segundo_nombre_admin'];
+
+        campotercernombre.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+                });
+            }
+        });
+
+        /**
+         * Mostrar/ocultar alerta
+         */
         function showAlert(type, message) {
             nitAlert.className = `alert alert-${type} d-block`;
             nitAlertMessage.innerHTML = message;
         }
 
+        /**
+         * Llenar formulario con datos de la empresa
+         * Con selects en lugar de inputs hidden
+         */
         function llenarFormulario(datos) {
             // Llenar campos de texto
             document.getElementById('nombre_empresa').value = datos.nombre_empresa || '';
             document.getElementById('telefono_empresa').value = datos.telefono_empresa || '';
             document.getElementById('correo_corporativo').value = datos.correo_corporativo || '';
 
-            // Llenar Visualización de ubicación
-            document.getElementById('nombre_departamento').value = datos.nombre_departamento || '';
-            document.getElementById('nombre_ciudad').value = datos.nombre_city || '';
+            // ✅ Seleccionar departamento en el select
+            selectDepartamento.value = datos.id_departamento || '';
 
-            // Llenar IDs ocultos para el envío del formulario
-            document.getElementById('id_departamento_id').value = datos.id_departamento || '';
-            document.getElementById('id_ciudad_id').value = datos.id_ciudad || '';
+            // Cargar ciudades para el departamento seleccionado
+            if (datos.id_departamento) {
+                selectDepartamento.dispatchEvent(new Event('change'));
+                
+                // Después de que se carguen las ciudades, seleccionar la ciudad
+                setTimeout(() => {
+                    selectCiudad.value = datos.id_ciudad || '';
+                }, 300); // Pequeño delay para permitir que AJAX termine
+            }
         }
 
+        /**
+         * Limpiar formulario
+         */
         function limpiarFormulario() {
-            const campos = [
-                'nombre_empresa', 'telefono_empresa', 'correo_corporativo',
-                'nombre_departamento', 'nombre_ciudad',
-                'id_departamento_id', 'id_ciudad_id'
-            ];
-            campos.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = '';
-            });
+            document.getElementById('nombre_empresa').value = '';
+            document.getElementById('telefono_empresa').value = '';
+            document.getElementById('correo_corporativo').value = '';
+            selectDepartamento.value = '';
+            selectCiudad.value = '';
+            selectCiudad.innerHTML = '<option value="">-- Primero seleccione Departamento --</option>';
+            selectCiudad.disabled = true;
         }
     });
 </script>

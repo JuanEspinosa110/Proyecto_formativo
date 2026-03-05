@@ -114,7 +114,7 @@
                 <tr>
                     <td>{{ $ciudad->id_ciudad }}</td>
                     <td>{{ $ciudad->nombre_city }}</td>
-                    <td>{{ $ciudad->departamento->nombre_departamento }}</td>
+                    <td>{{ $ciudad->departamento?->nombre_departamento }}</td>
                     <td>
                         <button 
                             class="btn btn-warning btn-sm"
