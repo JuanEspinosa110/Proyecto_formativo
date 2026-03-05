@@ -172,7 +172,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Código Ruta <span class="text-danger">*</span></label>
-                            <input type="number" name="codigo_ruta" class="form-control bg-light border-0 py-2" required placeholder="Ej: 101">
+                            <input type="number" name="codigo_ruta" class="form-control bg-light border-0 py-2" required min="1" max="90" placeholder="Ej: 1 o 45">
                             <div class="invalid-feedback feedback-codigo_ruta"></div>
                         </div>
                         <div class="col-md-6">
@@ -240,7 +240,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Código Ruta <span class="text-danger">*</span></label>
-                            <input type="number" name="codigo_ruta" id="edit_codigo_ruta" class="form-control bg-light border-0 py-2" required>
+                            <input type="number" name="codigo_ruta" id="edit_codigo_ruta" class="form-control bg-light border-0 py-2" required min="1" max="90">
                             <div class="invalid-feedback feedback-codigo_ruta"></div>
                         </div>
                         <div class="col-md-6">
