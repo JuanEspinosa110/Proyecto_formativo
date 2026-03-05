@@ -54,12 +54,13 @@ class PerfilSeguridadController extends Controller
         $validated = $request->validate([
             'nombre' => 'required|string|max:150',
             'correo' => 'required|email|max:150|unique:super_administrador,correo,' . $superAdmin->doc_super_admin . ',doc_super_admin',
-            'telefono' => 'nullable|string|max:20',
+            'telefono' => 'nullable|string|max:20', 'regex:/^[0-9]/',
         ], [
             'nombre.required' => 'El nombre es obligatorio',
             'correo.required' => 'El correo es obligatorio',
             'correo.email' => 'El correo debe ser válido',
             'correo.unique' => 'Este correo ya está registrado',
+            'telefono.regex' => 'El teléfono solo puede contener números',
         ]);
 
         try {

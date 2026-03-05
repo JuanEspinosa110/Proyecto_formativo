@@ -76,14 +76,16 @@
                     <span class="material-symbols-rounded">layers</span>
                     <span>Planes</span>
                 </a>
+                <a href="{{ route('superadmin.rutas.index') }}"
+                    class="sigu-nl {{ request()->routeIs('superadmin.rutas.*') ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">map</span>
+                    <span>Rutas</span>
+                </a>
             </nav>
             <div class="dropdown">
             <a href="#"
             class="sigu-nl dropdown-toggle 
-            {{ request()->routeIs('superadmin.ciudades.*') ||
-                request()->routeIs('superadmin.tipo-empresa.*') ||
-                request()->routeIs('superadmin.tipo_usuario.*') ||
-                request()->routeIs('superadmin.estados.*') ? 'active' : '' }}"
+            {{ request()->routeIs('superadmin.configuracion.*') ? 'active' : '' }}"
             data-bs-toggle="dropdown"
             aria-expanded="false">
 
@@ -96,7 +98,7 @@
                 {{-- CIUDADES --}}
                 <li>
                     <a class="dropdown-item"
-                    href="{{ route('superadmin.ciudades.index') }}">
+                    href="{{ route('superadmin.configuracion.ciudades.index') }}">
                         <i class="bi bi-geo-alt"></i> Ciudades
                     </a>
                 </li>
@@ -104,7 +106,7 @@
                 {{-- TIPOS DE EMPRESA --}}
                 <li>
                     <a class="dropdown-item"
-                    href="{{ route('superadmin.tipo-empresa.index') }}">
+                    href="{{ route('superadmin.configuracion.tipo-empresa.index') }}">
                         <i class="bi bi-building"></i> Tipos de Empresa
                     </a>
                 </li>
@@ -112,7 +114,7 @@
                 {{-- TIPOS DE USUARIO --}}
                 <li>
                     <a class="dropdown-item"
-                    href="{{ route('superadmin.tipo_usuario.index') }}">
+                    href="{{ route('superadmin.configuracion.tipo-usuario.index') }}">
                         <i class="bi bi-people"></i> Tipos de Usuario
                     </a>
                 </li>
@@ -120,18 +122,28 @@
                 {{-- ESTADOS --}}
                 <li>
                     <a class="dropdown-item"
-                    href="{{ route('superadmin.estados.index') }}">
+                    href="{{ route('superadmin.configuracion.estados.index') }}">
                         <i class="bi bi-toggle-on"></i> Estados
                     </a>
                 </li>
-                {{-- TIPO DE DOCUMENTOS --}}
                 <li>
                     <a class="dropdown-item"
-                    href="{{ route('superadmin.tipo_documento.index') }}">
-                        <i class="bi bi-file-earmark-text"></i> Tipos de Documento
+                    href="{{ route('superadmin.configuracion.tipo-mantenimiento.index') }}">
+                        <i class="bi bi-tools"></i> Tipo de Mantenimiento
                     </a>
                 </li>
-
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.tipo-documento.index') }}">
+                        <i class="bi bi-file-earmark-text"></i> Tipo de Documento
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.tipo-asignacion.index') }}">
+                        <i class="bi bi-journal-check"></i> Tipo de Asignación
+                    </a>
+                </li>
             </ul>
         </div>
 
@@ -194,6 +206,7 @@
             <a href="{{ route('superadmin.empresas.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.empresas.*') ? 'active' : '' }}"><span class="material-symbols-rounded">business</span>Empresas</a>
             <a href="{{ route('superadmin.licencias.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.licencias.*') ? 'active' : '' }}"><span class="material-symbols-rounded">verified</span>Licencias</a>
             <a href="{{ route('superadmin.planes.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.planes.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">layers</span>Planes</a>
+            <a href="{{ route('superadmin.rutas.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.rutas.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">map</span>Rutas</a>
             <a href="{{ route('superadmin.perfil.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.perfil.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">badge</span>Perfil</a>
             <div class="sigu-drawer-footer">
                 <form method="POST" action="{{ route('logout') }}">

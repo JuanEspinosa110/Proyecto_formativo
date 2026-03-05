@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 
@@ -33,30 +34,17 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">dashboard</span></span>
                     <span>Dashboard</span>
                 </a>
-                <a href="{{ url('admin/usuarios') }}" class="sigu-sb-link {{ request()->is('admin/usuarios*') ? 'active' : '' }}">
+                
+                <a href="{{ route('admin.usuarios.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
                     <span>Usuarios</span>
                 </a>
+
                 <a href="{{ url('admin/buses') }}" class="sigu-sb-link {{ request()->is('admin/buses*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">directions_bus</span></span>
                     <span>Buses</span>
                 </a>
-                <a href="{{ url('admin/documentos') }}" class="sigu-sb-link {{ request()->is('admin/documentos*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">file_upload</span></span>
-                    <span>Documentos</span>
-                </a>
-                <a href="{{ url('admin/rutas') }}" class="sigu-sb-link {{ request()->is('admin/rutas*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">map</span></span>
-                    <span>Rutas</span>
-                </a>
-                <a href="{{ url('admin/reportes') }}" class="sigu-sb-link {{ request()->is('admin/reportes*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">insert_chart</span></span>
-                    <span>Reportes</span>
-                </a>
-                <a href="{{ url('admin/perfil') }}" class="sigu-sb-link {{ request()->is('admin/perfil*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">badge</span></span>
-                    <span>Perfil</span>
-                </a>
+                
             </nav>
 
             <div class="sigu-sidebar-footer">

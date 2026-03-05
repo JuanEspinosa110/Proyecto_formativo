@@ -24,5 +24,10 @@ class Documento extends Model
         'placa',
         'id_estado'
     ];
+
+    public function tipoDocumento()
+    {
+        return $this->belongsTo(TipoDocumento::class, 'id_tipo_documento', 'id_tipo_documento');
+    }
 }
 

@@ -5,7 +5,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
-use App\Http\Controllers\Admin\UsuarioController;
+use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
@@ -18,17 +18,17 @@ use App\Http\Controllers\SuperAdmin\{
     ReporteController,
     AlertaController,
     ConfiguracionController,
-    TipoUsuarioController,
     PerfilSeguridadController,
     PlanLicenciaController,
-    CiudadController,
-    TipoEmpresaController,
-    TipoDocumentoController
+    RutaController,
 };
 
-Route::get('/', function () {
-    return view('index');
-})->name('home');
+// Rutas Administrativas (Panel Empresas)
+require base_path('routes/admin.php');
+
+use App\Http\Controllers\LandingController;
+
+Route::get('/', [LandingController::class, 'index'])->name('home');
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
@@ -63,23 +63,11 @@ Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCo
     ->name('password.resend.code');
 
 // Mostrar vista nueva contraseña
-Route::get('/nueva-password', function () {
-    if (!session('correo')) {
-        return redirect()->route('recuperar');
-    }
+Route::get(
+    '/nueva-password',
+    [RecuperarPasswordController::class, 'mostrarNuevaPassword']
+)->name('password.nueva.form');
 
-
-    Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCodigo'])
-        ->name('password.resend.code');
-
-    // Mostrar vista nueva contraseña
-    Route::get(
-        '/nueva-password',
-        [RecuperarPasswordController::class, 'mostrarNuevaPassword']
-    )->name('password.nueva.form');
-
-    return view('auth.nueva_password');
-})->name('password.nueva.form');
 
 
 
@@ -100,23 +88,7 @@ Route::middleware('auth:web')->group(function () {
         ->name('empresa.dashboard');
 });
 
-// Admin routes (sidebar layout)
-Route::prefix('admin')
-    ->name('admin.')
-    ->middleware(['auth:web'])
-    ->group(function () {
-        Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
-            ->name('dashboard');
 
-        // Estadísticas AJAX para dashboard
-        Route::get('/dashboard/stats', [App\Http\Controllers\Admin\DashboardController::class, 'stats'])
-            ->name('dashboard.stats');
-
-        // Ejemplo: rutas administrativas adicionales (usar nombres con prefijo)
-        Route::get('/empresas', fn() => view('admin.empresas.index'))->name('empresas.index');
-        Route::get('/usuarios', [App\Http\Controllers\Admin\UsuarioController::class, 'index'])
-            ->name('usuarios.index');
-    });
 
 Route::middleware('auth:superadmin')->group(function () {
 
@@ -133,19 +105,6 @@ Route::prefix('superadmin')
     ->group(function () 
     {
 
-        // En web.php, dentro del grupo superadmin
-        Route::get('tipo-usuario', [TipoUsuarioController::class, 'index'])->name('tipo_usuario.index');
-        Route::post('tipo-usuario', [TipoUsuarioController::class, 'store'])->name('tipo_usuario.store');
-        Route::put('tipo-usuario/{id}', [TipoUsuarioController::class, 'update'])->name('tipo_usuario.update');    
-        // Tipos de Usuario (Roles)
-        Route::get('roles', [TipoUsuarioController::class, 'index'])->name('roles.index');
-        Route::get('roles/create', [TipoUsuarioController::class, 'create'])->name('roles.create');
-        Route::post('roles', [TipoUsuarioController::class, 'store'])->name('roles.store');
-        Route::get('roles/{id}/edit', [TipoUsuarioController::class, 'edit'])->name('roles.edit');
-        Route::put('roles/{id}', [TipoUsuarioController::class, 'update'])->name('roles.update');
-        Route::delete('roles/{id}', [TipoUsuarioController::class, 'destroy'])->name('roles.destroy');
-        Route::get('roles/{id}/permissions', [TipoUsuarioController::class, 'showPermissions'])->name('roles.permissions.show');
-        Route::get('roles/{id}/usuarios', [TipoUsuarioController::class, 'users'])->name('roles.users');
 
         // Perfil y Seguridad
         Route::get('perfil_seguridad', [PerfilSeguridadController::class, 'index'])->name('perfil.index');
@@ -218,24 +177,6 @@ Route::prefix('superadmin')
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
 
 
-        Route::get('estados', [EstadoController::class, 'index'])
-            ->name('estados.index');
-
-        Route::post('estados', [EstadoController::class, 'store'])
-            ->name('estados.store');
-
-        Route::put('estados/{id}', [EstadoController::class, 'update'])
-            ->name('estados.update');
-
-        //configuracion
-        Route::prefix('configuracion')->name('configuracion.')->group(function () {
-            Route::prefix('ciudades')->name('ciudades.')->group(function () {
-                Route::get('/', [CiudadController::class, 'index'])->name('index');
-            });
-            Route::prefix('tipo_empresa')->name('tipo_empresa.')->group(function () {
-                Route::get('/', [TipoEmpresaController::class, 'index'])->name('index');
-            });
-        });
 
         //Reportes 
         Route::get('reportes', [ReporteController::class, 'index'])
@@ -251,35 +192,15 @@ Route::prefix('superadmin')
         Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
             ->name('tarjetas.update');
 
-        Route::get('ciudades', [CiudadController::class, 'index'])
-            ->name('ciudades.index');
+        // Módulo de Rutas (SuperAdmin)
+        Route::get('/rutas', [RutaController::class, 'index'])->name('rutas.index');
+        Route::post('/rutas', [RutaController::class, 'store'])->name('rutas.store');
+        Route::put('/rutas/{ruta}', [RutaController::class, 'update'])->name('rutas.update');
+        Route::get('/rutas/export', [RutaController::class, 'export'])->name('rutas.export');
+        Route::get('/rutas/barrios/{id_ciudad}', [RutaController::class, 'getBarriosByCiudad'])->name('rutas.barrios');
+    });
 
-        Route::post('ciudades', [CiudadController::class, 'store'])
-            ->name('ciudades.store');
-
-        Route::put('ciudades/{id}', [CiudadController::class, 'update'])
-            ->name('ciudades.update');
-
-        Route::post('departamentos', [CiudadController::class, 'storeDepartamento'])
-            ->name('departamentos.store');
-
-
-
-        Route::get('tipo-empresa', [TipoEmpresaController::class, 'index'])
-            ->name('tipo-empresa.index');
-
-        Route::post('tipo-empresa', [TipoEmpresaController::class, 'store'])
-            ->name('tipo-empresa.store');
-
-        Route::put('tipo-empresa/{id}', [TipoEmpresaController::class, 'update'])
-            ->name('tipo-empresa.update');
-
-        Route::get('tipo-documento', [TipoDocumentoController::class, 'index'])
-            ->name('tipo_documento.index');
-
-        Route::post('tipo-documento', [TipoDocumentoController::class, 'store'])
-            ->name('tipo_documento.store');
-
-        Route::put('tipo-documento/{id}', [TipoDocumentoController::class, 'update'])
-            ->name('tipo_documento.update');
-            });
+    Route::patch(
+    'usuarios/{doc}/inactivar',
+    [UsuarioController::class, 'inactivar']
+)->name('admin.usuarios.inactivar');

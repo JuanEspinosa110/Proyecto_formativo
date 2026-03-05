@@ -9,6 +9,7 @@ class Departamento extends Model
     protected $table = 'departamento';
     protected $primaryKey = 'id_departamento';
     public $timestamps = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
         'nombre_departamento'

@@ -9,6 +9,7 @@ use App\Models\Empresa;
 use App\Models\Usuario;
 use App\Models\Documento;
 use App\Models\VentaViaje;
+use App\Models\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
@@ -26,7 +27,7 @@ class DashboardController extends Controller
     public function stats(Request $request)
     {
         $user = Auth::guard('web')->user();
-        $nit = $user->NIT ?? null;
+        $nit = $user->getActiveNit();
 
         $empresa = $nit ? Empresa::where('NIT', $nit)->first() : null;
 
@@ -125,11 +126,6 @@ class DashboardController extends Controller
             return round((($curr - $prev) / max(1,$prev)) * 100, 1);
         };
 
-        // rutas y buses: sólo si las tablas existen
-        $rutasCount = 0;
-        if ($nit && Schema::hasTable('ruta')) {
-            $rutasCount = DB::table('ruta')->where('NIT', $nit)->count();
-        }
 
         $busesCount = 0;
         // comprobar nombres comunes de tabla para buses
@@ -153,6 +149,7 @@ class DashboardController extends Controller
                 'documentos' => $totalDocumentos,
                 'ventas_count' => $ventasCount,
                 'ventas_total' => (float)$ventasTotal,
+                'buses' => $busesCount,
             ],
             'trends' => [
                 'usuarios' => ['current' => $currentUsuarios, 'previous' => $prevUsuarios, 'pct' => $pct($currentUsuarios,$prevUsuarios)],
