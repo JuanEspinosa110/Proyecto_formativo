@@ -73,6 +73,7 @@
                 <thead class="bg-light">
                     <tr>
                         <th class="ps-4 py-3 text-uppercase small fw-bold text-muted border-0">ID</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Código</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Ciudad</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Barrio Origen</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Barrio Destino</th>
@@ -84,6 +85,7 @@
                     @forelse($rutas as $ruta)
                         <tr class="border-top">
                             <td class="ps-4 text-muted small fw-bold">#{{ $ruta->id_ruta }}</td>
+                            <td class="text-dark small fw-bold">{{ $ruta->codigo_ruta }}</td>
                             <td class="text-uppercase small fw-medium text-muted">
                                 {{ optional($ruta->ciudad)->nombre_city ?? '—' }}
                             </td>
@@ -157,7 +159,7 @@
                     <div id="create-errors-alert" class="alert alert-danger d-none shadow-sm py-2 small mb-4"></div>
 
                     <div class="row g-3">
-                        <div class="col-12">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Ciudad <span class="text-danger">*</span></label>
                             <select name="id_ciudad" class="form-select bg-light border-0 py-2" required>
                                 @foreach($ciudades as $ciu)
@@ -167,6 +169,11 @@
                                 @endforeach
                             </select>
                             <div class="invalid-feedback feedback-id_ciudad"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Código Ruta <span class="text-danger">*</span></label>
+                            <input type="number" name="codigo_ruta" class="form-control bg-light border-0 py-2" required min="1" max="90" placeholder="Ej: 1 o 45">
+                            <div class="invalid-feedback feedback-codigo_ruta"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Origen <span class="text-danger">*</span></label>
@@ -220,7 +227,7 @@
                     <div id="edit-errors-alert" class="alert alert-danger d-none shadow-sm py-2 small mb-4"></div>
 
                     <div class="row g-3">
-                        <div class="col-12">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Ciudad <span class="text-danger">*</span></label>
                             <select name="id_ciudad" id="edit_id_ciudad" class="form-select bg-light border-0 py-2" required>
                                 @foreach($ciudades as $ciu)
@@ -232,28 +239,21 @@
                             <div class="invalid-feedback feedback-id_ciudad"></div>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Código Ruta <span class="text-danger">*</span></label>
+                            <input type="number" name="codigo_ruta" id="edit_codigo_ruta" class="form-control bg-light border-0 py-2" required min="1" max="90">
+                            <div class="invalid-feedback feedback-codigo_ruta"></div>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Origen <span class="text-danger">*</span></label>
                             <select name="id_barrio_origen" id="edit_id_barrio_origen" class="form-select bg-light border-0 py-2" required>
-<<<<<<< HEAD
                                 <option value="" selected disabled>Seleccionar...</option>
-=======
-                                @foreach($barrios as $bar)
-                                    <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
-                                @endforeach
->>>>>>> 46a0f22cc73e44ddec95c253bea0afad04e6f84e
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_origen"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Destino <span class="text-danger">*</span></label>
                             <select name="id_barrio_destino" id="edit_id_barrio_destino" class="form-select bg-light border-0 py-2" required>
-<<<<<<< HEAD
                                 <option value="" selected disabled>Seleccionar...</option>
-=======
-                                @foreach($barrios as $bar)
-                                    <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
-                                @endforeach
->>>>>>> 46a0f22cc73e44ddec95c253bea0afad04e6f84e
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_destino"></div>
                         </div>
@@ -287,6 +287,7 @@
                 const form = document.getElementById('formEditRuta');
                 
                 form.querySelector('[name="id_ciudad"]').value = data.id_ciudad || '';
+                form.querySelector('[name="codigo_ruta"]').value = data.codigo_ruta || '';
                 form.querySelector('[name="id_estado"]').value = data.id_estado;
                 
                 // Cargar barrios de la ciudad seleccionada y luego setear los valores
