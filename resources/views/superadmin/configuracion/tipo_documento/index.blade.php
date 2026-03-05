@@ -239,17 +239,4 @@
     });
 </script>
 
-<<<<<<< HEAD
-<style>
-    .fs-xs { font-size: 0.75rem; }
-    .w-fit-content { width: fit-content; }
-    .text-purple { color: #6f42c1; }
-    .bg-purple-subtle { background-color: #f1e6ff; }
-    .border-purple { border-color: #d0bfff !important; }
-    .custom-switch .form-check-input { width: 3em; height: 1.5em; cursor: pointer; }
-    .table-hover tbody tr:hover { background-color: rgba(0,0,0,0.02) !important; }
-</style>
-@endpush
-=======
->>>>>>> origin/develop
 @endsection
