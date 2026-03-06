@@ -59,20 +59,36 @@
 						<td>{{ $u->telefono }}</td>
 						<td>{{ $u->nombre_tipo ?? 'N/A' }}</td>
 						<td>
-							@if($u->nombre_estado == 'Activo')
-								<span class="badge bg-success">Activo</span>
+							@php
+								$estado = $estados->firstWhere('id_estado', $u->id_estado);
+							@endphp
+							@if($estado && $estado->id_estado == 1)
+								<span class="badge bg-success">{{ $estado->nombre_estado }}</span>
+							@elseif($estado)
+								<span class="badge bg-secondary">{{ $estado->nombre_estado }}</span>
 							@else
-								<span class="badge bg-secondary">Inactivo</span>
+								<span class="badge bg-secondary">Desconocido</span>
 							@endif
 						</td>
 						<td class="d-flex gap-1">
-
-							<a href="{{ url('admin/usuarios/'.$u->doc_usuario) }}" 
-							class="btn btn-sm btn-outline-secondary">
+							<button 
+								type="button"
+								class="btn btn-sm btn-outline-info"
+								data-bs-toggle="modal"
+								data-bs-target="#modalVerUsuario"
+								data-doc="{{ $u->doc_usuario }}"
+								data-primer-nombre="{{ $u->primer_nombre }}"
+								data-segundo-nombre="{{ $u->segundo_nombre }}"
+								data-primer-apellido="{{ $u->primer_apellido }}"
+								data-segundo-apellido="{{ $u->segundo_apellido }}"
+								data-correo="{{ $u->correo }}"
+								data-telefono="{{ $u->telefono }}"
+								data-rol="{{ $u->nombre_tipo }}"
+								data-estado="{{ $u->nombre_estado }}"
+								data-ciudad="{{ $u->nombre_city }}"
+							>
 								Ver
-							</a>
-
-							<!-- Botón Editar (dentro de la tabla) -->
+							</button>
 							<button 
 								type="button"
 								class="btn btn-sm btn-outline-primary"
@@ -86,10 +102,10 @@
 								data-correo="{{ $u->correo }}"
 								data-telefono="{{ $u->telefono }}"
 								data-rol="{{ $u->id_tipo_usuario }}"
+								data-estado_id="{{ $u->id_estado }}"
 							>
 								Editar
 							</button>
-
 						</td>
 					</tr>
 				@endforeach
@@ -121,7 +137,7 @@
                         <!-- Documento -->
                         <div class="col-md-6">
                             <label class="form-label">Documento</label>
-                            <input type="text" name="doc_usuario" class="form-control" required minlength="7" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g,'')" >
+                            <input type="text" name="doc_usuario" class="form-control" required minlength="7" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g,''); if(this.value.startsWith('0')) this.value = this.value.replace(/^0+/, '');" >
                         </div>
 
                         <!-- Rol -->
@@ -214,7 +230,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">Documento</label>
-                            <input type="text" name="doc_usuario" id="editDoc" class="form-control" required minlength="7" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g,'')">
+                            <input type="text" name="doc_usuario" id="editDoc" class="form-control" required minlength="7" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g,''); if(this.value.startsWith('0')) this.value = this.value.replace(/^0+/, '');" >
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Rol</label>
@@ -231,19 +247,19 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Primer Nombre</label>
-                            <input type="text" name="primer_nombre" id="editPrimerNombre" class="form-control" required maxlength="50" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g,'')">
+                            <input type="text" name="primer_nombre" id="editPrimerNombre" class="form-control" required maxlength="50" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g,'')" >
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Segundo Nombre</label>
-                            <input type="text" name="segundo_nombre" id="editSegundoNombre" class="form-control" maxlength="50" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g,'')">
+                            <input type="text" name="segundo_nombre" id="editSegundoNombre" class="form-control" maxlength="50" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g,'')" >
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Primer Apellido</label>
-                            <input type="text" name="primer_apellido" id="editPrimerApellido" class="form-control" required maxlength="50" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g,'')">
+                            <input type="text" name="primer_apellido" id="editPrimerApellido" class="form-control" required maxlength="50" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g,'')" >
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Segundo Apellido</label>
-                            <input type="text" name="segundo_apellido" id="editSegundoApellido" class="form-control" maxlength="50" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g,'')">
+                            <input type="text" name="segundo_apellido" id="editSegundoApellido" class="form-control" maxlength="50" oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g,'')" >
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Correo</label>
@@ -251,7 +267,17 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">Teléfono</label>
-                            <input type="text" name="telefono" id="editTelefono" class="form-control" required minlength="10" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g,'')">
+                            <input type="text" name="telefono" id="editTelefono" class="form-control" required minlength="10" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g,'')"
+ >
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <select name="id_estado" id="editEstado" class="form-select" required>
+                                <option value="">Seleccione</option>
+                                @foreach($estados as $estado)
+                                    <option value="{{ $estado->id_estado }}">{{ $estado->nombre_estado }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -264,6 +290,67 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ver Usuario -->
+<div class="modal fade" id="modalVerUsuario" tabindex="-1" aria-labelledby="modalVerUsuarioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalVerUsuarioLabel">Información del Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Documento</label>
+                        <span id="verDoc" class="form-control bg-light"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Rol</label>
+                        <span id="verRol" class="form-control bg-light"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Primer Nombre</label>
+                        <span id="verPrimerNombre" class="form-control bg-light"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Segundo Nombre</label>
+                        <span id="verSegundoNombre" class="form-control bg-light"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Primer Apellido</label>
+                        <span id="verPrimerApellido" class="form-control bg-light"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Segundo Apellido</label>
+                        <span id="verSegundoApellido" class="form-control bg-light"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Correo</label>
+                        <span id="verCorreo" class="form-control bg-light"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Teléfono</label>
+                        <span id="verTelefono" class="form-control bg-light"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Ciudad</label>
+                        <span id="verCiudad" class="form-control bg-light"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Estado</label>
+                        <span id="verEstado" class="form-control bg-light"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -281,8 +368,24 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('editCorreo').value = button.getAttribute('data-correo');
         document.getElementById('editTelefono').value = button.getAttribute('data-telefono');
         document.getElementById('editRol').value = button.getAttribute('data-rol');
+        document.getElementById('editEstado').value = button.getAttribute('data-estado_id');
         var form = document.getElementById('formEditarUsuario');
         form.action = '/admin/usuarios/' + button.getAttribute('data-doc');
+    });
+
+    var modalVer = document.getElementById('modalVerUsuario');
+    modalVer.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        document.getElementById('verDoc').textContent = button.getAttribute('data-doc');
+        document.getElementById('verPrimerNombre').textContent = button.getAttribute('data-primer-nombre');
+        document.getElementById('verSegundoNombre').textContent = button.getAttribute('data-segundo-nombre');
+        document.getElementById('verPrimerApellido').textContent = button.getAttribute('data-primer-apellido');
+        document.getElementById('verSegundoApellido').textContent = button.getAttribute('data-segundo-apellido');
+        document.getElementById('verCorreo').textContent = button.getAttribute('data-correo');
+        document.getElementById('verTelefono').textContent = button.getAttribute('data-telefono');
+        document.getElementById('verRol').textContent = button.getAttribute('data-rol');
+        document.getElementById('verEstado').textContent = button.getAttribute('data-estado');
+        document.getElementById('verCiudad').textContent = button.getAttribute('data-ciudad');
     });
 });
 </script>
