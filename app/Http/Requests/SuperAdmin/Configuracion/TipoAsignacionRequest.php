@@ -29,7 +29,7 @@ class TipoAsignacionRequest extends FormRequest
                 'regex:/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/',
 
                 // Unique ignorando el actual en update
-                Rule::unique('tipo_asignaciones', 'nombre_tipo')
+                Rule::unique('tipo_asignacion', 'nombre_tipo')
                     ->ignore($id, 'id_tipo'),
             ],
         ];
@@ -72,7 +72,7 @@ class TipoAsignacionRequest extends FormRequest
             $id = $this->route('id');
             $nombre = strtolower($this->nombre_tipo);
 
-            $existe = DB::table('tipo_asignaciones')
+            $existe = DB::table('tipo_asignacion')
                 ->whereRaw('LOWER(nombre_tipo) = ?', [$nombre])
                 ->when($id, function ($query) use ($id) {
                     $query->where('id_tipo', '!=', $id);

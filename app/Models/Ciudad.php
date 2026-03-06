@@ -14,6 +14,7 @@ class Ciudad extends Model
     protected $keyType = 'string'; // Forza a que se trate como texto
 
     protected $fillable = [
+        'id_ciudad',
         'nombre_city',
         'id_departamento',
     ];

@@ -31,6 +31,7 @@ use App\Http\Controllers\SuperAdmin\{
 
 // Rutas Administrativas (Panel Empresas)
 require base_path('routes/admin.php');
+require base_path('routes/superadmin.php');
 
 use App\Http\Controllers\LandingController;
 
