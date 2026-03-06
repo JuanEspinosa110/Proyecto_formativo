@@ -114,16 +114,7 @@
                 <tr>
                     <td>{{ $ciudad->id_ciudad }}</td>
                     <td>{{ $ciudad->nombre_city }}</td>
-                    <td>
-                        @if($ciudad->departamento)
-                        {{ $ciudad->departamento->nombre_departamento }}
-                        @else
-                        <span style="color: red; font-weight: bold;">
-                            Error - ID Depto: "{{ $ciudad->id_departamento }}"
-                            (No encontrado en la tabla departamento)
-                        </span>
-                        @endif
-                    </td>
+                    <td>{{ $ciudad->departamento?->nombre_departamento }}</td>
                     <td>
                         <button
                             class="btn btn-warning btn-sm"
