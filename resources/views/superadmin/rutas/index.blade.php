@@ -159,15 +159,6 @@
 
                     <div class="row g-3">
                         <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">
-                                Código de Ruta <span class="text-danger">*</span>
-                            </label>
-                            <input type="number" name="codigo_ruta" 
-                                class="form-control bg-light border-0 py-2" 
-                                required>
-                            <div class="invalid-feedback feedback-codigo_ruta"></div>
-                        </div>
-                        <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Ciudad <span class="text-danger">*</span></label>
                             <select name="id_ciudad" class="form-select bg-light border-0 py-2" required>
                                 @foreach($ciudades as $ciu)
@@ -185,7 +176,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Origen <span class="text-danger">*</span></label>
-                            <select name="id_barrio_origen" id="create_id_barrio_origen" class="form-select bg-light border-0 py-2" required disabled>
+                            <select name="id_barrio_origen" id="create_id_barrio_origen" class="form-select bg-light border-0 py-2" required>
                                 <option value="" selected >Seleccionar Ciudad primero...</option>
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_origen"></div>
