@@ -35,14 +35,23 @@
                     <span>Dashboard</span>
                 </a>
                 
+<<<<<<< HEAD
+                <a href="{{ route('admin.buses.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.buses.*') ? 'active' : '' }}">
+=======
                 <a href="{{ route('admin.usuarios.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
                     <span>Usuarios</span>
                 </a>
 
                 <a href="{{ url('admin/buses') }}" class="sigu-sb-link {{ request()->is('admin/buses*') ? 'active' : '' }}">
+>>>>>>> origin/develop
                     <span class="sb-ico"><span class="material-symbols-rounded">directions_bus</span></span>
                     <span>Buses</span>
+                </a>
+
+                <a href="{{ route('admin.asignaciones.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.asignaciones.*') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">assignment</span></span>
+                    <span>Asignaciones</span>
                 </a>
                 
             </nav>

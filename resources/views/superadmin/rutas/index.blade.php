@@ -1,3 +1,4 @@
+
 @extends('superadmin.layouts.admin')
 
 @section('title', 'Rutas — SIGU')
@@ -72,7 +73,12 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
+<<<<<<< HEAD
+                        <th class="ps-4 py-3 text-uppercase small fw-bold text-muted border-0">ID</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Código</th>
+=======
                         <th class="ps-4 py-3 text-uppercase small fw-bold text-muted border-0">CODIGO</th>
+>>>>>>> origin/develop
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Ciudad</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Barrio Origen</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Barrio Destino</th>
@@ -178,6 +184,11 @@
                             <div class="invalid-feedback feedback-id_ciudad"></div>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Código Ruta <span class="text-danger">*</span></label>
+                            <input type="number" name="codigo_ruta" class="form-control bg-light border-0 py-2" required min="1" max="90" placeholder="Ej: 1 o 45">
+                            <div class="invalid-feedback feedback-codigo_ruta"></div>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Origen <span class="text-danger">*</span></label>
                             <select name="id_barrio_origen" id="create_id_barrio_origen" class="form-select bg-light border-0 py-2" required disabled>
                                 <option value="" selected >Seleccionar Ciudad primero...</option>
@@ -250,8 +261,16 @@
                             <div class="invalid-feedback feedback-id_ciudad"></div>
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Código Ruta <span class="text-danger">*</span></label>
+                            <input type="number" name="codigo_ruta" id="edit_codigo_ruta" class="form-control bg-light border-0 py-2" required min="1" max="90">
+                            <div class="invalid-feedback feedback-codigo_ruta"></div>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Origen <span class="text-danger">*</span></label>
                             <select name="id_barrio_origen" id="edit_id_barrio_origen" class="form-select bg-light border-0 py-2" required>
+<<<<<<< HEAD
+                                <option value="" selected disabled>Seleccionar...</option>
+=======
 <<<<<<< HEAD
                                 <option value="" selected disabled>Seleccionar...</option>
 =======
@@ -259,6 +278,7 @@
                                     <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
                                 @endforeach
 >>>>>>> 46a0f22cc73e44ddec95c253bea0afad04e6f84e
+>>>>>>> origin/develop
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_origen"></div>
                         </div>
@@ -268,10 +288,14 @@
 <<<<<<< HEAD
                                 <option value="" selected disabled>Seleccionar...</option>
 =======
+<<<<<<< HEAD
+                                <option value="" selected disabled>Seleccionar...</option>
+=======
                                 @foreach($barrios as $bar)
                                     <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
                                 @endforeach
 >>>>>>> 46a0f22cc73e44ddec95c253bea0afad04e6f84e
+>>>>>>> origin/develop
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_destino"></div>
                         </div>
@@ -302,10 +326,17 @@
         document.querySelectorAll('.edit-ruta').forEach(btn => {
             btn.addEventListener('click', async function() {
                 const data = JSON.parse(this.dataset.json);
+<<<<<<< HEAD
+                const form = document.getElementById('formEditRuta');
+                
+                form.querySelector('[name="id_ciudad"]').value = data.id_ciudad || '';
+                form.querySelector('[name="codigo_ruta"]').value = data.codigo_ruta || '';
+=======
                 form.querySelector('[name="codigo_ruta"]').value = data.codigo_ruta || '';
                 const form = document.getElementById('formEditRuta');
                 
                 form.querySelector('[name="id_ciudad"]').value = data.id_ciudad || '';
+>>>>>>> origin/develop
                 form.querySelector('[name="id_estado"]').value = data.id_estado;
                 
                 // Cargar barrios de la ciudad seleccionada y luego setear los valores
@@ -456,6 +487,8 @@
             });
         }
     });
+<<<<<<< HEAD
+=======
 
 
         // No permitir caracteres no numéricos 
@@ -470,6 +503,7 @@
                 }
             }
         });
+>>>>>>> origin/develop
 </script>
 
 <style>

@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Models;
@@ -10,6 +11,10 @@ class Departamento extends Model
     protected $primaryKey = 'id_departamento';
     public $timestamps = false;
     protected $keyType = 'string';
+<<<<<<< HEAD
+    public $incrementing = false;
+=======
+>>>>>>> origin/develop
 
     protected $fillable = [
         'nombre_departamento'

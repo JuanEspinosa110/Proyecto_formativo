@@ -283,7 +283,7 @@
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Placa del Vehículo</label>
-                            <input type="text" id="edit_placa_display" class="form-control bg-light border-0 fw-bold text-primary" disabled>
+                            <input type="text" id="edit_placa_display" class="form-control bg-light border-0 fw-bold text-primary" readonly>
                         </div>
 
                         <div class="col-md-6">

@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,11 @@ use App\Http\Controllers\SuperAdmin\{
     PerfilSeguridadController,
     PlanLicenciaController,
     RutaController,
+    BarrioController,
+    CiudadController,
+    TipoEmpresaController,
+    TipoDocumentoController,
+    EstadoController
 };
 
 // Rutas Administrativas (Panel Empresas)
@@ -68,6 +74,7 @@ Route::get(
     '/nueva-password',
     [RecuperarPasswordController::class, 'mostrarNuevaPassword']
 )->name('password.nueva.form');
+
 
 
 
@@ -175,7 +182,6 @@ Route::prefix('superadmin')
 
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
-
 
 
 

@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Services;
@@ -67,6 +68,7 @@ class RutaService
         return Ruta::create([
             'id_ruta'           => $id,
             'id_ciudad'         => $data['id_ciudad'],
+            'codigo_ruta'       => $data['codigo_ruta'],
             'id_barrio_origen'  => $data['id_barrio_origen'],
             'id_barrio_destino' => $data['id_barrio_destino'],
             'id_estado'         => $data['id_estado'],
@@ -80,6 +82,7 @@ class RutaService
     {
         return $ruta->update([
             'id_ciudad'         => $data['id_ciudad'] ?? $ruta->id_ciudad,
+            'codigo_ruta'       => $data['codigo_ruta'] ?? $ruta->codigo_ruta,
             'id_barrio_origen'  => $data['id_barrio_origen'] ?? $ruta->id_barrio_origen,
             'id_barrio_destino' => $data['id_barrio_destino'] ?? $ruta->id_barrio_destino,
             'id_estado'         => $data['id_estado'],
