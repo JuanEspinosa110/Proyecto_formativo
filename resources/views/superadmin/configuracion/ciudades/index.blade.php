@@ -158,6 +158,13 @@
                 @csrf
                 <div class="modal-body py-4">
                     <div class="mb-3">
+                        <label class="form-label fw-semibold">Código Postal <span class="text-danger">*</span></label>
+                        <input type="text" name="id_ciudad" class="form-control @error('id_ciudad') is-invalid @enderror" placeholder="Ej: 05001" required value="{{ old('id_ciudad') }}">
+                        @error('id_ciudad')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label fw-semibold">Nombre de la Ciudad <span class="text-danger">*</span></label>
                         <input type="text" name="nombre_city" class="form-control @error('nombre_city') is-invalid @enderror" placeholder="Ej: Medellín" required value="{{ old('nombre_city') }}">
                         @error('nombre_city')
