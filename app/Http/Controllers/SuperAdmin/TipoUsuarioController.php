@@ -3,181 +3,82 @@
 namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Models\TipoUsuario;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class TipoUsuarioController extends Controller
 {
-    /**
-     * Mostrar lista de tipos de usuario
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $tiposUsuario = DB::table('tipo_usuario')
-            ->orderBy('id_tipo_usuario', 'asc')
-            ->get();
+       $query = TipoUsuario::query();
 
-        // Contar usuarios por tipo
-        foreach ($tiposUsuario as $tipo) {
-            $tipo->usuarios_count = DB::table('usuario')
-                ->where('id_tipo_usuario', $tipo->id_tipo_usuario)
-                ->count();
-        }
-
-        return view('admin.roles.index', compact('tiposUsuario'));
+    if ($request->filled('buscar')) {
+        $query->where('nombre_tipo', 'like', '%' . $request->buscar . '%');
     }
 
-    /**
-     * Mostrar formulario de creación
-     */
-    public function create()
-    {
-        return view('admin.roles.create');
+    $tipos = $query->orderBy('id_tipo_usuario', 'asc')
+                   ->paginate(5);
+
+    return view('superadmin.configuracion.tipo_usuario.index', compact('tipos'));
     }
 
-    /**
-     * Guardar nuevo tipo de usuario
-     */
+   // ... dentro de TipoUsuarioController.php
+
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nombre_tipo' => 'required|string|max:50|unique:tipo_usuario,nombre_tipo',
-            'descripcion' => 'nullable|string|max:255',
+        $request->validate([
+            'nombre_tipo' => [
+                'required',
+                'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/',
+                function ($attribute, $value, $fail) {
+                    $exists = TipoUsuario::whereRaw('LOWER(nombre_tipo) = ?', [strtolower($value)])->exists();
+                    if ($exists) {
+                        $fail('El tipo de usuario "' . $value . '" ya se encuentra registrado.');
+                    }
+                }
+            ]
         ], [
-            'nombre_tipo.required' => 'El nombre del tipo de usuario es obligatorio',
-            'nombre_tipo.unique' => 'Ya existe un tipo de usuario con ese nombre',
+            'nombre_tipo.required' => 'El nombre del tipo de usuario es obligatorio.',
+            'nombre_tipo.regex' => 'Solo se permiten letras y espacios.'
         ]);
 
-        try {
-            DB::table('tipo_usuario')->insert([
-                'nombre_tipo' => $validated['nombre_tipo'],
-            ]);
+        TipoUsuario::create([
+            'nombre_tipo' => strtoupper($request->nombre_tipo) 
+        ]);
 
-            return redirect()
-                ->route('admin.roles.index')
-                ->with('success', 'Tipo de usuario creado exitosamente');
-
-        } catch (\Exception $e) {
-            return back()
-                ->withInput()
-                ->with('error', 'Error al crear el tipo de usuario: ' . $e->getMessage());
-        }
+        return redirect()
+            ->route('superadmin.tipo_usuario.index')
+            ->with('success', 'Tipo de usuario creado correctamente.');
     }
 
-    /**
-     * Mostrar formulario de edición
-     */
-    public function edit($id)
-    {
-        $tipoUsuario = DB::table('tipo_usuario')
-            ->where('id_tipo_usuario', $id)
-            ->first();
-
-        if (!$tipoUsuario) {
-            return redirect()
-                ->route('admin.roles.index')
-                ->with('error', 'Tipo de usuario no encontrado');
-        }
-
-
-
-        return view('admin.roles.edit', compact('tipoUsuario'));
-    }
-
-    /**
-     * Actualizar tipo de usuario
-     */
     public function update(Request $request, $id)
     {
-        $tipoUsuario = DB::table('tipo_usuario')
-            ->where('id_tipo_usuario', $id)
-            ->first();
-
-        if (!$tipoUsuario) {
-            return redirect()
-                ->route('admin.roles.index')
-                ->with('error', 'Tipo de usuario no encontrado');
-        }
-
-        $validated = $request->validate([
-            'nombre_tipo' => 'required|string|max:50|unique:tipo_usuario,nombre_tipo,' . $id . ',id_tipo_usuario',
-            'descripcion' => 'nullable|string|max:255',
+        $request->validate([
+            'nombre_tipo' => [
+                'required',
+                'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/',
+                function ($attribute, $value, $fail) use ($id) {
+                    $exists = TipoUsuario::whereRaw('LOWER(nombre_tipo) = ?', [strtolower($value)])
+                        ->where('id_tipo_usuario', '!=', $id)
+                        ->exists();
+                    if ($exists) {
+                        $fail('El tipo de usuario "' . $value . '" ya existe.');
+                    }
+                }
+            ]
         ], [
-            'nombre_tipo.required' => 'El nombre del tipo de usuario es obligatorio',
-            'nombre_tipo.unique' => 'Ya existe un tipo de usuario con ese nombre',
+            'nombre_tipo.required' => 'El nombre del tipo de usuario es obligatorio.',
+            'nombre_tipo.regex' => 'Solo se permiten letras y espacios.'
         ]);
 
-        try {
-            DB::table('tipo_usuario')
-                ->where('id_tipo_usuario', $id)
-                ->update([
-                    'nombre_tipo' => $validated['nombre_tipo'],
-                ]);
+        $tipo = TipoUsuario::findOrFail($id);
+        
+        $tipo->update([
+            'nombre_tipo' => strtoupper($request->nombre_tipo)
+        ]);
 
-            return redirect()
-                ->route('admin.roles.index')
-                ->with('success', 'Tipo de usuario actualizado exitosamente');
-
-        } catch (\Exception $e) {
-            return back()
-                ->withInput()
-                ->with('error', 'Error al actualizar el tipo de usuario: ' . $e->getMessage());
-        }
+        return redirect()
+            ->route('superadmin.tipo_usuario.index')
+            ->with('success', 'Tipo de usuario actualizado correctamente.');
     }
-
-    /**
-     * Eliminar tipo de usuario
-     */
-    public function destroy($id)
-    {
-        try {
-            // Verificar si el tipo tiene usuarios asignados
-            $usersCount = DB::table('usuario')
-                ->where('id_tipo_usuario', $id)
-                ->count();
-            
-            if ($usersCount > 0) {
-                return back()->with('error', "No se puede eliminar el tipo de usuario porque tiene {$usersCount} usuario(s) asignado(s)");
-            }
-
-            DB::table('tipo_usuario')
-                ->where('id_tipo_usuario', $id)
-                ->delete();
-
-            return redirect()
-                ->route('admin.roles.index')
-                ->with('success', 'Tipo de usuario eliminado exitosamente');
-
-        } catch (\Exception $e) {
-            return back()->with('error', 'Error al eliminar el tipo de usuario: ' . $e->getMessage());
-        }
-    }
-
-    /**
-
-     * Mostrar usuarios con tipo específico
-     */
-    public function users($id)
-    {
-        $tipoUsuario = DB::table('tipo_usuario')
-            ->where('id_tipo_usuario', $id)
-            ->first();
-
-        if (!$tipoUsuario) {
-            return redirect()
-                ->route('admin.roles.index')
-                ->with('error', 'Tipo de usuario no encontrado');
-        }
-
-        $usuarios = DB::table('usuario')
-            ->leftJoin('estado', 'usuario.id_estado', '=', 'estado.id_estado')
-            ->leftJoin('ciudad', 'usuario.id_ciudad', '=', 'ciudad.id_ciudad')
-            ->where('usuario.id_tipo_usuario', $id)
-            ->select('usuario.*', 'estado.nombre_estado', 'ciudad.nombre_city')
-            ->paginate(15);
-
-        return view('admin.roles.users', compact('tipoUsuario', 'usuarios'));
-    }
-
-    
 }

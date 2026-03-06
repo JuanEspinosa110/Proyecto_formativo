@@ -5,8 +5,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
-use App\Http\Controllers\Admin\suarioController;
-
+use Illuminate\Http\Request;
+use App\Http\Controllers\SuperAdmin\EstadoController;
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
     RolController,
@@ -23,6 +23,9 @@ use App\Http\Controllers\SuperAdmin\{
     PlanLicenciaController,
     RutaController,
     BarrioController,
+    CiudadController,
+    TipoEmpresaController,
+    TipoDocumentoController
 };
 
 // Rutas Administrativas (Panel Empresas)
@@ -32,18 +35,20 @@ use App\Http\Controllers\LandingController;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
-
-Route::get('/superadmin/dashboard', function () {
-    return view('superadmin.dashboard');
-});
-
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+
+Route::get('/superadmin/dashboard', function () {
+    return view('admin.dashboard');
+});
+
 Route::view('/register', 'auth.register')->name('register');
 Route::post('/register', [RegistroController::class, 'store'])
     ->name('register.store');
+
+Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
 
 Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
 
@@ -68,8 +73,19 @@ Route::get('/nueva-password', function () {
         return redirect()->route('recuperar');
     }
 
+
+    Route::post('/codigo/reenviar', [RecuperarPasswordController::class, 'reenviarCodigo'])
+        ->name('password.resend.code');
+
+    // Mostrar vista nueva contraseña
+    Route::get(
+        '/nueva-password',
+        [RecuperarPasswordController::class, 'mostrarNuevaPassword']
+    )->name('password.nueva.form');
+
     return view('auth.nueva_password');
 })->name('password.nueva.form');
+
 
 
 // Procesar actualización
@@ -98,16 +114,18 @@ Route::middleware('auth:superadmin')->group(function () {
 });
 
 
-Route::get(
-    '/superadmin/dashboard/stats',
-    [DashboardController::class, 'superAdminStats']
-)->name('superadmin.dashboard.stats');
+Route::get('/superadmin/dashboard/stats', [DashboardController::class, 'superAdminStats'])->name('superadmin.dashboard.stats');
 
 Route::prefix('superadmin')
     ->name('superadmin.')
     ->middleware(['auth:superadmin'])
-    ->group(function () {
+    ->group(function () 
+    {
 
+        // En web.php, dentro del grupo superadmin
+        Route::get('tipo-usuario', [TipoUsuarioController::class, 'index'])->name('tipo_usuario.index');
+        Route::post('tipo-usuario', [TipoUsuarioController::class, 'store'])->name('tipo_usuario.store');
+        Route::put('tipo-usuario/{id}', [TipoUsuarioController::class, 'update'])->name('tipo_usuario.update');    
         // Tipos de Usuario (Roles)
         Route::get('roles', [TipoUsuarioController::class, 'index'])->name('roles.index');
         Route::get('roles/create', [TipoUsuarioController::class, 'create'])->name('roles.create');
@@ -168,8 +186,8 @@ Route::prefix('superadmin')
 
         // Ruta para obtener ciudades por departamento (AJAX)
         Route::get('/empresas/ciudades/{id_departamento}', [EmpresaController::class, 'getCiudadesByDepartamento'])
-            ->name('superadmin.empresas.ciudades');
-
+        ->name('superadmin.empresas.ciudades');
+    
         // Rutas CRUD de Empresas
         Route::resource('empresas', EmpresaController::class);
         Route::get('empresas/export/csv', [EmpresaController::class, 'exportCsv'])->name('empresas.export.csv');
@@ -187,6 +205,26 @@ Route::prefix('superadmin')
 
         Route::get('/alertas', [AlertaController::class, 'index'])->name('alertas.index');
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+
+
+        Route::get('estados', [EstadoController::class, 'index'])
+            ->name('estados.index');
+
+        Route::post('estados', [EstadoController::class, 'store'])
+            ->name('estados.store');
+
+        Route::put('estados/{id}', [EstadoController::class, 'update'])
+            ->name('estados.update');
+
+        //configuracion
+        Route::prefix('configuracion')->name('configuracion.')->group(function () {
+            Route::prefix('ciudades')->name('ciudades.')->group(function () {
+                Route::get('/', [CiudadController::class, 'index'])->name('index');
+            });
+            Route::prefix('tipo_empresa')->name('tipo_empresa.')->group(function () {
+                Route::get('/', [TipoEmpresaController::class, 'index'])->name('index');
+            });
+        });
 
         //Reportes 
         Route::get('reportes', [ReporteController::class, 'index'])
@@ -214,4 +252,34 @@ Route::prefix('superadmin')
         Route::post('/barrios', [BarrioController::class, 'store'])->name('barrios.store');
         Route::put('/barrios/{id}', [BarrioController::class, 'update'])->name('barrios.update');
         Route::get('/barrios/export', [BarrioController::class, 'export'])->name('barrios.export');
+
+        Route::get('ciudades', [CiudadController::class, 'index'])
+            ->name('ciudades.index');
+
+        Route::post('ciudades', [CiudadController::class, 'store'])
+            ->name('ciudades.store');
+
+        Route::put('ciudades/{id}', [CiudadController::class, 'update'])
+            ->name('ciudades.update');
+
+        Route::post('departamentos', [CiudadController::class, 'storeDepartamento'])
+            ->name('departamentos.store');
+
+        Route::get('tipo-empresa', [TipoEmpresaController::class, 'index'])
+            ->name('tipo-empresa.index');
+
+        Route::post('tipo-empresa', [TipoEmpresaController::class, 'store'])
+            ->name('tipo-empresa.store');
+
+        Route::put('tipo-empresa/{id}', [TipoEmpresaController::class, 'update'])
+            ->name('tipo-empresa.update');
+
+        Route::get('tipo-documento', [TipoDocumentoController::class, 'index'])
+            ->name('tipo_documento.index');
+
+        Route::post('tipo-documento', [TipoDocumentoController::class, 'store'])
+            ->name('tipo_documento.store');
+
+        Route::put('tipo-documento/{id}', [TipoDocumentoController::class, 'update'])
+            ->name('tipo_documento.update');
     });
