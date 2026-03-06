@@ -73,12 +73,7 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
-<<<<<<< HEAD
-                        <th class="ps-4 py-3 text-uppercase small fw-bold text-muted border-0">ID</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Código</th>
-=======
                         <th class="ps-4 py-3 text-uppercase small fw-bold text-muted border-0">CODIGO</th>
->>>>>>> origin/develop
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Ciudad</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Barrio Origen</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Barrio Destino</th>

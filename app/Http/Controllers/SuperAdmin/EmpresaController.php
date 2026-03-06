@@ -277,12 +277,8 @@ class EmpresaController extends Controller
         $writer->save($temp);
 
         return response()->download($temp, $fileName)->deleteFileAfterSend(true);
-<<<<<<< HEAD
-    } 
-=======
     }
 
     
     
->>>>>>> origin/develop
 }

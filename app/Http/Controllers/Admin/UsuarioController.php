@@ -78,5 +78,26 @@ class UsuarioController extends Controller
             ->with('success', 'Usuario inactivado correctamente');
     }
 
+    public function update(Request $request, $doc_usuario)
+    {
+        $request->validate([
+            'primer_nombre' => 'required|string|max:50',
+            'segundo_nombre' => 'nullable|string|max:50',
+            'primer_apellido' => 'required|string|max:50',
+            'segundo_apellido' => 'nullable|string|max:50',
+            'correo' => 'required|email|max:150',
+            'telefono' => 'required|string|max:10',
+            'id_tipo_usuario' => 'required|integer|exists:tipo_usuario,id_tipo_usuario',
+        ], [
+            'primer_nombre.required' => 'El primer nombre es obligatorio.',
+            'primer_apellido.required' => 'El primer apellido es obligatorio.',
+            'correo.required' => 'El correo es obligatorio.',
+            'telefono.required' => 'El teléfono es obligatorio.',
+            'id_tipo_usuario.required' => 'Debe seleccionar un rol.',
+        ]);
 
+        Usuario::where('doc_usuario', $doc_usuario)->update($request->except(['_token', '_method']));
+
+        return redirect()->route('admin.usuarios.index')->with('success', 'Usuario actualizado correctamente');
+    }
 }

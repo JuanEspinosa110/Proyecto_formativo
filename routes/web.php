@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -22,16 +21,10 @@ use App\Http\Controllers\SuperAdmin\{
     PerfilSeguridadController,
     PlanLicenciaController,
     RutaController,
-    BarrioController,
-    CiudadController,
-    TipoEmpresaController,
-    TipoDocumentoController,
-    EstadoController
 };
 
 // Rutas Administrativas (Panel Empresas)
 require base_path('routes/admin.php');
-require base_path('routes/superadmin.php');
 
 use App\Http\Controllers\LandingController;
 
@@ -74,7 +67,6 @@ Route::get(
     '/nueva-password',
     [RecuperarPasswordController::class, 'mostrarNuevaPassword']
 )->name('password.nueva.form');
-
 
 
 
@@ -185,6 +177,7 @@ Route::prefix('superadmin')
 
 
 
+
         //Reportes 
         Route::get('reportes', [ReporteController::class, 'index'])
             ->name('reportes.index');
@@ -211,3 +204,5 @@ Route::prefix('superadmin')
     'usuarios/{doc}/inactivar',
     [UsuarioController::class, 'inactivar']
 )->name('admin.usuarios.inactivar');
+
+    Route::put('admin/usuarios/{doc_usuario}', [\App\Http\Controllers\Admin\UsuarioController::class, 'update'])->name('admin.usuarios.update');
