@@ -199,6 +199,22 @@
   opacity: 0.9;
 }
 
+/* Organizar gráficas en una cuadrícula de 2 columnas */
+.sigu-admin-layout .sa-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+.sigu-admin-layout .sa-charts-grid .sa-chart-card {
+  margin-top: 0;
+}
+@media (max-width: 992px) {
+  .sigu-admin-layout .sa-charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
 
 /* Responsive */
 @media (max-width: 992px) {

@@ -140,16 +140,106 @@
     });
   }
 
+  function renderBusesEstado(data) {
+    const ctx = document.getElementById('chartBusesEstado');
+    if (!ctx) return;
+    const buses = data.buses || [];
+    const estados = {};
+    buses.forEach(bus => {
+      const nombre = bus.estado?.nombre_estado || 'Desconocido';
+      estados[nombre] = (estados[nombre] || 0) + 1;
+    });
+    const labels = Object.keys(estados);
+    const values = Object.values(estados);
+    new Chart(ctx.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Cantidad de Buses',
+          data: values,
+          backgroundColor: ['#6A4CC5', '#9B84E3', '#ff6b6b', '#4cc56a', '#e3b684']
+        }]
+      },
+      options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+  }
+
+  function renderViajesRuta(data) {
+    const ctx = document.getElementById('chartViajesRuta');
+    if (!ctx) return;
+    const viajes = data.viajes || [];
+    const rutas = {};
+    viajes.forEach(viaje => {
+      const nombre = viaje.ruta?.id_ruta || 'Desconocido';
+      rutas[nombre] = (rutas[nombre] || 0) + 1;
+    });
+    const labels = Object.keys(rutas);
+    const values = Object.values(rutas);
+    new Chart(ctx.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Viajes por Ruta',
+          data: values,
+          borderColor: '#6A4CC5',
+          backgroundColor: 'rgba(106,76,197,0.1)',
+          tension: 0.3
+        }]
+      },
+      options: { responsive: true, plugins: { legend: { display: true } } }
+    });
+  }
+
+  function renderUsuariosTable(data) {
+    const usuarios = data.usuarios || [];
+    const tbody = document.getElementById('dashboardUsuariosTable');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    usuarios.forEach(u => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${u.doc_usuario}</td>
+        <td>${u.primer_nombre} ${u.primer_apellido}</td>
+        <td>${u.correo}</td>
+        <td>${u.telefono}</td>
+        <td>${u.nombre_tipo ?? ''}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function renderDocumentosTable(data) {
+    const documentos = data.documentos || [];
+    const tbody = document.getElementById('dashboardDocumentosTable');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    documentos.forEach(d => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${d.id_documento}</td>
+        <td>${d.nombre}</td>
+        <td>${d.doc_usuario}</td>
+        <td>${d.fecha_expedicion ?? ''}</td>
+        <td>${d.fecha_vencimiento ?? ''}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
   async function fetchStats() {
     try {
       const res = await fetch(STATS_URL, { credentials: 'same-origin' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      // Exponer para depuración y futuras visualizaciones
       window.ADMIN_STATS = data;
-      console.debug('ADMIN_STATS', data);
       updateKPIs(data);
+      renderUsuariosTable(data);
+      renderDocumentosTable(data);
       renderDonut(data);
+      renderBusesEstado(data);
+      renderViajesRuta(data);
       renderSparklines(data);
     } catch (err) {
       console.error('Error fetching admin stats', err);

@@ -1,4 +1,3 @@
-
 @extends('admin.layouts.app')
 
 @section('title', 'Dashboard — SIGU')
@@ -13,55 +12,27 @@
         </div>
     </div>
 
-    <section class="sa-kpi-section">
-        <div class="sa-kpi-card">
-            <div class="kpi-left">
-                <span class="kpi-title">Empresa</span>
-                <span class="kpi-value" id="kpiEmpresa">—</span>
-            </div>
-            <div class="kpi-right">
-                <div class="kpi-trend positive">+3% <span class="material-symbols-rounded" style="font-size:14px">trending_up</span></div>
-                <svg class="kpi-sparkline" viewBox="0 0 100 28" preserveAspectRatio="none"><polyline points="0,20 20,14 40,10 60,8 80,12 100,6" fill="none" stroke="#9B84E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
-            </div>
-        </div>
-        <div class="sa-kpi-card">
-            <div class="kpi-left">
-                <span class="kpi-title">Total Usuarios</span>
-                <span class="kpi-value" id="kpiUsuarios">—</span>
-            </div>
-            <div class="kpi-right">
-                <div class="kpi-trend positive">+8% <span class="material-symbols-rounded" style="font-size:14px">trending_up</span></div>
-                <svg class="kpi-sparkline" viewBox="0 0 100 28" preserveAspectRatio="none"><polyline points="0,22 20,18 40,14 60,12 80,10 100,8" fill="none" stroke="#6A4CC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
-            </div>
-        </div>
-        <div class="sa-kpi-card">
-            <div class="kpi-left">
-                <span class="kpi-title">Documentos</span>
-                <span class="kpi-value" id="kpiDocumentos">—</span>
-            </div> 
-            <div class="kpi-right">
-                <div class="kpi-trend negative">-1% <span class="material-symbols-rounded" style="font-size:14px">trending_down</span></div>
-                <svg class="kpi-sparkline" viewBox="0 0 100 28" preserveAspectRatio="none"><polyline points="0,12 20,16 40,20 60,22 80,20 100,24" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
-            </div>
-        </div>
-        <a href="{{ route('admin.buses.index') }}" class="sa-kpi-card text-decoration-none">
-            <div class="kpi-left">
-                <span class="kpi-title">Flota de Buses</span>
-                <span class="kpi-value" id="kpiBuses">—</span>
-            </div>
-            <div class="kpi-right">
-                <span class="material-symbols-rounded text-primary" style="font-size: 2.5rem; opacity: 0.2;">directions_bus</span>
-            </div>
-        </a>
-    </section>
-
-    <section style="margin-top:1rem;">
+    <section class="sa-charts-grid">
         <div class="sa-chart-card" style="max-width:600px;">
             <h4>
                 <span class="material-symbols-rounded" style="font-size:1rem;color:var(--p);font-variation-settings:'FILL' 1">pie_chart</span>
                 Distribución: Usuarios vs Documentos
             </h4>
             <canvas id="chartUsersDocs" width="600" height="300"></canvas>
+        </div>
+        <div class="sa-chart-card" style="max-width:600px;">
+            <h4>
+                <span class="material-symbols-rounded" style="font-size:1rem;color:var(--p);font-variation-settings:'FILL' 1">bar_chart</span>
+                Buses por Estado
+            </h4>
+            <canvas id="chartBusesEstado" width="600" height="300"></canvas>
+        </div>
+        <div class="sa-chart-card" style="max-width:600px;">
+            <h4>
+                <span class="material-symbols-rounded" style="font-size:1rem;color:var(--p);font-variation-settings:'FILL' 1">timeline</span>
+                Viajes por Ruta
+            </h4>
+            <canvas id="chartViajesRuta" width="600" height="300"></canvas>
         </div>
     </section>
 
