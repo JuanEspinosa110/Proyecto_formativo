@@ -276,52 +276,6 @@
 </div>
 
 {{-- MODAL EDITAR --}}
-<<<<<<< HEAD
-<div class="modal fade" id="editarModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-            <form id="formEditar" method="POST">
-                @csrf
-                @method('PUT')
-
-                <div class="modal-header bg-warning">
-                    <h5 class="modal-title">Editar Estado</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Nombre</label>
-                        <input type="text"
-                               name="nombre_estado"
-                               id="editNombre"
-                               class="form-control"
-                               required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Descripción</label>
-                        <input type="text"
-                               name="descripcion"
-                               id="editDescripcion"
-                               class="form-control">
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">
-                        Guardar Cambios
-                    </button>
-                    <button type="button" class="btn btn-secondary"
-                            data-bs-dismiss="modal">
-                        Cancelar
-                    </button>
-                </div>
-
-            </form>
-
-=======
 <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0 shadow">
@@ -346,33 +300,12 @@
                     <button type="submit" class="btn btn-warning px-4 text-dark">Guardar Cambios</button>
                 </div>
             </form>
->>>>>>> origin/develop
         </div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-<<<<<<< HEAD
-
-    var editarModal = document.getElementById('editarModal');
-
-    editarModal.addEventListener('show.bs.modal', function (event) {
-
-        var button = event.relatedTarget;
-
-        var id = button.getAttribute('data-id');
-        var nombre = button.getAttribute('data-nombre');
-        var descripcion = button.getAttribute('data-descripcion');
-
-        var form = document.getElementById('formEditar');
-        form.action = "{{ url('superadmin/estados') }}/" + id;
-
-        document.getElementById('editNombre').value = nombre;
-        document.getElementById('editDescripcion').value = descripcion;
-    });
-
-=======
     var editarModal = document.getElementById('editarModal');
     if (editarModal) {
         editarModal.addEventListener('show.bs.modal', function (event) {
@@ -407,7 +340,6 @@ document.addEventListener('DOMContentLoaded', function () {
             myModal.show();
         @endif
     @endif
->>>>>>> origin/develop
 });
 </script>
 

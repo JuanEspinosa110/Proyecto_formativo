@@ -20,20 +20,11 @@ class RutaService
     {
         $query = Ruta::with(['estado', 'ciudad', 'barrioOrigen', 'barrioDestino']);
 
-<<<<<<< HEAD
-        // Búsqueda por ciudad, barrios o código de ruta
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('codigo_ruta', 'like', "%{$search}%")
-                  ->orWhereHas('ciudad', function($sq) use ($search) {
-=======
         // Búsqueda por ciudad o barrios
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->whereHas('ciudad', function($sq) use ($search) {
->>>>>>> origin/develop
                       $sq->where('nombre_city', 'like', "%{$search}%");
                   })
                   ->orWhereHas('barrioOrigen', function($sq) use ($search) {
@@ -130,13 +121,8 @@ class RutaService
         $sheet = $spreadsheet->getActiveSheet();
 
         // Encabezados Estándar
-<<<<<<< HEAD
-        $headers = ['ID Ruta', 'Código', 'Ciudad', 'Barrio Origen', 'Barrio Destino', 'Estado'];
-        $cols = ['A', 'B', 'C', 'D', 'E', 'F'];
-=======
         $headers = ['ID Ruta', 'Ciudad', 'Barrio Origen', 'Barrio Destino', 'Estado'];
         $cols = ['A', 'B', 'C', 'D', 'E'];
->>>>>>> origin/develop
 
         foreach ($cols as $index => $col) {
             $sheet->setCellValue($col . '1', $headers[$index]);
@@ -148,18 +134,10 @@ class RutaService
         $row = 2;
         foreach ($rutas as $ruta) {
             $sheet->setCellValue('A' . $row, $ruta->id_ruta);
-<<<<<<< HEAD
-            $sheet->setCellValue('B' . $row, $ruta->codigo_ruta);
-            $sheet->setCellValue('C' . $row, optional($ruta->ciudad)->nombre_city ?? '—');
-            $sheet->setCellValue('D' . $row, optional($ruta->barrioOrigen)->nombre ?? '—');
-            $sheet->setCellValue('E' . $row, optional($ruta->barrioDestino)->nombre ?? '—');
-            $sheet->setCellValue('F' . $row, optional($ruta->estado)->nombre_estado ?? '—');
-=======
             $sheet->setCellValue('B' . $row, optional($ruta->ciudad)->nombre_city ?? '—');
             $sheet->setCellValue('C' . $row, optional($ruta->barrioOrigen)->nombre ?? '—');
             $sheet->setCellValue('D' . $row, optional($ruta->barrioDestino)->nombre ?? '—');
             $sheet->setCellValue('E' . $row, optional($ruta->estado)->nombre_estado ?? '—');
->>>>>>> origin/develop
             $row++;
         }
 
@@ -167,11 +145,7 @@ class RutaService
         foreach ($cols as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
-<<<<<<< HEAD
-        $sheet->getStyle('A1:F' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-=======
         $sheet->getStyle('A1:E' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
->>>>>>> origin/develop
 
         $writer = new Xlsx($spreadsheet);
         $filename = 'Reporte_Rutas_' . date('Ymd_His') . '.xlsx';

@@ -14,12 +14,9 @@ class TipoEmpresa extends Model
     protected $fillable = [
         'nombre_tipo'
     ];
-<<<<<<< HEAD
-=======
 
     public function empresa()
     {
         return $this->hasMany(Empresa::class, 'id_tipo_empresa', 'id_tipo_empresa');
     }
->>>>>>> origin/develop
 }

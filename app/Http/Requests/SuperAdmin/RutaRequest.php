@@ -24,10 +24,6 @@ class RutaRequest extends FormRequest
         $idCiudad = $this->input('id_ciudad');
 
         return [
-<<<<<<< HEAD
-            'id_ciudad' => [
-                'required',
-=======
 
             'codigo_ruta' => [
                 'required',
@@ -52,7 +48,6 @@ class RutaRequest extends FormRequest
 
             'id_ciudad' => [
                 'required',
->>>>>>> origin/develop
                 'string',
                 'size:6',
                 'regex:/^[0-9]+$/',
@@ -84,7 +79,6 @@ class RutaRequest extends FormRequest
                         if ($exists) {
                             $fail("Esta ruta (mismo origen y destino en esta ciudad) ya está registrada.");
                         }
-<<<<<<< HEAD
                     }
                 }
             ],
@@ -104,33 +98,6 @@ class RutaRequest extends FormRequest
                     }
                 }
             ],
-            'codigo_ruta' => [
-                'required',
-                'regex:/^0?[0-9]+$/',
-                'integer',
-                'between:1,90'
-            ],
-=======
-                    }
-                }
-            ],
-            'id_barrio_destino' => [
-                'required',
-                'integer',
-                'min:1',
-                'regex:/^[0-9]+$/',
-                'exists:barrio,id_barrio',
-                'different:id_barrio_origen',
-                function ($attribute, $value, $fail) use ($idCiudad) {
-                    if ($idCiudad) {
-                        $barrio = Barrio::where('id_barrio', $value)->first();
-                        if ($barrio && $barrio->id_ciudad !== $idCiudad) {
-                            $fail('El barrio de destino debe pertenecer a la ciudad seleccionada.');
-                        }
-                    }
-                }
-            ],
->>>>>>> origin/develop
             'id_estado' => 'required|exists:estado,id_estado',
         ];
     }
@@ -138,15 +105,12 @@ class RutaRequest extends FormRequest
     public function messages(): array
     {
         return [
-<<<<<<< HEAD
-=======
             'codigo_ruta.required' => 'El código de ruta es obligatorio.',
             'codigo_ruta.integer' => 'El código debe ser numérico.',
             'codigo_ruta.regex' => 'El código debe ser numérico y no puede iniciar en 0.',
             'codigo_ruta.unique' => 'Este código de ruta ya está registrado.',
             'codigo_ruta.max' => 'El código de ruta no puede ser mayor a 99.',
             'codigo_ruta.min' => 'El código debe ser mayor a 0.',
->>>>>>> origin/develop
             'id_ciudad.required' => 'La ciudad es obligatoria.',
             'id_ciudad.size' => 'La ciudad debe tener exactamente 6 caracteres.',
             'id_ciudad.regex' => 'La ciudad solo puede contener números.',

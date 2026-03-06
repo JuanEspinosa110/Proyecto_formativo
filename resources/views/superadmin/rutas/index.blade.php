@@ -89,12 +89,7 @@
                 <tbody>
                     @forelse($rutas as $ruta)
                         <tr class="border-top">
-<<<<<<< HEAD
-                            <td class="ps-4 text-muted small fw-bold">#{{ $ruta->id_ruta }}</td>
-                            <td class="text-dark small fw-bold">{{ $ruta->codigo_ruta }}</td>
-=======
                             <td class="ps-4 text-muted small fw-bold">#{{ $ruta->codigo_ruta }}</td>
->>>>>>> origin/develop
                             <td class="text-uppercase small fw-medium text-muted">
                                 {{ optional($ruta->ciudad)->nombre_city ?? '—' }}
                             </td>
@@ -168,9 +163,6 @@
                     <div id="create-errors-alert" class="alert alert-danger d-none shadow-sm py-2 small mb-4"></div>
 
                     <div class="row g-3">
-<<<<<<< HEAD
-                        <div class="col-md-6">
-=======
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">
                                 Código de Ruta <span class="text-danger">*</span>
@@ -181,7 +173,6 @@
                             <div class="invalid-feedback feedback-codigo_ruta"></div>
                         </div>
                         <div class="col-12">
->>>>>>> origin/develop
                             <label class="form-label small fw-bold text-muted text-uppercase">Ciudad <span class="text-danger">*</span></label>
                             <select name="id_ciudad" class="form-select bg-light border-0 py-2" required>
                                 @foreach($ciudades as $ciu)
@@ -249,9 +240,6 @@
                     <div id="edit-errors-alert" class="alert alert-danger d-none shadow-sm py-2 small mb-4"></div>
 
                     <div class="row g-3">
-<<<<<<< HEAD
-                        <div class="col-md-6">
-=======
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">
                                 Código de Ruta <span class="text-danger">*</span>
@@ -262,7 +250,6 @@
                             <div class="invalid-feedback feedback-codigo_ruta"></div>
                         </div>
                         <div class="col-12">
->>>>>>> origin/develop
                             <label class="form-label small fw-bold text-muted text-uppercase">Ciudad <span class="text-danger">*</span></label>
                             <select name="id_ciudad" id="edit_id_ciudad" class="form-select bg-light border-0 py-2" required>
                                 @foreach($ciudades as $ciu)

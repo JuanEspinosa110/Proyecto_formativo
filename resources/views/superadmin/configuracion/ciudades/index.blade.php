@@ -440,34 +440,6 @@
     </div>
 </div>
 
-<<<<<<< HEAD
-@endsection
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-
-        const editarModal = document.getElementById('editarCiudadModal');
-        const form = document.getElementById('formEditarCiudad');
-
-        editarModal.addEventListener('show.bs.modal', function(event) {
-
-            const button = event.relatedTarget;
-
-            const id = button.getAttribute('data-id');
-            const nombre = button.getAttribute('data-nombre');
-            const departamento = button.getAttribute('data-departamento');
-
-            document.getElementById('editNombre').value = nombre;
-            document.getElementById('editDepartamento').value = departamento;
-
-            form.action = "{{ route('superadmin.ciudades.update', ':id') }}".replace(':id', id);
-        });
-
-    });
-</script>
-@endpush
-=======
 {{-- MODAL EDITAR --}}
 <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
@@ -553,4 +525,3 @@
 </script>
 
 @endsection
->>>>>>> origin/develop
