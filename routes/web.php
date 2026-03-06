@@ -5,8 +5,13 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
+<<<<<<< HEAD
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 
+=======
+use Illuminate\Http\Request;
+use App\Http\Controllers\SuperAdmin\EstadoController;
+>>>>>>> f31dff1adf54449ad08bd0def50691dd807aff5f
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
     RolController,

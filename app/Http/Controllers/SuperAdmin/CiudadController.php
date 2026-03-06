@@ -47,7 +47,17 @@ class CiudadController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre_city' => 'required|string|max:100',
+            'nombre_city' => [
+                'required',
+                'string',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    $exists = Ciudad::whereRaw('LOWER(nombre_city) = ?', [strtolower($value)])->exists();
+                    if ($exists) {
+                        $fail('La ciudad "' . $value . '" ya se encuentra registrada en el sistema.');
+                    }
+                }
+            ],
             'id_departamento' => 'required|exists:departamento,id_departamento'
         ], [
             'nombre_city.required' => 'El nombre de la ciudad es obligatorio.',
@@ -56,13 +66,19 @@ class CiudadController extends Controller
             'id_departamento.exists' => 'El departamento seleccionado no es válido.'
         ]);
 
+        // Generar ID único de 5 dígitos
+        do {
+            $id_ciudad = str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
+        } while (Ciudad::where('id_ciudad', $id_ciudad)->exists());
+
         Ciudad::create([
+            'id_ciudad' => $id_ciudad,
             'nombre_city' => strtoupper($request->nombre_city),
             'id_departamento' => $request->id_departamento
         ]);
 
         return redirect()->back()->with('success',
-            'Ciudad creada correctamente.');
+            'Ciudad creada correctamente con el código: ' . $id_ciudad);
     }
 
     /*
@@ -75,7 +91,19 @@ class CiudadController extends Controller
         $ciudad = Ciudad::findOrFail($id);
 
         $request->validate([
-            'nombre_city' => 'required|string|max:100',
+            'nombre_city' => [
+                'required',
+                'string',
+                'max:100',
+                function ($attribute, $value, $fail) use ($id) {
+                    $exists = Ciudad::whereRaw('LOWER(nombre_city) = ?', [strtolower($value)])
+                        ->where('id_ciudad', '!=', $id)
+                        ->exists();
+                    if ($exists) {
+                        $fail('La ciudad "' . $value . '" ya existe registrada en el sistema.');
+                    }
+                }
+            ],
             'id_departamento' => 'required|exists:departamento,id_departamento'
         ], [
             'nombre_city.required' => 'El nombre de la ciudad es obligatorio.',
