@@ -76,16 +76,6 @@
                     <span class="material-symbols-rounded">layers</span>
                     <span>Planes</span>
                 </a>
-                <a href="{{ route('superadmin.rutas.index') }}"
-                    class="sigu-nl {{ request()->routeIs('superadmin.rutas.*') ? 'active' : '' }}">
-                    <span class="material-symbols-rounded">map</span>
-                    <span>Rutas</span>
-                </a>
-                <a href="{{ route('superadmin.barrios.index') }}"
-                    class="sigu-nl {{ request()->routeIs('superadmin.barrios.*') ? 'active' : '' }}">
-                    <span class="material-symbols-rounded">location_city</span>
-                    <span>Barrios</span>
-                </a>
             </nav>
             <div class="dropdown">
             <a href="#"
@@ -93,7 +83,7 @@
             {{ request()->routeIs('superadmin.ciudades.*') ||
                 request()->routeIs('superadmin.tipo-empresa.*') ||
                 request()->routeIs('superadmin.tipo_usuario.*') ||
-                request()->routeIs('superadmin.estados.*') ? 'active' : '' }}"
+                request()->routeIs('superadmin.estados.*') ? 'active' : '' }}||"
             data-bs-toggle="dropdown"
             aria-expanded="false">
 
@@ -108,6 +98,22 @@
                     <a class="dropdown-item"
                     href="{{ route('superadmin.ciudades.index') }}">
                         <i class="bi bi-geo-alt"></i> Ciudades
+                    </a>
+                </li>
+
+                {{-- BARRIOS --}}
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.barrios.index') }}">
+                        <i class="bi bi-geo-fill"></i> Barrios
+                    </a>
+                </li>
+
+                {{-- RUTAS --}}
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.rutas.index') }}">
+                        <i class="bi bi-map"></i> Rutas
                     </a>
                 </li>
 
