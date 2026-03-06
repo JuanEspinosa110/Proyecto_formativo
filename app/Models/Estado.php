@@ -38,4 +38,12 @@ class Estado extends Model
     {
         return $this->hasMany(Empresa::class, 'id_estado', 'id_estado');
     }
+
+    /**
+     * Relación con TipoDocumento
+     */
+    public function tipoDocumentos()
+    {
+        return $this->hasMany(TipoDocumento::class, 'id_estado', 'id_estado');
+    }
 }

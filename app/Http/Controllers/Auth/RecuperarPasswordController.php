@@ -108,16 +108,14 @@ class RecuperarPasswordController extends Controller
                 $usuario = Usuario::where('correo', $correo)->first();
 
                 if ($usuario) {
-                    $usuario->update([
-                        'password' => Hash::make($request->password)
-                    ]);
+                    Usuario::where('correo', $correo)
+                        ->update(['password' => Hash::make($request->password)]);
                 } else {
                     $superadmin = SuperAdministrador::where('correo', $correo)->first();
 
                     if ($superadmin) {
-                        $superadmin->update([
-                            'password' => Hash::make($request->password)
-                        ]);
+                        SuperAdministrador::where('correo', $correo)
+                            ->update(['password' => Hash::make($request->password)]);
                     } else {
                          return redirect()->route('recuperar')
                             ->withErrors('No se encontró un usuario asociado a ese correo.');

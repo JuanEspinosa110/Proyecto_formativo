@@ -43,6 +43,11 @@ class Empresa extends Model
     {
         return $this->hasMany(Usuario::class, 'NIT', 'NIT');
     }
+    
+    public function tipoEmpresa()
+    {
+        return $this->belongsTo(TipoEmpresa::class, 'id_tipo_empresa', 'id_tipo_empresa');
+    }
 
     public function getNombreCompletoRepresentanteAttribute()
     {

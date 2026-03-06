@@ -80,10 +80,14 @@
             <div class="dropdown">
             <a href="#"
             class="sigu-nl dropdown-toggle 
+<<<<<<< HEAD
             {{ request()->routeIs('superadmin.ciudades.*') ||
                 request()->routeIs('superadmin.tipo-empresa.*') ||
                 request()->routeIs('superadmin.tipo_usuario.*') ||
                 request()->routeIs('superadmin.estados.*') ? 'active' : '' }}||"
+=======
+            {{ request()->routeIs('superadmin.configuracion.*') ? 'active' : '' }}"
+>>>>>>> origin/develop
             data-bs-toggle="dropdown"
             aria-expanded="false">
 
@@ -96,11 +100,16 @@
                 {{-- CIUDADES --}}
                 <li>
                     <a class="dropdown-item"
+<<<<<<< HEAD
                     href="{{ route('superadmin.ciudades.index') }}">
+=======
+                    href="{{ route('superadmin.configuracion.ciudades.index') }}">
+>>>>>>> origin/develop
                         <i class="bi bi-geo-alt"></i> Ciudades
                     </a>
                 </li>
 
+<<<<<<< HEAD
                 {{-- BARRIOS --}}
                 <li>
                     <a class="dropdown-item"
@@ -121,6 +130,12 @@
                 <li>
                     <a class="dropdown-item"
                     href="{{ route('superadmin.tipo-empresa.index') }}">
+=======
+                {{-- TIPOS DE EMPRESA --}}
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.tipo-empresa.index') }}">
+>>>>>>> origin/develop
                         <i class="bi bi-building"></i> Tipos de Empresa
                     </a>
                 </li>
@@ -128,7 +143,11 @@
                 {{-- TIPOS DE USUARIO --}}
                 <li>
                     <a class="dropdown-item"
+<<<<<<< HEAD
                     href="{{ route('superadmin.tipo_usuario.index') }}">
+=======
+                    href="{{ route('superadmin.configuracion.tipo-usuario.index') }}">
+>>>>>>> origin/develop
                         <i class="bi bi-people"></i> Tipos de Usuario
                     </a>
                 </li>
@@ -136,6 +155,7 @@
                 {{-- ESTADOS --}}
                 <li>
                     <a class="dropdown-item"
+<<<<<<< HEAD
                     href="{{ route('superadmin.estados.index') }}">
                         <i class="bi bi-toggle-on"></i> Estados
                     </a>
@@ -148,6 +168,30 @@
                     </a>
                 </li>
 
+=======
+                    href="{{ route('superadmin.configuracion.estados.index') }}">
+                        <i class="bi bi-toggle-on"></i> Estados
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.tipo-mantenimiento.index') }}">
+                        <i class="bi bi-tools"></i> Tipo de Mantenimiento
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.tipo-documento.index') }}">
+                        <i class="bi bi-file-earmark-text"></i> Tipo de Documento
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.tipo-asignacion.index') }}">
+                        <i class="bi bi-journal-check"></i> Tipo de Asignación
+                    </a>
+                </li>
+>>>>>>> origin/develop
             </ul>
         </div>
 

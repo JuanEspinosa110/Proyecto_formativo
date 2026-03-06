@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\StoreUsuarioRequest;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use App\Models\Usuario;
 
 class UsuarioController extends Controller
 {
@@ -39,4 +43,40 @@ class UsuarioController extends Controller
 
         return view('admin.usuarios.index', compact('usuarios', 'roles', 'selectedRole'));
     }
+
+    public function store(StoreUsuarioRequest $request)
+    {
+        $passwordGenerada = Str::random(10);
+
+        Usuario::create([
+            'nombre' => $request->nombre,
+            'apellido' => $request->apellido,
+            'doc_usuario' => $request->doc_usuario,
+            'correo' => $request->correo,
+            'telefono' => $request->telefono,
+            'rol' => $request->rol,
+            'estado' => $request->estado,
+            'password' => Hash::make($passwordGenerada)
+        ]);
+
+        return redirect()
+            ->route('admin.usuarios.index')
+            ->with('password_generada', $passwordGenerada, 'success', 'Usuario creado correctamente.');
+    }
+
+
+    public function inactivar($doc)
+    {
+        DB::table('usuario')
+            ->where('doc_usuario', $doc)
+            ->update([
+                'id_estado' => 2 // estado inactivo
+            ]);
+
+        return redirect()
+            ->route('admin.usuarios.index')
+            ->with('success', 'Usuario inactivado correctamente');
+    }
+
+
 }

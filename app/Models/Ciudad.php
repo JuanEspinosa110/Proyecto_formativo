@@ -11,6 +11,7 @@ class Ciudad extends Model
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
+    protected $keyType = 'string'; // Forza a que se trate como texto
 
     protected $fillable = [
         'nombre_city',

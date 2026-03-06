@@ -2,6 +2,7 @@
 
 @section('content')
 
+<<<<<<< HEAD
 @if(session('success'))
 <div class="alert alert-success alert-dismissible fade show">
     {{ session('success') }}
@@ -113,33 +114,107 @@
                             data-bs-dismiss="modal">Cancelar</button>
                 </div>
 
-            </form>
-        </div>
-    </div>
-</div>
+=======
+<div class="container-fluid px-4">
+    <div class="row mt-4">
+        <div class="col-12">
+            @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            @endif
 
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function(){
+            @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                @foreach ($errors->all() as $error)
+                {{ $error }}
+                @endforeach
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            @endif
 
-    const modal = document.getElementById('editarModal');
-    const form = document.getElementById('formEditar');
+            {{-- HEADER Y BOTONES --}}
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Tipos de Empresa</h1>
+                <div>
+                    <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#crearModal">
+                        <i class="fas fa-plus me-1"></i> Crear Nuevo
+                    </button>
+                    <a href="{{ route('superadmin.configuracion.tipo-empresa.export', ['buscar' => request('buscar')]) }}" class="btn btn-success shadow-sm ms-2">
+                        <i class="fas fa-file-excel me-1"></i> Exportar Excel
+                    </a>
+                </div>
+            </div>
 
-    modal.addEventListener('show.bs.modal', function(event){
+            @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            @endif
 
-        const button = event.relatedTarget;
+            {{-- BUSCADOR --}}
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <form method="GET" action="{{ route('superadmin.configuracion.tipo-empresa.index') }}" class="row g-3">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" name="buscar" value="{{ request('buscar') }}" class="form-control border-start-0" placeholder="Buscar por nombre...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-secondary w-100">Filtrar</button>
+                        </div>
+                        @if(request('buscar'))
+                        <div class="col-md-2">
+                            <a href="{{ route('superadmin.configuracion.tipo-empresa.index') }}" class="btn btn-outline-secondary w-100">Limpiar</a>
+                        </div>
+                        @endif
+                    </form>
+                </div>
+            </div>
 
-        const id = button.getAttribute('data-id');
-        const nombre = button.getAttribute('data-nombre');
+            {{-- TABLA --}}
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-muted text-uppercase small">
+                                <tr>
+                                    
 
-        document.getElementById('editNombre').value = nombre;
+                var form = document.getElementById('formEditar');
+                form.action = "{{ url('superadmin/configuracion/tipo-empresa') }}/" + id;
 
-        form.action = "{{ route('superadmin.tipo-empresa.update', ':id') }}"
-            .replace(':id', id);
+                document.getElementById('editNombre').value = nombre;
+
+                // Save ID for reopening on validation error
+                sessionStorage.setItem('last_edit_id_tipo_empresa', id);
+            });
+        }
+
+        // Redirect error to correct modal
+        @if($errors->any())
+        @if(old('_method') == 'PUT')
+        var lastEditId = sessionStorage.getItem('last_edit_id_tipo_empresa');
+        if (lastEditId) {
+            var form = document.getElementById('formEditar');
+            form.action = "{{ url('superadmin/configuracion/tipo-empresa') }}/" + lastEditId;
+            var myModal = new bootstrap.Modal(document.getElementById('editarModal'));
+            myModal.show();
+        }
+        @else
+        var myModal = new bootstrap.Modal(document.getElementById('crearModal'));
+        myModal.show();
+        @endif
+        @endif
     });
-
-});
 </script>
-@endpush
+>>>>>>> origin/develop
 
 @endsection
