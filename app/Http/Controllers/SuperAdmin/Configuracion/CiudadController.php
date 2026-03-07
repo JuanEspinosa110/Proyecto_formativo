@@ -68,11 +68,18 @@ class CiudadController extends Controller
 
     public function storeDepartamento(Request $request)
     {
+        // 1. Validamos incluyendo el id_departamento
         $data = $request->validate([
-            'nombre_departamento' => 'required|string|max:100'
+            'id_departamento'     => 'required|string|size:2|unique:departamento,id_departamento',
+            'nombre_departamento' => 'required|string|max:100|unique:departamento,nombre_departamento'
+        ], [
+            'id_departamento.unique' => 'Este código de departamento ya existe.',
+            'id_departamento.size'   => 'El código debe ser de exactamente 2 dígitos.'
         ]);
 
+        // 2. Ahora sí pasamos el array con las dos llaves al Service
         $this->service->storeDepartamento($data);
+
         return redirect()->back()->with('success', 'Departamento creado correctamente.');
     }
 

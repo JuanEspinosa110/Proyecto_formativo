@@ -76,8 +76,10 @@ class CiudadService
             'nombre_departamento'
         );
 
+        // Creamos el registro con los datos que vienen del controlador
         return Departamento::create([
-            'nombre_departamento' => $data['nombre_departamento']
+            'id_departamento' => $data['id_departamento'],
+            'nombre_departamento' => strtoupper($data['nombre_departamento'])
         ]);
     }
 

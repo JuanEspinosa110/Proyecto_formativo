@@ -1,4 +1,3 @@
-
 @extends('superadmin.layouts.admin')
 
 @section('title', 'Rutas — SIGU')
@@ -47,9 +46,9 @@
                     <select name="id_estado" class="form-select bg-light">
                         <option value="">Estados (Todos)</option>
                         @foreach($estados as $est)
-                            <option value="{{ $est->id_estado }}" {{ request('id_estado') == $est->id_estado ? 'selected' : '' }}>
-                                {{ $est->nombre_estado }}
-                            </option>
+                        <option value="{{ $est->id_estado }}" {{ request('id_estado') == $est->id_estado ? 'selected' : '' }}>
+                            {{ $est->nombre_estado }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -83,51 +82,51 @@
                 </thead>
                 <tbody>
                     @forelse($rutas as $ruta)
-                        <tr class="border-top">
-                            <td class="ps-4 text-muted small fw-bold">#{{ $ruta->codigo_ruta }}</td>
-                            <td class="text-uppercase small fw-medium text-muted">
-                                {{ optional($ruta->ciudad)->nombre_city ?? '—' }}
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="badge bg-primary bg-opacity-10 text-primary fs-xs">ORI</span>
-                                    <span class="fw-semibold text-dark">{{ optional($ruta->barrioOrigen)->nombre ?? '—' }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="badge bg-success bg-opacity-10 text-success fs-xs">DES</span>
-                                    <span class="fw-semibold text-dark">{{ optional($ruta->barrioDestino)->nombre ?? '—' }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                @php
-                                    $bad = match($ruta->id_estado) {
-                                        1, 9 => 'success',
-                                        2 => 'danger',
-                                        default => 'warning'
-                                    };
-                                @endphp
-                                <span class="badge bg-{{ $bad }}-subtle text-{{ $bad }} border border-{{ $bad }} rounded-pill px-3 py-1 fw-bold fs-xs">
-                                    {{ optional($ruta->estado)->nombre_estado ?? '—' }}
-                                </span>
-                            </td>
-                            <td class="text-end pe-4">
-                                <button class="btn btn-outline-primary btn-sm rounded-3 edit-ruta shadow-sm px-3 fw-semibold" 
-                                        data-bs-toggle="modal" data-bs-target="#modalEditRuta"
-                                        data-json="{{ json_encode($ruta) }}">
-                                    <span class="material-symbols-rounded" style="font-size: 1.1rem; vertical-align: middle;">edit_square</span>
-                                    Modificar
-                                </button>
-                            </td>
-                        </tr>
+                    <tr class="border-top">
+                        <td class="ps-4 text-muted small fw-bold">#{{ $ruta->codigo_ruta }}</td>
+                        <td class="text-uppercase small fw-medium text-muted">
+                            {{ optional($ruta->ciudad)->nombre_city ?? '—' }}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary bg-opacity-10 text-primary fs-xs">ORI</span>
+                                <span class="fw-semibold text-dark">{{ optional($ruta->barrioOrigen)->nombre ?? '—' }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-success bg-opacity-10 text-success fs-xs">DES</span>
+                                <span class="fw-semibold text-dark">{{ optional($ruta->barrioDestino)->nombre ?? '—' }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            @php
+                            $bad = match($ruta->id_estado) {
+                            1, 9 => 'success',
+                            2 => 'danger',
+                            default => 'warning'
+                            };
+                            @endphp
+                            <span class="badge bg-{{ $bad }}-subtle text-{{ $bad }} border border-{{ $bad }} rounded-pill px-3 py-1 fw-bold fs-xs">
+                                {{ optional($ruta->estado)->nombre_estado ?? '—' }}
+                            </span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-outline-primary btn-sm rounded-3 edit-ruta shadow-sm px-3 fw-semibold"
+                                data-bs-toggle="modal" data-bs-target="#modalEditRuta"
+                                data-json="{{ json_encode($ruta) }}">
+                                <span class="material-symbols-rounded" style="font-size: 1.1rem; vertical-align: middle;">edit_square</span>
+                                Modificar
+                            </button>
+                        </td>
+                    </tr>
                     @empty
-                        <tr>
-                            <td colspan="6" class="text-center py-5 text-muted bg-light bg-opacity-50">
-                                <span class="material-symbols-rounded display-4 opacity-25">route</span>
-                                <p class="mt-2 fw-medium mb-0">No se encontraron rutas con los filtros aplicados.</p>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted bg-light bg-opacity-50">
+                            <span class="material-symbols-rounded display-4 opacity-25">route</span>
+                            <p class="mt-2 fw-medium mb-0">No se encontraron rutas con los filtros aplicados.</p>
+                        </td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -162,9 +161,9 @@
                             <label class="form-label small fw-bold text-muted text-uppercase">Ciudad <span class="text-danger">*</span></label>
                             <select name="id_ciudad" class="form-select bg-light border-0 py-2" required>
                                 @foreach($ciudades as $ciu)
-                                    @if($ciu->id_ciudad == '730001')
-                                        <option value="{{ $ciu->id_ciudad }}" selected>{{ $ciu->nombre_city }}</option>
-                                    @endif
+                                @if($ciu->id_ciudad == '730001')
+                                <option value="{{ $ciu->id_ciudad }}" selected>{{ $ciu->nombre_city }}</option>
+                                @endif
                                 @endforeach
                             </select>
                             <div class="invalid-feedback feedback-id_ciudad"></div>
@@ -177,14 +176,14 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Origen <span class="text-danger">*</span></label>
                             <select name="id_barrio_origen" id="create_id_barrio_origen" class="form-select bg-light border-0 py-2" required>
-                                <option value="" selected >Seleccionar Ciudad primero...</option>
+                                <option value="" selected>Seleccionar Ciudad primero...</option>
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_origen"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Destino <span class="text-danger">*</span></label>
                             <select name="id_barrio_destino" id="create_id_barrio_destino" class="form-select bg-light border-0 py-2" required disabled>
-                                <option value="" selected >Seleccionar Ciudad primero...</option>
+                                <option value="" selected>Seleccionar Ciudad primero...</option>
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_destino"></div>
                         </div>
@@ -193,7 +192,7 @@
                             <select name="id_estado" class="form-select bg-light border-0 py-2" required>
                                 <option value="" selected disabled>Seleccionar...</option>
                                 @foreach($estados as $est)
-                                    <option value="{{ $est->id_estado }}">{{ $est->nombre_estado }}</option>
+                                <option value="{{ $est->id_estado }}">{{ $est->nombre_estado }}</option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback feedback-id_estado"></div>
@@ -227,21 +226,12 @@
 
                     <div class="row g-3">
                         <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">
-                                Código de Ruta <span class="text-danger">*</span>
-                            </label>
-                            <input type="number" name="codigo_ruta" 
-                                class="form-control bg-light border-0 py-2" 
-                                required>
-                            <div class="invalid-feedback feedback-codigo_ruta"></div>
-                        </div>
-                        <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Ciudad <span class="text-danger">*</span></label>
                             <select name="id_ciudad" id="edit_id_ciudad" class="form-select bg-light border-0 py-2" required>
                                 @foreach($ciudades as $ciu)
-                                    @if($ciu->id_ciudad == '730001')
-                                        <option value="{{ $ciu->id_ciudad }}" selected>{{ $ciu->nombre_city }}</option>
-                                    @endif
+                                @if($ciu->id_ciudad == '730001')
+                                <option value="{{ $ciu->id_ciudad }}" selected>{{ $ciu->nombre_city }}</option>
+                                @endif
                                 @endforeach
                             </select>
                             <div class="invalid-feedback feedback-id_ciudad"></div>
@@ -254,34 +244,18 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Origen <span class="text-danger">*</span></label>
                             <select name="id_barrio_origen" id="edit_id_barrio_origen" class="form-select bg-light border-0 py-2" required>
-<<<<<<< HEAD
-                                <option value="" selected disabled>Seleccionar...</option>
-=======
-<<<<<<< HEAD
-                                <option value="" selected disabled>Seleccionar...</option>
-=======
                                 @foreach($barrios as $bar)
-                                    <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
+                                <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
                                 @endforeach
->>>>>>> 46a0f22cc73e44ddec95c253bea0afad04e6f84e
->>>>>>> origin/develop
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_origen"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Destino <span class="text-danger">*</span></label>
                             <select name="id_barrio_destino" id="edit_id_barrio_destino" class="form-select bg-light border-0 py-2" required>
-<<<<<<< HEAD
-                                <option value="" selected disabled>Seleccionar...</option>
-=======
-<<<<<<< HEAD
-                                <option value="" selected disabled>Seleccionar...</option>
-=======
                                 @foreach($barrios as $bar)
-                                    <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
+                                <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
                                 @endforeach
->>>>>>> 46a0f22cc73e44ddec95c253bea0afad04e6f84e
->>>>>>> origin/develop
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_destino"></div>
                         </div>
@@ -289,7 +263,7 @@
                             <label class="form-label small fw-bold text-muted text-uppercase">Estado <span class="text-danger">*</span></label>
                             <select name="id_estado" id="edit_id_estado" class="form-select bg-light border-0 py-2" required>
                                 @foreach($estados as $est)
-                                    <option value="{{ $est->id_estado }}">{{ $est->nombre_estado }}</option>
+                                <option value="{{ $est->id_estado }}">{{ $est->nombre_estado }}</option>
                                 @endforeach
                             </select>
                             <div class="invalid-feedback feedback-id_estado"></div>
@@ -311,26 +285,24 @@
         // Inicializar Modal de Edición
         document.querySelectorAll('.edit-ruta').forEach(btn => {
             btn.addEventListener('click', async function() {
-                const data = JSON.parse(this.dataset.json);
-<<<<<<< HEAD
+                const data = JSON.parse(this.dataset.json); // Obtiene los datos de la fila
                 const form = document.getElementById('formEditRuta');
-                
-                form.querySelector('[name="id_ciudad"]').value = data.id_ciudad || '';
-                form.querySelector('[name="codigo_ruta"]').value = data.codigo_ruta || '';
-=======
-                form.querySelector('[name="codigo_ruta"]').value = data.codigo_ruta || '';
-                const form = document.getElementById('formEditRuta');
-                
-                form.querySelector('[name="id_ciudad"]').value = data.id_ciudad || '';
->>>>>>> origin/develop
+
+                // 1. Limpiar validaciones previas
+                clearValidation('formEditRuta', 'edit-errors-alert');
+
+                // 2. Asignar valores básicos
+                form.querySelector('#edit_codigo_ruta').value = data.codigo_ruta;
+                form.querySelector('#edit_id_ciudad').value = data.id_ciudad;
                 form.querySelector('[name="id_estado"]').value = data.id_estado;
-                
-                // Cargar barrios de la ciudad seleccionada y luego setear los valores
+
+                // 3. IMPORTANTE: Cargar barrios y seleccionar los actuales
+                // Esperamos a que la petición AJAX termine para marcar el 'selected'
                 await loadBarrios(data.id_ciudad, 'edit_id_barrio_origen', data.id_barrio_origen);
                 await loadBarrios(data.id_ciudad, 'edit_id_barrio_destino', data.id_barrio_destino);
-                
+
+                // 4. Actualizar la URL del formulario para el UPDATE
                 form.action = `/superadmin/rutas/${data.id_ruta}`;
-                clearValidation('formEditRuta', 'edit-errors-alert');
             });
         });
 
@@ -380,17 +352,19 @@
                 e.preventDefault();
                 const btn = e.submitter;
                 const originalText = btn.innerHTML;
-                
+
                 btn.disabled = true;
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
-                
+
                 clearValidation(formId, alertId);
 
                 try {
                     const response = await fetch(form.action, {
                         method: 'POST',
                         body: new FormData(form),
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
                     });
 
                     if (response.ok) {
@@ -398,14 +372,16 @@
                         // Mostrar éxito antes de recargar
                         btn.classList.replace('btn-primary', 'btn-success');
                         btn.innerHTML = '<span class="material-symbols-rounded align-middle">check_circle</span> Guardado';
-                        
+
                         setTimeout(() => location.reload(), 800);
                     } else if (response.status === 422) {
                         const data = await response.json();
                         showValidationErrors(formId, alertId, data.errors);
                     } else {
                         const errorData = await response.json();
-                        alert('Error: ' + (errorData.message || 'Error técnico en el servidor.'));
+                        const alertContainer = document.getElementById(alertId);
+                        alertContainer.innerText = errorData.message || 'Ocurrió un error inesperado.';
+                        alertContainer.classList.remove('d-none');
                     }
                 } catch (err) {
                     console.error(err);
@@ -422,10 +398,10 @@
 
         function clearValidation(fId, aId) {
             const fm = document.getElementById(fId);
-            if(!fm) return;
+            if (!fm) return;
             fm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
             fm.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
-            if(aId) {
+            if (aId) {
                 const al = document.getElementById(aId);
                 al.classList.add('d-none');
                 al.innerHTML = '';
@@ -440,7 +416,7 @@
             Object.keys(errors).forEach(f => {
                 // Mapear campos a sus respectivos inputs en CREATE y EDIT
                 let inp = fm.querySelector(`[name="${f}"]`);
-                
+
                 if (inp) {
                     inp.classList.add('is-invalid');
                     const feed = fm.querySelector(`.feedback-${f}`);
@@ -452,7 +428,7 @@
                 }
             });
 
-            if(al && firstError) {
+            if (al && firstError) {
                 al.innerHTML = `<div class="d-flex align-items-center gap-2">
                     <span class="material-symbols-rounded">error</span>
                     <span>${firstError}</span>
@@ -473,32 +449,48 @@
             });
         }
     });
-<<<<<<< HEAD
-=======
 
+    // No permitir caracteres no numéricos 
+    document.addEventListener('input', function(e) {
+        if (e.target.name === 'codigo_ruta') {
+            // Eliminar todo lo que no sea número
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
 
-        // No permitir caracteres no numéricos 
-        document.addEventListener('input', function(e) {
-            if (e.target.name === 'codigo_ruta') {
-                // Eliminar todo lo que no sea número
-                e.target.value = e.target.value.replace(/[^0-9]/g, '');
-
-                // Evitar que empiece con 0
-                if (e.target.value.startsWith('0')) {
-                    e.target.value = e.target.value.replace(/^0+/, '');
-                }
+            // Evitar que empiece con 0
+            if (e.target.value.startsWith('0')) {
+                e.target.value = e.target.value.replace(/^0+/, '');
             }
-        });
->>>>>>> origin/develop
+        }
+    });
 </script>
 
 <style>
-    .fs-xs { font-size: 0.75rem; }
-    .btn-outline-primary:hover { border-color: transparent !important; }
-    .modal-content { border-radius: 1.25rem !important; }
-    .table-hover tbody tr:hover { background-color: rgba(94, 84, 142, 0.04) !important; cursor: default; }
-    .is-invalid { border-color: #dc3545 !important; background-image: none !important; }
-    .invalid-feedback { font-weight: 500; font-size: 0.8rem; }
+    .fs-xs {
+        font-size: 0.75rem;
+    }
+
+    .btn-outline-primary:hover {
+        border-color: transparent !important;
+    }
+
+    .modal-content {
+        border-radius: 1.25rem !important;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(94, 84, 142, 0.04) !important;
+        cursor: default;
+    }
+
+    .is-invalid {
+        border-color: #dc3545 !important;
+        background-image: none !important;
+    }
+
+    .invalid-feedback {
+        font-weight: 500;
+        font-size: 0.8rem;
+    }
 </style>
 @endpush
 @endsection

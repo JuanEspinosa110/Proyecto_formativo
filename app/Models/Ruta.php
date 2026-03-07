@@ -8,12 +8,14 @@ class Ruta extends Model
 {
     protected $table = 'ruta';
     protected $primaryKey = 'id_ruta';
-    public $incrementing = false;
+
+    public $incrementing = false; 
     protected $keyType = 'int';
     public $timestamps = false;
 
     protected $fillable = [
         'id_ruta',
+        'codigo_ruta', 
         'id_ciudad',
         'id_barrio_origen',
         'id_barrio_destino',

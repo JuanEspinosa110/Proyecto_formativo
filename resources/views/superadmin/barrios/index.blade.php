@@ -63,7 +63,7 @@
                     <div class="col-auto">
                         <button type="submit" class="btn btn-secondary px-4 fw-semibold shadow-sm">Filtrar</button>
                         @if(request('search'))
-                            <a href="{{ route('superadmin.barrios.index') }}" class="btn btn-link text-decoration-none text-muted fw-medium">Limpiar</a>
+                            <a href="{{ route('superadmin.configuracion.barrios.index') }}" class="btn btn-link text-decoration-none text-muted fw-medium">Limpiar</a>
                         @endif
                     </div>
                 </form>
@@ -230,7 +230,7 @@
      */
     function editarBarrio(id, nombre, idCiudad) {
         const form = document.getElementById('formEditar');
-        form.action = "{{ url('superadmin/barrios') }}/" + id;
+        form.action = "{{ url('superadmin/configuracion/barrios') }}/" + id;
         document.getElementById('edit_nombre').value = nombre;
         document.getElementById('edit_id_ciudad').value = idCiudad;
         

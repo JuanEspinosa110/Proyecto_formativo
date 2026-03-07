@@ -10,8 +10,10 @@ class Departamento extends Model
     protected $primaryKey = 'id_departamento';
     public $timestamps = false;
     protected $keyType = 'string';
+    public $incrementing = false; // Indica que no es autoincremental
 
     protected $fillable = [
+        'id_departamento',
         'nombre_departamento'
     ];
 
