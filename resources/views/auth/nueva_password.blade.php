@@ -56,6 +56,7 @@
 
                 <form method="POST" action="{{ route('password.update') }}">
                     @csrf
+                    <input type="hidden" name="correo" value="{{ $correo }}">
 
                     <div class="recov-group">
                         <label>Nueva contraseña</label>

@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Usuario;
 use Illuminate\Support\Str;
 use App\Models\SuperAdministrador;
+use Illuminate\Support\Facades\DB;
+use App\Mail\RecuperacionMailable;
+use Carbon\Carbon;
 
 class RecuperarPasswordController extends Controller
 {
@@ -20,62 +23,77 @@ class RecuperarPasswordController extends Controller
     }
 
     public function enviarCodigo(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email'
-    ]);
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ], [
+            'email.required' => 'El correo es obligatorio.',
+            'email.email' => 'El formato del correo no es válido.'
+        ]);
 
-    $correo = $request->email;
+        $correo = $request->email;
 
-    $usuario = Usuario::where('correo', $request->email)->first();
-    $superAdmin = SuperAdministrador::where('correo', $request->email)->first();
+        // Verificar existencia en Usuario o SuperAdministrador
+        $usuario = Usuario::where('correo', $correo)->first();
+        $superAdmin = SuperAdministrador::where('correo', $correo)->first();
 
-    if (!$usuario && !$superAdmin) {
-    return back()->withErrors('El correo no se encuentra registrado en el sistema.');
-}
+        if (!$usuario && !$superAdmin) {
+            return back()->withErrors(['email' => 'El correo no se encuentra registrado en el sistema.']);
+        }
 
-    $codigo = random_int(100000, 999999);
+        // Generar código aleatorio de 6 dígitos
+        $codigo = (string) random_int(100000, 999999);
 
-    Cache::put(
-        'recuperacion_'.$request->email,
-        $codigo,
-        now()->addMinutes(10)
-    );
+        // Almacenar en la tabla de recuperación (invalidando el anterior)
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $correo],
+            [
+                'token' => $codigo,
+                'created_at' => Carbon::now()
+            ]
+        );
 
-    Mail::raw("Tu código de recuperación es: $codigo", function ($message) use ($request) {
-        $message->to($request->email)
-                ->subject('Código de recuperación');
-    });
+        // Enviar correo con Mailable profesional
+        try {
+            Mail::to($correo)->send(new RecuperacionMailable($codigo));
+        } catch (\Exception $e) {
+            return back()->withErrors(['email' => 'Error al enviar el correo: ' . $e->getMessage()]);
+        }
 
-    session(['correo' => $request->email]);
+        session(['correo' => $correo]);
 
-    return redirect()->route('password.codigo.form')
-        ->with('success', 'Se envió un código al correo '.$request->email);
-
-}
+        return redirect()->route('password.codigo.form')
+            ->with('success', 'Se ha enviado un código de 6 dígitos al correo ' . $correo);
+    }
 
 
     public function verificarCodigo(Request $request)
-        {
+    {
+        $request->validate([
+            'correo' => 'required|email',
+            'codigo' => 'required|size:6'
+        ]);
 
-            $request->validate([
-                'correo' => 'required|email',
-                'codigo' => 'required'
-            ]);
+        $tokenRecord = DB::table('password_reset_tokens')
+            ->where('email', $request->correo)
+            ->first();
 
-            $codigoGuardado = Cache::get('recuperacion_'.$request->correo);
-
-            if (!$codigoGuardado || $codigoGuardado != $request->codigo) {
-                return back()
-                    ->withErrors('Código inválido o expirado.')
-                    ->with('correo', $request->correo);
-                }
-
-            session(['correo' => $request->correo]);
-            return redirect()->route('password.nueva.form');
-
-
+        if (!$tokenRecord || $tokenRecord->token != $request->codigo) {
+            return back()
+                ->withErrors('Código inválido o expirado.')
+                ->with('correo', $request->correo);
         }
+
+        // Verificar si expiró (ejm: 10 minutos)
+        if (Carbon::parse($tokenRecord->created_at)->addMinutes(10)->isPast()) {
+            return back()
+                ->withErrors('El código ha expirado, solicita uno nuevo.')
+                ->with('correo', $request->correo);
+        }
+
+        session(['correo' => $request->correo]);
+        return redirect()->route('password.nueva.form');
+    }
 
         public function actualizarPassword(Request $request)
             {
@@ -107,27 +125,28 @@ class RecuperarPasswordController extends Controller
 
                 $usuario = Usuario::where('correo', $correo)->first();
 
-                if ($usuario) {
-                    $usuario->update([
-                        'password' => Hash::make($request->password)
-                    ]);
-                } else {
-                    $superadmin = SuperAdministrador::where('correo', $correo)->first();
+        if ($usuario) {
+            $usuario->update([
+                'password' => Hash::make($request->password)
+            ]);
+        } else {
+            $superadmin = SuperAdministrador::where('correo', $correo)->first();
 
-                    if ($superadmin) {
-                        $superadmin->update([
-                            'password' => Hash::make($request->password)
-                        ]);
-                    } else {
-                         return redirect()->route('recuperar')
-                            ->withErrors('No se encontró un usuario asociado a ese correo.');
-                    }
-                }
+            if ($superadmin) {
+                $superadmin->update([
+                    'password' => Hash::make($request->password)
+                ]);
+            } else {
+                return redirect()->route('recuperar')
+                    ->withErrors('No se encontró un usuario asociado a ese correo.');
+            }
+        }
 
-                Cache::forget('recuperacion_'.$correo);
+        // Limpiar token una vez usado
+        DB::table('password_reset_tokens')->where('email', $correo)->delete();
 
-                return redirect()->route('login')
-                    ->with('success', 'Contraseña actualizada correctamente');
+        return redirect()->route('login')
+            ->with('success', 'Tu contraseña ha sido actualizada correctamente. Inicia sesión con tus nuevas credenciales.');
                     
                 }
 
@@ -140,20 +159,24 @@ class RecuperarPasswordController extends Controller
                     ->withErrors('Sesión expirada. Inicia nuevamente el proceso.');
             }
 
-            $codigo = random_int(100000, 999999);
+        $codigo = (string) random_int(100000, 999999);
 
-            Cache::put(
-                'recuperacion_'.$correo,
-                $codigo,
-                now()->addMinutes(10)
-            );
+        // Actualizar el token anterior
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $correo],
+            [
+                'token' => $codigo,
+                'created_at' => Carbon::now()
+            ]
+        );
 
-            Mail::raw("Tu nuevo código es: $codigo", function ($message) use ($correo) {
-                $message->to($correo)
-                        ->subject('Nuevo código de recuperación');
-            });
+        try {
+            Mail::to($correo)->send(new RecuperacionMailable($codigo));
+        } catch (\Exception $e) {
+            return back()->withErrors('Error al enviar el nuevo código: ' . $e->getMessage());
+        }
 
-            return back()->with('success', 'Nuevo código enviado');
+        return back()->with('success', 'Se ha enviado un nuevo código a tu correo.');
         }
 
 
