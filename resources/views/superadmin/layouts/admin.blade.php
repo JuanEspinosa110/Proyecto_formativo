@@ -80,14 +80,7 @@
             <div class="dropdown">
             <a href="#"
             class="sigu-nl dropdown-toggle 
-<<<<<<< HEAD
-            {{ request()->routeIs('superadmin.ciudades.*') ||
-                request()->routeIs('superadmin.tipo-empresa.*') ||
-                request()->routeIs('superadmin.tipo_usuario.*') ||
-                request()->routeIs('superadmin.estados.*') ? 'active' : '' }}||"
-=======
             {{ request()->routeIs('superadmin.configuracion.*') ? 'active' : '' }}"
->>>>>>> origin/develop
             data-bs-toggle="dropdown"
             aria-expanded="false">
 
@@ -100,42 +93,15 @@
                 {{-- CIUDADES --}}
                 <li>
                     <a class="dropdown-item"
-<<<<<<< HEAD
-                    href="{{ route('superadmin.ciudades.index') }}">
-=======
                     href="{{ route('superadmin.configuracion.ciudades.index') }}">
->>>>>>> origin/develop
                         <i class="bi bi-geo-alt"></i> Ciudades
                     </a>
                 </li>
 
-<<<<<<< HEAD
-                {{-- BARRIOS --}}
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.barrios.index') }}">
-                        <i class="bi bi-geo-fill"></i> Barrios
-                    </a>
-                </li>
-
-                {{-- RUTAS --}}
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.rutas.index') }}">
-                        <i class="bi bi-map"></i> Rutas
-                    </a>
-                </li>
-
-                {{-- TIPOS DE EMPRESA --}}
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.tipo-empresa.index') }}">
-=======
                 {{-- TIPOS DE EMPRESA --}}
                 <li>
                     <a class="dropdown-item"
                     href="{{ route('superadmin.configuracion.tipo-empresa.index') }}">
->>>>>>> origin/develop
                         <i class="bi bi-building"></i> Tipos de Empresa
                     </a>
                 </li>
@@ -143,11 +109,7 @@
                 {{-- TIPOS DE USUARIO --}}
                 <li>
                     <a class="dropdown-item"
-<<<<<<< HEAD
-                    href="{{ route('superadmin.tipo_usuario.index') }}">
-=======
                     href="{{ route('superadmin.configuracion.tipo-usuario.index') }}">
->>>>>>> origin/develop
                         <i class="bi bi-people"></i> Tipos de Usuario
                     </a>
                 </li>
@@ -155,20 +117,6 @@
                 {{-- ESTADOS --}}
                 <li>
                     <a class="dropdown-item"
-<<<<<<< HEAD
-                    href="{{ route('superadmin.estados.index') }}">
-                        <i class="bi bi-toggle-on"></i> Estados
-                    </a>
-                </li>
-                {{-- TIPO DE DOCUMENTOS --}}
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.tipo_documento.index') }}">
-                        <i class="bi bi-file-earmark-text"></i> Tipos de Documento
-                    </a>
-                </li>
-
-=======
                     href="{{ route('superadmin.configuracion.estados.index') }}">
                         <i class="bi bi-toggle-on"></i> Estados
                     </a>
@@ -191,7 +139,6 @@
                         <i class="bi bi-journal-check"></i> Tipo de Asignación
                     </a>
                 </li>
->>>>>>> origin/develop
             </ul>
         </div>
 

@@ -321,17 +321,9 @@
         document.querySelectorAll('.edit-ruta').forEach(btn => {
             btn.addEventListener('click', async function() {
                 const data = JSON.parse(this.dataset.json);
-<<<<<<< HEAD
                 const form = document.getElementById('formEditRuta');
-                
                 form.querySelector('[name="id_ciudad"]').value = data.id_ciudad || '';
                 form.querySelector('[name="codigo_ruta"]').value = data.codigo_ruta || '';
-=======
-                form.querySelector('[name="codigo_ruta"]').value = data.codigo_ruta || '';
-                const form = document.getElementById('formEditRuta');
-                
-                form.querySelector('[name="id_ciudad"]').value = data.id_ciudad || '';
->>>>>>> origin/develop
                 form.querySelector('[name="id_estado"]').value = data.id_estado;
                 
                 // Cargar barrios de la ciudad seleccionada y luego setear los valores
@@ -482,10 +474,6 @@
             });
         }
     });
-<<<<<<< HEAD
-=======
-
-
         // No permitir caracteres no numéricos 
         document.addEventListener('input', function(e) {
             if (e.target.name === 'codigo_ruta') {
@@ -498,7 +486,6 @@
                 }
             }
         });
->>>>>>> origin/develop
 </script>
 
 <style>
