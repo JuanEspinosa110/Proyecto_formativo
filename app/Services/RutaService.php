@@ -40,7 +40,7 @@ class RutaService
             $query->where('id_estado', $request->id_estado);
         }
 
-        return $query->orderBy('id_ruta', 'asc')->paginate(10)->withQueryString();
+        return $query->orderBy('id_ruta', 'asc')->paginate(5)->withQueryString();
     }
 
     /**

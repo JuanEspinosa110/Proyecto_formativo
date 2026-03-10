@@ -34,7 +34,7 @@ class BusService
             $query->where('id_estado', $request->id_estado);
         }
 
-        return $query->orderBy('placa', 'asc')->paginate(10)->withQueryString();
+        return $query->orderBy('placa', 'asc')->paginate(5)->withQueryString();
     }
 
     /**
@@ -64,7 +64,18 @@ class BusService
      */
     public function updateBus(Bus $bus, array $data)
     {
+        // La placa no debe actualizarse para evitar conflictos con llaves foráneas (FK en tabla viaje)
+        unset($data['placa']);
+        
         return $bus->update($data);
+    }
+
+    /**
+     * Eliminar bus
+     */
+    public function deleteBus(Bus $bus)
+    {
+        return $bus->delete();
     }
 
     /**

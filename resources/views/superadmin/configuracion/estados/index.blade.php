@@ -76,15 +76,17 @@
                                     <td class="px-4 fw-bold text-dark">{{ $estado->id_estado }}</td>
                                     <td>{{ $estado->nombre_estado }}</td>
                                     <td class="text-end px-4">
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-warning btn-sm border-0"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editarModal"
-                                            data-id="{{ $estado->id_estado }}"
-                                            data-nombre="{{ $estado->nombre_estado }}">
-                                            <i class="fas fa-edit me-1"></i> Editar
-                                        </button>
+                                        <div class="d-flex justify-content-end gap-3">
+                                            <a href="#" 
+                                               class="text-primary text-decoration-none d-flex align-items-center"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#editarModal"
+                                               data-id="{{ $estado->id_estado }}"
+                                               data-nombre="{{ $estado->nombre_estado }}"
+                                               title="Editar estado">
+                                                <span class="material-symbols-rounded fs-5">edit</span>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 @empty
@@ -112,12 +114,15 @@
 </div>
 
 {{-- MODAL CREAR --}}
-<div class="modal fade" id="crearModal" tabindex="-1" aria-labelledby="crearModalLabel" aria-hidden="true">
+<div class="modal fade" id="crearModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title fw-bold" id="crearModalLabel">Nuevo Estado</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-primary me-2 fs-5">add_circle</span>
+                    NUEVO ESTADO
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form action="{{ route('superadmin.configuracion.estados.store') }}" method="POST">
                 @csrf
@@ -130,9 +135,9 @@
                         @enderror
                     </div>
                 </div>
-                <div class="modal-footer border-top-0 pt-0">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4 text-white">Guardar Registro</button>
+                <div class="modal-footer border-0 p-3 bg-light">
+                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold shadow-sm">GUARDAR REGISTRO</button>
                 </div>
             </form>
         </div>
@@ -140,28 +145,29 @@
 </div>
 
 {{-- MODAL EDITAR --}}
-<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
+<div class="modal fade" id="editarModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title fw-bold" id="editarModalLabel">Editar Registro</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-warning me-2 fs-5">edit_square</span>
+                    MODIFICAR ESTADO
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form id="formEditar" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="modal-body py-4">
-                    <div class="mb-0">
-                        <label class="form-label fw-semibold">Nombre del Estado <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_estado" id="editNombre" class="form-control @error('nombre_estado') is-invalid @enderror" required value="{{ old('nombre_estado') }}">
-                        @error('nombre_estado')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                <div class="modal-body p-4">
+                    <div class="mb-0 text-input-validate" data-type="text">
+                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre del Estado <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre_estado" id="editNombre" class="form-control form-control-sm @error('nombre_estado') is-invalid @enderror" required>
+                        @error('nombre_estado') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                 </div>
-                <div class="modal-footer border-top-0 pt-0">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-warning px-4 text-dark">Guardar Cambios</button>
+                <div class="modal-footer border-0 p-3 bg-light">
+                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold shadow-sm">GUARDAR CAMBIOS</button>
                 </div>
             </form>
         </div>
@@ -213,6 +219,30 @@
         myModal.show();
         @endif
         @endif
+
+        // Validaciones de Entrada (Solo texto)
+        document.querySelectorAll('.text-input-validate').forEach(container => {
+            const input = container.querySelector('input');
+            const type = container.getAttribute('data-type');
+            
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    if (type === 'text') {
+                        this.value = this.value.replace(/[0-9]/g, '');
+                    }
+                });
+            }
+        });
     });
 </script>
+
+<style>
+    .ls-1 {
+        letter-spacing: 0.5px;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(94, 84, 142, 0.03) !important;
+        cursor: default;
+    }
+</style>
 @endsection

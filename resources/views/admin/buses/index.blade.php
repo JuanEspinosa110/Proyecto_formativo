@@ -3,9 +3,9 @@
 @section('title', 'Buses — SIGU')
 
 @section('content')
-<div class="container-fluid py-4">
+<div class="container-fluid pt-0 pb-4">
     <!-- Header de Página -->
-    <div class="d-flex align-items-center justify-content-between mb-4 mt-2 px-1">
+    <div class="d-flex align-items-center justify-content-between mb-4 px-1">
         <div>
             <h1 class="h3 mb-1 text-dark fw-bold">Gestión de Flota</h1>
             <p class="text-muted small mb-0">Administra los vehículos y sus estados operativos en tiempo real.</p>
@@ -88,9 +88,6 @@
                     <tr class="border-top">
                         <td class="ps-4">
                             <div class="d-flex align-items-center gap-3">
-                                <div class="rounded-circle bg-primary bg-opacity-10 p-2 text-primary">
-                                    <span class="material-symbols-rounded">directions_bus</span>
-                                </div>
                                 <div>
                                     <span class="d-block fw-bold text-dark fs-6">{{ $bus->placa }}</span>
                                     <small class="text-muted d-block" style="font-size: 0.75rem;">
@@ -140,13 +137,31 @@
                             </span>
                         </td>
                         <td class="text-end pe-4">
-                            <button class="btn btn-outline-primary btn-sm rounded-3 edit-bus"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalEditBus"
-                                data-json="{{ json_encode($bus) }}">
-                                <span class="material-symbols-rounded" style="font-size: 1.1rem; vertical-align: middle;">edit</span>
-                                Editar
-                            </button>
+                            <div class="d-flex justify-content-end gap-3">
+                                <a href="#" 
+                                   class="text-info text-decoration-none d-flex align-items-center"
+                                   title="Ver expediente"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#modalViewBus"
+                                   data-json="{{ json_encode($bus) }}"
+                                   data-estado="{{ optional($bus->estado)->nombre_estado }}">
+                                    <span class="material-symbols-rounded fs-5">visibility</span>
+                                </a>
+                                <a href="#" 
+                                   class="text-primary text-decoration-none d-flex align-items-center"
+                                   title="Editar vehículo"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#modalEditBus"
+                                   data-json="{{ json_encode($bus) }}">
+                                    <span class="material-symbols-rounded fs-5">edit</span>
+                                </a>
+                                <form action="{{ route('admin.buses.destroy', $bus->placa) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar este vehículo? Todas las asignaciones relacionadas podrían verse afectadas.')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="p-0 border-0 bg-transparent text-danger d-flex align-items-center" title="Eliminar">
+                                        <span class="material-symbols-rounded fs-5">delete</span>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @empty
@@ -167,308 +182,402 @@
     </div>
 </div>
 
-<!-- Modal CREAR (Standard Bootstrap Modal) -->
-<div class="modal fade" id="modalCreateBus" tabindex="-1" aria-labelledby="modalCreateLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg rounded-3">
-            <div class="modal-header border-bottom-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold text-dark" id="modalCreateLabel">
-                    <span class="material-symbols-rounded align-middle me-2 text-primary">add_circle</span>
-                    Registrar Nuevo Vehículo
-                </h5>
-                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Modal CREAR -->
+<div class="modal fade" id="modalCreateBus" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-primary me-2 fs-5">add_circle</span>
+                    REGISTRAR NUEVO VEHÍCULO
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form id="formCreateBus" action="{{ route('admin.buses.store') }}" method="POST">
                 @csrf
-                <div class="modal-body px-4 pb-4">
-                    <div id="create-errors-alert" class="alert alert-danger d-none shadow-sm py-2 small mb-4"></div>
+                <div class="modal-body p-4">
+                    {{-- Errores de validación --}}
+                    @if($errors->any() && !old('_method'))
+                        <div class="alert alert-danger shadow-sm py-2 small mb-4">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Placa <span class="text-danger">*</span></label>
-                            <input type="text" name="placa" class="form-control bg-light border-0 py-2" placeholder="ABC-123" required style="text-transform:uppercase">
-                            <div class="invalid-feedback feedback-placa"></div>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Placa <span class="text-danger">*</span></label>
+                            <input type="text" name="placa" class="form-control form-control-sm fw-bold" placeholder="ABC123" required style="text-transform:uppercase" maxlength="6">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Modelo / Ref. <span class="text-danger">*</span></label>
-                            <input type="text" name="modelo" class="form-control bg-light border-0 py-2" placeholder="Toyota 2024" required>
-                            <div class="invalid-feedback feedback-modelo"></div>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Modelo / Ref. <span class="text-danger">*</span></label>
+                            <input type="text" name="modelo" class="form-control form-control-sm" placeholder="Ej: Bus 2024" required>
+                        </div>
+
+                        <div class="col-md-6 text-input-validate" data-type="number">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Pasajeros <span class="text-danger">*</span></label>
+                            <input type="text" name="capacidad_pasajeros" class="form-control form-control-sm" required min="10" placeholder="00">
+                        </div>
+                        <div class="col-md-6 text-input-validate" data-type="number">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Kilometraje <span class="text-danger">*</span></label>
+                            <input type="text" name="kilometraje" class="form-control form-control-sm" required placeholder="0">
+                        </div>
+
+                        <div class="col-md-6 text-input-validate" data-type="number">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Licencia Tránsito <span class="text-danger">*</span></label>
+                            <input type="text" name="linc_transito" class="form-control form-control-sm" required minlength="9" pattern="[1-9][0-9]{8,19}" placeholder="No. Licencia"
+                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch){this.setCustomValidity('La licencia debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
+                                oninput="this.setCustomValidity('')">
+                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
+                        </div>
+                        <div class="col-md-6 text-input-validate" data-type="number">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Doc. Propietario <span class="text-danger">*</span></label>
+                            <input type="text" name="doc_propietario" class="form-control form-control-sm" required minlength="9" pattern="[1-9][0-9]{8,14}" placeholder="Cédula/NIT"
+                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch){this.setCustomValidity('El documento debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
+                                oninput="this.setCustomValidity('')">
+                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
+                        </div>
+
+                        <div class="col-md-12 text-input-validate" data-type="text">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre Propietario <span class="text-danger">*</span></label>
+                            <input type="text" name="nombre_propietario" class="form-control form-control-sm" placeholder="Nombre Completo" required minlength="2" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]{2,}">
+                        </div>
+
+                        <div class="col-md-6 text-input-validate" data-type="number">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Teléfono <span class="text-danger">*</span></label>
+                            <input type="text" name="telefono" class="form-control form-control-sm" required minlength="10" maxlength="10">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Correo <span class="text-danger">*</span></label>
+                            <input type="email" name="correo" class="form-control form-control-sm" placeholder="prop@sigu.com" required>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Pasajeros <span class="text-danger">*</span></label>
-                            <input type="number" name="capacidad_pasajeros" class="form-control bg-light border-0 py-2" required min="10">
-                            <div class="invalid-feedback feedback-capacidad_pasajeros"></div>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Chasis</label>
+                            <input type="text" name="numero_chasis" class="form-control form-control-sm" maxlength="17">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Kilometraje <span class="text-danger">*</span></label>
-                            <input type="number" name="kilometraje" class="form-control bg-light border-0 py-2" required min="0">
-                            <div class="invalid-feedback feedback-kilometraje"></div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Núm. Chasis</label>
-                            <input type="text" name="numero_chasis" class="form-control bg-light border-0 py-2" maxlength="17">
-                            <div class="invalid-feedback feedback-numero_chasis"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Núm. Motor</label>
-                            <input type="text" name="numero_motor" class="form-control bg-light border-0 py-2" maxlength="14">
-                            <div class="invalid-feedback feedback-numero_motor"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Lic. Tránsito</label>
-                            <input type="number" name="linc_transito" class="form-control bg-light border-0 py-2" placeholder="Número de licencia">
-                            <div class="invalid-feedback feedback-linc_transito"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Doc. Propietario</label>
-                            <input type="number" name="doc_propietario" class="form-control bg-light border-0 py-2" placeholder="Cédula o NIT">
-                            <div class="invalid-feedback feedback-doc_propietario"></div>
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Nombre del Propietario <span class="text-danger">*</span></label>
-                            <input type="text" name="nombre_propietario" class="form-control bg-light border-0 py-2" placeholder="Nombre completo" required>
-                            <div class="invalid-feedback feedback-nombre_propietario"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Teléfono</label>
-                            <input type="text" name="telefono" class="form-control bg-light border-0 py-2" placeholder="Ej: 3001234567">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Correo Electrónico</label>
-                            <input type="email" name="correo" class="form-control bg-light border-0 py-2" placeholder="correo@ejemplo.com">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Motor</label>
+                            <input type="text" name="numero_motor" class="form-control form-control-sm" maxlength="14">
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Estado Operativo <span class="text-danger">*</span></label>
-                            <select name="id_estado" class="form-select bg-light border-0 py-2" required>
-                                <option value="" selected disabled>Seleccionar estado...</option>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Estado Operativo <span class="text-danger">*</span></label>
+                            <select name="id_estado" class="form-select form-select-sm" required>
+                                <option value="" selected disabled>Seleccionar...</option>
                                 @foreach($estados as $est)
                                 <option value="{{ $est->id_estado }}">{{ $est->nombre_estado }}</option>
                                 @endforeach
                             </select>
-                            <div class="invalid-feedback feedback-id_estado"></div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-top-0 px-4 pb-4 bg-white d-flex gap-2">
-                    <button type="button" class="btn btn-light px-4 fw-semibold border" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm flex-fill">Guardar Registro</button>
+                <div class="modal-footer border-0 p-3 bg-light">
+                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold shadow-sm">GUARDAR BUS</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Modal EDITAR (Standard Bootstrap Modal) -->
-<div class="modal fade" id="modalEditBus" tabindex="-1" aria-labelledby="modalEditLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg rounded-3">
-            <div class="modal-header border-bottom-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold text-dark" id="modalEditLabel">
-                    <span class="material-symbols-rounded align-middle me-2 text-primary">edit_square</span>
-                    Editar Información del Vehículo
-                </h5>
-                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Modal EDITAR -->
+<div class="modal fade" id="modalEditBus" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-warning me-2 fs-5">edit_square</span>
+                    MODIFICAR VEHÍCULO
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form id="formEditBus" method="POST">
                 @csrf @method('PUT')
-                <div class="modal-body px-4 pb-4">
-                    <div id="edit-errors-alert" class="alert alert-danger d-none shadow-sm py-2 small mb-4"></div>
+                <div class="modal-body p-4">
+                    {{-- Errores de validación --}}
+                    @if($errors->any() && old('_method') == 'PUT')
+                        <div class="alert alert-danger shadow-sm py-2 small mb-4">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
                     <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Placa del Vehículo</label>
-                            <input type="text" id="edit_placa_display" class="form-control bg-light border-0 fw-bold text-primary" name="placa" readonly>
-                        </div>
-
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Modelo / Ref. <span class="text-danger">*</span></label>
-                            <input type="text" name="modelo" id="edit_modelo" class="form-control bg-light border-0 py-2" required>
-                            <div class="invalid-feedback feedback-modelo"></div>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Placa</label>
+                            <input type="text" id="edit_placa_display" class="form-control form-control-sm bg-light fw-bold" readonly>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Estado <span class="text-danger">*</span></label>
-                            <select name="id_estado" id="edit_id_estado" class="form-select bg-light border-0 py-2" required>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Estado Operativo</label>
+                            <select name="id_estado" id="edit_id_estado" class="form-select form-select-sm" required>
                                 @foreach($estados as $est)
                                 <option value="{{ $est->id_estado }}">{{ $est->nombre_estado }}</option>
                                 @endforeach
                             </select>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Capacidad <span class="text-danger">*</span></label>
-                            <input type="number" name="capacidad_pasajeros" id="edit_capacidad" class="form-control bg-light border-0 py-2" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Kilometraje <span class="text-danger">*</span></label>
-                            <input type="number" name="kilometraje" id="edit_kilometraje" class="form-control bg-light border-0 py-2" required>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Núm. Chasis</label>
-                            <input type="text" name="numero_chasis" id="edit_numero_chasis" class="form-control bg-light border-0 py-2" maxlength="17">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Núm. Motor</label>
-                            <input type="text" name="numero_motor" id="edit_numero_motor" class="form-control bg-light border-0 py-2" maxlength="14">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Lic. Tránsito</label>
-                            <input type="number" name="linc_transito" id="edit_linc_transito" class="form-control bg-light border-0 py-2">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Doc. Propietario</label>
-                            <input type="number" name="doc_propietario" id="edit_doc_propietario" class="form-control bg-light border-0 py-2">
-                        </div>
                         <div class="col-md-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Nombre del Propietario <span class="text-danger">*</span></label>
-                            <input type="text" name="nombre_propietario" id="edit_nombre_propietario" class="form-control bg-light border-0 py-2" required>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Modelo / Referencia <span class="text-danger">*</span></label>
+                            <input type="text" name="modelo" id="edit_modelo" class="form-control form-control-sm" required>
+                        </div>
+
+                        <div class="col-md-6 text-input-validate" data-type="number">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Capacidad</label>
+                            <input type="text" name="capacidad_pasajeros" id="edit_capacidad" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-md-6 text-input-validate" data-type="number">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Kilometraje</label>
+                            <input type="text" name="kilometraje" id="edit_kilometraje" class="form-control form-control-sm" required>
+                        </div>
+
+                        <div class="col-md-6 text-input-validate" data-type="number">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Licencia Tránsito</label>
+                            <input type="text" name="linc_transito" id="edit_linc_transito" class="form-control form-control-sm" minlength="9" pattern="[1-9][0-9]{8,19}"
+                                oninvalid="if(this.validity.patternMismatch){this.setCustomValidity('La licencia debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
+                                oninput="this.setCustomValidity('')">
+                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
+                        </div>
+                        <div class="col-md-6 text-input-validate" data-type="number">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Doc. Propietario</label>
+                            <input type="text" name="doc_propietario" id="edit_doc_propietario" class="form-control form-control-sm" minlength="9" pattern="[1-9][0-9]{8,14}"
+                                oninvalid="if(this.validity.patternMismatch){this.setCustomValidity('El documento debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
+                                oninput="this.setCustomValidity('')">
+                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
+                        </div>
+                        <div class="col-md-12 text-input-validate" data-type="text">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre Propietario</label>
+                            <input type="text" name="nombre_propietario" id="edit_nombre_propietario" class="form-control form-control-sm" required>
+                        </div>
+
+                        <div class="col-md-6 text-input-validate" data-type="number">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Teléfono</label>
+                            <input type="text" name="telefono" id="edit_telefono" class="form-control form-control-sm">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Correo</label>
+                            <input type="email" name="correo" id="edit_correo" class="form-control form-control-sm">
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Teléfono</label>
-                            <input type="text" name="telefono" id="edit_telefono" class="form-control bg-light border-0 py-2">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Chasis</label>
+                            <input type="text" name="numero_chasis" id="edit_numero_chasis" class="form-control form-control-sm" maxlength="17">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Correo Electrónico</label>
-                            <input type="email" name="correo" id="edit_correo" class="form-control bg-light border-0 py-2">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Motor</label>
+                            <input type="text" name="numero_motor" id="edit_numero_motor" class="form-control form-control-sm" maxlength="14">
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-top-0 px-4 pb-4 bg-white d-flex gap-2">
-                    <button type="button" class="btn btn-light px-4 fw-semibold border" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm flex-fill">Guardar Cambios</button>
+                <div class="modal-footer border-0 p-3 bg-light">
+                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">DESCARTAR</button>
+                    <button type="submit" class="btn btn-sm btn-warning px-4 fw-bold shadow-sm">GUARDAR CAMBIOS</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal VER BUS -->
+<div class="modal fade" id="modalViewBus" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-info me-2 fs-5">directions_bus</span>
+                    DETALLES DEL VEHÍCULO
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            
+            <div class="modal-body p-4">
+                <div class="mb-4 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <div>
+                            <h4 id="view_bus_placa" class="fw-bold mb-0 text-dark"></h4>
+                            <p class="text-muted small mb-0" id="view_bus_modelo"></p>
+                        </div>
+                    </div>
+                    <span id="view_bus_estado" class="badge rounded-pill"></span>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="p-3 bg-light rounded-3 border border-light-subtle">
+                            <div class="row g-3 small">
+                                <div class="col-6">
+                                    <label class="d-block text-muted fw-bold text-uppercase ls-1">Capacidad</label>
+                                    <span class="text-dark fw-medium"><span id="view_bus_capacidad"></span> pasajeros</span>
+                                </div>
+                                <div class="col-6">
+                                    <label class="d-block text-muted fw-bold text-uppercase ls-1">Kilometraje</label>
+                                    <span id="view_bus_kilometraje" class="text-dark fw-medium"></span> <small class="text-muted">KM</small>
+                                </div>
+                                <div class="col-12 border-top pt-2">
+                                    <label class="d-block text-muted fw-bold text-uppercase ls-1">Propietario</label>
+                                    <span id="view_bus_nombre_prop" class="text-dark fw-medium d-block"></span>
+                                    <small class="text-muted">Doc: <span id="view_bus_doc_prop"></span></small>
+                                </div>
+                                <div class="col-6 border-top pt-2">
+                                    <label class="d-block text-muted fw-bold text-uppercase ls-1">Teléfono</label>
+                                    <span id="view_bus_tel_prop" class="text-dark fw-medium"></span>
+                                </div>
+                                <div class="col-6 border-top pt-2">
+                                    <label class="d-block text-muted fw-bold text-uppercase ls-1">Licencia</label>
+                                    <span id="view_bus_licencia" class="text-dark fw-medium"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer border-0 p-3 bg-light">
+                <button type="button" class="btn btn-sm btn-dark w-100 fw-bold" data-bs-dismiss="modal">CERRAR EXPEDIENTE</button>
+            </div>
         </div>
     </div>
 </div>
 
 @push('scripts')
 <script>
-    // Inicializar Datos de Edición
-    document.querySelectorAll('.edit-bus').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const data = JSON.parse(this.dataset.json);
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Buses script initialized');
 
-            // Campos existentes
-            document.getElementById('edit_placa_display').value = data.placa;
-            document.getElementById('edit_modelo').value = data.modelo || '';
-            document.getElementById('edit_capacidad').value = data.capacidad_pasajeros || 0;
-            document.getElementById('edit_kilometraje').value = data.kilometraje || 0;
-            document.getElementById('edit_id_estado').value = data.id_estado;
+        // Delegación de eventos para sincronizar datos antes de mostrar modales
+        document.addEventListener('click', function(e) {
+            // Botón VER
+            const btnVer = e.target.closest('[data-bs-target="#modalViewBus"]');
+            if (btnVer) {
+                e.preventDefault();
+                handleVerBus(btnVer);
+                return;
+            }
 
-            // NUEVOS CAMPOS (Asegúrate de que los nombres coincidan con el JSON del objeto $bus)
-            document.getElementById('edit_linc_transito').value = data.linc_transito || '';
-            document.getElementById('edit_doc_propietario').value = data.doc_propietario || '';
-            document.getElementById('edit_nombre_propietario').value = data.nombre_propietario || '';
-            document.getElementById('edit_telefono').value = data.telefono || '';
-            document.getElementById('edit_correo').value = data.correo || '';
-            document.getElementById('edit_numero_chasis').value = data.numero_chasis || '';
-            document.getElementById('edit_numero_motor').value = data.numero_motor || '';
-
-            document.getElementById('formEditBus').action = `/admin/buses/${data.placa}`;
-            resetValidation('formEditBus', 'edit-errors-alert');
+            // Botón EDITAR
+            const btnEdit = e.target.closest('[data-bs-target="#modalEditBus"]');
+            if (btnEdit) {
+                e.preventDefault();
+                handleEditBus(btnEdit);
+                return;
+            }
         });
-    });
 
-    // Gestión AJAX Estándar para Modales Flotantes
-    function manageAjax(formId, alertId) {
-        const form = document.getElementById(formId);
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = e.submitter;
-            const originalBtnHtml = btn.innerHTML;
-
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
-
-            resetValidation(formId, alertId);
-
+        function handleVerBus(btn) {
             try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: new FormData(form),
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
+                const data = JSON.parse(btn.dataset.json);
+                const estado = btn.dataset.estado;
 
-                if (response.ok) {
-                    location.reload();
-                } else if (response.status === 422) {
-                    const data = await response.json();
-                    applyErrors(formId, alertId, data.errors);
+                document.getElementById('view_bus_placa').textContent = data.placa;
+                document.getElementById('view_bus_modelo').textContent = data.modelo || 'N/A';
+                document.getElementById('view_bus_capacidad').textContent = data.capacidad_pasajeros || '0';
+                document.getElementById('view_bus_kilometraje').textContent = Number(data.kilometraje || 0).toLocaleString();
+                document.getElementById('view_bus_chasis').textContent = data.numero_chasis || 'No registrado';
+                document.getElementById('view_bus_motor').textContent = data.numero_motor || 'No registrado';
+                document.getElementById('view_bus_licencia').textContent = data.linc_transito || 'No asignada';
+                document.getElementById('view_bus_nombre_prop').textContent = data.nombre_propietario || 'No asignado';
+                document.getElementById('view_bus_doc_prop').textContent = data.doc_propietario || '—';
+                document.getElementById('view_bus_tel_prop').textContent = data.telefono || '—';
+
+                const viewEst = document.getElementById('view_bus_estado');
+                viewEst.textContent = estado;
+                viewEst.className = 'badge rounded-pill px-4 py-2 fs-6 fw-bold';
+                
+                const stateId = parseInt(data.id_estado);
+                if (stateId === 1) {
+                    viewEst.classList.add('bg-success-subtle', 'text-success', 'border', 'border-success-subtle');
+                } else if (stateId === 2) {
+                    viewEst.classList.add('bg-danger-subtle', 'text-danger', 'border', 'border-danger-subtle');
+                } else if (stateId === 7) {
+                    viewEst.classList.add('bg-info-subtle', 'text-info', 'border', 'border-info-subtle');
                 } else {
-                    const alertEl = document.getElementById(alertId);
-                    alertEl.textContent = "Error inesperado en el servidor.";
-                    alertEl.classList.remove('d-none');
+                    viewEst.classList.add('bg-warning-subtle', 'text-warning', 'border', 'border-warning-subtle');
                 }
-            } catch (err) {
-                console.error(err);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalBtnHtml;
-            }
-        });
-    }
 
-    function resetValidation(formId, alertId) {
-        const f = document.getElementById(formId);
-        f.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        f.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
-        if (alertId) document.getElementById(alertId).classList.add('d-none');
-    }
-
-    function applyErrors(formId, alertId, errors) {
-        const f = document.getElementById(formId);
-        const alertEl = document.getElementById(alertId);
-        let errorCount = Object.keys(errors).length;
-
-        Object.keys(errors).forEach(key => {
-            const input = f.querySelector(`[name="${key}"]`) || f.querySelector(`#edit_${key}`);
-            if (input) {
-                input.classList.add('is-invalid');
-                const feedback = f.querySelector(`.feedback-${key}`);
-                if (feedback) {
-                    feedback.innerText = errors[key][0];
-                }
-            }
-        });
-
-        const firstError = Object.values(errors)[0][0];
-        alertEl.innerHTML = `<div class="d-flex align-items-center gap-2">
-            <span class="material-symbols-rounded" style="font-size:1.2rem">error</span>
-            <span><strong>Error:</strong> ${firstError}</span>
-        </div>`;
-        alertEl.classList.remove('d-none');
-    }
-
-    manageAjax('formCreateBus', 'create-errors-alert');
-    manageAjax('formEditBus', 'edit-errors-alert');
-</script>
-
-<script>
-    document.getElementById('placa').addEventListener('input', function(e) {
-
-        let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-
-        if (value.length <= 3) {
-            // Solo permitir letras en los primeros 3
-            value = value.replace(/[^A-Z]/g, '');
-        } else {
-            let letters = value.substring(0, 3).replace(/[^A-Z]/g, '');
-            let numbers = value.substring(3).replace(/[^0-9]/g, '');
-            value = letters + numbers;
+                const modalEl = document.getElementById('modalViewBus');
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } catch (err) { console.error('Ver Bus Error:', err); }
         }
 
-        e.target.value = value.substring(0, 6);
+        function handleEditBus(btn) {
+            try {
+                const data = JSON.parse(btn.dataset.json);
+                const form = document.getElementById('formEditBus');
+                if (!form) return;
+
+                document.getElementById('edit_placa_display').value = data.placa;
+                document.getElementById('edit_modelo').value = data.modelo || '';
+                document.getElementById('edit_capacidad').value = data.capacidad_pasajeros || 0;
+                document.getElementById('edit_kilometraje').value = data.kilometraje || 0;
+                document.getElementById('edit_id_estado').value = data.id_estado;
+
+                document.getElementById('edit_linc_transito').value = data.linc_transito || '';
+                document.getElementById('edit_doc_propietario').value = data.doc_propietario || '';
+                document.getElementById('edit_nombre_propietario').value = data.nombre_propietario || '';
+                document.getElementById('edit_telefono').value = data.telefono || '';
+                document.getElementById('edit_correo').value = data.correo || '';
+                document.getElementById('edit_numero_chasis').value = data.numero_chasis || '';
+                document.getElementById('edit_numero_motor').value = data.numero_motor || '';
+
+                form.action = "{{ url('admin/buses') }}/" + data.placa;
+                sessionStorage.setItem('last_edit_bus_placa', data.placa);
+
+                const modalEl = document.getElementById('modalEditBus');
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } catch (err) { console.error('Edit Bus Error:', err); }
+        }
+
+        // Manejo de errores y reapertura de modales
+        @if($errors->any())
+            @if(old('_method') == 'PUT')
+                const lastPlaca = sessionStorage.getItem('last_edit_bus_placa');
+                if (lastPlaca) {
+                    const form = document.getElementById('formEditBus');
+                    form.action = "{{ url('admin/buses') }}/" + lastPlaca;
+                    new bootstrap.Modal(document.getElementById('modalEditBus')).show();
+                }
+            @else
+                new bootstrap.Modal(document.getElementById('modalCreateBus')).show();
+            @endif
+        @endif
+
+        // Validaciones de Entrada (Solo números / Solo letras)
+        document.querySelectorAll('.text-input-validate').forEach(container => {
+            const input = container.querySelector('input');
+            const type = container.getAttribute('data-type');
+            
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    if (type === 'number') {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                    } else if (type === 'text') {
+                        this.value = this.value.replace(/[0-9]/g, '');
+                    }
+                });
+            }
+        });
+
+        // Formateo de placa
+        const placaInput = document.querySelector('[name="placa"]');
+        if (placaInput) {
+            placaInput.addEventListener('input', function(e) {
+                let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                if (value.length <= 3) {
+                    value = value.replace(/[^A-Z]/g, '');
+                } else {
+                    let letters = value.substring(0,3).replace(/[^A-Z]/g, '');
+                    let numbers = value.substring(3).replace(/[^0-9]/g, '');
+                    value = letters + numbers;
+                }
+                e.target.value = value.substring(0,6);
+            });
+        }
     });
 </script>
 
@@ -477,12 +586,45 @@
         font-size: 0.75rem;
     }
 
-    .modal-content {
+    .ls-1 {
+        letter-spacing: 0.5px;
+    }
+
+    .fw-extrabold {
+        font-weight: 800;
+    }
+
+    .rounded-4 {
         border-radius: 1rem !important;
     }
 
+    .modal-content {
+        border-radius: 1.5rem !important;
+    }
+
     .table-hover tbody tr:hover {
-        background-color: rgba(94, 84, 142, 0.03) !important;
+        background-color: rgba(94, 84, 142, 0.04) !important;
+    }
+
+    .tracking-tight {
+        letter-spacing: -0.025em;
+    }
+    
+    .tracking-tighter {
+        letter-spacing: -0.05em;
+    }
+
+    .bg-info-subtle {
+        background-color: #e1f5fe !important;
+    }
+    
+    .text-info {
+        color: #0288d1 !important;
+    }
+
+    .invalid-feedback {
+        font-weight: 500;
+        font-size: 0.8rem;
     }
 </style>
 @endpush

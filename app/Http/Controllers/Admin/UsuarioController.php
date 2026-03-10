@@ -40,29 +40,45 @@ class UsuarioController extends Controller
             $query->where('usuario.id_tipo_usuario', $selectedRole);
         }
 
-        $usuarios = $query->orderBy('usuario.primer_nombre')->paginate(15)->withQueryString();
+        $usuarios = $query->orderBy('usuario.primer_nombre')->paginate(5)->withQueryString();
 
         return view('admin.usuarios.index', compact('usuarios', 'roles', 'selectedRole', 'estados'));
     }
 
     public function store(StoreUsuarioRequest $request)
     {
-        $passwordGenerada = Str::random(10);
+        try {
+            $passwordGenerada = Str::random(10);
 
-        Usuario::create([
-            'nombre' => $request->nombre,
-            'apellido' => $request->apellido,
-            'doc_usuario' => $request->doc_usuario,
-            'correo' => $request->correo,
-            'telefono' => $request->telefono,
-            'rol' => $request->rol,
-            'estado' => $request->estado,
-            'password' => Hash::make($passwordGenerada)
-        ]);
+            // Usamos los nombres de campos que vienen del formulario
+            $data = [
+                'primer_nombre'   => $request->primer_nombre,
+                'segundo_nombre'  => $request->segundo_nombre,
+                'primer_apellido' => $request->primer_apellido,
+                'segundo_apellido'=> $request->segundo_apellido,
+                'doc_usuario'     => $request->doc_usuario,
+                'correo'          => $request->correo,
+                'telefono'        => $request->telefono,
+                'id_tipo_usuario' => $request->id_tipo_usuario,
+                'id_estado'       => 1,
+                'password'        => Hash::make($passwordGenerada),
+                'NIT'             => Auth::user()->NIT
+            ];
 
-        return redirect()
-            ->route('admin.usuarios.index')
-            ->with('password_generada', $passwordGenerada, 'success', 'Usuario creado correctamente.');
+            if ($request->hasFile('foto_usuario')) {
+                $path = $request->file('foto_usuario')->store('usuarios', 'public');
+                $data['foto_usuario'] = $path;
+            }
+
+            Usuario::create($data);
+
+            return redirect()
+                ->route('admin.usuarios.index')
+                ->with('success', 'Registro creado correctamente. Contraseña: ' . $passwordGenerada);
+
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Error al crear: ' . $e->getMessage());
+        }
     }
 
     public function update(Request $request, $doc_usuario)
@@ -70,31 +86,49 @@ class UsuarioController extends Controller
         $request->validate([
             'doc_usuario' => [
                 'required',
-                'digits_between:7,10',
-                'regex:/^[1-9][0-9]*$/'
+                'numeric',
+                'regex:/^[1-9][0-9]{8,11}$/'
             ],
-            'primer_nombre' => 'required|string|max:50',
-            'segundo_nombre' => 'nullable|string|max:50',
-            'primer_apellido' => 'required|string|max:50',
-            'segundo_apellido' => 'nullable|string|max:50',
+            'primer_nombre' => 'required|string|min:2|regex:/^[\pL\s]+$/u',
+            'segundo_nombre' => 'nullable|string|min:2|regex:/^[\pL\s]+$/u',
+            'primer_apellido' => 'required|string|min:2|regex:/^[\pL\s]+$/u',
+            'segundo_apellido' => 'required|string|min:2|regex:/^[\pL\s]+$/u',
             'correo' => 'required|email|max:150',
-            'telefono' => 'required|string|size:10',
+            'telefono' => 'required|numeric|digits:10',
             'id_tipo_usuario' => 'required|integer|exists:tipo_usuario,id_tipo_usuario',
             'id_estado' => 'required|integer|in:1,2,3',
         ], [
             'doc_usuario.required' => 'El documento es obligatorio.',
-            'doc_usuario.digits_between' => 'El documento debe tener entre 7 y 10 dígitos.',
-            'doc_usuario.regex' => 'El documento no puede iniciar con 0.',
+            'doc_usuario.numeric' => 'El documento solo puede contener números.',
+            'doc_usuario.regex' => 'El documento debe tener mínimo 9 dígitos y no puede iniciar con 0.',
             'primer_nombre.required' => 'El primer nombre es obligatorio.',
+            'primer_nombre.min' => 'El primer nombre debe tener mínimo 2 caracteres.',
+            'primer_nombre.regex' => 'El primer nombre solo puede contener letras.',
             'primer_apellido.required' => 'El primer apellido es obligatorio.',
+            'primer_apellido.min' => 'El primer apellido debe tener mínimo 2 caracteres.',
+            'primer_apellido.regex' => 'El primer apellido solo puede contener letras.',
+            'segundo_apellido.required' => 'El segundo apellido es obligatorio.',
             'correo.required' => 'El correo es obligatorio.',
             'telefono.required' => 'El teléfono es obligatorio.',
-            'telefono.size' => 'El teléfono debe tener exactamente 10 dígitos.',
+            'telefono.digits' => 'El teléfono debe tener exactamente 10 dígitos.',
             'id_tipo_usuario.required' => 'Debe seleccionar un rol.',
             'id_estado.required' => 'Debe seleccionar un estado.',
         ]);
 
-        Usuario::where('doc_usuario', $doc_usuario)->update($request->except(['_token', '_method']));
+        $data = $request->except(['_token', '_method', 'foto_usuario', 'form_type']);
+        
+        if ($request->hasFile('foto_usuario')) {
+            // Opcional: Eliminar foto anterior si existe
+            $userToUpdate = Usuario::find($doc_usuario);
+            if ($userToUpdate && $userToUpdate->foto_usuario) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($userToUpdate->foto_usuario);
+            }
+            
+            $path = $request->file('foto_usuario')->store('usuarios', 'public');
+            $data['foto_usuario'] = $path;
+        }
+
+        Usuario::where('doc_usuario', $doc_usuario)->update($data);
 
         // Si el usuario editado es el que está en sesión y se inactiva o bloquea, cerrar sesión
         $usuarioEditado = Auth::user();
@@ -103,6 +137,6 @@ class UsuarioController extends Controller
             return redirect('/login')->with('error', 'Tu cuenta ha sido inactivada o bloqueada.');
         }
 
-        return redirect()->route('admin.usuarios.index')->with('success', 'Usuario actualizado correctamente');
+        return redirect()->route('admin.usuarios.index')->with('success', 'Registro actualizado correctamente');
     }
 }
