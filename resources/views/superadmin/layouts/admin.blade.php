@@ -106,7 +106,6 @@
                     </a>
                 </li>
 
-
                 {{-- TIPOS DE EMPRESA --}}
                 <li>
                     <a class="dropdown-item"
@@ -122,7 +121,6 @@
                         <i class="bi bi-people"></i> Tipos de Usuario
                     </a>
                 </li>
-
                 {{-- ESTADOS --}}
                 <li>
                     <a class="dropdown-item"

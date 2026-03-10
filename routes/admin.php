@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\BusController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UsuarioController;
-
+use App\Http\Controllers\Admin\DocumentoController;
 use App\Http\Controllers\Admin\AsignacionController;
 use App\Http\Controllers\Admin\RutaController;
 
@@ -36,5 +36,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('/rutas/{ruta}', [RutaController::class, 'update'])->name('rutas.update');
         Route::get('/rutas/export', [RutaController::class, 'export'])->name('rutas.export');
         Route::get('/rutas/barrios/{id_ciudad}', [RutaController::class, 'getBarriosByCiudad'])->name('rutas.barrios');
+
+        // Módulo de Documentos
+        Route::get('documentos', [DocumentoController::class, 'index'])->name('documentos.index');
+        Route::get('documentos/create', [DocumentoController::class, 'create'])->name('documentos.create');
+        Route::post('documentos', [DocumentoController::class, 'store'])->name('documentos.store');
+        Route::get('documentos/{id}/edit', [DocumentoController::class, 'edit'])->name('documentos.edit');
+        Route::put('documentos/{id}', [DocumentoController::class, 'update'])->name('documentos.update');
+        Route::delete('documentos/{id}', [DocumentoController::class, 'destroy'])->name('documentos.destroy');
+        Route::get('documentos/{id}/download', [DocumentoController::class, 'download'])->name('documentos.download');
+        Route::get('documentos/export', [DocumentoController::class, 'export'])->name('documentos.export');
     });
 });

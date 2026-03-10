@@ -22,7 +22,7 @@ class LoginController extends Controller
 
         /*
         |----------------------------------
-        | 1️⃣ INTENTO USUARIOS (web)
+        |  INTENTO USUARIOS (web)
         |----------------------------------
         */
         if (Auth::guard('web')->attempt([
