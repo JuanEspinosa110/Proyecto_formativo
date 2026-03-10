@@ -41,7 +41,7 @@ class CiudadController extends Controller
                 });
             })
             ->orderBy('id_ciudad', 'asc')
-            ->paginate(10);
+            ->paginate(5);
 
         // mantenemos AMBOS filtros en la paginación
         $ciudades->appends([

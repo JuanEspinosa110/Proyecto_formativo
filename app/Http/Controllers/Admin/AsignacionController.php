@@ -41,7 +41,7 @@ class AsignacionController extends Controller
 
         // Orden ID ASC y paginación
         $asignaciones = $query->orderBy('id_viaje', 'asc')
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString();
 
         // Datos para los modales
@@ -76,7 +76,7 @@ class AsignacionController extends Controller
         Viaje::create($data);
 
         return redirect()->route('admin.asignaciones.index')
-            ->with('success', 'Asignación creada exitosamente.');
+            ->with('success', 'Registro creado correctamente');
     }
 
     /**
@@ -87,7 +87,7 @@ class AsignacionController extends Controller
         $asignacion->update($request->validated());
 
         return redirect()->route('admin.asignaciones.index')
-            ->with('success', 'Asignación actualizada correctamente.');
+            ->with('success', 'Registro actualizado correctamente');
     }
 
     /**
@@ -98,6 +98,6 @@ class AsignacionController extends Controller
         $asignacion->delete();
 
         return redirect()->route('admin.asignaciones.index')
-            ->with('success', 'Asignación eliminada correctamente.');
+            ->with('success', 'Registro eliminado correctamente');
     }
 }

@@ -96,12 +96,13 @@
                                     </div>
                                 </td>
                                 <td class="text-end pe-4">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button type="button" class="btn btn-sm btn-action-edit btn-outline-primary border-2 d-flex align-items-center justify-content-center p-2 rounded-3" 
-                                                onclick="editarBarrio({{ $barrio->id_barrio }}, '{{ addslashes($barrio->nombre) }}', '{{ $barrio->id_ciudad }}')"
-                                                title="Editar barrio">
+                                    <div class="d-flex justify-content-end gap-3">
+                                        <a href="#" 
+                                           class="text-primary text-decoration-none d-flex align-items-center"
+                                           onclick="editarBarrio({{ $barrio->id_barrio }}, '{{ addslashes($barrio->nombre) }}', '{{ $barrio->id_ciudad }}')"
+                                           title="Editar barrio">
                                             <span class="material-symbols-rounded fs-5">edit</span>
-                                        </button>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -133,29 +134,26 @@
 {{-- MODAL CREAR --}}
 <div class="modal fade" id="modalCrear" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0 bg-primary text-white p-4">
-                <div class="d-flex align-items-center gap-3">
-                    <span class="material-symbols-rounded fs-2">add_location_alt</span>
-                    <div>
-                        <h5 class="modal-title fw-bold mb-0">Registrar Nuevo Barrio</h5>
-                        <small class="opacity-75">Ingrese los detalles del nuevo barrio</small>
-                    </div>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-primary me-2 fs-5">add_location_alt</span>
+                    REGISTRAR NUEVO BARRIO
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form action="{{ route('superadmin.configuracion.barrios.store') }}" method="POST">
                 @csrf
                 <div class="modal-body p-4">
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-dark small text-uppercase ls-wide">Nombre del Barrio</label>
-                        <input type="text" name="nombre" class="form-control form-control-lg bg-light border-0 shadow-none @error('nombre') is-invalid @enderror" value="{{ old('nombre') }}" placeholder="Ej: Chapinero" required maxlength="100">
+                    <div class="mb-3 text-input-validate" data-type="text">
+                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre del Barrio</label>
+                        <input type="text" name="nombre" class="form-control form-control-sm @error('nombre') is-invalid @enderror" value="{{ old('nombre') }}" placeholder="Ej: Chapinero" required maxlength="100">
                         @error('nombre') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="mb-0">
-                        <label class="form-label fw-bold text-dark small text-uppercase ls-wide">Ciudad Asociada</label>
-                        <select name="id_ciudad" class="form-select form-select-lg bg-light border-0 shadow-none @error('id_ciudad') is-invalid @enderror" required>
-                            <option value="" disabled selected>Seleccione la ciudad...</option>
+                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">Ciudad Asociada</label>
+                        <select name="id_ciudad" class="form-select form-select-sm @error('id_ciudad') is-invalid @enderror" required>
+                            <option value="" disabled selected>Seleccione...</option>
                             @foreach($ciudades as $ciudad)
                                 <option value="{{ $ciudad->id_ciudad }}" {{ old('id_ciudad') == $ciudad->id_ciudad ? 'selected' : '' }}>
                                     {{ $ciudad->nombre_city }}
@@ -165,9 +163,9 @@
                         @error('id_ciudad') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                 </div>
-                <div class="modal-footer border-0 p-4 bg-light bg-opacity-50">
-                    <button type="button" class="btn btn-light px-4 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4 fw-bold">Crear Barrio</button>
+                <div class="modal-footer border-0 p-3 bg-light">
+                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold shadow-sm">CREAR BARRIO</button>
                 </div>
             </form>
         </div>
@@ -177,37 +175,34 @@
 {{-- MODAL EDITAR --}}
 <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header border-0 bg-dark text-white p-4">
-                <div class="d-flex align-items-center gap-3">
-                    <span class="material-symbols-rounded fs-2">edit_location</span>
-                    <div>
-                        <h5 class="modal-title fw-bold mb-0">Editar Información</h5>
-                        <small class="opacity-75">Modifique los datos del barrio seleccionado</small>
-                    </div>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-warning me-2 fs-5">edit_location</span>
+                    MODIFICAR BARRIO
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form id="formEditar" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="modal-body p-4">
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-dark small text-uppercase ls-wide">Nombre del Barrio</label>
-                        <input type="text" name="nombre" id="edit_nombre" class="form-control form-control-lg bg-light border-0 shadow-none" required maxlength="100">
+                    <div class="mb-3 text-input-validate" data-type="text">
+                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre del Barrio</label>
+                        <input type="text" name="nombre" id="edit_nombre" class="form-control form-control-sm shadow-none" required maxlength="100">
                     </div>
                     <div class="mb-0">
-                        <label class="form-label fw-bold text-dark small text-uppercase ls-wide">Ciudad Asociada</label>
-                        <select name="id_ciudad" id="edit_id_ciudad" class="form-select form-select-lg bg-light border-0 shadow-none" required>
+                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">Ciudad Asociada</label>
+                        <select name="id_ciudad" id="edit_id_ciudad" class="form-select form-select-sm shadow-none" required>
                             @foreach($ciudades as $ciudad)
                                 <option value="{{ $ciudad->id_ciudad }}">{{ $ciudad->nombre_city }}</option>
                             @endforeach
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer border-0 p-4 bg-light bg-opacity-50">
-                    <button type="button" class="btn btn-light px-4 fw-semibold" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4 fw-bold">Guardar Cambios</button>
+                <div class="modal-footer border-0 p-3 bg-light">
+                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold shadow-sm">GUARDAR CAMBIOS</button>
                 </div>
             </form>
         </div>
@@ -217,10 +212,11 @@
 
 <style>
     .fs-xs { font-size: 0.75rem; }
-    .ls-wide { letter-spacing: 0.05em; }
-    .btn-action-edit:hover { background-color: var(--bs-primary) !important; color: white !important; }
-    .form-control:focus, .form-select:focus { background-color: #fff !important; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1) !important; }
-    .modal-backdrop.show { opacity: 0.7; }
+    .ls-1 { letter-spacing: 0.5px; }
+    .table-hover tbody tr:hover {
+        background-color: rgba(94, 84, 142, 0.03) !important;
+        cursor: default;
+    }
 </style>
 
 @push('scripts')
@@ -238,8 +234,21 @@
         modal.show();
     }
 
+    // Validaciones de Entrada (Solo texto)
+    document.querySelectorAll('.text-input-validate').forEach(container => {
+        const input = container.querySelector('input');
+        const type = container.getAttribute('data-type');
+        
+        if (input) {
+            input.addEventListener('input', function(e) {
+                if (type === 'text') {
+                    this.value = this.value.replace(/[0-9]/g, '');
+                }
+            });
+        }
+    });
 
-    // Auto-open modal si hay errores de validación (opcional, para mejor UX)
+    // Auto-open modal si hay errores de validación
     @if($errors->any() && !old('_method'))
         window.addEventListener('load', () => {
             const modal = new bootstrap.Modal(document.getElementById('modalCrear'));
