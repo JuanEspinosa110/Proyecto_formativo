@@ -205,6 +205,17 @@
                             <input type="number" name="kilometraje" class="form-control bg-light border-0 py-2" required min="0">
                             <div class="invalid-feedback feedback-kilometraje"></div>
                         </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Núm. Chasis</label>
+                            <input type="text" name="numero_chasis" class="form-control bg-light border-0 py-2" maxlength="17">
+                            <div class="invalid-feedback feedback-numero_chasis"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Núm. Motor</label>
+                            <input type="text" name="numero_motor" class="form-control bg-light border-0 py-2" maxlength="14">
+                            <div class="invalid-feedback feedback-numero_motor"></div>
+                        </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Lic. Tránsito</label>
@@ -230,17 +241,6 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Correo Electrónico</label>
                             <input type="email" name="correo" class="form-control bg-light border-0 py-2" placeholder="correo@ejemplo.com">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Núm. Chasis</label>
-                            <input type="text" name="numero_chasis" class="form-control bg-light border-0 py-2" maxlength="17">
-                            <div class="invalid-feedback feedback-numero_chasis"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Núm. Motor</label>
-                            <input type="text" name="numero_motor" class="form-control bg-light border-0 py-2" maxlength="14">
-                            <div class="invalid-feedback feedback-numero_motor"></div>
                         </div>
 
                         <div class="col-12">
@@ -283,7 +283,7 @@
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Placa del Vehículo</label>
-                            <input type="text" id="edit_placa_display" class="form-control bg-light border-0 fw-bold text-primary" readonly>
+                            <input type="text" id="edit_placa_display" class="form-control bg-light border-0 fw-bold text-primary" name="placa" readonly>
                         </div>
 
                         <div class="col-md-6">
@@ -310,6 +310,15 @@
                         </div>
 
                         <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Núm. Chasis</label>
+                            <input type="text" name="numero_chasis" id="edit_numero_chasis" class="form-control bg-light border-0 py-2" maxlength="17">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Núm. Motor</label>
+                            <input type="text" name="numero_motor" id="edit_numero_motor" class="form-control bg-light border-0 py-2" maxlength="14">
+                        </div>
+
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Lic. Tránsito</label>
                             <input type="number" name="linc_transito" id="edit_linc_transito" class="form-control bg-light border-0 py-2">
                         </div>
@@ -329,15 +338,6 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Correo Electrónico</label>
                             <input type="email" name="correo" id="edit_correo" class="form-control bg-light border-0 py-2">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Núm. Chasis</label>
-                            <input type="text" name="numero_chasis" id="edit_numero_chasis" class="form-control bg-light border-0 py-2" maxlength="17">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Núm. Motor</label>
-                            <input type="text" name="numero_motor" id="edit_numero_motor" class="form-control bg-light border-0 py-2" maxlength="14">
                         </div>
                     </div>
                 </div>
@@ -455,21 +455,21 @@
 </script>
 
 <script>
-document.getElementById('placa').addEventListener('input', function(e) {
+    document.getElementById('placa').addEventListener('input', function(e) {
 
-    let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
-    if (value.length <= 3) {
-        // Solo permitir letras en los primeros 3
-        value = value.replace(/[^A-Z]/g, '');
-    } else {
-        let letters = value.substring(0,3).replace(/[^A-Z]/g, '');
-        let numbers = value.substring(3).replace(/[^0-9]/g, '');
-        value = letters + numbers;
-    }
+        if (value.length <= 3) {
+            // Solo permitir letras en los primeros 3
+            value = value.replace(/[^A-Z]/g, '');
+        } else {
+            let letters = value.substring(0, 3).replace(/[^A-Z]/g, '');
+            let numbers = value.substring(3).replace(/[^0-9]/g, '');
+            value = letters + numbers;
+        }
 
-    e.target.value = value.substring(0,6);
-});
+        e.target.value = value.substring(0, 6);
+    });
 </script>
 
 <style>

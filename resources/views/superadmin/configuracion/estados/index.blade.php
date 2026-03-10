@@ -124,7 +124,7 @@
                 <div class="modal-body py-4">
                     <div class="mb-0">
                         <label class="form-label fw-semibold">Nombre del Estado <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_estado" class="form-control @error('nombre_estado') is-invalid @enderror" placeholder="Ej: Activo" required value="{{ old('nombre_estado') }}">
+                        <input type="text" name="nombre_estado" id="nombre_estado" class="form-control @error('nombre_estado') is-invalid @enderror" placeholder="Ej: Activo" required value="{{ old('nombre_estado') }}">
                         @error('nombre_estado')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -186,6 +186,18 @@
                 sessionStorage.setItem('last_edit_id_estado', id);
             });
         }
+
+        const camposTexto = ['nombre_estado', 'editNombre'];
+
+        camposTexto.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    // Reemplaza lo que NO sea: letras (a-z), letras con tilde, ñ o espacios
+                    this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+                });
+            }
+        });
 
         @if($errors->any())
         @if(old('_method') == 'PUT')

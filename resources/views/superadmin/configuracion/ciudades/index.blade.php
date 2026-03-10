@@ -132,7 +132,7 @@
                 <div class="modal-body py-4">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Código ID (2 dígitos) <span class="text-danger">*</span></label>
-                        <input type="text" name="id_departamento" class="form-control @error('id_departamento') is-invalid @enderror"
+                        <input type="text" name="id_departamento" id="id_departamento" inputmode="numeric" class="form-control @error('id_departamento') is-invalid @enderror"
                             placeholder="Ej: 05" maxlength="2" required value="{{ old('id_departamento') }}">
                         @error('id_departamento')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -168,21 +168,21 @@
                 <div class="modal-body py-4">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Código Postal <span class="text-danger">*</span></label>
-                        <input type="text" name="id_ciudad" class="form-control @error('id_ciudad') is-invalid @enderror" placeholder="Ej: 05001" required value="{{ old('id_ciudad') }}">
+                        <input type="text" name="id_ciudad" id="id_ciudad" inputmode="numeric" class="form-control @error('id_ciudad') is-invalid @enderror" placeholder="Ej: 05001" required value="{{ old('id_ciudad') }}">
                         @error('id_ciudad')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Nombre de la Ciudad <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_city" class="form-control @error('nombre_city') is-invalid @enderror" placeholder="Ej: Medellín" required value="{{ old('nombre_city') }}">
+                        <input type="text" name="nombre_city" id="nombre_city" class="form-control @error('nombre_city') is-invalid @enderror" placeholder="Ej: Medellín" required value="{{ old('nombre_city') }}">
                         @error('nombre_city')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="mb-0">
                         <label class="form-label fw-semibold">Departamento <span class="text-danger">*</span></label>
-                        <select name="id_departamento" class="form-select @error('id_departamento') is-invalid @enderror" required>
+                        <select name="id_departamento" id="id_departamento" class="form-select @error('id_departamento') is-invalid @enderror" required>
                             <option value="">Seleccione...</option>
                             @foreach($departamentos as $depto)
                             <option value="{{ $depto->id_departamento }}" {{ old('id_departamento') == $depto->id_departamento ? 'selected' : '' }}>
@@ -266,6 +266,19 @@
                 sessionStorage.setItem('last_edit_id_ciudad', id);
             });
         }
+
+        // Lista de IDs de los inputs que quieres restringir a solo números
+        const camposNumericos = ['id_departamento', 'id_ciudad'];
+
+        camposNumericos.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    // Reemplaza cualquier cosa que NO sea un número (0-9) con un string vacío
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                });
+            }
+        });
 
         // Redirect error to correct modal
         @if($errors->any())
