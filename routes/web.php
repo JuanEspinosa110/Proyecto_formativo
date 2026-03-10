@@ -21,8 +21,10 @@ use App\Http\Controllers\SuperAdmin\{
     PerfilSeguridadController,
     PlanLicenciaController,
     RutaController,
+    CiudadController,
 };
 
+require base_path('routes/superadmin.php');
 // Rutas Administrativas (Panel Empresas)
 require base_path('routes/admin.php');
 

@@ -15,7 +15,7 @@
             <p class="sigu-page-sub">Panel de configuración de barrios por ciudad — Módulo Configuración</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('superadmin.barrios.export') }}" class="btn btn-outline-success d-flex align-items-center gap-2 px-3 shadow-sm border-2">
+            <a href="{{ route('superadmin.configuracion.barrios.export') }}" class="btn btn-outline-success d-flex align-items-center gap-2 px-3 shadow-sm border-2">
                 <span class="material-symbols-rounded fs-5">file_download</span>
                 <span class="fw-semibold">Exportar Excel</span>
             </a>
@@ -51,7 +51,7 @@
             
             <!-- FILTROS -->
             <div class="p-4 border-bottom bg-light bg-opacity-50">
-                <form action="{{ route('superadmin.barrios.index') }}" method="GET" class="row g-3">
+                <form action="{{ route('superadmin.configuracion.barrios.index') }}" method="GET" class="row g-3">
                     <div class="col-md-6 col-lg-4">
                         <div class="input-group shadow-sm">
                             <span class="input-group-text bg-white border-end-0">
@@ -63,7 +63,7 @@
                     <div class="col-auto">
                         <button type="submit" class="btn btn-secondary px-4 fw-semibold shadow-sm">Filtrar</button>
                         @if(request('search'))
-                            <a href="{{ route('superadmin.barrios.index') }}" class="btn btn-link text-decoration-none text-muted fw-medium">Limpiar</a>
+                            <a href="{{ route('superadmin.configuracion.barrios.index') }}" class="btn btn-link text-decoration-none text-muted fw-medium">Limpiar</a>
                         @endif
                     </div>
                 </form>
@@ -144,7 +144,7 @@
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('superadmin.barrios.store') }}" method="POST">
+            <form action="{{ route('superadmin.configuracion.barrios.store') }}" method="POST">
                 @csrf
                 <div class="modal-body p-4">
                     <div class="mb-4">
@@ -230,7 +230,7 @@
      */
     function editarBarrio(id, nombre, idCiudad) {
         const form = document.getElementById('formEditar');
-        form.action = "{{ url('superadmin/barrios') }}/" + id;
+        form.action = "{{ url('superadmin/configuracion/barrios') }}/" + id;
         document.getElementById('edit_nombre').value = nombre;
         document.getElementById('edit_id_ciudad').value = idCiudad;
         

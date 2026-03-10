@@ -6,9 +6,18 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Ciudad;
 use App\Models\Departamento;
+use App\Services\SuperAdmin\Configuracion\CiudadService;
 
 class CiudadController extends Controller
 {
+    // Inyectamos el servicio de Ciudad para manejar la lógica de negocio
+    protected $ciudadService;
+
+    public function __construct(CiudadService $ciudadService)
+    {
+        $this->ciudadService = $ciudadService;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | INDEX — Vista principal unificada
@@ -25,9 +34,9 @@ class CiudadController extends Controller
 
             $query->where(function ($q) use ($buscar) {
                 $q->where('nombre_city', 'LIKE', "%$buscar%")
-                  ->orWhereHas('departamento', function ($sub) use ($buscar) {
-                      $sub->where('nombre_departamento', 'LIKE', "%$buscar%");
-                  });
+                    ->orWhereHas('departamento', function ($sub) use ($buscar) {
+                        $sub->where('nombre_departamento', 'LIKE', "%$buscar%");
+                    });
             });
         }
 
@@ -35,8 +44,10 @@ class CiudadController extends Controller
 
         $departamentos = Departamento::orderBy('nombre_departamento')->get();
 
-        return view('superadmin.configuracion.ciudades.index',
-            compact('ciudades', 'departamentos'));
+        return view(
+            'superadmin.configuracion.ciudades.index',
+            compact('ciudades', 'departamentos')
+        );
     }
 
     /*
@@ -77,8 +88,10 @@ class CiudadController extends Controller
             'id_departamento' => $request->id_departamento
         ]);
 
-        return redirect()->back()->with('success',
-            'Ciudad creada correctamente con el código: ' . $id_ciudad);
+        return redirect()->back()->with(
+            'success',
+            'Ciudad creada correctamente con el código: ' . $id_ciudad
+        );
     }
 
     /*
@@ -116,8 +129,10 @@ class CiudadController extends Controller
             'id_departamento' => $request->id_departamento
         ]);
 
-        return redirect()->back()->with('success',
-            'Ciudad actualizada correctamente.');
+        return redirect()->back()->with(
+            'success',
+            'Ciudad actualizada correctamente.'
+        );
     }
 
 
@@ -126,23 +141,24 @@ class CiudadController extends Controller
     | CREAR DEPARTAMENTO (Desde mismo módulo)
     |--------------------------------------------------------------------------
     */
-    public function storeDepartamento(Request $request)
+
+    public function storeDepartamentoTEST(Request $request)
     {
-        $request->validate([
+        dd($request->all()); // Esto detendrá el programa y mostrará qué datos llegan
+        // 1. Validar que ambos campos lleguen desde el modal
+        $validated = $request->validate([
+            'id_departamento' => 'required|string|size:2|unique:departamento,id_departamento',
             'nombre_departamento' => 'required|string|max:100|unique:departamento,nombre_departamento'
         ], [
+            'id_departamento.required' => 'El código del departamento es obligatorio.',
+            'id_departamento.size' => 'El código debe tener exactamente 2 dígitos.',
+            'id_departamento.unique' => 'Este código ya existe.',
             'nombre_departamento.required' => 'El nombre del departamento es obligatorio.',
-            'nombre_departamento.unique' => 'Este departamento ya existe.',
-            'nombre_departamento.max' => 'Máximo 100 caracteres permitidos.'
         ]);
 
-        Departamento::create([
-            'nombre_departamento' => strtoupper($request->nombre_departamento)
-        ]);
+        // 2. Pasar TODO el arreglo $validated (que ya incluye el ID) al Service
+        $this->ciudadService->storeDepartamento($validated);
 
-        return redirect()->back()->with('success',
-            'Departamento creado correctamente.');
+        return redirect()->back()->with('success', 'Departamento creado correctamente.');
     }
-
-    
 }
