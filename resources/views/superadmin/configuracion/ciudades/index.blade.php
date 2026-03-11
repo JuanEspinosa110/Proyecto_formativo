@@ -84,7 +84,7 @@
                                     <td class="py-2">{{ $ciudad->departamento->nombre_departamento ?? 'Sin Departamento' }}</td>
                                     <td class="text-end px-4 py-2">
                                         <div class="d-flex justify-content-end gap-3">
-                                            <a href="#" 
+                                            <a href="#"
                                                class="text-primary text-decoration-none d-flex align-items-center"
                                                data-bs-toggle="modal"
                                                data-bs-target="#editarModal"
@@ -315,7 +315,7 @@
         document.querySelectorAll('.text-input-validate').forEach(container => {
             const input = container.querySelector('input');
             const type = container.getAttribute('data-type');
-            
+
             if (input) {
                 input.addEventListener('input', function(e) {
                     if (type === 'number') {

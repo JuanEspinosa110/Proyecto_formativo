@@ -155,12 +155,6 @@
                                    data-json="{{ json_encode($bus) }}">
                                     <span class="material-symbols-rounded fs-5">edit</span>
                                 </a>
-                                <form action="{{ route('admin.buses.destroy', $bus->placa) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar este vehículo? Todas las asignaciones relacionadas podrían verse afectadas.')">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="p-0 border-0 bg-transparent text-danger d-flex align-items-center" title="Eliminar">
-                                        <span class="material-symbols-rounded fs-5">delete</span>
-                                    </button>
-                                </form>
                             </div>
                         </td>
                     </tr>

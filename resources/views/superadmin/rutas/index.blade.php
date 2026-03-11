@@ -287,6 +287,8 @@
             btn.addEventListener('click', async function() {
                 const data = JSON.parse(this.dataset.json);
                 const form = document.getElementById('formEditRuta');
+                form.querySelector('[name="id_ciudad"]').value = data.id_ciudad || '';
+                form.querySelector('[name="codigo_ruta"]').value = data.codigo_ruta || '';
 
                 // 1. Limpiar validaciones previas
                 clearValidation('formEditRuta', 'edit-errors-alert');
@@ -449,7 +451,7 @@
         }
     });
 
-    // No permitir caracteres no numéricos 
+    // No permitir caracteres no numéricos
     document.addEventListener('input', function(e) {
         if (e.target.name === 'codigo_ruta') {
             // Eliminar todo lo que no sea número

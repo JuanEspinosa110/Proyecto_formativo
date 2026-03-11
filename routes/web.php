@@ -27,6 +27,8 @@ use App\Http\Controllers\SuperAdmin\{
 require base_path('routes/superadmin.php');
 // Rutas Administrativas (Panel Empresas)
 require base_path('routes/admin.php');
+// Rutas del Gestor SETP
+require base_path('routes/gestor-setp.php');
 
 use App\Http\Controllers\LandingController;
 
