@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\SuperAdmin;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ruta;
-// use App\Models\Empresa;
 use App\Services\RutaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Requests\SuperAdmin\RutaRequest;
+use App\Http\Requests\Admin\RutaRequest;
 
 class RutaController extends Controller
 {
@@ -31,7 +30,7 @@ class RutaController extends Controller
         $ciudades = \App\Models\Ciudad::orderBy('nombre_city')->get();
         $barrios = \App\Models\Barrio::orderBy('nombre')->get();
 
-        return view('superadmin.rutas.index', compact('rutas', 'estados', 'ciudades', 'barrios'));
+        return view('admin.rutas.index', compact('rutas', 'estados', 'ciudades', 'barrios'));
     }
 
     /**
@@ -47,8 +46,13 @@ class RutaController extends Controller
             'id_estado'         => 'required|numeric',
         ], [
             'codigo_ruta.required' => 'El código de la ruta es obligatorio.',
-            'codigo_ruta.unique'   => 'Este código de ruta ya se encuentra registrado.',
+            'codigo_ruta.numeric' => 'El código debe ser numérico.',
+            'codigo_ruta.unique'   => 'Este código de ruta ya está registrado.',
+            'id_ciudad.required'   => 'La ciudad es obligatoria.',
+            'id_barrio_origen.required' => 'El barrio de origen es obligatorio.',
+            'id_barrio_destino.required' => 'El barrio de destino es obligatorio.',
             'id_barrio_destino.different' => 'El barrio de destino debe ser diferente al de origen.',
+            'id_estado.required'   => 'El estado es obligatorio.',
         ]);
 
         if ($validator->fails()) {
@@ -58,12 +62,12 @@ class RutaController extends Controller
             ], 422);
         }
 
-        // Al usar el servicio, asegúrate de pasar los datos validados
         $this->rutaService->storeRuta($validator->validated());
+        session()->flash('success', 'Registro creado correctamente');
 
         return response()->json([
             'success' => true,
-            'message' => 'Ruta creada con éxito.'
+            'message' => 'Registro creado correctamente'
         ]);
     }
 
@@ -73,8 +77,9 @@ class RutaController extends Controller
     public function update(RutaRequest $request, Ruta $ruta)
     {
         $this->rutaService->updateRuta($ruta, $request->validated());
+        session()->flash('success', 'Registro actualizado correctamente');
 
-        return response()->json(['message' => 'La ruta ha sido actualizada correctamente.']);
+        return response()->json(['message' => 'Registro actualizado correctamente']);
     }
 
     /**

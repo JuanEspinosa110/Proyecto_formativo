@@ -35,12 +35,8 @@ class BusController extends Controller
     {
         $this->busService->storeBus($request->validated());
         
-        if ($request->ajax()) {
-            return response()->json(['message' => 'El bus ha sido creado exitosamente.']);
-        }
-
         return redirect()->route('admin.buses.index')
-            ->with('success', 'El bus ha sido creado exitosamente.');
+            ->with('success', 'Registro creado correctamente');
     }
 
     /**
@@ -50,12 +46,19 @@ class BusController extends Controller
     {
         $this->busService->updateBus($bus, $request->validated());
         
-        if ($request->ajax()) {
-            return response()->json(['message' => 'El bus ha sido actualizado correctamente.']);
-        }
-
         return redirect()->route('admin.buses.index')
-            ->with('success', 'El bus ha sido actualizado correctamente.');
+            ->with('success', 'Registro actualizado correctamente');
+    }
+
+    /**
+     * Eliminar bus
+     */
+    public function destroy(Bus $bus)
+    {
+        $this->busService->deleteBus($bus);
+        
+        return redirect()->route('admin.buses.index')
+            ->with('success', 'Registro eliminado correctamente');
     }
 
     /**

@@ -3,9 +3,9 @@
 @section('title', 'Asignaciones — SIGU')
 
 @section('content')
-<div class="container-fluid py-4">
+<div class="container-fluid pt-0 pb-4">
     <!-- Header de Página -->
-    <div class="d-flex align-items-center justify-content-between mb-4 mt-2 px-1">
+    <div class="d-flex align-items-center justify-content-between mb-4 px-1">
         <div>
             <h1 class="h3 mb-1 text-dark fw-bold">Gestión de Asignaciones</h1>
             <p class="text-muted small mb-0">Controla la vinculación de conductores, buses y rutas en tiempo real.</p>
@@ -90,9 +90,6 @@
                         <td class="ps-4 fw-bold text-muted">#{{ $asig->id_viaje }}</td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div class="rounded-circle bg-primary bg-opacity-10 p-2 text-primary d-flex">
-                                    <span class="material-symbols-rounded fs-5">directions_bus</span>
-                                </div>
                                 <span class="fw-bold text-dark">{{ $asig->placa }}</span>
                             </div>
                         </td>
@@ -127,19 +124,29 @@
                             </span>
                         </td>
                         <td class="text-end pe-4">
-                            <div class="d-flex justify-content-end gap-2">
-                                <button class="btn btn-outline-primary btn-sm rounded-3 px-3 edit-asignacion"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalEditAsignacion"
-                                    data-json="{{ json_encode($asig) }}">
-                                    <span class="material-symbols-rounded fs-6 align-middle me-1">edit</span>
-                                    Editar
-                                </button>
+                            <div class="d-flex justify-content-end gap-3">
+                                <a href="#" 
+                                   class="text-info text-decoration-none d-flex align-items-center view-asignacion"
+                                   title="Ver detalles"
+                                   data-json="{{ json_encode($asig) }}"
+                                   data-conductor="{{ optional($asig->conductor)->primer_nombre }} {{ optional($asig->conductor)->primer_apellido }}"
+                                   data-ruta="{{ $asig->ruta->nombre_ruta ?? 'Ruta #'.$asig->id_ruta }}"
+                                   data-estado="{{ optional($asig->estado)->nombre_estado }}">
+                                    <span class="material-symbols-rounded fs-5">visibility</span>
+                                </a>
+                                <a href="#" 
+                                   class="text-primary text-decoration-none d-flex align-items-center edit-asignacion"
+                                   title="Editar asignación"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#modalEditAsignacion"
+                                   data-json="{{ json_encode($asig) }}">
+                                    <span class="material-symbols-rounded fs-5">edit</span>
+                                </a>
                                 <form action="{{ route('admin.asignaciones.destroy', $asig->id_viaje) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar esta asignación?')">
                                     @csrf @method('DELETE')
                                     <input type="hidden" name="form_type" value="delete">
-                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-3">
-                                        <span class="material-symbols-rounded fs-6 align-middle">delete</span>
+                                    <button type="submit" class="p-0 border-0 bg-transparent text-danger d-flex align-items-center" title="Eliminar">
+                                        <span class="material-symbols-rounded fs-5">delete</span>
                                     </button>
                                 </form>
                             </div>
@@ -166,25 +173,25 @@
 </div>
 
 <!-- Modal CREAR -->
-<div class="modal fade @if($errors->any() && old('form_type') == 'create') show @endif" id="modalCreateAsignacion" tabindex="-1" aria-labelledby="modalCreateLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg rounded-3">
-            <div class="modal-header border-bottom-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold text-dark" id="modalCreateLabel">
-                    <span class="material-symbols-rounded align-middle me-2 text-primary">add_circle</span>
-                    Registrar Nueva Asignación
-                </h5>
-                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade @if($errors->any() && old('form_type') == 'create') show @endif" id="modalCreateAsignacion" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-primary me-2 fs-5">add_circle</span>
+                    NUEVA ASIGNACIÓN
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form id="formCreateAsignacion" action="{{ route('admin.asignaciones.store') }}" method="POST">
                 @csrf
                 <input type="hidden" name="form_type" value="create">
-                <div class="modal-body px-4 pb-4">
+                <div class="modal-body p-4">
                     <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Vehículo (Placa) <span class="text-danger">*</span></label>
-                            <select name="placa" class="form-select bg-light border-0 py-2 @error('placa') is-invalid @enderror" required>
-                                <option value="" selected disabled>Seleccionar vehículo...</option>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Vehículo (Placa) <span class="text-danger">*</span></label>
+                            <select name="placa" class="form-select form-select-sm @error('placa') is-invalid @enderror" required>
+                                <option value="" selected disabled>Seleccionar...</option>
                                 @foreach($buses as $bus)
                                 <option value="{{ $bus->placa }}" @if(old('placa') == $bus->placa) selected @endif>{{ $bus->placa }} - {{ $bus->modelo }}</option>
                                 @endforeach
@@ -192,10 +199,10 @@
                             @error('placa') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Ruta <span class="text-danger">*</span></label>
-                            <select name="id_ruta" class="form-select bg-light border-0 py-2 @error('id_ruta') is-invalid @enderror" required>
-                                <option value="" selected disabled>Seleccionar ruta...</option>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Ruta <span class="text-danger">*</span></label>
+                            <select name="id_ruta" class="form-select form-select-sm @error('id_ruta') is-invalid @enderror" required>
+                                <option value="" selected disabled>Seleccionar...</option>
                                 @foreach($rutas as $ruta)
                                 <option value="{{ $ruta->id_ruta }}" @if(old('id_ruta') == $ruta->id_ruta) selected @endif>{{ $ruta->nombre_ruta ?? 'Ruta #'.$ruta->id_ruta }}</option>
                                 @endforeach
@@ -203,10 +210,10 @@
                             @error('id_ruta') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Conductor <span class="text-danger">*</span></label>
-                            <select name="doc_us" class="form-select bg-light border-0 py-2 @error('doc_us') is-invalid @enderror" required>
-                                <option value="" selected disabled>Seleccionar conductor...</option>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Conductor <span class="text-danger">*</span></label>
+                            <select name="doc_us" class="form-select form-select-sm @error('doc_us') is-invalid @enderror" required>
+                                <option value="" selected disabled>Seleccionar...</option>
                                 @foreach($conductores as $con)
                                 <option value="{{ $con->doc_usuario }}" @if(old('doc_us') == $con->doc_usuario) selected @endif>{{ $con->primer_nombre }} {{ $con->primer_apellido }}</option>
                                 @endforeach
@@ -215,26 +222,25 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Fecha y Hora <span class="text-danger">*</span></label>
-                            <input type="datetime-local" name="fecha" class="form-control bg-light border-0 py-2 @error('fecha') is-invalid @enderror" value="{{ old('fecha') }}" required>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Fecha y Hora <span class="text-danger">*</span></label>
+                            <input type="datetime-local" name="fecha" class="form-control form-control-sm @error('fecha') is-invalid @enderror" value="{{ old('fecha') }}" required>
                             @error('fecha') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Estado <span class="text-danger">*</span></label>
-                            <select name="id_estado" class="form-select bg-light border-0 py-2 @error('id_estado') is-invalid @enderror" required>
-                                <option value="" selected disabled>Seleccionar estado...</option>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Estado <span class="text-danger">*</span></label>
+                            <select name="id_estado" class="form-select form-select-sm @error('id_estado') is-invalid @enderror" required>
                                 @foreach($estados as $est)
-                                <option value="{{ $est->id_estado }}" @if(old('id_estado') == $est->id_estado) selected @endif>{{ $est->nombre_estado }}</option>
+                                <option value="{{ $est->id_estado }}" @if(old('id_estado', 1) == $est->id_estado) selected @endif>{{ $est->nombre_estado }}</option>
                                 @endforeach
                             </select>
                             @error('id_estado') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-top-0 px-4 pb-4 bg-white d-flex gap-2">
-                    <button type="button" class="btn btn-light px-4 fw-semibold border" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm flex-fill">Guardar Asignación</button>
+                <div class="modal-footer border-0 p-3 bg-light">
+                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold shadow-sm">GUARDAR ASIGNACIÓN</button>
                 </div>
             </form>
         </div>
@@ -242,25 +248,25 @@
 </div>
 
 <!-- Modal EDITAR -->
-<div class="modal fade @if($errors->any() && old('form_type') == 'edit') show @endif" id="modalEditAsignacion" tabindex="-1" aria-labelledby="modalEditLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow-lg rounded-3">
-            <div class="modal-header border-bottom-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold text-dark" id="modalEditLabel">
-                    <span class="material-symbols-rounded align-middle me-2 text-primary">edit_square</span>
-                    Editar Asignación
-                </h5>
-                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade @if($errors->any() && old('form_type') == 'edit') show @endif" id="modalEditAsignacion" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-warning me-2 fs-5">edit_square</span>
+                    MODIFICAR ASIGNACIÓN
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form id="formEditAsignacion" action="{{ old('edit_action') }}" method="POST">
                 @csrf @method('PUT')
                 <input type="hidden" name="form_type" value="edit">
                 <input type="hidden" name="edit_action" id="edit_action_hidden" value="{{ old('edit_action') }}">
-                <div class="modal-body px-4 pb-4">
+                <div class="modal-body p-4">
                     <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Vehículo (Placa) <span class="text-danger">*</span></label>
-                            <select name="placa" id="edit_placa" class="form-select bg-light border-0 py-2 @error('placa') is-invalid @enderror" required>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Vehículo (Placa) <span class="text-danger">*</span></label>
+                            <select name="placa" id="edit_placa" class="form-select form-select-sm @error('placa') is-invalid @enderror" required>
                                 @foreach($buses as $bus)
                                 <option value="{{ $bus->placa }}" @if(old('placa') == $bus->placa) selected @endif>{{ $bus->placa }} - {{ $bus->modelo }}</option>
                                 @endforeach
@@ -268,9 +274,9 @@
                             @error('placa') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Ruta <span class="text-danger">*</span></label>
-                            <select name="id_ruta" id="edit_id_ruta" class="form-select bg-light border-0 py-2 @error('id_ruta') is-invalid @enderror" required>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Ruta <span class="text-danger">*</span></label>
+                            <select name="id_ruta" id="edit_id_ruta" class="form-select form-select-sm @error('id_ruta') is-invalid @enderror" required>
                                 @foreach($rutas as $ruta)
                                 <option value="{{ $ruta->id_ruta }}" @if(old('id_ruta') == $ruta->id_ruta) selected @endif>{{ $ruta->nombre_ruta ?? 'Ruta #'.$ruta->id_ruta }}</option>
                                 @endforeach
@@ -278,9 +284,9 @@
                             @error('id_ruta') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Conductor <span class="text-danger">*</span></label>
-                            <select name="doc_us" id="edit_doc_us" class="form-select bg-light border-0 py-2 @error('doc_us') is-invalid @enderror" required>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Conductor <span class="text-danger">*</span></label>
+                            <select name="doc_us" id="edit_doc_us" class="form-select form-select-sm @error('doc_us') is-invalid @enderror" required>
                                 @foreach($conductores as $con)
                                 <option value="{{ $con->doc_usuario }}" @if(old('doc_us') == $con->doc_usuario) selected @endif>{{ $con->primer_nombre }} {{ $con->primer_apellido }}</option>
                                 @endforeach
@@ -289,14 +295,14 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Fecha y Hora <span class="text-danger">*</span></label>
-                            <input type="datetime-local" name="fecha" id="edit_fecha" class="form-control bg-light border-0 py-2 @error('fecha') is-invalid @enderror" value="{{ old('fecha') }}" required>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Fecha y Hora <span class="text-danger">*</span></label>
+                            <input type="datetime-local" name="fecha" id="edit_fecha" class="form-control form-control-sm @error('fecha') is-invalid @enderror" value="{{ old('fecha') }}" required>
                             @error('fecha') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Estado <span class="text-danger">*</span></label>
-                            <select name="id_estado" id="edit_id_estado" class="form-select bg-light border-0 py-2 @error('id_estado') is-invalid @enderror" required>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Estado <span class="text-danger">*</span></label>
+                            <select name="id_estado" id="edit_id_estado" class="form-select form-select-sm @error('id_estado') is-invalid @enderror" required>
                                 @foreach($estados as $est)
                                 <option value="{{ $est->id_estado }}" @if(old('id_estado') == $est->id_estado) selected @endif>{{ $est->nombre_estado }}</option>
                                 @endforeach
@@ -305,39 +311,135 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-top-0 px-4 pb-4 bg-white d-flex gap-2">
-                    <button type="button" class="btn btn-light px-4 fw-semibold border" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm flex-fill">Guardar Cambios</button>
+                <div class="modal-footer border-0 p-3 bg-light">
+                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">DESCARTAR</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold shadow-sm">GUARDAR CAMBIOS</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<!-- Modal VER ASIGNACIÓN -->
+<div class="modal fade" id="modalViewAsignacion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-info me-2 fs-5">assignment_ind</span>
+                    DETALLES DE ASIGNACIÓN
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="mb-4 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <div>
+                            <h4 id="view_placa" class="fw-bold mb-0 text-dark"></h4>
+                            <p class="text-muted small mb-0">Vehículo Registrado</p>
+                        </div>
+                    </div>
+                    <span id="view_estado_asig" class="badge rounded-pill"></span>
+                </div>
+
+                <div class="p-3 bg-light rounded-3 border border-light-subtle small">
+                    <div class="mb-3">
+                        <label class="d-block text-muted fw-bold text-uppercase ls-1">Ruta Programada</label>
+                        <span id="view_ruta" class="text-dark fw-medium d-block"></span>
+                        <small id="view_id_ruta" class="text-muted"></small>
+                    </div>
+                    <div class="mb-3 border-top pt-2">
+                        <label class="d-block text-muted fw-bold text-uppercase ls-1">Conductor Responsable</label>
+                        <span id="view_conductor" class="text-dark fw-medium d-block"></span>
+                        <small id="view_doc_us" class="text-muted"></small>
+                    </div>
+                    <div class="row g-2 border-top pt-2">
+                        <div class="col-6">
+                            <label class="d-block text-muted fw-bold text-uppercase ls-1">Fecha</label>
+                            <span id="view_fecha" class="text-dark fw-medium"></span>
+                        </div>
+                        <div class="col-6">
+                            <label class="d-block text-muted fw-bold text-uppercase ls-1">Hora Salida</label>
+                            <span id="view_hora" class="text-dark fw-medium"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3 bg-light">
+                <button type="button" class="btn btn-sm btn-dark w-100 fw-bold" data-bs-dismiss="modal">CERRAR DETALLES</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
-    // Inicializar Datos de Edición
-    document.querySelectorAll('.edit-asignacion').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const data = JSON.parse(this.dataset.json);
+    // Delegación para botones VER y EDITAR
+    document.addEventListener('click', function(e) {
+        // Botón VER
+        const btnVer = e.target.closest('.view-asignacion');
+        if (btnVer) {
+            e.preventDefault();
+            try {
+                const data = JSON.parse(btnVer.dataset.json);
+                const conductor = btnVer.dataset.conductor;
+                const ruta = btnVer.dataset.ruta;
+                const estado = btnVer.dataset.estado;
 
-            document.getElementById('edit_placa').value = data.placa;
-            document.getElementById('edit_id_ruta').value = data.id_ruta;
-            document.getElementById('edit_doc_us').value = data.doc_us;
-            document.getElementById('edit_id_estado').value = data.id_estado;
-            
-            // Formatear fecha para input datetime-local
-            if (data.fecha) {
-                const date = new Date(data.fecha);
-                const offset = date.getTimezoneOffset() * 60000;
-                const localISOTime = (new Date(date - offset)).toISOString().slice(0, 16);
-                document.getElementById('edit_fecha').value = localISOTime;
-            }
+                document.getElementById('view_placa').textContent = data.placa;
+                document.getElementById('view_ruta').textContent = ruta;
+                document.getElementById('view_id_ruta').textContent = `Código Ruta: ${data.id_ruta}`;
+                document.getElementById('view_conductor').textContent = conductor;
+                document.getElementById('view_doc_us').textContent = `Documento: ${data.doc_us}`;
+                
+                if (data.fecha) {
+                    const date = new Date(data.fecha);
+                    document.getElementById('view_fecha').textContent = date.toLocaleDateString();
+                    document.getElementById('view_hora').textContent = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                }
 
-            const action = `/admin/asignaciones/${data.id_viaje}`;
-            document.getElementById('formEditAsignacion').action = action;
-            document.getElementById('edit_action_hidden').value = action;
-        });
+                const viewEst = document.getElementById('view_estado_asig');
+                viewEst.textContent = estado;
+                viewEst.className = 'badge rounded-pill px-3 py-2 fw-bold';
+                if (data.id_estado == 1) {
+                    viewEst.classList.add('bg-success-subtle', 'text-success', 'border', 'border-success-subtle');
+                } else if (data.id_estado == 2) {
+                    viewEst.classList.add('bg-danger-subtle', 'text-danger', 'border', 'border-danger-subtle');
+                } else {
+                    viewEst.classList.add('bg-warning-subtle', 'text-warning', 'border', 'border-warning-subtle');
+                }
+
+                const modalEl = document.getElementById('modalViewAsignacion');
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } catch (err) { console.error('Ver Asignacion Error:', err); }
+        }
+
+        // Botón EDITAR
+        const btnEdit = e.target.closest('.edit-asignacion');
+        if (btnEdit) {
+            e.preventDefault();
+            try {
+                const data = JSON.parse(btnEdit.dataset.json);
+                document.getElementById('edit_placa').value = data.placa;
+                document.getElementById('edit_id_ruta').value = data.id_ruta;
+                document.getElementById('edit_doc_us').value = data.doc_us;
+                document.getElementById('edit_id_estado').value = data.id_estado;
+                
+                if (data.fecha) {
+                    const date = new Date(data.fecha);
+                    const offset = date.getTimezoneOffset() * 60000;
+                    const localISOTime = (new Date(date - offset)).toISOString().slice(0, 16);
+                    document.getElementById('edit_fecha').value = localISOTime;
+                }
+
+                const action = `asignaciones/${data.id_viaje}`; // RELATIVA
+                document.getElementById('formEditAsignacion').action = action;
+                document.getElementById('edit_action_hidden').value = action;
+                
+                const modalEl = document.getElementById('modalEditAsignacion');
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } catch (err) { console.error('Edit Asignacion Error:', err); }
+        }
     });
 
     @if($errors->any())
@@ -354,15 +456,15 @@
 </script>
 
 <style>
+    .ls-1 {
+        letter-spacing: 0.5px;
+    }
     .modal-content {
         border-radius: 1rem !important;
     }
     .table-hover tbody tr:hover {
         background-color: rgba(94, 84, 142, 0.03) !important;
-    }
-    .badge {
-        font-weight: 600;
-        letter-spacing: 0.3px;
+        cursor: default;
     }
 </style>
 @endpush

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\SuperAdmin;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +23,6 @@ class RutaRequest extends FormRequest
         $idCiudad = $this->input('id_ciudad');
 
         return [
-
             'codigo_ruta' => [
                 'required',
                 'regex:/^[1-9][0-9]*$/',
@@ -44,7 +43,6 @@ class RutaRequest extends FormRequest
                     }
                 }
             ],
-
             'id_ciudad' => [
                 'required',
                 'string',
@@ -114,10 +112,6 @@ class RutaRequest extends FormRequest
             'id_ciudad.size' => 'La ciudad debe tener exactamente 6 caracteres.',
             'id_ciudad.regex' => 'La ciudad solo puede contener números.',
             'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
-            'codigo_ruta.required' => 'El código de ruta es obligatorio.',
-            'codigo_ruta.regex' => 'El código de ruta solo permite números (0-9) sin caracteres especiales.',
-            'codigo_ruta.integer' => 'El código de ruta debe ser un número válido.',
-            'codigo_ruta.between' => 'El código de ruta debe estar entre 1 y 90.',
             'id_barrio_origen.required' => 'El barrio de origen es obligatorio.',
             'id_barrio_origen.integer' => 'El barrio de origen debe ser un número entero.',
             'id_barrio_origen.min' => 'El barrio de origen no es válido.',

@@ -18,62 +18,67 @@ class StoreUsuarioRequest extends FormRequest
             'primer_nombre' => [
                 'required',
                 'string',
-                'min:3',
-                'max:30',
-                'regex:/^[\pL]+$/u'
+                'min:2',
+                'regex:/^[\pL\s]+$/u'
             ],
             
             'segundo_nombre' => [
                 'nullable',
                 'string',
-                'min:3',
-                'max:30',
-                'regex:/^[\pL]+$/u'
+                'min:2',
+                'regex:/^[\pL\s]+$/u'
             ],
 
             'primer_apellido' => [
                 'required',
                 'string',
-                'min:3',
-                'max:30',
-                'regex:/^[\pL]+$/u'
+                'min:2',
+                'regex:/^[\pL\s]+$/u'
             ],
             
             'segundo_apellido' => [
-                'nullable',
+                'required', // Rule 3: Mandatory
                 'string',
-                'min:3',
-                'max:30',
-                'regex:/^[\pL]+$/u'
+                'min:2',
+                'regex:/^[\pL\s]+$/u'
             ],
 
             'doc_usuario' => [
                 'required',
-                'digits_between:6,12',
                 'numeric',
-                'unique:usuarios,doc_usuario'
+                'regex:/^[1-9][0-9]{8,11}$/', // Permite 9 a 12 dígitos, no inicie con 0
+                'unique:usuario,doc_usuario'
             ],
 
             'correo' => [
                 'required',
-                'email:rfc,dns',
-                'max:100',
-                'unique:usuarios,correo'
+                'email',
+                'max:150',
+                'unique:usuario,correo'
             ],
 
             'telefono' => [
+                'required', // Rule 3: Mandatory
+                'numeric',
+                'digits:10'
+            ],
+
+            'id_tipo_usuario' => [
+                'required',
+                'exists:tipo_usuario,id_tipo_usuario'
+            ],
+
+            'foto_usuario' => [
                 'nullable',
-                'digits_between:7,15'
+                'image',
+                'mimes:jpeg,png,jpg',
+                'max:2048'
             ],
 
-            'rol' => [
+            'NIT' => [
                 'required',
-                'in:admin,operador,usuario'
-            ],
-
-            'estado' => [
-                'required',
-                'boolean'
+                'numeric',
+                'regex:/^[1-9][0-9]{8,11}$/', // Permite 9 a 12 dígitos, no inicie con 0
             ],
         ];
     }
@@ -82,38 +87,42 @@ class StoreUsuarioRequest extends FormRequest
     {
         return [
 
-            'primer_nombre.required' => 'El nombre es obligatorio.',
-            'primer_nombre.regex' => 'El nombre solo puede contener letras.',
-            'primer_nombre.min' => 'El nombre debe tener mínimo 3 caracteres.',
-            'primer_nombre.max' => 'El nombre no puede superar los 30 caracteres.',
+            'primer_nombre.required' => 'El primer nombre es obligatorio.',
+            'primer_nombre.regex' => 'El primer nombre solo puede contener letras.',
+            'primer_nombre.min' => 'El primer nombre debe tener mínimo 2 caracteres.',
 
             'segundo_nombre.regex' => 'El segundo nombre solo puede contener letras.',
-            'segundo_nombre.min' => 'El segundo nombre debe tener mínimo 3 caracteres.',
-            'segundo_nombre.max' => 'El segundo nombre no puede superar los 30 caracteres.',
+            'segundo_nombre.min' => 'El segundo nombre debe tener mínimo 2 caracteres.',
 
             'primer_apellido.required' => 'El primer apellido es obligatorio.',
             'primer_apellido.regex' => 'El primer apellido solo puede contener letras.',
-            'primer_apellido.min' => 'El primer apellido debe tener mínimo 3 caracteres.',
-            'primer_apellido.max' => 'El primer apellido no puede superar los 30 caracteres.',
+            'primer_apellido.min' => 'El primer apellido debe tener mínimo 2 caracteres.',
 
+            'segundo_apellido.required' => 'El segundo apellido es obligatorio.',
             'segundo_apellido.regex' => 'El segundo apellido solo puede contener letras.',
-            'segundo_apellido.min' => 'El segundo apellido debe tener mínimo 3 caracteres.',
-            'segundo_apellido.max' => 'El segundo apellido no puede superar los 30 caracteres.',
+            'segundo_apellido.min' => 'El segundo apellido debe tener mínimo 2 caracteres.',
 
-            'doc_usuario.required' => 'El documento es obligatorio.',
+            'doc_usuario.required' => 'El documento de identidad es obligatorio.',
             'doc_usuario.numeric' => 'El documento solo puede contener números.',
-            'doc_usuario.unique' => 'Este documento ya está registrado.',
+            'doc_usuario.regex' => 'El documento debe tener mínimo 9 dígitos y no puede iniciar con 0.',
+            'doc_usuario.unique' => 'Este número de documento ya está registrado.',
 
-            'correo.required' => 'El correo es obligatorio.',
-            'correo.email' => 'El correo no tiene un formato válido.',
-            'correo.unique' => 'Este correo ya está registrado.',
+            'correo.required' => 'El correo electrónico es obligatorio.',
+            'correo.email' => 'Ingrese una dirección de correo válida.',
+            'correo.unique' => 'Este correo ya está en uso.',
 
-            'telefono.digits_between' => 'El teléfono debe tener entre 7 y 15 dígitos.',
+            'telefono.required' => 'El número de teléfono es obligatorio.',
+            'telefono.numeric' => 'El teléfono solo debe contener números.',
+            'telefono.digits' => 'El teléfono debe tener exactamente 10 dígitos.',
 
-            'rol.required' => 'Debe seleccionar un rol válido.',
-            'rol.in' => 'El rol seleccionado no es válido.',
+            'id_tipo_usuario.required' => 'Debe seleccionar un rol operativo.',
+            'id_tipo_usuario.exists' => 'El rol seleccionado no es válido.',
 
-            'estado.required' => 'El estado es obligatorio.',
+            'NIT.required' => 'El NIT de la empresa es obligatorio.',
+            'NIT.numeric' => 'El NIT solo debe contener números.',
+            'NIT.regex' => 'El NIT debe tener mínimo 9 dígitos y no puede iniciar con 0.',
+
+            'id_estado.required' => 'El estado de la cuenta es obligatorio.',
         ];
     }
 }

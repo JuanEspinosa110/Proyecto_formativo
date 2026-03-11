@@ -28,6 +28,7 @@ class User extends Authenticatable
         'doc_usuario',
         'NIT',
         'primer_nombre',
+        'segundo_nombre',
         'primer_apellido',
         'segundo_apellido',
         'correo',

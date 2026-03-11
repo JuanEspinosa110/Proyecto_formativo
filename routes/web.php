@@ -194,12 +194,7 @@ Route::prefix('superadmin')
         Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
             ->name('tarjetas.update');
 
-        // Módulo de Rutas (SuperAdmin)
-        Route::get('/rutas', [RutaController::class, 'index'])->name('rutas.index');
-        Route::post('/rutas', [RutaController::class, 'store'])->name('rutas.store');
-        Route::put('/rutas/{ruta}', [RutaController::class, 'update'])->name('rutas.update');
-        Route::get('/rutas/export', [RutaController::class, 'export'])->name('rutas.export');
-        Route::get('/rutas/barrios/{id_ciudad}', [RutaController::class, 'getBarriosByCiudad'])->name('rutas.barrios');
+
     });
 
     Route::patch(

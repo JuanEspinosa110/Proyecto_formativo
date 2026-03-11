@@ -13,6 +13,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/validacion.css') }}">
 
     @stack('styles')
 </head>
@@ -34,10 +35,15 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">dashboard</span></span>
                     <span>Dashboard</span>
                 </a>
-                
+
                 <a href="{{ route('admin.usuarios.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
                     <span>Usuarios</span>
+                </a>
+
+                <a href="{{ route('admin.documentos.index') }}" class="sigu-sb-link {{ request()->is('admin/documentos*') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">description</span></span>
+                    <span>Documentos</span>
                 </a>
 
                 <a href="{{ url('admin/buses') }}" class="sigu-sb-link {{ request()->is('admin/buses*') ? 'active' : '' }}">
@@ -49,7 +55,12 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">assignment</span></span>
                     <span>Asignaciones</span>
                 </a>
-                
+
+                <a href="{{ route('admin.rutas.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.rutas.*') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">map</span></span>
+                    <span>Rutas</span>
+                </a>
+
             </nav>
 
             <div class="sigu-sidebar-footer">
@@ -75,8 +86,54 @@
         <span>© {{ date('Y') }}</span>
     </footer>
 
+    <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1085;">
+        <div id="siguToast" class="toast align-items-center text-white border-0 shadow-lg rounded-4" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-3 py-3 px-4">
+                    <div id="toastIconWrap" class="rounded-circle d-flex align-items-center justify-content-center" style="width:32px; height:32px; background: rgba(255,255,255,0.2)">
+                        <span id="toastIcon" class="material-symbols-rounded fs-5"></span>
+                    </div>
+                    <div id="toastMessage" class="fw-medium"></div>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-3 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <script>
+        function showToast(message, type = 'success') {
+            const toastEl = document.getElementById('siguToast');
+            const toastBody = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastEl.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
+
+            if (type === 'success') {
+                toastEl.classList.add('bg-success');
+                toastIcon.textContent = 'check_circle';
+            } else if (type === 'error') {
+                toastEl.classList.add('bg-danger');
+                toastIcon.textContent = 'error';
+            } else {
+                toastEl.classList.add('bg-info');
+                toastIcon.textContent = 'info';
+            }
+
+            toastBody.textContent = message;
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+        @if(session('success'))
+        document.addEventListener('DOMContentLoaded', () => showToast("{{ session('success') }}", 'success'));
+        @endif
+        @if(session('error'))
+        document.addEventListener('DOMContentLoaded', () => showToast("{{ session('error') }}", 'error'));
+        @endif
+    </script>
 
     @stack('scripts')
 </body>

@@ -83,16 +83,18 @@
                                     <td class="py-2">{{ $ciudad->nombre_city }}</td>
                                     <td class="py-2">{{ $ciudad->departamento->nombre_departamento ?? 'Sin Departamento' }}</td>
                                     <td class="text-end px-4 py-2">
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-warning btn-sm border-0"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editarModal"
-                                            data-id="{{ $ciudad->id_ciudad }}"
-                                            data-nombre="{{ $ciudad->nombre_city }}"
-                                            data-depto="{{ $ciudad->id_departamento }}">
-                                            <i class="fas fa-edit me-1"></i> Editar
-                                        </button>
+                                        <div class="d-flex justify-content-end gap-3">
+                                            <a href="#" 
+                                               class="text-primary text-decoration-none d-flex align-items-center"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#editarModal"
+                                               data-id="{{ $ciudad->id_ciudad }}"
+                                               data-nombre="{{ $ciudad->nombre_city }}"
+                                               data-depto="{{ $ciudad->id_departamento }}"
+                                               title="Editar ciudad">
+                                                <span class="material-symbols-rounded fs-5">edit</span>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 @empty
@@ -120,12 +122,15 @@
 </div>
 
 {{-- MODAL CREAR DEPARTAMENTO --}}
-<div class="modal fade" id="deptoModal" tabindex="-1" aria-labelledby="deptoModalLabel" aria-hidden="true">
+<div class="modal fade" id="deptoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title fw-bold" id="deptoModalLabel">Nuevo Departamento</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-secondary me-2 fs-5">map_marked</span>
+                    NUEVO DEPARTAMENTO
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form action="{{ route('superadmin.configuracion.ciudades.storeDepartamento') }}" method="POST">
                 @csrf
@@ -145,10 +150,15 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                    <div class="mb-0 text-input-validate" data-type="text">
+                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre del Departamento <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre_departamento" class="form-control form-control-sm @error('nombre_departamento') is-invalid @enderror" placeholder="Ej: Antioquia" required value="{{ old('nombre_departamento') }}">
+                        @error('nombre_departamento') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
                 </div>
-                <div class="modal-footer border-top-0 pt-0">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-secondary px-4">Guardar Depto</button>
+                <div class="modal-footer border-0 p-3 bg-light">
+                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                    <button type="submit" class="btn btn-sm btn-secondary px-4 fw-bold shadow-sm">GUARDAR DEPTO</button>
                 </div>
             </form>
         </div>
@@ -156,33 +166,36 @@
 </div>
 
 {{-- MODAL CREAR CIUDAD --}}
-<div class="modal fade" id="crearModal" tabindex="-1" aria-labelledby="crearModalLabel" aria-hidden="true">
+<div class="modal fade" id="crearModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title fw-bold" id="crearModalLabel">Nueva Ciudad</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-primary me-2 fs-5">add_location_alt</span>
+                    REGISTRAR NUEVA CIUDAD
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form action="{{ route('superadmin.configuracion.ciudades.store') }}" method="POST">
                 @csrf
                 <div class="modal-body py-4">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Código Postal <span class="text-danger">*</span></label>
-                        <input type="text" name="id_ciudad" class="form-control @error('id_ciudad') is-invalid @enderror" placeholder="Ej: 05001" required value="{{ old('id_ciudad') }}">
+                        <input type="text" name="id_ciudad" id="id_ciudad" inputmode="numeric" class="form-control @error('id_ciudad') is-invalid @enderror" placeholder="Ej: 05001" required value="{{ old('id_ciudad') }}">
                         @error('id_ciudad')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Nombre de la Ciudad <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_city" class="form-control @error('nombre_city') is-invalid @enderror" placeholder="Ej: Medellín" required value="{{ old('nombre_city') }}">
+                        <input type="text" name="nombre_city" id="nombre_city" class="form-control @error('nombre_city') is-invalid @enderror" placeholder="Ej: Medellín" required value="{{ old('nombre_city') }}">
                         @error('nombre_city')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="mb-0">
                         <label class="form-label fw-semibold">Departamento <span class="text-danger">*</span></label>
-                        <select name="id_departamento" class="form-select @error('id_departamento') is-invalid @enderror" required>
+                        <select name="id_departamento" id="id_departamento" class="form-select @error('id_departamento') is-invalid @enderror" required>
                             <option value="">Seleccione...</option>
                             @foreach($departamentos as $depto)
                             <option value="{{ $depto->id_departamento }}" {{ old('id_departamento') == $depto->id_departamento ? 'selected' : '' }}>
@@ -195,9 +208,9 @@
                         @enderror
                     </div>
                 </div>
-                <div class="modal-footer border-top-0 pt-0">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4 text-white">Guardar Ciudad</button>
+                <div class="modal-footer border-0 p-3 bg-light">
+                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold shadow-sm">GUARDAR CIUDAD</button>
                 </div>
             </form>
         </div>
@@ -205,39 +218,38 @@
 </div>
 
 {{-- MODAL EDITAR --}}
-<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
+<div class="modal fade" id="editarModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title fw-bold" id="editarModalLabel">Editar Ciudad</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header bg-light py-3">
+                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
+                    <span class="material-symbols-rounded text-warning me-2 fs-5">edit_location</span>
+                    MODIFICAR CIUDAD
+                </h6>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <form id="formEditar" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="modal-body py-4">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Nombre de la Ciudad <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_city" id="editNombre" class="form-control @error('nombre_city') is-invalid @enderror" required value="{{ old('nombre_city') }}">
-                        @error('nombre_city')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                <div class="modal-body p-4">
+                    <div class="mb-3 text-input-validate" data-type="text">
+                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre de la Ciudad <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre_city" id="editNombre" class="form-control form-control-sm @error('nombre_city') is-invalid @enderror" required>
+                        @error('nombre_city') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="mb-0">
-                        <label class="form-label fw-semibold">Departamento <span class="text-danger">*</span></label>
-                        <select name="id_departamento" id="editDepto" class="form-select @error('id_departamento') is-invalid @enderror" required>
+                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">Departamento <span class="text-danger">*</span></label>
+                        <select name="id_departamento" id="editDepto" class="form-select form-select-sm @error('id_departamento') is-invalid @enderror" required>
                             @foreach($departamentos as $depto)
                             <option value="{{ $depto->id_departamento }}">{{ $depto->nombre_departamento }}</option>
                             @endforeach
                         </select>
-                        @error('id_departamento')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        @error('id_departamento') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                 </div>
-                <div class="modal-footer border-top-0 pt-0">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-warning px-4 text-dark">Guardar Cambios</button>
+                <div class="modal-footer border-0 p-3 bg-light">
+                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
+                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold shadow-sm">GUARDAR CAMBIOS</button>
                 </div>
             </form>
         </div>
@@ -267,6 +279,19 @@
             });
         }
 
+        // Lista de IDs de los inputs que quieres restringir a solo números
+        const camposNumericos = ['id_departamento', 'id_ciudad'];
+
+        camposNumericos.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    // Reemplaza cualquier cosa que NO sea un número (0-9) con un string vacío
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                });
+            }
+        });
+
         // Redirect error to correct modal
         @if($errors->any())
         @if(old('_method') == 'PUT')
@@ -277,7 +302,7 @@
             var myModal = new bootstrap.Modal(document.getElementById('editarModal'));
             myModal.show();
         }
-        @elseif(old('nombre_departamento'))
+        @elseif(old('nombre_departamento') || old('id_departamento'))
         var myModal = new bootstrap.Modal(document.getElementById('deptoModal'));
         myModal.show();
         @else
@@ -285,6 +310,32 @@
         myModal.show();
         @endif
         @endif
+
+        // Validaciones de Entrada (Solo números/texto)
+        document.querySelectorAll('.text-input-validate').forEach(container => {
+            const input = container.querySelector('input');
+            const type = container.getAttribute('data-type');
+            
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    if (type === 'number') {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                    } else if (type === 'text') {
+                        this.value = this.value.replace(/[0-9]/g, '');
+                    }
+                });
+            }
+        });
     });
 </script>
+
+<style>
+    .ls-1 {
+        letter-spacing: 0.5px;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(94, 84, 142, 0.03) !important;
+        cursor: default;
+    }
+</style>
 @endsection
