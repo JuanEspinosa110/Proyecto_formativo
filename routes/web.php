@@ -6,6 +6,7 @@ use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
+use  App\Http\Controllers\Admin\ReporteController;
 
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
@@ -15,7 +16,6 @@ use App\Http\Controllers\SuperAdmin\{
     DocumentoController,
     TarjetaController,
     LicenciaController,
-    ReporteController,
     AlertaController,
     ConfiguracionController,
     PerfilSeguridadController,
@@ -181,10 +181,11 @@ Route::prefix('superadmin')
 
 
         //Reportes 
-        Route::get('reportes', [ReporteController::class, 'index'])
+        // Reportes (ahora en Admin)
+        Route::get('reportes', [\App\Http\Controllers\Admin\ReporteController::class, 'index'])
             ->name('reportes.index');
 
-        Route::get('/reportes/pdf', [ReporteController::class, 'exportPdf'])
+        Route::get('/reportes/pdf', [\App\Http\Controllers\Admin\ReporteController::class, 'exportPdf'])
             ->name('reportes.pdf');
 
         // Tarjetas
