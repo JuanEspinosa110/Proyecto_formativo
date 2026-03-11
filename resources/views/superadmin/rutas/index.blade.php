@@ -285,7 +285,7 @@
         // Inicializar Modal de Edición
         document.querySelectorAll('.edit-ruta').forEach(btn => {
             btn.addEventListener('click', async function() {
-                const data = JSON.parse(this.dataset.json); // Obtiene los datos de la fila
+                const data = JSON.parse(this.dataset.json);
                 const form = document.getElementById('formEditRuta');
 
                 // 1. Limpiar validaciones previas
@@ -297,7 +297,6 @@
                 form.querySelector('[name="id_estado"]').value = data.id_estado;
 
                 // 3. IMPORTANTE: Cargar barrios y seleccionar los actuales
-                // Esperamos a que la petición AJAX termine para marcar el 'selected'
                 await loadBarrios(data.id_ciudad, 'edit_id_barrio_origen', data.id_barrio_origen);
                 await loadBarrios(data.id_ciudad, 'edit_id_barrio_destino', data.id_barrio_destino);
 

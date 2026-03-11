@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 use App\Models\TipoUsuario;
 
@@ -82,6 +83,11 @@ class Usuario extends Authenticatable
     public function tipoUsuario()
     {
         return $this->belongsTo(TipoUsuario::class, 'id_tipo_usuario', 'id_tipo_usuario');
+    }
+
+    public function titularidadesTarjeta(): HasMany
+    {
+        return $this->hasMany(TitularidadTarjeta::class, 'doc_usuario', 'doc_usuario');
     }
 
 

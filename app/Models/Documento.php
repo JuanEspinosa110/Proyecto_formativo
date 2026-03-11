@@ -3,13 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Documento extends Model
 {
     protected $table = 'documentos';
-
     protected $primaryKey = 'id_documento';
-
     public $timestamps = true;
 
     protected $fillable = [
@@ -25,9 +24,68 @@ class Documento extends Model
         'id_estado'
     ];
 
-    public function tipoDocumento()
+    protected $casts = [
+        'fecha_expedicion' => 'date',
+        'fecha_vencimiento' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime'
+    ];
+
+    /**
+     * Relación: Un documento pertenece a un tipo de documento
+     */
+    public function tipoDocumento(): BelongsTo
     {
         return $this->belongsTo(TipoDocumento::class, 'id_tipo_documento', 'id_tipo_documento');
     }
-}
 
+    /**
+     * Relación: Un documento pertenece a un estado
+     */
+    public function estado(): BelongsTo
+    {
+        return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
+    }
+
+    /**
+     * Relación: Un documento pertenece a una empresa
+     */
+    public function empresa(): BelongsTo
+    {
+        return $this->belongsTo(Empresa::class, 'NIT', 'NIT');
+    }
+
+    /**
+     * Relación: Un documento puede estar asociado a un usuario
+     */
+    public function usuario(): BelongsTo
+    {
+        return $this->belongsTo(Usuario::class, 'doc_usuario', 'doc_usuario');
+    }
+
+    /**
+     * Relación: Un documento puede estar asociado a un bus
+     */
+    public function bus(): BelongsTo
+    {
+        return $this->belongsTo(Bus::class, 'placa', 'placa');
+    }
+
+    // Métodos auxiliares
+    public function isVigente()
+    {
+        return $this->fecha_vencimiento >= now()->toDateString() && $this->id_estado == 1;
+    }
+
+    public function isVencido()
+    {
+        return $this->fecha_vencimiento < now()->toDateString();
+    }
+
+    public function diasParaVencimiento()
+    {
+        return now()->toDateString() < $this->fecha_vencimiento
+            ? now()->diffInDays($this->fecha_vencimiento)
+            : 0;
+    }
+}

@@ -162,7 +162,7 @@ class BusRequest extends FormRequest
             'telefono.digits' => 'El teléfono debe tener exactamente 10 dígitos numéricos.',
 
             'correo.required' => 'El correo electrónico es obligatorio.',
-            'correo.email' => 'Ingrese una dirección de correo válida.',
+            'correo.email' => 'Ingrese un correo electrónico válido.',
     ];
     }
 }

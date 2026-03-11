@@ -156,9 +156,13 @@
                             <input type="text" name="nombre" class="form-control bg-light border-0 py-2 @error('nombre') is-invalid @enderror" required value="{{ old('nombre') }}" placeholder="Ej: SOAT, Licencia de Conducción">
                             @error('nombre') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Descripción</label>
-                            <textarea name="descripcion" class="form-control bg-light border-0 py-2" rows="2" placeholder="Opcional...">{{ old('descripcion') }}</textarea>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea name="descripcion" id="desc_crear" class="form-control"
+                                rows="3" maxlength="250" placeholder="Breve descripción del documento..."></textarea>
+                            <div class="text-end">
+                                <small id="count_crear" class="text-muted">0 / 250 caracteres</small>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase d-block mb-3">Asociación Requerida</label>
@@ -212,9 +216,13 @@
                             <input type="text" name="nombre" id="edit_nombre" class="form-control bg-light border-0 py-2 @error('nombre') is-invalid @enderror" required>
                             @error('nombre') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase">Descripción</label>
-                            <textarea name="descripcion" id="edit_descripcion" class="form-control bg-light border-0 py-2" rows="2"></textarea>
+                        <div class="mb-3">
+                            <label for="edit_descripcion" class="form-label">Descripción</label>
+                            <textarea name="descripcion" id="desc_editar" class="form-control"
+                                rows="3" maxlength="250"></textarea>
+                            <div class="text-end">
+                                <small id="count_editar" class="text-muted">0 / 250 caracteres</small>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase d-block mb-3">Asociación Requerida</label>
@@ -266,6 +274,55 @@
                 formActual.querySelector('[name="id_estado"]').value = data.id_estado;
             });
         });
+
+        // 1. Filtro para NOMBRES (Solo letras, espacios y tildes)
+        const inputsNombre = document.querySelectorAll('input[name="nombre"]');
+        inputsNombre.forEach(input => {
+            input.addEventListener('input', function() {
+                // Permitimos letras, tildes, ñ y espacios
+                this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+
+                // Opcional: Convertir la primera letra en mayúscula automáticamente
+                if (this.value.length > 0) {
+                    this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+                }
+            });
+        });
+
+        // 2. Filtro para DESCRIPCIÓN (Alfanumérico + puntuación básica)
+        const textareasDesc = document.querySelectorAll('textarea[name="descripcion"]');
+        textareasDesc.forEach(textarea => {
+            textarea.addEventListener('input', function() {
+                // Permitimos letras, números, espacios, comas, puntos y guiones
+                this.value = this.value.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,-]/g, '');
+            });
+        });
+
+        // Función genérica para configurar contadores
+        function configurarContador(idInput, idContador) {
+            const input = document.getElementById(idInput);
+            const contador = document.getElementById(idContador);
+
+            if (input && contador) {
+                input.addEventListener('input', function() {
+                    const longitud = this.value.length;
+                    contador.textContent = `${longitud} / 250 caracteres`;
+
+                    // Cambio de color visual si llega al límite
+                    if (longitud >= 250) {
+                        contador.classList.remove('text-muted');
+                        contador.classList.add('text-danger', 'fw-bold');
+                    } else {
+                        contador.classList.remove('text-danger', 'fw-bold');
+                        contador.classList.add('text-muted');
+                    }
+                });
+            }
+        }
+
+        // Inicializamos para los dos modales
+        configurarContador('desc_crear', 'count_crear');
+        configurarContador('desc_editar', 'count_editar');
 
         @if($errors->any())
         const lastModal = '{{ old("_method") == "PUT" ? "#modalEditTipo" : "#modalCreateTipo" }}';

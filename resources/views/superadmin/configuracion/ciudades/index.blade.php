@@ -134,11 +134,21 @@
             </div>
             <form action="{{ route('superadmin.configuracion.ciudades.storeDepartamento') }}" method="POST">
                 @csrf
-                <div class="modal-body p-4">
-                    <div class="mb-3 text-input-validate" data-type="number">
-                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">Código ID (2 dígitos) <span class="text-danger">*</span></label>
-                        <input type="text" name="id_departamento" class="form-control form-control-sm @error('id_departamento') is-invalid @enderror" placeholder="Ej: 05" maxlength="2" required value="{{ old('id_departamento') }}">
-                        @error('id_departamento') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <div class="modal-body py-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Código ID (2 dígitos) <span class="text-danger">*</span></label>
+                        <input type="text" name="id_departamento" class="form-control @error('id_departamento') is-invalid @enderror"
+                            placeholder="Ej: 05" maxlength="2" required value="{{ old('id_departamento') }}">
+                        @error('id_departamento')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold">Nombre del Departamento <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre_departamento" class="form-control @error('nombre_departamento') is-invalid @enderror" placeholder="Ej: Antioquia" required value="{{ old('nombre_departamento') }}">
+                        @error('nombre_departamento')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="mb-0 text-input-validate" data-type="text">
                         <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre del Departamento <span class="text-danger">*</span></label>
@@ -168,30 +178,34 @@
             </div>
             <form action="{{ route('superadmin.configuracion.ciudades.store') }}" method="POST">
                 @csrf
-                <div class="modal-body p-4">
-                    <div class="row g-3">
-                        <div class="col-md-6 text-input-validate" data-type="number">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Código Postal <span class="text-danger">*</span></label>
-                            <input type="text" name="id_ciudad" class="form-control form-control-sm @error('id_ciudad') is-invalid @enderror" placeholder="05001" required value="{{ old('id_ciudad') }}">
-                            @error('id_ciudad') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="col-md-6 text-input-validate" data-type="text">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre <span class="text-danger">*</span></label>
-                            <input type="text" name="nombre_city" class="form-control form-control-sm @error('nombre_city') is-invalid @enderror" placeholder="Medellín" required value="{{ old('nombre_city') }}">
-                            @error('nombre_city') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Departamento <span class="text-danger">*</span></label>
-                            <select name="id_departamento" class="form-select form-select-sm @error('id_departamento') is-invalid @enderror" required>
-                                <option value="" selected disabled>Seleccione...</option>
-                                @foreach($departamentos as $depto)
-                                <option value="{{ $depto->id_departamento }}" {{ old('id_departamento') == $depto->id_departamento ? 'selected' : '' }}>
-                                    {{ $depto->nombre_departamento }}
-                                </option>
-                                @endforeach
-                            </select>
-                            @error('id_departamento') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
+                <div class="modal-body py-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Código Postal <span class="text-danger">*</span></label>
+                        <input type="text" name="id_ciudad" id="id_ciudad" inputmode="numeric" class="form-control @error('id_ciudad') is-invalid @enderror" placeholder="Ej: 05001" required value="{{ old('id_ciudad') }}">
+                        @error('id_ciudad')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nombre de la Ciudad <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre_city" id="nombre_city" class="form-control @error('nombre_city') is-invalid @enderror" placeholder="Ej: Medellín" required value="{{ old('nombre_city') }}">
+                        @error('nombre_city')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold">Departamento <span class="text-danger">*</span></label>
+                        <select name="id_departamento" id="id_departamento" class="form-select @error('id_departamento') is-invalid @enderror" required>
+                            <option value="">Seleccione...</option>
+                            @foreach($departamentos as $depto)
+                            <option value="{{ $depto->id_departamento }}" {{ old('id_departamento') == $depto->id_departamento ? 'selected' : '' }}>
+                                {{ $depto->nombre_departamento }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @error('id_departamento')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-3 bg-light">
@@ -264,6 +278,19 @@
                 sessionStorage.setItem('last_edit_id_ciudad', id);
             });
         }
+
+        // Lista de IDs de los inputs que quieres restringir a solo números
+        const camposNumericos = ['id_departamento', 'id_ciudad'];
+
+        camposNumericos.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    // Reemplaza cualquier cosa que NO sea un número (0-9) con un string vacío
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                });
+            }
+        });
 
         // Redirect error to correct modal
         @if($errors->any())

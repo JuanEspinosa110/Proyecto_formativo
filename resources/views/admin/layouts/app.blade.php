@@ -13,6 +13,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/validacion.css') }}">
 
     @stack('styles')
 </head>
@@ -34,10 +35,15 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">dashboard</span></span>
                     <span>Dashboard</span>
                 </a>
-                
+
                 <a href="{{ route('admin.usuarios.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
                     <span>Usuarios</span>
+                </a>
+
+                <a href="{{ route('admin.documentos.index') }}" class="sigu-sb-link {{ request()->is('admin/documentos*') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">description</span></span>
+                    <span>Documentos</span>
                 </a>
 
                 <a href="{{ url('admin/buses') }}" class="sigu-sb-link {{ request()->is('admin/buses*') ? 'active' : '' }}">
@@ -54,7 +60,7 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">map</span></span>
                     <span>Rutas</span>
                 </a>
-                
+
             </nav>
 
             <div class="sigu-sidebar-footer">
@@ -102,9 +108,9 @@
             const toastEl = document.getElementById('siguToast');
             const toastBody = document.getElementById('toastMessage');
             const toastIcon = document.getElementById('toastIcon');
-            
+
             toastEl.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
-            
+
             if (type === 'success') {
                 toastEl.classList.add('bg-success');
                 toastIcon.textContent = 'check_circle';
@@ -115,17 +121,17 @@
                 toastEl.classList.add('bg-info');
                 toastIcon.textContent = 'info';
             }
-            
+
             toastBody.textContent = message;
             const toast = new bootstrap.Toast(toastEl);
             toast.show();
         }
 
         @if(session('success'))
-            document.addEventListener('DOMContentLoaded', () => showToast("{{ session('success') }}", 'success'));
+        document.addEventListener('DOMContentLoaded', () => showToast("{{ session('success') }}", 'success'));
         @endif
         @if(session('error'))
-            document.addEventListener('DOMContentLoaded', () => showToast("{{ session('error') }}", 'error'));
+        document.addEventListener('DOMContentLoaded', () => showToast("{{ session('error') }}", 'error'));
         @endif
     </script>
 
