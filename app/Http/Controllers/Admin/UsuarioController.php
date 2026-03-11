@@ -35,12 +35,22 @@ class UsuarioController extends Controller
             ->where('usuario.NIT', $nit)
             ->select('usuario.*', 'estado.nombre_estado', 'ciudad.nombre_city', 'tipo_usuario.nombre_tipo');
 
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('usuario.doc_usuario', 'like', "%$search%")
+                  ->orWhere('usuario.primer_nombre', 'like', "%$search%")
+                  ->orWhere('usuario.primer_apellido', 'like', "%$search%")
+                  ->orWhere('usuario.correo', 'like', "%$search%");
+            });
+        }
+
         $selectedRole = $request->query('role');
         if ($selectedRole) {
             $query->where('usuario.id_tipo_usuario', $selectedRole);
         }
 
-        $usuarios = $query->orderBy('usuario.primer_nombre')->paginate(5)->withQueryString();
+        $usuarios = $query->orderBy('usuario.doc_usuario', 'ASC')->paginate(5)->withQueryString();
 
         return view('admin.usuarios.index', compact('usuarios', 'roles', 'selectedRole', 'estados'));
     }
@@ -87,12 +97,8 @@ class UsuarioController extends Controller
             'doc_usuario' => [
                 'required',
                 'numeric',
-                'regex:/^[1-9][0-9]{8,11}$/'
+                'regex:/^[1-9][0-9]{5,9}$/'
             ],
-            'primer_nombre' => 'required|string|min:2|regex:/^[\pL\s]+$/u',
-            'segundo_nombre' => 'nullable|string|min:2|regex:/^[\pL\s]+$/u',
-            'primer_apellido' => 'required|string|min:2|regex:/^[\pL\s]+$/u',
-            'segundo_apellido' => 'required|string|min:2|regex:/^[\pL\s]+$/u',
             'correo' => 'required|email|max:150',
             'telefono' => 'required|numeric|digits:10',
             'id_tipo_usuario' => 'required|integer|exists:tipo_usuario,id_tipo_usuario',
@@ -100,14 +106,7 @@ class UsuarioController extends Controller
         ], [
             'doc_usuario.required' => 'El documento es obligatorio.',
             'doc_usuario.numeric' => 'El documento solo puede contener números.',
-            'doc_usuario.regex' => 'El documento debe tener mínimo 9 dígitos y no puede iniciar con 0.',
-            'primer_nombre.required' => 'El primer nombre es obligatorio.',
-            'primer_nombre.min' => 'El primer nombre debe tener mínimo 2 caracteres.',
-            'primer_nombre.regex' => 'El primer nombre solo puede contener letras.',
-            'primer_apellido.required' => 'El primer apellido es obligatorio.',
-            'primer_apellido.min' => 'El primer apellido debe tener mínimo 2 caracteres.',
-            'primer_apellido.regex' => 'El primer apellido solo puede contener letras.',
-            'segundo_apellido.required' => 'El segundo apellido es obligatorio.',
+            'doc_usuario.regex' => 'El documento debe tener entre 6 y 10 dígitos y no puede iniciar en 0.',
             'correo.required' => 'El correo es obligatorio.',
             'telefono.required' => 'El teléfono es obligatorio.',
             'telefono.digits' => 'El teléfono debe tener exactamente 10 dígitos.',
@@ -115,7 +114,11 @@ class UsuarioController extends Controller
             'id_estado.required' => 'Debe seleccionar un estado.',
         ]);
 
-        $data = $request->except(['_token', '_method', 'foto_usuario', 'form_type']);
+        // Los campos de nombre y apellidos no deben ser modificables
+        $data = $request->except([
+            '_token', '_method', 'foto_usuario', 'form_type', 
+            'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'
+        ]);
         
         if ($request->hasFile('foto_usuario')) {
             // Opcional: Eliminar foto anterior si existe

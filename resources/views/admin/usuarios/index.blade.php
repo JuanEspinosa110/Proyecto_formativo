@@ -40,7 +40,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-2 ms-auto">
                     <button class="btn btn-dark w-100 fw-semibold">Consultar</button>
                 </div>
             </form>
@@ -161,43 +161,51 @@
             <form method="POST" action="{{ route('admin.usuarios.store') }}" id="formCrearUsuario" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body p-4">
-                    {{-- Errores de validación --}}
+                    {{-- Errores de validación (Solo para campos sin validación en tiempo real) --}}
                     @if($errors->any() && old('form_type') == 'create')
-                        <div class="alert alert-danger shadow-sm py-2 small mb-4">
-                            <ul class="mb-0">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
+                        @php
+                            $realTimeFields = ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'];
+                            $hasOtherErrors = false;
+                            foreach($errors->keys() as $key) {
+                                if(!in_array($key, $realTimeFields)) {
+                                    $hasOtherErrors = true;
+                                    break;
+                                }
+                            }
+                        @endphp
+                        
+                        @if($hasOtherErrors)
+                            <div class="alert alert-danger shadow-sm py-2 small mb-4">
+                                <ul class="mb-0">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                     @endif
 
                     <div class="row g-3">
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-12 text-input-validate" data-type="number">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Documento <span class="text-danger">*</span></label>
-                            <input type="text" name="doc_usuario" class="form-control form-control-sm" required minlength="9" maxlength="12" pattern="[1-9][0-9]{8,11}" placeholder="0000000000" 
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch){this.setCustomValidity('El documento debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
+                            <input type="text" name="doc_usuario" class="form-control form-control-sm @error('doc_usuario') is-invalid @enderror" required minlength="6" maxlength="10" pattern="[1-9][0-9]{5,9}" placeholder="Documento..." value="{{ old('doc_usuario') }}"
+                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch){this.setCustomValidity('El documento debe tener entre 6 y 10 dígitos y no puede iniciar en 0')}else{this.setCustomValidity('')}"
                                 oninput="this.setCustomValidity('')">
-                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
-                        </div>
-
-                        <div class="col-md-6 text-input-validate" data-type="number">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">NIT Empresa <span class="text-danger">*</span></label>
-                            <input type="text" name="NIT" class="form-control form-control-sm bg-light" value="{{ auth()->user()->NIT }}" readonly required 
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
+                            @error('doc_usuario') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            <small class="text-muted fs-xs">Mín. 6, máx. 10 dígitos (Sin 0 inicial).</small>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Rol Operativo <span class="text-danger">*</span></label>
-                            <select name="id_tipo_usuario" id="select_id_tipo_usuario" class="form-select form-select-sm" required
+                            <select name="id_tipo_usuario" id="select_id_tipo_usuario" class="form-select form-select-sm @error('id_tipo_usuario') is-invalid @enderror" required
                                 oninvalid="this.setCustomValidity('Este campo es obligatorio')"
                                 oninput="this.setCustomValidity('')">
                                 <option value="" selected disabled>Seleccione...</option>
                                 @foreach($roles as $r)
-                                    <option value="{{ $r->id_tipo_usuario }}">{{ $r->nombre_tipo }}</option>
+                                    <option value="{{ $r->id_tipo_usuario }}" {{ old('id_tipo_usuario') == $r->id_tipo_usuario ? 'selected' : '' }}>{{ $r->nombre_tipo }}</option>
                                 @endforeach
                             </select>
+                            @error('id_tipo_usuario') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="col-12">
@@ -206,41 +214,47 @@
                         </div>
                         <div class="col-md-6 text-input-validate" data-type="text">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Primer Nombre <span class="text-danger">*</span></label>
-                            <input type="text" name="primer_nombre" class="form-control form-control-sm" required minlength="2" maxlength="50" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+" 
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, mínimo 2 caracteres')}else{this.setCustomValidity('')}"
+                            <input type="text" name="primer_nombre" class="form-control form-control-sm @error('primer_nombre') is-invalid @enderror" required minlength="2" maxlength="30" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ]+(\s[a-zA-ZÁÉÍÓÚáéíóúÑñ]+)?" value="{{ old('primer_nombre') }}"
+                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, máximo dos palabras, mín 2 chars')}else{this.setCustomValidity('')}"
                                 oninput="this.setCustomValidity('')">
+                            <div class="invalid-feedback real-time-error">@error('primer_nombre') {{ $message }} @enderror</div>
                         </div>
                         <div class="col-md-6 text-input-validate" data-type="text">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Segundo Nombre</label>
-                            <input type="text" name="segundo_nombre" class="form-control form-control-sm" minlength="2" maxlength="50" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]*" 
-                                oninvalid="if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, mínimo 2 caracteres')}else{this.setCustomValidity('')}"
+                            <input type="text" name="segundo_nombre" class="form-control form-control-sm @error('segundo_nombre') is-invalid @enderror" minlength="2" maxlength="30" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ]+(\s[a-zA-ZÁÉÍÓÚáéíóúÑñ]+)?" value="{{ old('segundo_nombre') }}"
+                                oninvalid="if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, máximo dos palabras, mín 2 caracteres')}else{this.setCustomValidity('')}"
                                 oninput="this.setCustomValidity('')">
+                            <div class="invalid-feedback real-time-error">@error('segundo_nombre') {{ $message }} @enderror</div>
                         </div>
 
                         <div class="col-md-6 text-input-validate" data-type="text">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Primer Apellido <span class="text-danger">*</span></label>
-                            <input type="text" name="primer_apellido" class="form-control form-control-sm" required minlength="2" maxlength="50" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+" 
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, mínimo 2 caracteres')}else{this.setCustomValidity('')}"
+                            <input type="text" name="primer_apellido" class="form-control form-control-sm @error('primer_apellido') is-invalid @enderror" required minlength="2" maxlength="30" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ]+(\s[a-zA-ZÁÉÍÓÚáéíóúÑñ]+)?" value="{{ old('primer_apellido') }}"
+                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, máximo dos palabras, mín 2 chars')}else{this.setCustomValidity('')}"
                                 oninput="this.setCustomValidity('')">
+                            <div class="invalid-feedback real-time-error">@error('primer_apellido') {{ $message }} @enderror</div>
                         </div>
                         <div class="col-md-6 text-input-validate" data-type="text">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Segundo Apellido <span class="text-danger">*</span></label>
-                            <input type="text" name="segundo_apellido" class="form-control form-control-sm" required minlength="2" maxlength="50" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+" 
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, mínimo 2 caracteres')}else{this.setCustomValidity('')}"
+                            <input type="text" name="segundo_apellido" class="form-control form-control-sm @error('segundo_apellido') is-invalid @enderror" required minlength="2" maxlength="30" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ]+(\s[a-zA-ZÁÉÍÓÚáéíóúÑñ]+)?" value="{{ old('segundo_apellido') }}"
+                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, máximo dos palabras, mín 2 chars')}else{this.setCustomValidity('')}"
                                 oninput="this.setCustomValidity('')">
+                            <div class="invalid-feedback real-time-error">@error('segundo_apellido') {{ $message }} @enderror</div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Correo <span class="text-danger">*</span></label>
-                            <input type="email" name="correo" class="form-control form-control-sm" required placeholder="usuario@sigu.com"
+                            <input type="email" name="correo" class="form-control form-control-sm @error('correo') is-invalid @enderror" required placeholder="usuario@sigu.com" value="{{ old('correo') }}"
                                 oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else{this.setCustomValidity('Ingrese un correo válido')}"
                                 oninput="this.setCustomValidity('')">
+                            @error('correo') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
                         <div class="col-md-6 text-input-validate" data-type="number">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Teléfono <span class="text-danger">*</span></label>
-                            <input type="text" name="telefono" class="form-control form-control-sm" required minlength="10" maxlength="10" pattern="[0-9]{10}"
+                            <input type="text" name="telefono" class="form-control form-control-sm @error('telefono') is-invalid @enderror" required minlength="10" maxlength="10" pattern="[0-9]{10}" value="{{ old('telefono') }}"
                                 oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else{this.setCustomValidity('El teléfono debe tener 10 dígitos')}"
                                 oninput="this.setCustomValidity('')">
+                            @error('telefono') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
                     </div>
@@ -299,29 +313,28 @@
                         </div>
 
 
-                        <div class="col-md-6 text-input-validate" data-type="text">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Primer Nombre <span class="text-danger">*</span></label>
-                            <input type="text" name="primer_nombre" id="editPrimerNombre" class="form-control form-control-sm" required minlength="2" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+"
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, mínimo 2 caracteres')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
+                        <div class="col-12">
+                            <div class="alert alert-info py-2 small mb-0 border-0 shadow-none bg-info bg-opacity-10 text-info">
+                                <span class="material-symbols-rounded fs-6 align-middle">info</span>
+                                Los nombres y apellidos no pueden ser modificados.
+                            </div>
                         </div>
-                        <div class="col-md-6 text-input-validate" data-type="text">
+
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Primer Nombre</label>
+                            <input type="text" id="editPrimerNombre" class="form-control form-control-sm bg-light" readonly>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Segundo Nombre</label>
-                            <input type="text" name="segundo_nombre" id="editSegundoNombre" class="form-control form-control-sm" minlength="2" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]*"
-                                oninvalid="if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, mínimo 2 caracteres')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
+                            <input type="text" id="editSegundoNombre" class="form-control form-control-sm bg-light" readonly>
                         </div>
-                        <div class="col-md-6 text-input-validate" data-type="text">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Primer Apellido <span class="text-danger">*</span></label>
-                            <input type="text" name="primer_apellido" id="editPrimerApellido" class="form-control form-control-sm" required minlength="2" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+"
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, mínimo 2 caracteres')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Primer Apellido</label>
+                            <input type="text" id="editPrimerApellido" class="form-control form-control-sm bg-light" readonly>
                         </div>
-                        <div class="col-md-6 text-input-validate" data-type="text">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Segundo Apellido <span class="text-danger">*</span></label>
-                            <input type="text" name="segundo_apellido" id="editSegundoApellido" class="form-control form-control-sm" required minlength="2" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]+"
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, mínimo 2 caracteres')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Segundo Apellido</label>
+                            <input type="text" id="editSegundoApellido" class="form-control form-control-sm bg-light" readonly>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Correo <span class="text-danger">*</span></label>
@@ -381,7 +394,11 @@
                     </div>
                     <div>
                         <h5 id="verNombreCompleto" class="fw-bold mb-0 text-dark"></h5>
-                        <p class="text-muted small mb-0">ID: <span id="verDoc" class="fw-bold"></span> · <span id="verRol" class="badge bg-light text-dark border fw-medium"></span></p>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <span class="text-muted small">ID: <span id="verDoc" class="fw-bold"></span></span>
+                            <span class="text-muted small">·</span>
+                            <span id="verRol" class="badge bg-dark text-white px-3 py-2 border-0 fw-bold" style="font-size: 0.9rem; letter-spacing: 0.5px;"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -527,21 +544,78 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Validaciones de Entrada (Solo números / Solo letras)
+    // Validaciones de Entrada en Tiempo Real
     document.querySelectorAll('.text-input-validate').forEach(container => {
         const input = container.querySelector('input');
         const type = container.getAttribute('data-type');
+        const errorDiv = container.querySelector('.real-time-error');
         
         if (input) {
             input.addEventListener('input', function(e) {
+                let value = this.value;
+                let isValid = true;
+                let errorMessage = '';
+
                 if (type === 'number') {
-                    this.value = this.value.replace(/[^0-9]/g, '');
+                    this.value = value.replace(/[^0-9]/g, '');
                 } else if (type === 'text') {
-                    this.value = this.value.replace(/[0-9]/g, '');
+                    // Solo permitir letras y espacios (Regex para validación en vivo)
+                    const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+(\s[A-Za-zÁÉÍÓÚáéíóúÑñ]+)?$/;
+                    
+                    if (value.length > 0) {
+                        if (/[0-9]/.test(value)) {
+                            errorMessage = 'No se permiten números.';
+                            isValid = false;
+                        } else if (/[^a-zA-ZÁÉÍÓÚáéíóúÑñ\s]/.test(value)) {
+                            errorMessage = 'No se permiten caracteres especiales.';
+                            isValid = false;
+                        } else if (value.startsWith(' ')) {
+                            errorMessage = 'No debe iniciar con espacios.';
+                            isValid = false;
+                        } else if (value.length < 2) {
+                            errorMessage = 'Mínimo 2 caracteres.';
+                            isValid = false;
+                        } else if (value.length > 30) {
+                            errorMessage = 'Máximo 30 caracteres.';
+                            isValid = false;
+                        } else if (!nameRegex.test(value)) {
+                            errorMessage = 'Máximo dos palabras y sin espacios al final.';
+                            isValid = false;
+                        }
+                    } else if (this.hasAttribute('required')) {
+                        errorMessage = 'Este campo es obligatorio.';
+                        isValid = false;
+                    }
+
+                    // UI Feedback
+                    if (!isValid && value.length > 0) {
+                        this.classList.add('is-invalid');
+                        if (errorDiv) {
+                            errorDiv.textContent = errorMessage;
+                            errorDiv.style.display = 'block';
+                        }
+                    } else {
+                        this.classList.remove('is-invalid');
+                        if (errorDiv) {
+                            errorDiv.style.display = 'none';
+                        }
+                    }
                 }
             });
         }
     });
+
+    // Validar antes de enviar el formulario
+    const formCrearUser = document.getElementById('formCrearUsuario');
+    if (formCrearUser) {
+        formCrearUser.addEventListener('submit', function(e) {
+            const invalidInputs = this.querySelectorAll('.is-invalid');
+            if (invalidInputs.length > 0) {
+                e.preventDefault();
+                invalidInputs[0].focus();
+            }
+        });
+    }
 });
 </script>
 <style>

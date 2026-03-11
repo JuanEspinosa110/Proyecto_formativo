@@ -27,16 +27,47 @@ class AsignacionController extends Controller
                 $q->where('NIT', $nit);
             });
 
-        // Filtrado por buscador
+        // Filtrado por buscador (General)
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('placa', 'like', "%{$search}%")
+                  ->orWhere('id_viaje', 'like', "%{$search}%")
                   ->orWhereHas('conductor', function($sq) use ($search) {
                       $sq->where('primer_nombre', 'like', "%{$search}%")
-                        ->orWhere('primer_apellido', 'like', "%{$search}%");
+                        ->orWhere('primer_apellido', 'like', "%{$search}%")
+                        ->orWhere('doc_usuario', 'like', "%{$search}%");
                   });
             });
+        }
+
+        // Filtros específicos
+        if ($request->filled('id_viaje')) {
+            $query->where('id_viaje', $request->id_viaje);
+        }
+        if ($request->filled('placa')) {
+            $query->where('placa', $request->placa);
+        }
+        if ($request->filled('id_ruta')) {
+            $query->where('id_ruta', $request->id_ruta);
+        }
+        if ($request->filled('id_estado')) {
+            $query->where('id_estado', $request->id_estado);
+        }
+        if ($request->filled('conductor')) {
+            $cSearch = $request->conductor;
+            $query->whereHas('conductor', function($sq) use ($cSearch) {
+                $sq->where(function($ssq) use ($cSearch) {
+                    $ssq->where('primer_nombre', 'like', "%{$cSearch}%")
+                        ->orWhere('primer_apellido', 'like', "%{$cSearch}%")
+                        ->orWhere('doc_usuario', 'like', "%{$cSearch}%");
+                });
+            });
+        }
+        
+        // Filtro por Hora (Ej: '06:00')
+        if ($request->filled('hora')) {
+            $query->whereTime('fecha', '=', $request->hora);
         }
 
         // Orden ID ASC y paginación
@@ -66,7 +97,7 @@ class AsignacionController extends Controller
     {
         $data = $request->validated();
 
-        // Generar ID aleatorio único (Manual como en arquitectura base)
+        // Generar ID aleatorio único
         do {
             $id = random_int(100000, 999999);
         } while (Viaje::where('id_viaje', $id)->exists());
@@ -82,9 +113,10 @@ class AsignacionController extends Controller
     /**
      * Actualizar una asignación existente.
      */
-    public function update(AsignacionRequest $request, Viaje $asignacion)
+    public function update(AsignacionRequest $request, $id_viaje)
     {
-        $asignacion->update($request->validated());
+        $viaje = Viaje::findOrFail($id_viaje);
+        $viaje->update($request->validated());
 
         return redirect()->route('admin.asignaciones.index')
             ->with('success', 'Registro actualizado correctamente');
@@ -93,9 +125,10 @@ class AsignacionController extends Controller
     /**
      * Eliminar una asignación.
      */
-    public function destroy(Viaje $asignacion)
+    public function destroy($id_viaje)
     {
-        $asignacion->delete();
+        $viaje = Viaje::findOrFail($id_viaje);
+        $viaje->delete();
 
         return redirect()->route('admin.asignaciones.index')
             ->with('success', 'Registro eliminado correctamente');

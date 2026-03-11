@@ -26,7 +26,7 @@
     <div class="card border-0 shadow-sm mb-4 rounded-3">
         <div class="card-body p-3">
             <form method="GET" action="{{ route('admin.buses.index') }}" class="row g-2 align-items-center">
-                <div class="col-md-5">
+                <div class="col-md-7">
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0">
                             <span class="material-symbols-rounded text-muted">search</span>
@@ -44,8 +44,8 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-dark w-100 fw-semibold">Filtrar Resultados</button>
+                <div class="col-md-2 text-end">
+                    <button type="submit" class="btn btn-dark w-100 fw-semibold">Consultar</button>
                 </div>
                 @if(request()->hasAny(['search', 'id_estado']))
                 <div class="col-md-1">
@@ -211,57 +211,64 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Placa <span class="text-danger">*</span></label>
                             <input type="text" name="placa" class="form-control form-control-sm fw-bold" placeholder="ABC123" required style="text-transform:uppercase" maxlength="6">
+                            <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Modelo / Ref. <span class="text-danger">*</span></label>
-                            <input type="text" name="modelo" class="form-control form-control-sm" placeholder="Ej: Bus 2024" required>
+                            <input type="text" name="modelo" class="form-control form-control-sm" placeholder="Ej: Toyota 2019" required>
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Pasajeros <span class="text-danger">*</span></label>
-                            <input type="text" name="capacidad_pasajeros" class="form-control form-control-sm" required min="10" placeholder="00">
+                            <input type="text" name="capacidad_pasajeros" class="form-control form-control-sm" required placeholder="00">
+                            <div class="real-time-error"></div>
                         </div>
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Kilometraje <span class="text-danger">*</span></label>
                             <input type="text" name="kilometraje" class="form-control form-control-sm" required placeholder="0">
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Licencia Tránsito <span class="text-danger">*</span></label>
-                            <input type="text" name="linc_transito" class="form-control form-control-sm" required minlength="9" pattern="[1-9][0-9]{8,19}" placeholder="No. Licencia"
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch){this.setCustomValidity('La licencia debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
-                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
+                            <input type="text" name="linc_transito" class="form-control form-control-sm" required maxlength="12" placeholder="8 dígitos">
+                            <div class="real-time-error"></div>
                         </div>
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Doc. Propietario <span class="text-danger">*</span></label>
-                            <input type="text" name="doc_propietario" class="form-control form-control-sm" required minlength="9" pattern="[1-9][0-9]{8,14}" placeholder="Cédula/NIT"
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch){this.setCustomValidity('El documento debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
-                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
+                            <input type="text" name="doc_propietario" class="form-control form-control-sm" required maxlength="15" placeholder="Máx. 10 dígitos">
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-12 text-input-validate" data-type="text">
+                        <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre Propietario <span class="text-danger">*</span></label>
-                            <input type="text" name="nombre_propietario" class="form-control form-control-sm" placeholder="Nombre Completo" required minlength="2" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]{2,}">
+                            <input type="text" name="nombre_propietario" class="form-control form-control-sm" placeholder="Nombre completo" required>
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Teléfono <span class="text-danger">*</span></label>
-                            <input type="text" name="telefono" class="form-control form-control-sm" required minlength="10" maxlength="10">
+                            <input type="text" name="telefono" class="form-control form-control-sm" required maxlength="10" placeholder="312...">
+                            <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Correo <span class="text-danger">*</span></label>
-                            <input type="email" name="correo" class="form-control form-control-sm" placeholder="prop@sigu.com" required>
+                            <input type="email" name="correo" class="form-control form-control-sm" placeholder="ejemplo@correo.com" required>
+                            <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Chasis</label>
-                            <input type="text" name="numero_chasis" class="form-control form-control-sm" maxlength="17">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Chasis <span class="text-danger">*</span></label>
+                            <input type="text" name="numero_chasis" class="form-control form-control-sm" required maxlength="17" placeholder="17 dígitos">
+                            <small class="text-muted fs-xs">Debe contener exactamente 17 dígitos numéricos.</small>
+                            <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Motor</label>
-                            <input type="text" name="numero_motor" class="form-control form-control-sm" maxlength="14">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Motor <span class="text-danger">*</span></label>
+                            <input type="text" name="numero_motor" class="form-control form-control-sm" required maxlength="17" placeholder="8-17 dígitos">
+                            <small class="text-muted fs-xs">Debe contener entre 8 y 17 dígitos numéricos según el fabricante.</small>
+                            <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-12">
@@ -325,53 +332,59 @@
 
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Modelo / Referencia <span class="text-danger">*</span></label>
-                            <input type="text" name="modelo" id="edit_modelo" class="form-control form-control-sm" required>
+                            <input type="text" name="modelo" id="edit_modelo" class="form-control form-control-sm" required placeholder="Ej: Toyota 2019">
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Capacidad</label>
                             <input type="text" name="capacidad_pasajeros" id="edit_capacidad" class="form-control form-control-sm" required>
+                            <div class="real-time-error"></div>
                         </div>
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Kilometraje</label>
                             <input type="text" name="kilometraje" id="edit_kilometraje" class="form-control form-control-sm" required>
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Licencia Tránsito</label>
-                            <input type="text" name="linc_transito" id="edit_linc_transito" class="form-control form-control-sm" minlength="9" pattern="[1-9][0-9]{8,19}"
-                                oninvalid="if(this.validity.patternMismatch){this.setCustomValidity('La licencia debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
-                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
+                            <input type="text" name="linc_transito" id="edit_linc_transito" class="form-control form-control-sm" required maxlength="12" placeholder="8 dígitos">
+                            <div class="real-time-error"></div>
                         </div>
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Doc. Propietario</label>
-                            <input type="text" name="doc_propietario" id="edit_doc_propietario" class="form-control form-control-sm" minlength="9" pattern="[1-9][0-9]{8,14}"
-                                oninvalid="if(this.validity.patternMismatch){this.setCustomValidity('El documento debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
-                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
+                            <input type="text" name="doc_propietario" id="edit_doc_propietario" class="form-control form-control-sm" required maxlength="15" placeholder="Máx. 10 dígitos">
+                            <div class="real-time-error"></div>
                         </div>
-                        <div class="col-md-12 text-input-validate" data-type="text">
+                        <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre Propietario</label>
                             <input type="text" name="nombre_propietario" id="edit_nombre_propietario" class="form-control form-control-sm" required>
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Teléfono</label>
-                            <input type="text" name="telefono" id="edit_telefono" class="form-control form-control-sm">
+                            <input type="text" name="telefono" id="edit_telefono" class="form-control form-control-sm" required maxlength="10">
+                            <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Correo</label>
-                            <input type="email" name="correo" id="edit_correo" class="form-control form-control-sm">
+                            <input type="email" name="correo" id="edit_correo" class="form-control form-control-sm" required>
+                            <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Chasis</label>
-                            <input type="text" name="numero_chasis" id="edit_numero_chasis" class="form-control form-control-sm" maxlength="17">
+                            <input type="text" name="numero_chasis" id="edit_numero_chasis" class="form-control form-control-sm" required maxlength="17" placeholder="17 dígitos">
+                            <small class="text-muted fs-xs">Debe contener exactamente 17 dígitos numéricos.</small>
+                            <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Motor</label>
-                            <input type="text" name="numero_motor" id="edit_numero_motor" class="form-control form-control-sm" maxlength="14">
+                            <input type="text" name="numero_motor" id="edit_numero_motor" class="form-control form-control-sm" required maxlength="17" placeholder="8-17 dígitos">
+                            <small class="text-muted fs-xs">Debe contener entre 8 y 17 dígitos numéricos según el fabricante.</small>
+                            <div class="real-time-error"></div>
                         </div>
                     </div>
                 </div>
@@ -547,37 +560,136 @@
             @endif
         @endif
 
-        // Validaciones de Entrada (Solo números / Solo letras)
-        document.querySelectorAll('.text-input-validate').forEach(container => {
-            const input = container.querySelector('input');
-            const type = container.getAttribute('data-type');
+        // Función para mostrar/ocultar errores en tiempo real
+        function toggleError(input, show, message = '') {
+            const container = input.closest('.col-md-6, .col-md-12, .col-12');
+            const errorDiv = container.querySelector('.real-time-error');
             
-            if (input) {
-                input.addEventListener('input', function(e) {
-                    if (type === 'number') {
-                        this.value = this.value.replace(/[^0-9]/g, '');
-                    } else if (type === 'text') {
-                        this.value = this.value.replace(/[0-9]/g, '');
+            if (show) {
+                input.classList.add('is-invalid');
+                if (errorDiv) {
+                    errorDiv.textContent = message;
+                    errorDiv.style.display = 'block';
+                }
+            } else {
+                input.classList.remove('is-invalid');
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                }
+            }
+        }
+
+        // Delegación de eventos para validar mientras se escribe
+        document.addEventListener('input', function(e) {
+            const input = e.target;
+            const name = input.name;
+            if (!name) return;
+
+            let isValid = true;
+            let message = '';
+
+            // Limpiar solo números para campos específicos
+            if (['linc_transito', 'telefono', 'doc_propietario', 'numero_chasis', 'numero_motor', 'capacidad_pasajeros', 'kilometraje'].includes(name)) {
+                input.value = input.value.replace(/[^0-9]/g, '');
+            }
+
+            // Validaciones específicas
+            switch(name) {
+                case 'placa':
+                    let val = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                    if (val.length <= 3) val = val.replace(/[^A-Z]/g, '');
+                    else val = val.substring(0,3).replace(/[^A-Z]/g, '') + val.substring(3).replace(/[^0-9]/g, '');
+                    input.value = val.substring(0,6);
+                    
+                    if (input.value.length > 0 && !/^[A-Z]{3}[0-9]{3}$/.test(input.value)) {
+                        isValid = false;
+                        message = 'Formato requerido: AAA000 (3 letras y 3 números).';
+                    }
+                    break;
+
+                case 'linc_transito':
+                    if (input.value.length > 0 && input.value.length !== 8) {
+                        isValid = false;
+                        message = 'La licencia debe tener exactamente 8 caracteres numéricos.';
+                    }
+                    break;
+
+                case 'modelo':
+                    // Marca (letras) + Espacio + Año (4 números)
+                    if (input.value.length > 0) {
+                        // Regex: Letras (incluyendo tildes) + un espacio + 4 números
+                        const modelRegex = /^[\p{L}ÁÉÍÓÚáéíóúÑñ\s]+\s[0-9]{4}$/u;
+                        if (!modelRegex.test(input.value)) {
+                            isValid = false;
+                            message = 'Formato: Marca Año (Ej: Toyota 2019).';
+                        }
+                    }
+                    break;
+
+                case 'doc_propietario':
+                    if (input.value.length > 10) {
+                        isValid = false;
+                        message = 'El documento no debe superar los 10 dígitos.';
+                    } else if (input.value.length > 0 && input.value.length < 6) {
+                        isValid = false;
+                        message = 'El documento debe tener al menos 6 dígitos.';
+                    }
+                    break;
+
+                case 'nombre_propietario':
+                    if (input.value.length > 0 && !/^[\p{L}ÁÉÍÓÚáéíóúÑñ\s]+$/u.test(input.value)) {
+                        isValid = false;
+                        message = 'Solo se permiten letras y espacios.';
+                    }
+                    break;
+
+                case 'telefono':
+                    if (input.value.length > 0 && input.value.length !== 10) {
+                        isValid = false;
+                        message = 'El teléfono debe tener exactamente 10 dígitos.';
+                    }
+                    break;
+
+                case 'correo':
+                    if (input.value.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) {
+                        isValid = false;
+                        message = 'Formato de correo inválido.';
+                    }
+                    break;
+
+                case 'numero_chasis':
+                    if (input.value.length > 0 && input.value.length !== 17) {
+                        isValid = false;
+                        message = 'El chasis debe tener exactamente 17 números.';
+                    }
+                    break;
+
+                case 'numero_motor':
+                    if (input.value.length > 0 && (input.value.length < 8 || input.value.length > 17)) {
+                        isValid = false;
+                        message = 'El motor debe tener entre 8 y 17 números.';
+                    }
+                    break;
+            }
+
+            toggleError(input, !isValid, message);
+        });
+
+        // Validar antes de enviar
+        const forms = ['formCreateBus', 'formEditBus'];
+        forms.forEach(id => {
+            const f = document.getElementById(id);
+            if (f) {
+                f.addEventListener('submit', function(e) {
+                    const invalidInputs = this.querySelectorAll('.is-invalid');
+                    if (invalidInputs.length > 0) {
+                        e.preventDefault();
+                        invalidInputs[0].focus();
+                        alert('Por favor corrija los errores en el formulario antes de continuar.');
                     }
                 });
             }
         });
-
-        // Formateo de placa
-        const placaInput = document.querySelector('[name="placa"]');
-        if (placaInput) {
-            placaInput.addEventListener('input', function(e) {
-                let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                if (value.length <= 3) {
-                    value = value.replace(/[^A-Z]/g, '');
-                } else {
-                    let letters = value.substring(0,3).replace(/[^A-Z]/g, '');
-                    let numbers = value.substring(3).replace(/[^0-9]/g, '');
-                    value = letters + numbers;
-                }
-                e.target.value = value.substring(0,6);
-            });
-        }
     });
 </script>
 
@@ -625,6 +737,19 @@
     .invalid-feedback {
         font-weight: 500;
         font-size: 0.8rem;
+    }
+
+    .real-time-error {
+        color: #dc3545;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+        display: none; /* Se muestra vía JS */
+        font-weight: 500;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545 !important;
+        background-image: none !important;
     }
 </style>
 @endpush
