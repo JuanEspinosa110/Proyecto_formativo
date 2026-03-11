@@ -85,6 +85,17 @@
                                             data-nombre="{{ $estado->nombre_estado }}">
                                             <i class="fas fa-edit me-1"></i> Editar
                                         </button>
+                                        <div class="d-flex justify-content-end gap-3">
+                                            <a href="#"
+                                               class="text-primary text-decoration-none d-flex align-items-center"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#editarModal"
+                                               data-id="{{ $estado->id_estado }}"
+                                               data-nombre="{{ $estado->nombre_estado }}"
+                                               title="Editar estado">
+                                                <span class="material-symbols-rounded fs-5">edit</span>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                                 @empty
@@ -224,7 +235,7 @@
         document.querySelectorAll('.text-input-validate').forEach(container => {
             const input = container.querySelector('input');
             const type = container.getAttribute('data-type');
-            
+
             if (input) {
                 input.addEventListener('input', function(e) {
                     if (type === 'text') {

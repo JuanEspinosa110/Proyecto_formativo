@@ -299,7 +299,6 @@
                 form.querySelector('[name="id_estado"]').value = data.id_estado;
 
                 // 3. IMPORTANTE: Cargar barrios y seleccionar los actuales
-                // Esperamos a que la petición AJAX termine para marcar el 'selected'
                 await loadBarrios(data.id_ciudad, 'edit_id_barrio_origen', data.id_barrio_origen);
                 await loadBarrios(data.id_ciudad, 'edit_id_barrio_destino', data.id_barrio_destino);
 
@@ -452,7 +451,7 @@
         }
     });
 
-    // No permitir caracteres no numéricos 
+    // No permitir caracteres no numéricos
     document.addEventListener('input', function(e) {
         if (e.target.name === 'codigo_ruta') {
             // Eliminar todo lo que no sea número
