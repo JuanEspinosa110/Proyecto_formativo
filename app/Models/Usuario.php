@@ -3,8 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 use App\Models\TipoUsuario;
+use App\Models\Empresa;
+use App\Models\Ciudad;
+use App\Models\TitularidadTarjeta;
 
 class Usuario extends Authenticatable
 {
@@ -100,5 +104,10 @@ class Usuario extends Authenticatable
     {
         // Relación: Un usuario pertenece a una ciudad a través de id_ciudad
         return $this->belongsTo(Ciudad::class, 'id_ciudad', 'id_ciudad');
+    }
+
+    public function titularidadesTarjeta(): HasMany
+    {
+        return $this->hasMany(TitularidadTarjeta::class, 'doc_usuario', 'doc_usuario');
     }
 }

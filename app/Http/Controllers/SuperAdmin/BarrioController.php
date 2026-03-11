@@ -26,7 +26,7 @@ class BarrioController extends Controller
         }
 
         // Orden ASC por ID según requerimiento
-        $barrios = $query->orderBy('id_barrio', 'asc')->paginate(5);
+        $barrios = $query->orderBy('id_barrio', 'asc')->paginate(10);
 
         // Ciudades para los select en modales
         $ciudades = Ciudad::orderBy('nombre_city', 'asc')->get();

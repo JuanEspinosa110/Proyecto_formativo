@@ -76,17 +76,15 @@
                                     <td class="px-4 fw-bold text-dark">{{ $estado->id_estado }}</td>
                                     <td>{{ $estado->nombre_estado }}</td>
                                     <td class="text-end px-4">
-                                        <div class="d-flex justify-content-end gap-3">
-                                            <a href="#" 
-                                               class="text-primary text-decoration-none d-flex align-items-center"
-                                               data-bs-toggle="modal"
-                                               data-bs-target="#editarModal"
-                                               data-id="{{ $estado->id_estado }}"
-                                               data-nombre="{{ $estado->nombre_estado }}"
-                                               title="Editar estado">
-                                                <span class="material-symbols-rounded fs-5">edit</span>
-                                            </a>
-                                        </div>
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-warning btn-sm border-0"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editarModal"
+                                            data-id="{{ $estado->id_estado }}"
+                                            data-nombre="{{ $estado->nombre_estado }}">
+                                            <i class="fas fa-edit me-1"></i> Editar
+                                        </button>
                                     </td>
                                 </tr>
                                 @empty
@@ -158,11 +156,13 @@
             <form id="formEditar" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="modal-body p-4">
-                    <div class="mb-0 text-input-validate" data-type="text">
-                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre del Estado <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_estado" id="editNombre" class="form-control form-control-sm @error('nombre_estado') is-invalid @enderror" required>
-                        @error('nombre_estado') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <div class="modal-body py-4">
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold">Nombre del Estado <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre_estado" id="editNombre" class="form-control @error('nombre_estado') is-invalid @enderror" required value="{{ old('nombre_estado') }}">
+                        @error('nombre_estado')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-3 bg-light">

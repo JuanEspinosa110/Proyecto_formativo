@@ -20,6 +20,7 @@ use App\Http\Controllers\SuperAdmin\{
     ConfiguracionController,
     PerfilSeguridadController,
     PlanLicenciaController,
+    RutaController,
     CiudadController,
 };
 
