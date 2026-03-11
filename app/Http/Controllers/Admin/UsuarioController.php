@@ -58,7 +58,8 @@ class UsuarioController extends Controller
     public function store(StoreUsuarioRequest $request)
     {
         try {
-            $passwordGenerada = Str::random(10);
+            // Si viene una contraseña en el request, se usa esa, sino se genera una aleatoria
+            $passwordGenerada = $request->filled('password') ? $request->password : Str::random(10);
 
             // Usamos los nombres de campos que vienen del formulario
             $data = [

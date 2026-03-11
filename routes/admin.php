@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\AsignacionController;
 use App\Http\Controllers\Admin\RutaController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::middleware(['auth:web'])->group(function () {
+    Route::middleware(['auth:web', 'role:1'])->group(function () {
         // Dashboard
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
@@ -29,6 +29,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
 
         Route::post('/usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
+        Route::put('/usuarios/{doc_usuario}', [UsuarioController::class, 'update'])->name('usuarios.update');
 
         // Módulo de Rutas (Admin)
         Route::get('/rutas', [RutaController::class, 'index'])->name('rutas.index');

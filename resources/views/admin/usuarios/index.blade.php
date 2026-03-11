@@ -257,6 +257,18 @@
                             @error('telefono') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
+                        <div class="col-md-12" id="wrapper_password_crear" style="display: none;">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Contraseña de Acceso <span class="text-info" id="msg_pass_obligatorio">(Opcional para otros roles)</span></label>
+                            <div class="input-group input-group-sm">
+                                <input type="password" name="password" id="pass_crear" class="form-control @error('password') is-invalid @enderror" placeholder="Mínimo 8 caracteres">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('pass_crear')">
+                                    <span class="material-symbols-rounded fs-6 align-middle">visibility</span>
+                                </button>
+                            </div>
+                            @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            <small class="text-muted fs-xs">Si se deja vacío, se generará una contraseña aleatoria.</small>
+                        </div>
+
                     </div>
                 </div>
 
@@ -616,7 +628,39 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // Lógica para el campo de contraseña según el rol
+    const selectRol = document.getElementById('select_id_tipo_usuario');
+    const wrapperPass = document.getElementById('wrapper_password_crear');
+    const msgPass = document.getElementById('msg_pass_obligatorio');
+
+    if (selectRol && wrapperPass) {
+        const checkRol = () => {
+            const val = selectRol.value;
+            if (val == "6" || val == "9") { // Propietario
+                wrapperPass.style.display = 'block';
+                msgPass.textContent = '(Recomendado para propietarios)';
+                msgPass.classList.remove('text-info');
+                msgPass.classList.add('text-warning');
+            } else {
+                wrapperPass.style.display = 'block'; // Siempre visible pero opcional
+                msgPass.textContent = '(Opcional)';
+                msgPass.classList.remove('text-warning');
+                msgPass.classList.add('text-info');
+            }
+        };
+
+        selectRol.addEventListener('change', checkRol);
+        checkRol();
+    }
 });
+
+function togglePasswordVisibility(id) {
+    const input = document.getElementById(id);
+    if (input) {
+        input.type = input.type === 'password' ? 'text' : 'password';
+    }
+}
 </script>
 <style>
     .ls-1 {

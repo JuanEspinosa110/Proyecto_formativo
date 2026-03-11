@@ -61,6 +61,13 @@
                     <span>Rutas</span>
                 </a>
 
+                @if(auth()->check() && (auth()->user()->id_tipo_usuario == 6 || auth()->user()->id_tipo_usuario == 9))
+                <a href="{{ route('propietario.dashboard') }}" class="sigu-sb-link {{ request()->routeIs('propietario.*') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">person_pin</span></span>
+                    <span>Mi Vehículo</span>
+                </a>
+                @endif
+
             </nav>
 
             <div class="sigu-sidebar-footer">

@@ -78,6 +78,11 @@ class StoreUsuarioRequest extends FormRequest
                 'mimes:jpeg,png,jpg',
                 'max:2048'
             ],
+            'password' => [
+                'nullable',
+                'string',
+                'min:8'
+            ],
         ];
     }
 
@@ -119,6 +124,7 @@ class StoreUsuarioRequest extends FormRequest
 
             'id_tipo_usuario.required' => 'Debe seleccionar un rol operativo.',
             'id_tipo_usuario.exists' => 'El rol seleccionado no es válido.',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres.',
 
             'id_estado.required' => 'El estado de la cuenta es obligatorio.',
         ];
