@@ -85,7 +85,7 @@
             </nav>
             <div class="dropdown">
             <a href="#"
-            class="sigu-nl dropdown-toggle 
+            class="sigu-nl dropdown-toggle
             {{ request()->routeIs('superadmin.ciudades.*') ||
                 request()->routeIs('superadmin.tipo-empresa.*') ||
                 request()->routeIs('superadmin.tipo_usuario.*') ||

@@ -6,12 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Ruta;
 // use App\Models\Empresa;
 use App\Services\RutaService;
-use App\Http\Requests\Admin\RutaRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-
+use App\Http\Requests\SuperAdmin\RutaRequest;
 
 class RutaController extends Controller
 {

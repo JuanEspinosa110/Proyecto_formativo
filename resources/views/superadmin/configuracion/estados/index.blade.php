@@ -224,7 +224,7 @@
         document.querySelectorAll('.text-input-validate').forEach(container => {
             const input = container.querySelector('input');
             const type = container.getAttribute('data-type');
-            
+
             if (input) {
                 input.addEventListener('input', function(e) {
                     if (type === 'text') {
