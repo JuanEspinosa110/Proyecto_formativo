@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\TipoDocumento;
 use App\Models\Estado;
+use App\Http\Requests\SuperAdmin\Configuracion\TipoDocumentoRequest;
 use Illuminate\Http\Request;
 
 class TipoDocumentoController extends Controller
@@ -55,27 +56,18 @@ class TipoDocumentoController extends Controller
     {
         $tipo = TipoDocumento::findOrFail($id);
 
-        $validated = $request->validate([
-            'nombre'               => 'required|string|max:100|unique:tipo_documento,nombre,' . $id . ',id_tipo_documento',
-            'descripcion'          => 'nullable|string|max:255',
-            'id_estado'            => 'required|in:1,2'
-        ], [
-            'nombre.required'      => 'El nombre del tipo de documento es obligatorio.',
-            'nombre.unique'        => 'Ese nombre ya está en uso por otro tipo.',
-            'id_estado.required'   => 'El estado es obligatorio.',
-            'id_estado.in'         => 'El estado seleccionado no es válido (solo Activo/Inactivo).'
-        ]);
+        // Usar el FormRequest para validación
+        $validated = app(TipoDocumentoRequest::class)->validated();
 
-        $tipo->update([
-            'nombre'               => $validated['nombre'],
-            'descripcion'          => $validated['descripcion'],
-            'requiere_doc_usuario' => $request->has('requiere_doc_usuario'),
-            'requiere_placa'       => $request->has('requiere_placa'),
-            'id_estado'            => $validated['id_estado'],
-        ]);
+        $tipo->nombre = $validated['nombre'];
+        $tipo->descripcion = $validated['descripcion'] ?? null;
+        $tipo->id_estado = $validated['id_estado'];
+        $tipo->requiere_doc_usuario = $request->input('requiere_doc_usuario', 0) == 1 ? 1 : 0;
+        $tipo->requiere_placa = $request->input('requiere_placa', 0) == 1 ? 1 : 0;
+        $tipo->save();
 
         return redirect()
-            ->route('superadmin.tipo_documento.index')
+            ->route('superadmin.configuracion.tipo-documento.index')
             ->with('success', 'Tipo de documento actualizado correctamente.');
     }
 }

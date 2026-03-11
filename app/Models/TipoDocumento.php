@@ -13,7 +13,14 @@ class TipoDocumento extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
-        'id_estado'
+        'id_estado',
+        'requiere_doc_usuario',
+        'requiere_placa'
+    ];
+
+    protected $casts = [
+        'requiere_doc_usuario' => 'boolean',
+        'requiere_placa' => 'boolean',
     ];
 
     public function documentos()

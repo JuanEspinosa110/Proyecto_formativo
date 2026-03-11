@@ -205,6 +205,8 @@
             </div>
             <form id="formEditTipo" method="POST">
                 @csrf @method('PUT')
+                <input type="hidden" name="requiere_doc_usuario" value="0">
+                <input type="hidden" name="requiere_placa" value="0">
                 <div class="modal-body px-4 pb-4">
                     <div class="row g-3">
                         <div class="col-12">
@@ -220,11 +222,11 @@
                             <label class="form-label small fw-bold text-muted text-uppercase d-block mb-3">Asociación Requerida</label>
                             <div class="d-flex flex-wrap gap-4 px-2">
                                 <div class="form-check form-switch custom-switch">
-                                    <input class="form-check-input" type="checkbox" name="requiere_doc_usuario" id="edit_checkUser">
+                                    <input class="form-check-input" type="checkbox" name="requiere_doc_usuario" id="edit_checkUser" value="1">
                                     <label class="form-check-label ms-1" for="edit_checkUser">Requiere Doc. Usuario</label>
                                 </div>
                                 <div class="form-check form-switch custom-switch">
-                                    <input class="form-check-input" type="checkbox" name="requiere_placa" id="edit_checkPlate">
+                                    <input class="form-check-input" type="checkbox" name="requiere_placa" id="edit_checkPlate" value="1">
                                     <label class="form-check-label ms-1" for="edit_checkPlate">Requiere Placa</label>
                                 </div>
                             </div>
@@ -255,16 +257,34 @@
         document.querySelectorAll('.edit-tipo').forEach(btn => {
             btn.addEventListener('click', function() {
                 const data = JSON.parse(this.dataset.json);
-                const form = document.getElementById('formEditRuta'); // Nota: el form tiene ID raro en el controller del user? no, arreglemoslo
                 const formActual = document.getElementById('formEditTipo');
 
-                formActual.action = `/superadmin/tipo-documento/${data.id_tipo_documento}`;
+                formActual.action = `/superadmin/configuracion/tipo-documento/${data.id_tipo_documento}`;
                 formActual.querySelector('[name="nombre"]').value = data.nombre;
                 formActual.querySelector('[name="descripcion"]').value = data.descripcion || '';
-                formActual.querySelector('[name="requiere_doc_usuario"]').checked = data.requiere_doc_usuario == 1;
-                formActual.querySelector('[name="requiere_placa"]').checked = data.requiere_placa == 1;
+                // Limpiar checkboxes antes de asignar
+                formActual.querySelector('#edit_checkUser').checked = false;
+                formActual.querySelector('#edit_checkPlate').checked = false;
+                // Asignar estado real
+                if (data.requiere_doc_usuario == 1 || data.requiere_doc_usuario === true) {
+                    formActual.querySelector('#edit_checkUser').checked = true;
+                }
+                if (data.requiere_placa == 1 || data.requiere_placa === true) {
+                    formActual.querySelector('#edit_checkPlate').checked = true;
+                }
                 formActual.querySelector('[name="id_estado"]').value = data.id_estado;
             });
+        });
+
+        // Asegurar que el valor enviado sea 1 o 0
+        document.getElementById('formEditTipo').addEventListener('submit', function(e) {
+            const checkUser = document.getElementById('edit_checkUser');
+            const checkPlate = document.getElementById('edit_checkPlate');
+            // Si está checked, value=1, si no, value=0
+            if (!checkUser.checked) checkUser.value = 0;
+            else checkUser.value = 1;
+            if (!checkPlate.checked) checkPlate.value = 0;
+            else checkPlate.value = 1;
         });
 
         @if($errors->any())
