@@ -110,4 +110,10 @@ class Usuario extends Authenticatable
     {
         return $this->hasMany(TitularidadTarjeta::class, 'doc_usuario', 'doc_usuario');
     }
+
+    public function getActiveNit()
+    {
+        // Retorna el valor de la columna NIT de la tabla usuario
+        return $this->NIT;
+    }
 }
