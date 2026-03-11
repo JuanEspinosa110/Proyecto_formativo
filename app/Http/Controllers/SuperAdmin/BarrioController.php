@@ -27,7 +27,7 @@ class BarrioController extends Controller
 
         // Orden ASC por ID según requerimiento
         $barrios = $query->orderBy('id_barrio', 'asc')->paginate(10);
-        
+
         // Ciudades para los select en modales
         $ciudades = Ciudad::orderBy('nombre_city', 'asc')->get();
 
@@ -41,7 +41,7 @@ class BarrioController extends Controller
     {
         Barrio::create($request->validated());
 
-        return redirect()->route('superadmin.barrios.index')
+        return redirect()->route('superadmin.configuracion.barrios.index')
             ->with('success', 'Barrio creado exitosamente.');
     }
 
@@ -53,7 +53,7 @@ class BarrioController extends Controller
         $barrio = Barrio::findOrFail($id);
         $barrio->update($request->validated());
 
-        return redirect()->route('superadmin.barrios.index')
+        return redirect()->route('superadmin.configuracion.barrios.index')
             ->with('success', 'Barrio actualizado exitosamente.');
     }
 

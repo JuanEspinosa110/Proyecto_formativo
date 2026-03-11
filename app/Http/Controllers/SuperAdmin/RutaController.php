@@ -9,6 +9,7 @@ use App\Services\RutaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 use App\Http\Requests\SuperAdmin\RutaRequest;
 
@@ -37,11 +38,34 @@ class RutaController extends Controller
     /**
      * Guardar nueva ruta
      */
-    public function store(RutaRequest $request)
+    public function store(Request $request)
     {
-        $this->rutaService->storeRuta($request->validated());
+        $validator = Validator::make($request->all(), [
+            'codigo_ruta'       => 'required|numeric|unique:ruta,codigo_ruta',
+            'id_ciudad'         => 'required|exists:ciudad,id_ciudad',
+            'id_barrio_origen'  => 'required|exists:barrio,id_barrio',
+            'id_barrio_destino' => 'required|exists:barrio,id_barrio|different:id_barrio_origen',
+            'id_estado'         => 'required|numeric',
+        ], [
+            'codigo_ruta.required' => 'El código de la ruta es obligatorio.',
+            'codigo_ruta.unique'   => 'Este código de ruta ya se encuentra registrado.',
+            'id_barrio_destino.different' => 'El barrio de destino debe ser diferente al de origen.',
+        ]);
 
-        return response()->json(['message' => 'La ruta ha sido creada exitosamente.']);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        // Al usar el servicio, asegúrate de pasar los datos validados
+        $this->rutaService->storeRuta($validator->validated());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Ruta creada con éxito.'
+        ]);
     }
 
     /**

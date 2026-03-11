@@ -8,9 +8,10 @@ use App\Http\Controllers\SuperAdmin\Configuracion\TipoEmpresaController;
 use App\Http\Controllers\SuperAdmin\Configuracion\TipoUsuarioController;
 use App\Http\Controllers\SuperAdmin\Configuracion\CiudadController;
 use App\Http\Controllers\SuperAdmin\Configuracion\TipoMantenimientoController;
+use App\Http\Controllers\SuperAdmin\BarrioController;
 
 Route::middleware(['auth:superadmin'])->prefix('superadmin/configuracion')->name('superadmin.configuracion.')->group(function () {
-    
+
     // Tipo Documento
     Route::get('tipo-documento', [TipoDocumentoController::class, 'index'])->name('tipo-documento.index');
     Route::post('tipo-documento', [TipoDocumentoController::class, 'store'])->name('tipo-documento.store');
@@ -54,4 +55,9 @@ Route::middleware(['auth:superadmin'])->prefix('superadmin/configuracion')->name
     Route::put('tipo-mantenimiento/{id}', [TipoMantenimientoController::class, 'update'])->name('tipo-mantenimiento.update');
     Route::get('tipo-mantenimiento/export', [TipoMantenimientoController::class, 'exportExcel'])->name('tipo-mantenimiento.export');
 
+    // Barrios
+    Route::get('barrios', [BarrioController::class, 'index'])->name('barrios.index');
+    Route::post('barrios', [BarrioController::class, 'store'])->name('barrios.store');
+    Route::put('barrios/{id}', [BarrioController::class, 'update'])->name('barrios.update');
+    Route::get('barrios/export', [BarrioController::class, 'export'])->name('barrios.export');
 });

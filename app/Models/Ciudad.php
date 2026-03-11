@@ -10,8 +10,6 @@ class Ciudad extends Model
     protected $primaryKey = 'id_ciudad';
     public $incrementing = false;
     protected $keyType = 'string';
-    public $timestamps = false;
-    protected $keyType = 'string'; // Forza a que se trate como texto
 
     protected $fillable = [
         'id_ciudad',
