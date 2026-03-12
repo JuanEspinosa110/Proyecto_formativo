@@ -133,17 +133,17 @@ class BusRequest extends FormRequest
             'placa.size' => 'La placa debe tener 6 caracteres.',
             'placa.regex' => 'La placa debe tener 3 letras y 3 números (Ej: ABC123).',
             'placa.unique' => 'Este bus ya está registrado en su empresa.',
-       
+
             'modelo.required' => 'El modelo es obligatorio.',
             'modelo.regex' => 'El modelo debe incluir Marca y Año (Ej: Toyota 2019).',
 
             'linc_transito.required' => 'La licencia de tránsito es obligatoria.',
             'linc_transito.digits' => 'La licencia debe tener exactamente 8 caracteres numéricos.',
-            
+
             'numero_chasis.required' => 'El número de chasis es obligatorio.',
             'numero_chasis.digits' => 'El chasis debe tener exactamente 17 caracteres numéricos.',
             'numero_chasis.unique' => 'Este número de chasis ya está registrado en el sistema.',
-            
+
             'numero_motor.required' => 'El número de motor es obligatorio.',
             'numero_motor.min_digits' => 'El motor debe tener entre 8 y 17 caracteres numéricos.',
             'numero_motor.max_digits' => 'El motor debe tener entre 8 y 17 caracteres numéricos.',
@@ -162,7 +162,8 @@ class BusRequest extends FormRequest
             'telefono.digits' => 'El teléfono debe tener exactamente 10 dígitos numéricos.',
 
             'correo.required' => 'El correo electrónico es obligatorio.',
-            'correo.email' => 'Ingrese una dirección de correo válida.',
-    ];
+            'correo.email' => 'Debe ingresar un correo electrónico válido.',
+            'correo.max' => 'El correo electrónico no puede superar los 150 caracteres.',
+        ];
     }
 }

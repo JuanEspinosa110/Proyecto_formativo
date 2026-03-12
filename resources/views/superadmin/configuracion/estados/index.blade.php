@@ -76,8 +76,17 @@
                                     <td class="px-4 fw-bold text-dark">{{ $estado->id_estado }}</td>
                                     <td>{{ $estado->nombre_estado }}</td>
                                     <td class="text-end px-4">
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-warning btn-sm border-0"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#editarModal"
+                                            data-id="{{ $estado->id_estado }}"
+                                            data-nombre="{{ $estado->nombre_estado }}">
+                                            <i class="fas fa-edit me-1"></i> Editar
+                                        </button>
                                         <div class="d-flex justify-content-end gap-3">
-                                            <a href="#" 
+                                            <a href="#"
                                                class="text-primary text-decoration-none d-flex align-items-center"
                                                data-bs-toggle="modal"
                                                data-bs-target="#editarModal"
@@ -126,11 +135,13 @@
             </div>
             <form action="{{ route('superadmin.configuracion.estados.store') }}" method="POST">
                 @csrf
-                <div class="modal-body p-4">
-                    <div class="mb-0 text-input-validate" data-type="text">
-                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre del Estado <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_estado" class="form-control form-control-sm @error('nombre_estado') is-invalid @enderror" placeholder="Ej: Activo" required value="{{ old('nombre_estado') }}">
-                        @error('nombre_estado') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <div class="modal-body py-4">
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold">Nombre del Estado <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre_estado" id="nombre_estado" class="form-control @error('nombre_estado') is-invalid @enderror" placeholder="Ej: Activo" required value="{{ old('nombre_estado') }}">
+                        @error('nombre_estado')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-3 bg-light">
@@ -156,11 +167,13 @@
             <form id="formEditar" method="POST">
                 @csrf
                 @method('PUT')
-                <div class="modal-body p-4">
-                    <div class="mb-0 text-input-validate" data-type="text">
-                        <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre del Estado <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_estado" id="editNombre" class="form-control form-control-sm @error('nombre_estado') is-invalid @enderror" required>
-                        @error('nombre_estado') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <div class="modal-body py-4">
+                    <div class="mb-0">
+                        <label class="form-label fw-semibold">Nombre del Estado <span class="text-danger">*</span></label>
+                        <input type="text" name="nombre_estado" id="editNombre" class="form-control @error('nombre_estado') is-invalid @enderror" required value="{{ old('nombre_estado') }}">
+                        @error('nombre_estado')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-3 bg-light">
@@ -191,6 +204,18 @@
             });
         }
 
+        const camposTexto = ['nombre_estado', 'editNombre'];
+
+        camposTexto.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    // Reemplaza lo que NO sea: letras (a-z), letras con tilde, ñ o espacios
+                    this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+                });
+            }
+        });
+
         @if($errors->any())
         @if(old('_method') == 'PUT')
         var lastEditId = sessionStorage.getItem('last_edit_id_estado');
@@ -210,7 +235,7 @@
         document.querySelectorAll('.text-input-validate').forEach(container => {
             const input = container.querySelector('input');
             const type = container.getAttribute('data-type');
-            
+
             if (input) {
                 input.addEventListener('input', function(e) {
                     if (type === 'text') {

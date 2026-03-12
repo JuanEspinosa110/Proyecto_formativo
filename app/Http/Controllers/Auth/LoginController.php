@@ -22,7 +22,7 @@ class LoginController extends Controller
 
         /*
         |----------------------------------
-        | 1️⃣ INTENTO USUARIOS (web)
+        |  INTENTO USUARIOS (web)
         |----------------------------------
         */
         if (Auth::guard('web')->attempt([
@@ -44,6 +44,8 @@ class LoginController extends Controller
 
                 case 3:
                     return redirect()->route('empresa.dashboard');
+                case 11: 
+                    return redirect()->route('gestor-setp.dashboard');
 
                 default:
                     Auth::guard('web')->logout();

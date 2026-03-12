@@ -49,4 +49,9 @@ class Ruta extends Model
         $destino = $this->barrioDestino->nombre ?? 'N/A';
         return $origen . ' - ' . $destino;
     }
+
+    public function asignaciones()
+    {
+        return $this->hasMany(Asignacion::class, 'id_ruta', 'id_ruta');
+    }
 }

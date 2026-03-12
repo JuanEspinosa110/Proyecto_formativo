@@ -132,7 +132,9 @@
                 <div class="modal-body py-4">
                     <div class="mb-0">
                         <label class="form-label fw-semibold">Nombre del Tipo <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_tipo" class="form-control @error('nombre_tipo') is-invalid @enderror" placeholder="Ej: Pública" required value="{{ old('nombre_tipo') }}">
+
+                        <input type="text" name="nombre_tipo" id="nombre_tipo" class="form-control @error('nombre_tipo') is-invalid @enderror" placeholder="Ej: Pública" required value="{{ old('nombre_tipo') }}">
+
                         @error('nombre_tipo')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

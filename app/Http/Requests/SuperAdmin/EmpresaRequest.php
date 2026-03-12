@@ -38,7 +38,9 @@ class EmpresaRequest extends FormRequest
 
             // UBICACIÓN
             'id_ciudad' => 'required|exists:ciudad,id_ciudad',
-            'id_estado' => 'nullable|exists:estado,id_estado',
+
+            'id_estado' => 'nullable',
+            'id_tipo_empresa' => 'required|exists:tipo_empresa,id_tipo_empresa'
         ];
     }
 
@@ -51,6 +53,8 @@ class EmpresaRequest extends FormRequest
             'nombre_empresa.required' => 'El nombre de la empresa es obligatorio.',
             'nombre_empresa.regex' => 'El nombre solo puede contener letras y espacios.',
             'id_ciudad.required' => 'Debe seleccionar una ciudad.',
+            'id_ciudad.exists' => 'La ciudad seleccionada no es válida.',
+            'id_tipo_empresa.exists' => 'El tipo de empresa seleccionado no es válido.',
         ];
     }
 }

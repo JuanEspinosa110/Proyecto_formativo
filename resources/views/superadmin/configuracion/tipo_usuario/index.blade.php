@@ -17,7 +17,7 @@
             <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
                 <i class="fas fa-exclamation-circle me-2"></i>
                 @foreach ($errors->all() as $error)
-                    {{ $error }}
+                {{ $error }}
                 @endforeach
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -76,7 +76,7 @@
                                     <td class="px-4 fw-bold text-dark">{{ $tipo->id_tipo_usuario }}</td>
                                     <td>{{ $tipo->nombre_tipo }}</td>
                                     <td class="text-end px-4">
-                                        <button 
+                                        <button
                                             type="button"
                                             class="btn btn-outline-warning btn-sm border-0"
                                             data-bs-toggle="modal"
@@ -124,9 +124,9 @@
                 <div class="modal-body py-4">
                     <div class="mb-0">
                         <label class="form-label fw-semibold">Nombre del Tipo <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_tipo" class="form-control @error('nombre_tipo') is-invalid @enderror" placeholder="Ej: Super Admin" required value="{{ old('nombre_tipo') }}">
+                        <input type="text" name="nombre_tipo" id="nombre_tipo" class="form-control @error('nombre_tipo') is-invalid @enderror" placeholder="Ej: Super Admin" required value="{{ old('nombre_tipo') }}">
                         @error('nombre_tipo')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
@@ -155,7 +155,7 @@
                         <label class="form-label fw-semibold">Nombre del Tipo <span class="text-danger">*</span></label>
                         <input type="text" name="nombre_tipo" id="editNombre" class="form-control @error('nombre_tipo') is-invalid @enderror" required value="{{ old('nombre_tipo') }}">
                         @error('nombre_tipo')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
@@ -169,42 +169,54 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    var editarModal = document.getElementById('editarModal');
-    if (editarModal) {
-        editarModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            if (!button) return;
+    document.addEventListener('DOMContentLoaded', function() {
+        var editarModal = document.getElementById('editarModal');
+        if (editarModal) {
+            editarModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                if (!button) return;
 
-            var id = button.getAttribute('data-id');
-            var nombre = button.getAttribute('data-nombre');
+                var id = button.getAttribute('data-id');
+                var nombre = button.getAttribute('data-nombre');
 
-            var form = document.getElementById('formEditar');
-            form.action = "{{ url('superadmin/configuracion/tipo-usuario') }}/" + id;
-
-            document.getElementById('editNombre').value = nombre;
-
-            // Save ID for reopening on validation error
-            sessionStorage.setItem('last_edit_id_tipo_usuario', id);
-        });
-    }
-
-    // Redirect error to correct modal
-    @if($errors->any())
-        @if(old('_method') == 'PUT')
-            var lastEditId = sessionStorage.getItem('last_edit_id_tipo_usuario');
-            if (lastEditId) {
                 var form = document.getElementById('formEditar');
-                form.action = "{{ url('superadmin/configuracion/tipo-usuario') }}/" + lastEditId;
-                var myModal = new bootstrap.Modal(document.getElementById('editarModal'));
-                myModal.show();
+                form.action = "{{ url('superadmin/configuracion/tipo-usuario') }}/" + id;
+
+                document.getElementById('editNombre').value = nombre;
+
+                // Save ID for reopening on validation error
+                sessionStorage.setItem('last_edit_id_tipo_usuario', id);
+            });
+        }
+
+        const camposTexto = ['nombre_tipo', 'editNombre'];
+
+        camposTexto.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', function(e) {
+                    // Reemplaza lo que NO sea: letras (a-z), letras con tilde, ñ o espacios
+                    this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+                });
             }
-        @else
-            var myModal = new bootstrap.Modal(document.getElementById('crearModal'));
+        });
+
+        // Redirect error to correct modal
+        @if($errors-> any())
+        @if(old('_method') == 'PUT')
+        var lastEditId = sessionStorage.getItem('last_edit_id_tipo_usuario');
+        if (lastEditId) {
+            var form = document.getElementById('formEditar');
+            form.action = "{{ url('superadmin/configuracion/tipo-usuario') }}/" + lastEditId;
+            var myModal = new bootstrap.Modal(document.getElementById('editarModal'));
             myModal.show();
+        }
+        @else
+        var myModal = new bootstrap.Modal(document.getElementById('crearModal'));
+        myModal.show();
         @endif
-    @endif
-});
+        @endif
+    });
 </script>
 
 @endsection
