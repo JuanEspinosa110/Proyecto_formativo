@@ -23,7 +23,7 @@ class CheckRole
 
         if (! $user) {
             return redirect()->route('login')
-                             ->with('error', 'Debe iniciar sesión para continuar.');
+                ->with('error', 'Debe iniciar sesión para continuar.');
         }
 
         $idEsperado = self::ROLES[$role] ?? null;

@@ -12,6 +12,9 @@ class Tarjeta extends Model
 
     protected $primaryKey = 'id_tarjeta';
 
+    public $incrementing = false; // Indica que el ID no es autoincremental
+    protected $keyType = 'string'; // Indica que el ID es una cadena de texto
+
     public $timestamps = false; // si tu tabla no tiene timestamps
 
     protected $fillable = [
