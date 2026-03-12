@@ -41,6 +41,8 @@ class TipoDocumentoRequest extends FormRequest
                 'integer',
                 'exists:estado,id_estado',
             ],
+            'requiere_doc_usuario' => 'boolean',
+            'requiere_placa' => 'boolean',
         ];
     }
 
@@ -65,6 +67,13 @@ class TipoDocumentoRequest extends FormRequest
 
     protected function prepareForValidation()
     {
+
+        // Lógica para asegurar que siempre viajen como 0 o 1
+        $this->merge([
+            'requiere_doc_usuario' => $this->has('requiere_doc_usuario') ? 1 : 0,
+            'requiere_placa' => $this->has('requiere_placa') ? 1 : 0,
+        ]);
+
         if ($this->nombre) {
             $nombre = trim($this->nombre);
             $nombre = preg_replace('/\s+/', ' ', $nombre);
