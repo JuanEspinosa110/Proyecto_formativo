@@ -99,7 +99,7 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="d-flex justify-content-end gap-3">
-                                    <a href="#" 
+                                    <a href="#"
                                        class="text-info text-decoration-none d-flex align-items-center"
                                        title="Ver detalles"
                                        data-doc="{{ $u->doc_usuario }}"
@@ -117,7 +117,7 @@
                                        data-bs-target="#modalVerUsuario">
                                         <span class="material-symbols-rounded fs-5">visibility</span>
                                     </a>
-                                    <a href="#" 
+                                    <a href="#"
                                        class="text-primary text-decoration-none d-flex align-items-center"
                                        title="Editar usuario"
                                        data-doc="{{ $u->doc_usuario }}"
@@ -173,7 +173,7 @@
                                 }
                             }
                         @endphp
-                        
+
                         @if($hasOtherErrors)
                             <div class="alert alert-danger shadow-sm py-2 small mb-4">
                                 <ul class="mb-0">
@@ -215,14 +215,16 @@
                         <div class="col-md-6 text-input-validate" data-type="text">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Primer Nombre <span class="text-danger">*</span></label>
                             <input type="text" name="primer_nombre" class="form-control form-control-sm @error('primer_nombre') is-invalid @enderror" required minlength="2" maxlength="30" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ]+(\s[a-zA-ZÁÉÍÓÚáéíóúÑñ]+)?" value="{{ old('primer_nombre') }}"
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, máximo dos palabras, mín 2 chars')}else{this.setCustomValidity('')}"
+                                pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ]{2,30}"
+                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, sin espacios, mín 2 chars')}else{this.setCustomValidity('')}"
                                 oninput="this.setCustomValidity('')">
                             <div class="invalid-feedback real-time-error">@error('primer_nombre') {{ $message }} @enderror</div>
                         </div>
                         <div class="col-md-6 text-input-validate" data-type="text">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Segundo Nombre</label>
                             <input type="text" name="segundo_nombre" class="form-control form-control-sm @error('segundo_nombre') is-invalid @enderror" minlength="2" maxlength="30" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ]+(\s[a-zA-ZÁÉÍÓÚáéíóúÑñ]+)?" value="{{ old('segundo_nombre') }}"
-                                oninvalid="if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, máximo dos palabras, mín 2 caracteres')}else{this.setCustomValidity('')}"
+                                pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ]{2,30}"
+                                oninvalid="if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, sin espacios, mín 2 chars')}else{this.setCustomValidity('')}"
                                 oninput="this.setCustomValidity('')">
                             <div class="invalid-feedback real-time-error">@error('segundo_nombre') {{ $message }} @enderror</div>
                         </div>
@@ -230,14 +232,16 @@
                         <div class="col-md-6 text-input-validate" data-type="text">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Primer Apellido <span class="text-danger">*</span></label>
                             <input type="text" name="primer_apellido" class="form-control form-control-sm @error('primer_apellido') is-invalid @enderror" required minlength="2" maxlength="30" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ]+(\s[a-zA-ZÁÉÍÓÚáéíóúÑñ]+)?" value="{{ old('primer_apellido') }}"
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, máximo dos palabras, mín 2 chars')}else{this.setCustomValidity('')}"
+                                pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ]{2,30}"
+                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, sin espacios, mín 2 chars')}else{this.setCustomValidity('')}"
                                 oninput="this.setCustomValidity('')">
                             <div class="invalid-feedback real-time-error">@error('primer_apellido') {{ $message }} @enderror</div>
                         </div>
                         <div class="col-md-6 text-input-validate" data-type="text">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Segundo Apellido <span class="text-danger">*</span></label>
                             <input type="text" name="segundo_apellido" class="form-control form-control-sm @error('segundo_apellido') is-invalid @enderror" required minlength="2" maxlength="30" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ]+(\s[a-zA-ZÁÉÍÓÚáéíóúÑñ]+)?" value="{{ old('segundo_apellido') }}"
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, máximo dos palabras, mín 2 chars')}else{this.setCustomValidity('')}"
+                                pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ]{2,30}"
+                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch || this.validity.tooShort){this.setCustomValidity('Solo letras, sin espacios, mín 2 chars')}else{this.setCustomValidity('')}"
                                 oninput="this.setCustomValidity('')">
                             <div class="invalid-feedback real-time-error">@error('segundo_apellido') {{ $message }} @enderror</div>
                         </div>
@@ -386,7 +390,7 @@
                 </h6>
                 <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            
+
             <div class="modal-body p-4">
                 <div class="mb-4 d-flex align-items-center gap-3">
                     <div id="verFotoContainer">
@@ -427,7 +431,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="modal-footer border-0 p-3 bg-light">
                 <button type="button" class="btn btn-sm btn-dark w-100 fw-bold" data-bs-dismiss="modal">CERRAR EXPEDIENTE</button>
             </div>
@@ -497,7 +501,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('verTelefono').textContent = btnVer.getAttribute('data-telefono');
                 document.getElementById('verRol').textContent = btnVer.getAttribute('data-rol');
                 document.getElementById('verCiudad').textContent = btnVer.getAttribute('data-ciudad') || 'No asignada';
-                
+
                 const verEstado = document.getElementById('verEstado');
                 if (verEstado) {
                     verEstado.textContent = estadoNombre;
@@ -530,7 +534,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('editTelefono').value = btnEdit.getAttribute('data-telefono');
                 document.getElementById('editRol').value = btnEdit.getAttribute('data-rol');
                 document.getElementById('editEstado').value = btnEdit.getAttribute('data-estado_id');
-                
+
                 const form = document.getElementById('formEditarUsuario');
                 if (form) {
                     form.action = '/admin/usuarios/' + btnEdit.getAttribute('data-doc');
@@ -549,7 +553,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const input = container.querySelector('input');
         const type = container.getAttribute('data-type');
         const errorDiv = container.querySelector('.real-time-error');
-        
+
         if (input) {
             input.addEventListener('input', function(e) {
                 let value = this.value;
@@ -561,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else if (type === 'text') {
                     // Solo permitir letras y espacios (Regex para validación en vivo)
                     const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+(\s[A-Za-zÁÉÍÓÚáéíóúÑñ]+)?$/;
-                    
+
                     if (value.length > 0) {
                         if (/[0-9]/.test(value)) {
                             errorMessage = 'No se permiten números.';
@@ -603,6 +607,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
+    });
+
+    // Bloquear espacios en campos de nombre y apellido
+    const camposSinEspacios = [
+        'primer_nombre',
+        'segundo_nombre',
+        'primer_apellido',
+        'segundo_apellido'
+    ];
+    camposSinEspacios.forEach(function(nombreCampo) {
+        document.querySelectorAll('input[name="' + nombreCampo + '"]').forEach(function(input) {
+            input.addEventListener('keydown', function(e) {
+                if (e.key === ' ') {
+                    e.preventDefault();
+                }
+            });
+            input.addEventListener('input', function(e) {
+                this.value = this.value.replace(/\s/g, '');
+            });
+        });
     });
 
     // Validar antes de enviar el formulario

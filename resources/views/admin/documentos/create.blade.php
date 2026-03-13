@@ -171,8 +171,8 @@
             <h2><span class="material-symbols-rounded">link</span> Información Asociada</h2>
 
             <!--  CAMPO CONDICIONAL: Documento Usuario -->
-            <div class="row" id="fila-doc-usuario" style="display: none;">
-                <div class="col-md-6">
+            <div class="row" id="fila-asociados" style="display: flex; flex-wrap: wrap;">
+                <div class="col-md-6" id="col-doc-usuario" style="display: none;">
                     <div class="form-group">
                         <label for="doc_usuario" class="form-label">
                             <span class="text-danger" id="asterisco-doc-usuario">*</span> Documento Usuario
@@ -191,6 +191,53 @@
                         @error('doc_usuario')
                         <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
+                    </div>
+                </div>
+                <div class="col-md-6" id="col-fecha-nacimiento" style="display: none;">
+                    <div class="form-group">
+                        <label for="fecha_nacimiento" class="form-label">
+                            <span class="text-danger">*</span> Fecha de Nacimiento del Usuario
+                        </label>
+                        <input type="date" name="fecha_nacimiento" id="fecha_nacimiento"
+                            class="form-control"
+                            placeholder="YYYY-MM-DD">
+                        <small class="form-text text-muted">Obligatorio para Licencia. Usado para calcular vencimiento.</small>
+                    </div>
+                </div>
+                <div class="col-md-6" id="col-placa" style="display: none;">
+                    <div class="form-group">
+                        <label for="placa" class="form-label">
+                            <span class="text-danger" id="asterisco-placa">*</span> Placa del Bus
+                        </label>
+                        <input type="text" name="placa" id="placa"
+                            class="form-control @error('placa') is-invalid @enderror"
+                            placeholder="Ej: ABZ123 o ABZ-123"
+                            value="{{ old('placa') }}"
+                            maxlength="7"
+                            data-conditional="true"
+                            data-tipo="placa">
+                        <small class="form-text text-muted">Formato: XXX000 o XXX-000 (mayúsculas automáticas)</small>
+                        <small class="form-text text-info" id="info-placa" style="display: none;">
+                            Campo requerido para este tipo de documento
+                        </small>
+                        @error('placa')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+
+            <!-- CAMPO CONDICIONAL: Fecha de Nacimiento (solo para Licencia) -->
+            <div class="row" id="fila-fecha-nacimiento" style="display: none;">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="fecha_nacimiento" class="form-label">
+                            <span class="text-danger">*</span> Fecha de Nacimiento del Usuario
+                        </label>
+                        <input type="date" name="fecha_nacimiento" id="fecha_nacimiento"
+                            class="form-control"
+                            placeholder="YYYY-MM-DD">
+                        <small class="form-text text-muted">Obligatorio para Licencia. Usado para calcular vencimiento.</small>
                     </div>
                 </div>
             </div>
@@ -243,7 +290,6 @@
 @endpush
 
 @push('scripts')
-<script src="{{ asset('js/validaciones.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('formDocumento');
@@ -251,43 +297,58 @@
         const tipoDocumentoSelect = document.getElementById('id_tipo_documento');
         const docUsuarioInput = document.getElementById('doc_usuario');
         const placaInput = document.getElementById('placa');
-        const filaDocUsuario = document.getElementById('fila-doc-usuario');
-        const filaPlaca = document.getElementById('fila-placa');
+        const filaAsociados = document.getElementById('fila-asociados');
+        const colDocUsuario = document.getElementById('col-doc-usuario');
+        const colFechaNacimiento = document.getElementById('col-fecha-nacimiento');
+        const colPlaca = document.getElementById('col-placa');
         const sinCamposAdicionales = document.getElementById('sin-campos-adicionales');
+        const fechaNacimientoInput = document.getElementById('fecha_nacimiento');
+        const fechaExpedicionInput = document.getElementById('fecha_expedicion');
+        const fechaVencimientoInput = document.getElementById('fecha_vencimiento');
 
-        /**
-         * CONTROLAR VISIBILIDAD DE CAMPOS CONDICIONALES
-         * Usa directamente los atributos data-requiere-doc y data-requiere-placa de las options
-         */
         function actualizarCamposCondicionales() {
             const selectedOption = tipoDocumentoSelect.options[tipoDocumentoSelect.selectedIndex];
             const requiereDoc = selectedOption.getAttribute('data-requiere-doc') === 'true';
             const requierePlaca = selectedOption.getAttribute('data-requiere-placa') === 'true';
+            // Detectar si es SOAT o Licencia (por nombre, puedes ajustar si tienes otro identificador)
+            const nombreTipo = selectedOption.textContent.toLowerCase();
+            const esSOAT = nombreTipo.includes('soat');
+            const esLicencia = nombreTipo.includes('licencia');
 
             // Mostrar/ocultar y marcar como requerido: Documento Usuario
+
+            // Mostrar/ocultar columnas de campos condicionales
             if (requiereDoc) {
-                filaDocUsuario.style.display = 'flex';
+                colDocUsuario.style.display = 'block';
                 docUsuarioInput.setAttribute('required', 'required');
                 docUsuarioInput.classList.add('required-field');
                 document.getElementById('info-doc-usuario').style.display = 'block';
             } else {
-                filaDocUsuario.style.display = 'none';
+                colDocUsuario.style.display = 'none';
                 docUsuarioInput.removeAttribute('required');
                 docUsuarioInput.classList.remove('required-field');
                 document.getElementById('info-doc-usuario').style.display = 'none';
             }
 
-            // Mostrar/ocultar y marcar como requerido: Placa del Bus
             if (requierePlaca) {
-                filaPlaca.style.display = 'flex';
+                colPlaca.style.display = 'block';
                 placaInput.setAttribute('required', 'required');
                 placaInput.classList.add('required-field');
                 document.getElementById('info-placa').style.display = 'block';
             } else {
-                filaPlaca.style.display = 'none';
+                colPlaca.style.display = 'none';
                 placaInput.removeAttribute('required');
                 placaInput.classList.remove('required-field');
                 document.getElementById('info-placa').style.display = 'none';
+            }
+
+            if (esLicencia) {
+                colFechaNacimiento.style.display = 'block';
+                fechaNacimientoInput.setAttribute('required', 'required');
+            } else {
+                colFechaNacimiento.style.display = 'none';
+                fechaNacimientoInput.removeAttribute('required');
+                fechaNacimientoInput.value = '';
             }
 
             // Mostrar mensaje si no requiere campos adicionales
@@ -296,10 +357,42 @@
             } else {
                 sinCamposAdicionales.style.display = 'none';
             }
+
+            // Lógica automática de vencimiento para SOAT y Licencia
+            if (esSOAT && fechaExpedicionInput.value) {
+                // SOAT: vencimiento = expedición + 1 año
+                const exp = new Date(fechaExpedicionInput.value);
+                if (!isNaN(exp)) {
+                    const venc = new Date(exp);
+                    venc.setFullYear(venc.getFullYear() + 1);
+                    fechaVencimientoInput.value = venc.toISOString().slice(0, 10);
+                    fechaVencimientoInput.readOnly = true;
+                }
+            } else if (esLicencia && fechaExpedicionInput.value && fechaNacimientoInput.value) {
+                // Licencia: vencimiento depende de edad
+                const exp = new Date(fechaExpedicionInput.value);
+                const nac = new Date(fechaNacimientoInput.value);
+                if (!isNaN(exp) && !isNaN(nac)) {
+                    const edad = exp.getFullYear() - nac.getFullYear() - (exp < new Date(exp.getFullYear(), nac.getMonth(), nac.getDate()) ? 1 : 0);
+                    let añosVigencia = 10;
+                    if (edad < 60) añosVigencia = 10;
+                    else if (edad < 80) añosVigencia = 5;
+                    else añosVigencia = 1;
+                    const venc = new Date(exp);
+                    venc.setFullYear(venc.getFullYear() + añosVigencia);
+                    fechaVencimientoInput.value = venc.toISOString().slice(0, 10);
+                    fechaVencimientoInput.readOnly = true;
+                }
+            } else {
+                fechaVencimientoInput.readOnly = false;
+            }
         }
 
         // Ejecutar al cambiar tipo de documento
         tipoDocumentoSelect.addEventListener('change', actualizarCamposCondicionales);
+        // Ejecutar al cambiar fecha de expedición o nacimiento (para SOAT/Licencia)
+        if (fechaExpedicionInput) fechaExpedicionInput.addEventListener('change', actualizarCamposCondicionales);
+        if (fechaNacimientoInput) fechaNacimientoInput.addEventListener('change', actualizarCamposCondicionales);
 
         // Ejecutar al cargar la página (para mostrar campos si hay valor anterior)
         actualizarCamposCondicionales();

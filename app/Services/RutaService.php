@@ -65,12 +65,12 @@ class RutaService
         if ($request->filled('trayecto')) {
             $trayecto = trim($request->trayecto);
             $parts = explode(' ', $trayecto);
-            
+
             if (count($parts) >= 2) {
                 // Si hay 2 o más palabras, asumimos que intenta Origen y Destino
                 $origenSearch = $parts[0];
                 $destinoSearch = $parts[1];
-                
+
                 $query->where(function($q) use ($origenSearch, $destinoSearch) {
                     $q->whereHas('barrioOrigen', function($sq) use ($origenSearch) {
                         $sq->where('nombre', 'like', "%{$origenSearch}%");
@@ -99,7 +99,7 @@ class RutaService
     public function getEstadosOperativos()
     {
         return Estado::whereIn('nombre_estado', [
-            'ACTIVO', 
+            'ACTIVO',
             'INACTIVO'
         ])->get();
     }
@@ -188,12 +188,12 @@ class RutaService
         if ($request->filled('trayecto')) {
             $trayecto = trim($request->trayecto);
             $parts = explode(' ', $trayecto);
-            
+
             if (count($parts) >= 2) {
                 // Si hay 2 o más palabras, asumimos que intenta Origen y Destino
                 $origenSearch = $parts[0];
                 $destinoSearch = $parts[1];
-                
+
                 $query->where(function($q) use ($origenSearch, $destinoSearch) {
                     $q->whereHas('barrioOrigen', function($sq) use ($origenSearch) {
                         $sq->where('nombre', 'like', "%{$origenSearch}%");
