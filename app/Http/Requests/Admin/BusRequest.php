@@ -35,8 +35,12 @@ class BusRequest extends FormRequest
         $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
         $bus = $this->route('bus');
         $currentPlaca = $bus instanceof \App\Models\Bus ? $bus->placa : $bus;
-        $user = auth()->user();
-        $nit = $user ? $user->getActiveNit() : null;
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if ($user && (is_a($user, 'App\\Models\\User') || is_a($user, 'App\\Models\\Usuario')) && method_exists($user, 'getActiveNit')) {
+            $nit = $user->getActiveNit();
+        } else {
+            $nit = $user && isset($user->NIT) ? $user->NIT : null;
+        }
 
         return [
             'placa' => [
@@ -85,24 +89,26 @@ class BusRequest extends FormRequest
 
             'numero_chasis' => [
                 $isUpdate ? 'sometimes' : 'required',
-                'numeric',
-                'digits:17',
-                \Illuminate\Validation\Rule::unique('bus', 'numero_chasis')->ignore($currentPlaca, 'placa')
+                'string',
+                'size:17',
+                'regex:/^[A-Za-z0-9]{17}$/',
+                $isUpdate
+                    ? \Illuminate\Validation\Rule::unique('bus', 'numero_chasis')->ignore($currentPlaca, 'placa')
+                    : \Illuminate\Validation\Rule::unique('bus', 'numero_chasis')
             ],
 
             'numero_motor' => [
                 $isUpdate ? 'sometimes' : 'required',
-                'numeric',
-                'min_digits:8',
-                'max_digits:17',
-                \Illuminate\Validation\Rule::unique('bus', 'numero_motor')->ignore($currentPlaca, 'placa')
+                'string',
+                'size:14',
+                'regex:/^[A-Za-z0-9]{14}$/',
+                $isUpdate ? \Illuminate\Validation\Rule::unique('bus', 'numero_motor')->where(fn ($query) => $query->where('NIT', $nit))->ignore($currentPlaca, 'placa') : \Illuminate\Validation\Rule::unique('bus', 'numero_motor')->where(fn ($query) => $query->where('NIT', $nit))
             ],
 
             'doc_propietario' => [
                 $isUpdate ? 'sometimes' : 'required',
                 'numeric',
-                'min_digits:6',
-                'max_digits:10'
+                'digits_between:6,10'
             ],
 
             'nombre_propietario' => [
@@ -145,15 +151,13 @@ class BusRequest extends FormRequest
             'numero_chasis.unique' => 'Este número de chasis ya está registrado en el sistema.',
 
             'numero_motor.required' => 'El número de motor es obligatorio.',
-            'numero_motor.min_digits' => 'El motor debe tener entre 8 y 17 caracteres numéricos.',
-            'numero_motor.max_digits' => 'El motor debe tener entre 8 y 17 caracteres numéricos.',
-            'numero_motor.numeric' => 'El motor solo debe contener números.',
+            'numero_motor.size' => 'El motor debe tener exactamente 14 caracteres alfanuméricos.',
+            'numero_motor.regex' => 'El motor solo puede contener letras y números.',
             'numero_motor.unique' => 'Este número de motor ya está registrado en el sistema.',
 
             'doc_propietario.required' => 'El documento del propietario es obligatorio.',
             'doc_propietario.numeric' => 'El documento solo debe contener números.',
-            'doc_propietario.min_digits' => 'El documento debe tener mínimo 6 dígitos.',
-            'doc_propietario.max_digits' => 'El documento no debe superar los 10 dígitos.',
+            'doc_propietario.digits_between' => 'El documento debe tener entre 6 y 10 dígitos.',
 
             'nombre_propietario.required' => 'El nombre del propietario es obligatorio.',
             'nombre_propietario.regex' => 'El nombre solo puede contener letras y espacios.',

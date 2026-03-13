@@ -138,7 +138,7 @@
                         </td>
                         <td class="text-end pe-4">
                             <div class="d-flex justify-content-end gap-3">
-                                <a href="#" 
+                                <a href="#"
                                    class="text-info text-decoration-none d-flex align-items-center"
                                    title="Ver expediente"
                                    data-bs-toggle="modal"
@@ -147,7 +147,7 @@
                                    data-estado="{{ optional($bus->estado)->nombre_estado }}">
                                     <span class="material-symbols-rounded fs-5">visibility</span>
                                 </a>
-                                <a href="#" 
+                                <a href="#"
                                    class="text-primary text-decoration-none d-flex align-items-center"
                                    title="Editar vehículo"
                                    data-bs-toggle="modal"
@@ -204,64 +204,69 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Placa <span class="text-danger">*</span></label>
-                            <input type="text" name="placa" class="form-control form-control-sm fw-bold" placeholder="ABC123" required style="text-transform:uppercase" maxlength="6">
+                            <input type="text" name="placa" class="form-control form-control-sm fw-bold" placeholder="ABC123" required style="text-transform:uppercase" maxlength="6" value="{{ old('placa') }}">
                             <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Modelo / Ref. <span class="text-danger">*</span></label>
-                            <input type="text" name="modelo" class="form-control form-control-sm" placeholder="Ej: Toyota 2019" required>
+                            <input type="text" name="modelo" class="form-control form-control-sm" placeholder="Ej: Chevrolet Sail 2019" required value="{{ old('modelo') }}" maxlength="50" pattern="^.*\s\d{4}$">
+                            <small class="text-muted fs-xs">Debe terminar en un año de 4 dígitos (Ej: Chevrolet Sail 2019).</small>
                             <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Pasajeros <span class="text-danger">*</span></label>
-                            <input type="text" name="capacidad_pasajeros" class="form-control form-control-sm" required placeholder="00">
+                            <input type="number" name="capacidad_pasajeros" class="form-control form-control-sm" required placeholder="00" min="1" max="2000" value="{{ old('capacidad_pasajeros') }}">
+                            <small class="text-muted fs-xs">Máximo 80 pasajeros.</small>
                             <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Kilometraje <span class="text-danger">*</span></label>
-                            <input type="text" name="kilometraje" class="form-control form-control-sm" required placeholder="0">
+                            <input type="text" name="kilometraje" class="form-control form-control-sm" required placeholder="0" value="{{ old('kilometraje') }}">
                             <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Licencia Tránsito <span class="text-danger">*</span></label>
-                            <input type="text" name="linc_transito" class="form-control form-control-sm" required maxlength="12" placeholder="8 dígitos">
+                            <input type="text" name="linc_transito" class="form-control form-control-sm bg-light" required maxlength="8" minlength="8" pattern="^[0-9]{8}$" placeholder="8 dígitos" value="{{ old('linc_transito') }}">
+                            <small class="text-muted fs-xs">Solo se permiten 8 dígitos numéricos.</small>
                             <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Doc. Propietario <span class="text-danger">*</span></label>
-                            <input type="text" name="doc_propietario" class="form-control form-control-sm" required maxlength="15" placeholder="Máx. 10 dígitos">
+                            <input type="text" name="doc_propietario" class="form-control form-control-sm" required maxlength="10" minlength="6" pattern="^[0-9]{6,10}$" placeholder="Máx. 10 dígitos" value="{{ old('doc_propietario') }}">
+                            <small class="text-muted fs-xs">Solo se permiten entre 6 y 10 dígitos numéricos.</small>
                             <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre Propietario <span class="text-danger">*</span></label>
-                            <input type="text" name="nombre_propietario" class="form-control form-control-sm" placeholder="Nombre completo" required>
+                            <input type="text" name="nombre_propietario" class="form-control form-control-sm" placeholder="Nombre completo" required value="{{ old('nombre_propietario') }}">
                             <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Teléfono <span class="text-danger">*</span></label>
-                            <input type="text" name="telefono" class="form-control form-control-sm" required maxlength="10" placeholder="312...">
+                            <input type="text" name="telefono" class="form-control form-control-sm" required maxlength="10" placeholder="312..." value="{{ old('telefono') }}">
                             <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Correo <span class="text-danger">*</span></label>
-                            <input type="email" name="correo" class="form-control form-control-sm" placeholder="ejemplo@correo.com" required>
+                            <input type="email" name="correo" class="form-control form-control-sm" placeholder="ejemplo@correo.com" required value="{{ old('correo') }}">
                             <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Chasis <span class="text-danger">*</span></label>
-                            <input type="text" name="numero_chasis" class="form-control form-control-sm" required maxlength="17" placeholder="17 dígitos">
+                            <input type="text" name="numero_chasis" class="form-control form-control-sm" required maxlength="17" minlength="17" pattern="^[A-Za-z0-9]{17}$" placeholder="17 dígitos" value="{{ old('numero_chasis') }}">
                             <small class="text-muted fs-xs">Debe contener exactamente 17 dígitos numéricos.</small>
                             <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Motor <span class="text-danger">*</span></label>
-                            <input type="text" name="numero_motor" class="form-control form-control-sm" required maxlength="17" placeholder="8-17 dígitos">
-                            <small class="text-muted fs-xs">Debe contener entre 8 y 17 dígitos numéricos según el fabricante.</small>
+                            <input type="text" name="numero_motor" class="form-control form-control-sm" required maxlength="14" minlength="14" pattern="^[A-Za-z0-9]{14}$" placeholder="14 caracteres alfanuméricos" value="{{ old('numero_motor') }}" autocomplete="off">
+                            <small class="text-muted fs-xs">Solo se permiten exactamente 14 caracteres alfanuméricos.</small>
+                            <small class="text-muted fs-xs">Debe contener exactamente 14 caracteres alfanuméricos.</small>
                             <div class="real-time-error"></div>
                         </div>
 
@@ -313,7 +318,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Placa</label>
-                            <input type="text" id="edit_placa_display" class="form-control form-control-sm bg-light fw-bold" readonly>
+                            <input type="text" id="edit_placa_display" class="form-control form-control-sm bg-light fw-bold" readonly value="{{ old('placa', isset($bus) ? $bus->placa : '') }}">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Estado Operativo</label>
@@ -326,58 +331,63 @@
 
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Modelo / Referencia <span class="text-danger">*</span></label>
-                            <input type="text" name="modelo" id="edit_modelo" class="form-control form-control-sm" required placeholder="Ej: Toyota 2019">
+                            <input type="text" name="modelo" id="edit_modelo" class="form-control form-control-sm bg-light" required placeholder="Ej: Chevrolet Sail 2019" readonly value="{{ old('modelo', isset($bus) ? $bus->modelo : '') }}" maxlength="50" pattern="^.*\s\d{4}$">
+                            <small class="text-muted fs-xs">Debe terminar en un año de 4 dígitos (Ej: Chevrolet Sail 2019).</small>
                             <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Capacidad</label>
-                            <input type="text" name="capacidad_pasajeros" id="edit_capacidad" class="form-control form-control-sm" required>
+                            <input type="number" name="capacidad_pasajeros" id="edit_capacidad" class="form-control form-control-sm" required min="1" max="2000" value="{{ old('capacidad_pasajeros', isset($bus) ? $bus->capacidad_pasajeros : '') }}">
+                            <small class="text-muted fs-xs">Máximo 80 pasajeros.</small>
                             <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Kilometraje</label>
-                            <input type="text" name="kilometraje" id="edit_kilometraje" class="form-control form-control-sm" required>
+                            <input type="text" name="kilometraje" id="edit_kilometraje" class="form-control form-control-sm" required value="{{ old('kilometraje', isset($bus) ? $bus->kilometraje : '') }}">
                             <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Licencia Tránsito</label>
-                            <input type="text" name="linc_transito" id="edit_linc_transito" class="form-control form-control-sm" required maxlength="12" placeholder="8 dígitos">
+                            <input type="text" name="linc_transito" id="edit_linc_transito" class="form-control form-control-sm bg-light" required maxlength="8" minlength="8" pattern="^[0-9]{8}$" placeholder="8 dígitos" value="{{ old('linc_transito', isset($bus) ? $bus->linc_transito : '') }}" readonly>
+                            <small class="text-muted fs-xs">Solo se permiten 8 dígitos numéricos.</small>
                             <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Doc. Propietario</label>
-                            <input type="text" name="doc_propietario" id="edit_doc_propietario" class="form-control form-control-sm" required maxlength="15" placeholder="Máx. 10 dígitos">
+                            <input type="text" name="doc_propietario" id="edit_doc_propietario" class="form-control form-control-sm bg-light" required maxlength="10" minlength="6" pattern="^[0-9]{6,10}$" placeholder="Máx. 10 dígitos" readonly value="{{ old('doc_propietario', isset($bus) ? $bus->doc_propietario : '') }}">
+                            <small class="text-muted fs-xs">Solo se permiten entre 6 y 10 dígitos numéricos.</small>
                             <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre Propietario</label>
-                            <input type="text" name="nombre_propietario" id="edit_nombre_propietario" class="form-control form-control-sm" required>
+                            <input type="text" name="nombre_propietario" id="edit_nombre_propietario" class="form-control form-control-sm bg-light" required readonly value="{{ old('nombre_propietario', isset($bus) ? $bus->nombre_propietario : '') }}">
                             <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Teléfono</label>
-                            <input type="text" name="telefono" id="edit_telefono" class="form-control form-control-sm" required maxlength="10">
+                            <input type="text" name="telefono" id="edit_telefono" class="form-control form-control-sm" required maxlength="10" value="{{ old('telefono', isset($bus) ? $bus->telefono : '') }}">
                             <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Correo</label>
-                            <input type="email" name="correo" id="edit_correo" class="form-control form-control-sm" required>
+                            <input type="email" name="correo" id="edit_correo" class="form-control form-control-sm" required value="{{ old('correo', isset($bus) ? $bus->correo : '') }}">
                             <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Chasis</label>
-                            <input type="text" name="numero_chasis" id="edit_numero_chasis" class="form-control form-control-sm" required maxlength="17" placeholder="17 dígitos">
-                            <small class="text-muted fs-xs">Debe contener exactamente 17 dígitos numéricos.</small>
+                            <input type="text" name="numero_chasis" id="edit_numero_chasis" class="form-control form-control-sm bg-light" required maxlength="17" placeholder="17 caracteres alfanuméricos" readonly pattern="^[A-Za-z0-9]{17}$" value="{{ old('numero_chasis', isset($bus) ? $bus->numero_chasis : '') }}">
+                            <small class="text-muted fs-xs">Debe contener exactamente 17 caracteres alfanuméricos. No se puede editar.</small>
                             <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Motor</label>
-                            <input type="text" name="numero_motor" id="edit_numero_motor" class="form-control form-control-sm" required maxlength="17" placeholder="8-17 dígitos">
-                            <small class="text-muted fs-xs">Debe contener entre 8 y 17 dígitos numéricos según el fabricante.</small>
+                            <input type="text" name="numero_motor" id="edit_numero_motor" class="form-control form-control-sm" required maxlength="14" minlength="14" pattern="^[A-Za-z0-9]{14}$" placeholder="14 caracteres alfanuméricos" value="{{ old('numero_motor', isset($bus) ? $bus->numero_motor : '') }}" autocomplete="off">
+                            <small class="text-muted fs-xs">Solo se permiten exactamente 14 caracteres alfanuméricos.</small>
+                            <small class="text-muted fs-xs">Debe contener exactamente 14 caracteres alfanuméricos.</small>
                             <div class="real-time-error"></div>
                         </div>
                     </div>
@@ -402,7 +412,7 @@
                 </h6>
                 <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            
+
             <div class="modal-body p-4">
                 <div class="mb-4 d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center gap-3">
@@ -444,7 +454,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="modal-footer border-0 p-3 bg-light">
                 <button type="button" class="btn btn-sm btn-dark w-100 fw-bold" data-bs-dismiss="modal">CERRAR EXPEDIENTE</button>
             </div>
@@ -495,7 +505,7 @@
                 const viewEst = document.getElementById('view_bus_estado');
                 viewEst.textContent = estado;
                 viewEst.className = 'badge rounded-pill px-4 py-2 fs-6 fw-bold';
-                
+
                 const stateId = parseInt(data.id_estado);
                 if (stateId === 1) {
                     viewEst.classList.add('bg-success-subtle', 'text-success', 'border', 'border-success-subtle');
@@ -558,7 +568,7 @@
         function toggleError(input, show, message = '') {
             const container = input.closest('.col-md-6, .col-md-12, .col-12');
             const errorDiv = container.querySelector('.real-time-error');
-            
+
             if (show) {
                 input.classList.add('is-invalid');
                 if (errorDiv) {
@@ -573,7 +583,7 @@
             }
         }
 
-        // Delegación de eventos para validar mientras se escribe
+        // Validación estricta en frontend
         document.addEventListener('input', function(e) {
             const input = e.target;
             const name = input.name;
@@ -582,90 +592,73 @@
             let isValid = true;
             let message = '';
 
-            // Limpiar solo números para campos específicos
-            if (['linc_transito', 'telefono', 'doc_propietario', 'numero_chasis', 'numero_motor', 'capacidad_pasajeros', 'kilometraje'].includes(name)) {
-                input.value = input.value.replace(/[^0-9]/g, '');
-            }
-
-            // Validaciones específicas
             switch(name) {
-                case 'placa':
-                    let val = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                    if (val.length <= 3) val = val.replace(/[^A-Z]/g, '');
-                    else val = val.substring(0,3).replace(/[^A-Z]/g, '') + val.substring(3).replace(/[^0-9]/g, '');
-                    input.value = val.substring(0,6);
-                    
-                    if (input.value.length > 0 && !/^[A-Z]{3}[0-9]{3}$/.test(input.value)) {
-                        isValid = false;
-                        message = 'Formato requerido: AAA000 (3 letras y 3 números).';
-                    }
-                    break;
-
-                case 'linc_transito':
-                    if (input.value.length > 0 && input.value.length !== 8) {
-                        isValid = false;
-                        message = 'La licencia debe tener exactamente 8 caracteres numéricos.';
-                    }
-                    break;
-
-                case 'modelo':
-                    // Marca (letras) + Espacio + Año (4 números)
+                case 'capacidad_pasajeros':
+                    input.value = input.value.replace(/[^0-9]/g, '');
                     if (input.value.length > 0) {
-                        // Regex: Letras (incluyendo tildes) + un espacio + 4 números
-                        const modelRegex = /^[\p{L}ÁÉÍÓÚáéíóúÑñ\s]+\s[0-9]{4}$/u;
-                        if (!modelRegex.test(input.value)) {
+                        const val = parseInt(input.value);
+                        if (val > 2000) {
                             isValid = false;
-                            message = 'Formato: Marca Año (Ej: Toyota 2019).';
+                            message = 'Máximo 2000 pasajeros.';
+                            input.value = '2000';
+                        } else if (val < 1) {
+                            isValid = false;
+                            message = 'Debe ser mínimo 1 pasajero.';
                         }
                     }
                     break;
-
-                case 'doc_propietario':
-                    if (input.value.length > 10) {
+                case 'kilometraje':
+                    input.value = input.value.replace(/[^0-9]/g, '');
+                    if (input.value.length > 0) {
+                        const val = parseInt(input.value);
+                        if (val < 0) {
+                            isValid = false;
+                            message = 'El kilometraje no puede ser negativo.';
+                        }
+                    }
+                    break;
+                case 'modelo':
+                    // Permitir cualquier texto, pero solo 4 números al final
+                    let modeloVal = input.value;
+                    let match = modeloVal.match(/\d{4}$/);
+                    if (match) {
+                        let year = match[0];
+                        if (modeloVal.replace(/\d{4}$/, '').match(/\d/)) {
+                            isValid = false;
+                            message = 'Solo se permiten 4 números al final.';
+                        }
+                        if (year.length !== 4) {
+                            isValid = false;
+                            message = 'El año debe tener 4 dígitos.';
+                        }
+                    } else {
                         isValid = false;
-                        message = 'El documento no debe superar los 10 dígitos.';
+                        message = 'Debe terminar en un año de 4 dígitos.';
+                    }
+                    break;
+                case 'doc_propietario':
+                    input.value = input.value.replace(/[^0-9]/g, '');
+                    if (input.value.length > 10) {
+                        input.value = input.value.substring(0,10);
+                        isValid = false;
+                        message = 'Solo se permiten máximo 10 dígitos.';
                     } else if (input.value.length > 0 && input.value.length < 6) {
                         isValid = false;
                         message = 'El documento debe tener al menos 6 dígitos.';
                     }
                     break;
-
-                case 'nombre_propietario':
-                    if (input.value.length > 0 && !/^[\p{L}ÁÉÍÓÚáéíóúÑñ\s]+$/u.test(input.value)) {
-                        isValid = false;
-                        message = 'Solo se permiten letras y espacios.';
-                    }
-                    break;
-
-                case 'telefono':
-                    if (input.value.length > 0 && input.value.length !== 10) {
-                        isValid = false;
-                        message = 'El teléfono debe tener exactamente 10 dígitos.';
-                    }
-                    break;
-
-                case 'correo':
-                    if (input.value.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) {
-                        isValid = false;
-                        message = 'Formato de correo inválido.';
-                    }
-                    break;
-
-                case 'numero_chasis':
-                    if (input.value.length > 0 && input.value.length !== 17) {
-                        isValid = false;
-                        message = 'El chasis debe tener exactamente 17 números.';
-                    }
-                    break;
-
                 case 'numero_motor':
-                    if (input.value.length > 0 && (input.value.length < 8 || input.value.length > 17)) {
+                    input.value = input.value.replace(/[^A-Za-z0-9]/g, '');
+                    if (input.value.length > 14) {
+                        input.value = input.value.substring(0,14);
                         isValid = false;
-                        message = 'El motor debe tener entre 8 y 17 números.';
+                        message = 'Solo se permiten exactamente 14 caracteres alfanuméricos.';
+                    } else if (input.value.length < 14 && input.value.length > 0) {
+                        isValid = false;
+                        message = 'Debe contener exactamente 14 caracteres alfanuméricos.';
                     }
                     break;
             }
-
             toggleError(input, !isValid, message);
         });
 
@@ -715,7 +708,7 @@
     .tracking-tight {
         letter-spacing: -0.025em;
     }
-    
+
     .tracking-tighter {
         letter-spacing: -0.05em;
     }
@@ -723,7 +716,7 @@
     .bg-info-subtle {
         background-color: #e1f5fe !important;
     }
-    
+
     .text-info {
         color: #0288d1 !important;
     }

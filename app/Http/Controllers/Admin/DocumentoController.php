@@ -124,10 +124,30 @@ class DocumentoController extends Controller
             return redirect()->route('admin.dashboard')->with('error', '  No tiene empresa asignada');
         }
 
-        $documentos = Documento::where('NIT', $empresa->NIT)
-            ->with(['tipoDocumento', 'estado'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $query = Documento::where('NIT', $empresa->NIT)
+            ->with(['tipoDocumento', 'estado']);
+
+        // Filtro por tipo de documento
+        if (request('tipo')) {
+            $query->where('id_tipo_documento', request('tipo'));
+        }
+
+        // Filtro por estado
+        if (request('estado')) {
+            $query->where('id_estado', request('estado'));
+        }
+
+        // Filtro por búsqueda (nombre, usuario o placa)
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('nombre', 'like', "%$search%")
+                  ->orWhere('doc_usuario', 'like', "%$search%")
+                  ->orWhere('placa', 'like', "%$search%") ;
+            });
+        }
+
+        $documentos = $query->orderBy('created_at', 'desc')->paginate(15);
 
         $tiposDocumento = TipoDocumento::where('id_estado', 1)->get();
         $estados = Estado::all();
