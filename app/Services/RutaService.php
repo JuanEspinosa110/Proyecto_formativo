@@ -19,19 +19,20 @@ class RutaService
     {
         $query = Ruta::with(['estado', 'ciudad', 'barrioOrigen', 'barrioDestino']);
 
-        // Búsqueda por ciudad o barrios
+        // Búsqueda por ciudad, barrios o número de ruta
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->whereHas('ciudad', function($sq) use ($search) {
-                      $sq->where('nombre_city', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('barrioOrigen', function($sq) use ($search) {
-                      $sq->where('nombre', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('barrioDestino', function($sq) use ($search) {
-                      $sq->where('nombre', 'like', "%{$search}%");
-                  });
+                        $sq->where('nombre_city', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('barrioOrigen', function($sq) use ($search) {
+                        $sq->where('nombre', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('barrioDestino', function($sq) use ($search) {
+                        $sq->where('nombre', 'like', "%{$search}%");
+                    })
+                    ->orWhere('codigo_ruta', 'like', "%{$search}%");
             });
         }
 
@@ -89,7 +90,7 @@ class RutaService
             }
         }
 
-        return $query->orderBy('id_ruta', 'asc')->paginate(5)->withQueryString();
+        return $query->orderBy('codigo_ruta', 'asc')->paginate(5)->withQueryString();
     }
 
     /**

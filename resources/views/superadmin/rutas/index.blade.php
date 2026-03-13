@@ -26,20 +26,12 @@
     <div class="card border-0 shadow-sm mb-4 rounded-3 pt-1">
         <div class="card-body p-3">
             <form method="GET" action="{{ route('superadmin.rutas.index') }}" class="row g-2 align-items-center">
-                <div class="col-md-3">
+                <div class="col-md-5">
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0 text-muted">
-                            <span class="material-symbols-rounded">map</span>
+                            <span class="material-symbols-rounded">search</span>
                         </span>
-                        <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Buscar origen/destino..." value="{{ request('search') }}">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted">
-                            <span class="material-symbols-rounded">map</span>
-                        </span>
-                        <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Buscar origen/destino..." value="{{ request('search') }}">
+                        <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Buscar ciudad, barrio, número, origen o destino..." value="{{ request('search') }}">
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -181,14 +173,18 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Origen <span class="text-danger">*</span></label>
                             <select name="id_barrio_origen" id="create_id_barrio_origen" class="form-select bg-light border-0 py-2" required>
-                                <option value="" selected>Seleccionar Ciudad primero...</option>
+                                <!-- Opciones cargadas dinámicamente -->
+                                                                                        data-placeholder="Seleccionar..."
+                                                        class="form-select bg-light border-0 py-2 select2-barrio"
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_origen"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase">Barrio Destino <span class="text-danger">*</span></label>
                             <select name="id_barrio_destino" id="create_id_barrio_destino" class="form-select bg-light border-0 py-2" required disabled>
-                                <option value="" selected>Seleccionar Ciudad primero...</option>
+                                <!-- Opciones cargadas dinámicamente -->
+                                                            data-placeholder="Seleccionar..."
+                            class="form-select bg-light border-0 py-2 select2-barrio"
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_destino"></div>
                         </div>
@@ -252,6 +248,8 @@
                                 @foreach($barrios as $bar)
                                 <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
                                 @endforeach
+                                data-placeholder="Seleccionar..."
+                            class="form-select bg-light border-0 py-2 select2-barrio"
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_origen"></div>
                         </div>
@@ -261,6 +259,8 @@
                                 @foreach($barrios as $bar)
                                 <option value="{{ $bar->id_barrio }}">{{ $bar->nombre }}</option>
                                 @endforeach
+                                data-placeholder="Seleccionar..."
+                            class="form-select bg-light border-0 py-2 select2-barrio"
                             </select>
                             <div class="invalid-feedback feedback-id_barrio_destino"></div>
                         </div>
@@ -287,6 +287,32 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar Select2 en selects de barrios (crear y editar)
+        if (window.jQuery && $('.select2-barrio').length) {
+            $('.select2-barrio').select2({
+                width: '100%',
+                dropdownParent: $('#modalCreateRuta').length ? $('#modalCreateRuta') : undefined,
+                placeholder: 'Buscar barrio...',
+                allowClear: true,
+                language: {
+                    noResults: function() {
+                        return 'No se encontraron barrios';
+                    }
+                }
+            });
+            // Para el modal de edición
+            $('#modalEditRuta .select2-barrio').select2({
+                width: '100%',
+                dropdownParent: $('#modalEditRuta'),
+                placeholder: 'Buscar barrio...',
+                allowClear: true,
+                language: {
+                    noResults: function() {
+                        return 'No se encontraron barrios';
+                    }
+                }
+            });
+        }
         // Inicializar Modal de Edición
         document.querySelectorAll('.edit-ruta').forEach(btn => {
             btn.addEventListener('click', async function() {
