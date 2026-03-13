@@ -81,15 +81,28 @@ class DashboardController extends Controller
             ->where('id_estado', 1)
             ->count();
 
-        return view('pasajero.dashboard', compact(
-            'user',
-            'tarjeta',
-            'titularidad',
-            'totalRecargas',
-            'totalViajes',
-            'gastoMes',
-            'movimientos',
-            'rutasDisponibles'
-        ));
+        $viajesQuery = VentaViaje::with(['viaje.ruta.barrioOrigen', 'viaje.ruta.barrioDestino'])
+            ->where('id_tarjeta', $tarjeta?->id_tarjeta);
+
+        $viajesMes = (clone $viajesQuery)
+            ->whereMonth('fecha', Carbon::now()->month)
+            ->whereYear('fecha', Carbon::now()->year)
+            ->get();
+            
+        // Calculate total spent in the month using real data from the database
+        $totalGastadoMes = $viajesMes->sum('valor');
+
+        $viajes = $viajesQuery->orderBy('fecha', 'desc')->take(3)->get();
+        // Usar la colección ya sacada
+        $recargas = $tarjeta
+            ? Recarga::where('id_tarjeta', $tarjeta->id_tarjeta)
+                ->orderByDesc('created_at')
+                ->take(10)
+                ->get()
+            : collect();
+            
+        $totalRecargado = $tarjeta ? Recarga::where('id_tarjeta', $tarjeta->id_tarjeta)->sum('monto') : 0;
+
+        return view('pasajero.saldo.index', compact('tarjeta', 'titularidad', 'recargas', 'totalRecargado', 'viajes', 'viajesMes', 'totalGastadoMes'));
     }
 }

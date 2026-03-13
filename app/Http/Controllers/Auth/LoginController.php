@@ -40,7 +40,7 @@ class LoginController extends Controller
                     return redirect()->route('admin.dashboard');
 
                 case 2:
-                    return redirect()->route('pasajero.dashboard');
+                    return redirect()->route('pasajero.saldo');
 
                 case 3:
                     return redirect()->route('empresa.dashboard');

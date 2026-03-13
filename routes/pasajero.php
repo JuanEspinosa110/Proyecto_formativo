@@ -31,11 +31,14 @@ Route::middleware(['auth:web', 'role:pasajero', 'CheckTarjeta'])
      ->name('pasajero.')
      ->group(function () {
 
-        // Dashboard
-        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        // Saldo / tarjeta pasa a ser el index (home de pasajero)
+        Route::get('/', [TarjetaController::class, 'saldo'])->name('saldo');
 
-        // Saldo / tarjeta
-        Route::get('saldo', [TarjetaController::class, 'saldo'])->name('saldo');
+        // Cambio de tarjeta (pérdida/robo/deterioro)
+        Route::get('tarjeta/cambiar', [TarjetaController::class, 'cambiar'])->name('tarjeta.cambiar');
+        Route::post('tarjeta/cambiar/iniciar', [TarjetaController::class, 'iniciarCambio'])->name('tarjeta.iniciar-cambio');
+        Route::get('tarjeta/verificar-cambio', [TarjetaController::class, 'verificarCambioForm'])->name('tarjeta.verificar-cambio');
+        Route::post('tarjeta/confirmar-cambio', [TarjetaController::class, 'confirmarCambio'])->name('tarjeta.confirmar-cambio');
 
         // Rutas disponibles
         Route::get('rutas', [RutaController::class, 'index'])->name('rutas.index');

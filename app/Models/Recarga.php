@@ -22,6 +22,7 @@ class Recarga extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'id_recarga',
         'id_tarjeta',
         'monto',
     ];

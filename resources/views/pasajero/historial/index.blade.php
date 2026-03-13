@@ -129,7 +129,7 @@
                             </td>
                             <td style="font-family:monospace;font-size:.82rem">{{ $rec->id_tarjeta }}</td>
                             <td style="text-align:right">
-                                <span class="hist-monto-pos">+$ {{ number_format($rec->monto, 0, ',', '.') }}</span>
+                                <span class="hist-monto-pos">$ {{ number_format($rec->monto, 0, ',', '.') }}</span>
                             </td>
                         </tr>
                         @empty

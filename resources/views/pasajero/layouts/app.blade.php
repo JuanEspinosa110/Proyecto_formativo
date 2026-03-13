@@ -19,7 +19,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
 
     <!-- Bootstrap 5 -->
-    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- SIGU Core + Módulo Pasajero -->
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
@@ -35,7 +35,7 @@
         <div class="sigu-nav-inner">
 
             <!-- Brand -->
-            <a href="{{ route('pasajero.dashboard') }}" class="sigu-brand">
+            <a href="{{ route('pasajero.saldo') }}" class="sigu-brand">
                 <div class="sigu-brand-mark">
                     <span class="material-symbols-rounded"
                         style="font-variation-settings:var(--ms-on)">directions_transit</span>
@@ -45,13 +45,9 @@
 
             <!-- Links desktop -->
             <div class="sigu-nav-links" id="navLinks">
-                <a href="{{ route('pasajero.dashboard') }}"
-                    class="sigu-nl {{ request()->routeIs('pasajero.dashboard') ? 'active' : '' }}">
-                    <span class="material-symbols-rounded">home</span> Inicio
-                </a>
                 <a href="{{ route('pasajero.saldo') }}"
                     class="sigu-nl {{ request()->routeIs('pasajero.saldo') ? 'active' : '' }}">
-                    <span class="material-symbols-rounded">credit_card</span> Mi tarjeta
+                    <span class="material-symbols-rounded">credit_card</span> Inicio / Mi tarjeta
                 </a>
                 <a href="{{ route('pasajero.rutas.index') }}"
                     class="sigu-nl {{ request()->routeIs('pasajero.rutas.*') ? 'active' : '' }}">
@@ -73,6 +69,11 @@
 
             <!-- Perfil dropdown -->
             <div class="sigu-nav-end">
+                <!-- Hamburger Menu Mobile Toggle -->
+                <button class="sigu-hamburger d-md-none" id="navToggle">
+                    <span class="material-symbols-rounded">menu</span>
+                </button>
+
                 <div class="dropdown">
                     <button class="sigu-user-btn dropdown-toggle d-flex align-items-center gap-2" type="button"
                         id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
@@ -111,10 +112,6 @@
                         </li>
                     </ul>
                 </div>
-
-                <button class="sigu-hamburger d-md-none" id="navToggle" aria-label="Menú">
-                    <span class="material-symbols-rounded">menu</span>
-                </button>
             </div>
 
         </div>
@@ -130,13 +127,9 @@
             </button>
         </div>
         <div class="sigu-drawer-body">
-            <a href="{{ route('pasajero.dashboard') }}"
-                class="sigu-drawer-link {{ request()->routeIs('pasajero.dashboard') ? 'active' : '' }}">
-                <span class="material-symbols-rounded">home</span> Inicio
-            </a>
             <a href="{{ route('pasajero.saldo') }}"
                 class="sigu-drawer-link {{ request()->routeIs('pasajero.saldo') ? 'active' : '' }}">
-                <span class="material-symbols-rounded">credit_card</span> Mi tarjeta
+                <span class="material-symbols-rounded">credit_card</span> Inicio / Mi tarjeta
             </a>
             <a href="{{ route('pasajero.rutas.index') }}"
                 class="sigu-drawer-link {{ request()->routeIs('pasajero.rutas.*') ? 'active' : '' }}">
@@ -175,7 +168,7 @@
     </main>
 
     <!-- Bootstrap JS -->
-    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Drawer mobile toggle -->
     <script>
