@@ -42,14 +42,13 @@ class RutaController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'codigo_ruta'       => 'required|numeric|unique:ruta,codigo_ruta',
+            'codigo_ruta'       => 'required|numeric',
             'id_ciudad'         => 'required|exists:ciudad,id_ciudad',
             'id_barrio_origen'  => 'required|exists:barrio,id_barrio',
             'id_barrio_destino' => 'required|exists:barrio,id_barrio|different:id_barrio_origen',
             'id_estado'         => 'required|numeric',
         ], [
             'codigo_ruta.required' => 'El código de la ruta es obligatorio.',
-            'codigo_ruta.unique'   => 'Este código de ruta ya se encuentra registrado.',
             'id_barrio_destino.different' => 'El barrio de destino debe ser diferente al de origen.',
         ]);
 
@@ -60,12 +59,39 @@ class RutaController extends Controller
             ], 422);
         }
 
-        // Al usar el servicio, asegúrate de pasar los datos validados
-        $this->rutaService->storeRuta($validator->validated());
+        $data = $validator->validated();
+
+        // Verificar si ya existe la ruta original
+        $existeOriginal = \App\Models\Ruta::where('codigo_ruta', $data['codigo_ruta'])
+            ->where('id_ciudad', $data['id_ciudad'])
+            ->where('id_barrio_origen', $data['id_barrio_origen'])
+            ->where('id_barrio_destino', $data['id_barrio_destino'])
+            ->exists();
+
+        if (!$existeOriginal) {
+            $this->rutaService->storeRuta($data);
+        }
+
+        // Verificar si ya existe la ruta inversa
+        $existeInversa = \App\Models\Ruta::where('codigo_ruta', $data['codigo_ruta'])
+            ->where('id_ciudad', $data['id_ciudad'])
+            ->where('id_barrio_origen', $data['id_barrio_destino'])
+            ->where('id_barrio_destino', $data['id_barrio_origen'])
+            ->exists();
+
+        if (!$existeInversa) {
+            $this->rutaService->storeRuta([
+                'codigo_ruta'       => $data['codigo_ruta'],
+                'id_ciudad'         => $data['id_ciudad'],
+                'id_barrio_origen'  => $data['id_barrio_destino'],
+                'id_barrio_destino' => $data['id_barrio_origen'],
+                'id_estado'         => $data['id_estado'],
+            ]);
+        }
 
         return response()->json([
             'success' => true,
-            'message' => 'Ruta creada con éxito.'
+            'message' => 'Ruta y su inversa creadas con éxito.'
         ]);
     }
 

@@ -34,9 +34,15 @@
     <link rel="stylesheet" href="{{ asset('css/superadmin-gestores-setp.css') }}">
 
     @stack('styles')
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 
 <body class="sigu-body">
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- ╔══════════════════════════════════════════════════════╗
      ║  NAVBAR SIGU                                         ║
@@ -152,12 +158,6 @@
                     <a class="dropdown-item"
                     href="{{ route('superadmin.configuracion.tipo-mantenimiento.index') }}">
                         <i class="bi bi-tools"></i> Tipo de Mantenimiento
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.configuracion.tipo-documento.index') }}">
-                        <i class="bi bi-file-earmark-text"></i> Tipo de Documento
                     </a>
                 </li>
 

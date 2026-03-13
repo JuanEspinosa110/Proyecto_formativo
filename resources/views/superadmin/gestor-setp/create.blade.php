@@ -243,7 +243,8 @@
                             <input type="number" name="doc_usuario"
                                 class="form-control @error('doc_usuario') is-invalid @enderror"
                                 value="{{ old('doc_usuario') }}"
-                                placeholder="Ej: 1020304050" required min="1000000" max="9999999999" step="1" pattern="^[0-9]{7,10}$" title="Solo números, entre 7 y 10 dígitos">
+                                placeholder="Ej: 1020304050" required minlength="7" maxlength="10" inputmode="numeric" pattern="^[0-9]{7,10}$" title="Solo números, entre 7 y 10 dígitos"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,10)">
                             @error('doc_usuario')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -254,7 +255,8 @@
                             <input type="text" name="telefono"
                                 class="form-control @error('telefono') is-invalid @enderror"
                                 value="{{ old('telefono') }}"
-                                placeholder="Ej: 3001234567" size="10" pattern="^[0-9]{10}$" title="Ingrese numero de telefono de 10 dígitos">
+                                placeholder="Ej: 3001234567" maxlength="10" minlength="10" pattern="^[0-9]{10}$" title="Ingrese número de teléfono de 10 dígitos"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,10)">
                             @error('telefono')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -264,7 +266,8 @@
                             <input type="email" name="correo"
                                 class="form-control @error('correo') is-invalid @enderror"
                                 value="{{ old('correo') }}"
-                                placeholder="gestor@setp.gov.co" maxlength="150" required pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" title="Debe ser un correo válido, sin espacios">
+                                placeholder="gestor@setp.gov.co" maxlength="150" required pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" title="Debe ser un correo válido, sin espacios"
+                                oninput="this.value = this.value.replace(/\s/g, '')">
                             @error('correo')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

@@ -156,6 +156,11 @@
                 <div class="modal-body px-4 pb-4">
                     <div id="create-errors-alert" class="alert alert-danger d-none shadow-sm py-2 small mb-4"></div>
 
+                    <div class="alert alert-info shadow-sm py-2 small mb-4">
+                        <span class="material-symbols-rounded align-middle me-1">info</span>
+                        Al crear una ruta, el sistema también generará automáticamente la ruta de regreso (inversa) con el mismo código.
+                    </div>
+
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted text-uppercase">Ciudad <span class="text-danger">*</span></label>

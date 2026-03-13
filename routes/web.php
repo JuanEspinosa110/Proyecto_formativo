@@ -47,7 +47,7 @@ Route::view('/register', 'auth.register')->name('register');
 Route::post('/register', [RegistroController::class, 'store'])
     ->name('register.store');
 
-Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
+Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
 
 Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
 
@@ -105,7 +105,7 @@ Route::get('/superadmin/dashboard/stats', [DashboardController::class, 'superAdm
 Route::prefix('superadmin')
     ->name('superadmin.')
     ->middleware(['auth:superadmin'])
-    ->group(function () 
+    ->group(function ()
     {
 
 
@@ -160,7 +160,7 @@ Route::prefix('superadmin')
         // Ruta para obtener ciudades por departamento (AJAX)
         Route::get('/empresas/ciudades/{id_departamento}', [EmpresaController::class, 'getCiudadesByDepartamento'])
         ->name('superadmin.empresas.ciudades');
-    
+
         // Rutas CRUD de Empresas
         Route::resource('empresas', EmpresaController::class);
         Route::get('empresas/export/csv', [EmpresaController::class, 'exportCsv'])->name('empresas.export.csv');
@@ -182,7 +182,7 @@ Route::prefix('superadmin')
 
 
 
-        //Reportes 
+        //Reportes
         // Reportes (ahora en Admin)
         Route::get('reportes', [\App\Http\Controllers\Admin\ReporteController::class, 'index'])
             ->name('reportes.index');
@@ -197,6 +197,14 @@ Route::prefix('superadmin')
         Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
             ->name('tarjetas.update');
 
+
+        // RUTAS SUPERADMIN
+        Route::get('rutas', [RutaController::class, 'index'])->name('rutas.index');
+        Route::get('rutas/export', [RutaController::class, 'export'])->name('rutas.export');
+        Route::post('rutas', [RutaController::class, 'store'])->name('rutas.store');
+        Route::get('rutas/barrios/{id_ciudad}', [RutaController::class, 'getBarriosByCiudad']);
+        Route::put('rutas/{ruta}', [RutaController::class, 'update'])->name('rutas.update');
+        // ...otras rutas relacionadas a rutas...
 
     });
 
