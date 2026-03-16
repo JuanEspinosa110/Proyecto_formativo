@@ -16,19 +16,19 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'doc_us'   => 'required|integer',
+            'doc_us' => 'required|integer',
             'password' => 'required',
         ]);
 
         /*
-        |----------------------------------
-        |  INTENTO USUARIOS (web)
-        |----------------------------------
-        */
+         |----------------------------------
+         |  INTENTO USUARIOS (web)
+         |----------------------------------
+         */
         if (Auth::guard('web')->attempt([
-            'doc_usuario' => $request->doc_us,
-            'password'   => $request->password,
-            'id_estado'  => 1,
+        'doc_usuario' => $request->doc_us,
+        'password' => $request->password,
+        'id_estado' => 1,
         ])) {
 
             $request->session()->regenerate();
@@ -44,7 +44,7 @@ class LoginController extends Controller
 
                 case 3:
                     return redirect()->route('empresa.dashboard');
-                case 11: 
+                case 11:
                     return redirect()->route('gestor-setp.dashboard');
 
                 default:
@@ -56,21 +56,21 @@ class LoginController extends Controller
         }
 
         /*
-        |----------------------------------
-        | 2️⃣ INTENTO SUPERADMIN
-        |----------------------------------
-        */
+         |----------------------------------
+         | INTENTO SUPERADMIN
+         |----------------------------------
+         */
         if (Auth::guard('superadmin')->attempt([
-            'doc_super_admin' => $request->doc_us,
-            'password'  => $request->password,
-            'id_estado' => 1,
+        'doc_super_admin' => $request->doc_us,
+        'password' => $request->password,
+        'id_estado' => 1,
         ])) {
 
             $request->session()->regenerate();
             return redirect()->route('superadmin.dashboard');
         }
 
-        
+
         return back()->with([
             'error' => 'Documento o contraseña incorrectos']);
     }
