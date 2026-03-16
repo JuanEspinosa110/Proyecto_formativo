@@ -29,6 +29,8 @@ require base_path('routes/superadmin.php');
 require base_path('routes/admin.php');
 // Rutas del Gestor SETP
 require base_path('routes/gestor-setp.php');
+// Rutas del Pasajero
+require base_path('routes/pasajero.php');
 
 use App\Http\Controllers\LandingController;
 
@@ -47,7 +49,7 @@ Route::view('/register', 'auth.register')->name('register');
 Route::post('/register', [RegistroController::class, 'store'])
     ->name('register.store');
 
-Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
+Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
 
 Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
 
@@ -84,9 +86,6 @@ Route::post(
 
 Route::middleware('auth:web')->group(function () {
 
-    Route::get('/pasajero/dashboard', fn() => view('pasajeros.index'))
-        ->name('pasajero.dashboard');
-
     Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
         ->name('empresa.dashboard');
 });
@@ -105,7 +104,7 @@ Route::get('/superadmin/dashboard/stats', [DashboardController::class, 'superAdm
 Route::prefix('superadmin')
     ->name('superadmin.')
     ->middleware(['auth:superadmin'])
-    ->group(function () 
+    ->group(function ()
     {
 
 
@@ -160,7 +159,7 @@ Route::prefix('superadmin')
         // Ruta para obtener ciudades por departamento (AJAX)
         Route::get('/empresas/ciudades/{id_departamento}', [EmpresaController::class, 'getCiudadesByDepartamento'])
         ->name('superadmin.empresas.ciudades');
-    
+
         // Rutas CRUD de Empresas
         Route::resource('empresas', EmpresaController::class);
         Route::get('empresas/export/csv', [EmpresaController::class, 'exportCsv'])->name('empresas.export.csv');
@@ -182,7 +181,7 @@ Route::prefix('superadmin')
 
 
 
-        //Reportes 
+        //Reportes
         // Reportes (ahora en Admin)
         Route::get('reportes', [\App\Http\Controllers\Admin\ReporteController::class, 'index'])
             ->name('reportes.index');

@@ -137,6 +137,7 @@
                 <div class="modal-body py-4">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Código ID (2 dígitos) <span class="text-danger">*</span></label>
+<<<<<<< HEAD
                         <input type="text" name="id_departamento" class="form-control @error('id_departamento') is-invalid @enderror"
                             placeholder="Ej: 05" maxlength="2" required value="{{ old('id_departamento') }}">
                         @error('id_departamento')
@@ -147,6 +148,11 @@
                         <label class="form-label fw-semibold">Nombre del Departamento <span class="text-danger">*</span></label>
                         <input type="text" name="nombre_departamento" class="form-control @error('nombre_departamento') is-invalid @enderror" placeholder="Ej: Antioquia" required value="{{ old('nombre_departamento') }}">
                         @error('nombre_departamento')
+=======
+                        <input type="text" name="id_departamento" id="id_departamento" inputmode="numeric" class="form-control @error('id_departamento') is-invalid @enderror"
+                            placeholder="Ej: 05" maxlength="2" required value="{{ old('id_departamento') }}">
+                        @error('id_departamento')
+>>>>>>> origin/feature/modulo-pasajeros
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

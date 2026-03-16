@@ -13,6 +13,8 @@ class TipoDocumento extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
+        'requiere_doc_usuario',
+        'requiere_placa',
         'id_estado'
     ];
 
