@@ -74,4 +74,12 @@ class Viaje extends Model
     {
         return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
     }
+
+    /**
+     * Relación con las ventas del viaje.
+     */
+    public function ventas()
+    {
+        return $this->hasMany(VentaViaje::class, 'id_viaje', 'id_viaje');
+    }
 }

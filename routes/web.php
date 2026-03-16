@@ -45,8 +45,6 @@ Route::post('/register', [RegistroController::class, 'store'])
 
 Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
 
-Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
-
 Route::post(
     '/recuperar/enviar-codigo',
     [RecuperarPasswordController::class, 'enviarCodigo']
@@ -86,12 +84,19 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
         ->name('empresa.dashboard')->middleware('role:3');
 
-    // Módulo Propietario
-    Route::prefix('propietario')->name('propietario.')->middleware('role:6,9')->group(function () {
-        Route::get('/dashboard', [PropietarioController::class, 'index'])->name('dashboard');
-        Route::post('/documento', [PropietarioController::class, 'subirDocumento'])->name('subirDocumento');
-        Route::put('/documento/{id}', [PropietarioController::class, 'actualizarDocumento'])->name('actualizarDocumento');
-    });
+});
+
+// ==========================================
+// RAMP: PANEL PROPIETARIO (Independiente)
+// ==========================================
+Route::middleware(['auth:web', 'role:6,9'])->prefix('propietario')->name('propietario.')->group(function () {
+    Route::get('/dashboard', [PropietarioController::class, 'dashboard'])->name('dashboard');
+    Route::post('/documento', [PropietarioController::class, 'subirDocumento'])->name('subirDocumento');
+    Route::post('/gasto', [PropietarioController::class, 'registrarGasto'])->name('registrarGasto');
+    Route::put('/documento/{id}', [PropietarioController::class, 'actualizarDocumento'])->name('actualizarDocumento');
+    Route::get('/bus/{placa}/detalles', [PropietarioController::class, 'verVehiculo'])->name('verVehiculo');
+    Route::get('/bus/{placa}/historial-documental', [PropietarioController::class, 'historialDocumental'])->name('historialDocumental');
+    Route::get('/asignacion/{id}/detalle', [PropietarioController::class, 'getDetalleAsignacion'])->name('detalleAsignacion');
 });
 
 

@@ -153,11 +153,11 @@
                         </label>
                         <input type="file" name="archivo" id="archivo"
                             class="form-control @error('archivo') is-invalid @enderror"
-                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                            accept=".pdf,.jpg,.jpeg,.png"
                             required
                             data-required="true">
                         <small class="form-text text-muted">
-                             Formatos: PDF, JPG, PNG, DOC, DOCX | Máximo: 5MB
+                             Formatos: PDF, JPG, PNG | Máximo: 2MB
                         </small>
                         @error('archivo')
                         <div class="invalid-feedback d-block">{{ $message }}</div>

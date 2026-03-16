@@ -234,6 +234,7 @@
                                 @endforeach
                             </select>
                             @error('doc_us') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            <small class="text-muted d-block mt-1" style="font-size: 0.65rem;">* Máximo una jornada laboral por día (8h).</small>
                         </div>
 
                         <div class="col-md-6">
@@ -320,6 +321,7 @@
                                 @endforeach
                             </select>
                             @error('doc_us') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            <small class="text-muted d-block mt-1" style="font-size: 0.65rem;">* El conductor solo puede tener un turno por día.</small>
                         </div>
 
                         <div class="col-md-6">

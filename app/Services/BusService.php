@@ -64,10 +64,23 @@ class BusService
      */
     public function updateBus(Bus $bus, array $data)
     {
+        $oldStatus = $bus->id_estado;
         // La placa no debe actualizarse para evitar conflictos con llaves foráneas (FK en tabla viaje)
         unset($data['placa']);
         
-        return $bus->update($data);
+        $updated = $bus->update($data);
+
+        if ($updated && isset($data['id_estado']) && $data['id_estado'] != $oldStatus) {
+            $nuevoEstado = \App\Models\Estado::find($data['id_estado'])->nombre_estado;
+            $viejoEstado = \App\Models\Estado::find($oldStatus)->nombre_estado;
+            \App\Models\HistorialBus::create([
+                'placa' => $bus->placa,
+                'tipo_cambio' => 'ACTUALIZACION_ESTADO',
+                'detalle' => "{$viejoEstado} → {$nuevoEstado}"
+            ]);
+        }
+        
+        return $updated;
     }
 
     /**
@@ -76,6 +89,57 @@ class BusService
     public function deleteBus(Bus $bus)
     {
         return $bus->delete();
+    }
+
+    /**
+     * Obtener detalles completos de un bus incluyendo su asignación actual
+     */
+    public function getBusDetails($placa)
+    {
+        $bus = Bus::with('estado')->where('placa', $placa)->firstOrFail();
+        
+        // Obtener la última asignación (viaje)
+        $ultimaAsignacion = \App\Models\Viaje::where('placa', $placa)
+            ->with(['conductor', 'ruta'])
+            ->orderBy('fecha', 'desc')
+            ->first();
+
+        // Obtener documentos del vehículo
+        $documentos = Documento::where('placa', $placa)
+            ->with(['tipoDocumento', 'estado'])
+            ->get()
+            ->map(function($doc) {
+                return [
+                    'id_tipo_documento' => $doc->id_tipo_documento,
+                    'tipo_documento' => $doc->tipoDocumento,
+                    'fecha_vencimiento' => $doc->fecha_vencimiento->format('Y-m-d'),
+                    'created_at' => $doc->created_at->format('Y-m-d H:i:s'),
+                    'status_vigencia' => $doc->estado_expiracion,
+                    'status_color' => $doc->status_color,
+                    'url_archivo' => $doc->archivo ? asset('storage/' . $doc->archivo) : null
+                ];
+            });
+
+        return [
+            'bus' => $bus,
+            'asignacion' => $ultimaAsignacion ? [
+                'conductor' => $ultimaAsignacion->conductor->primer_nombre . ' ' . $ultimaAsignacion->conductor->primer_apellido,
+                'doc_conductor' => $ultimaAsignacion->conductor->doc_usuario,
+                'licencia' => 'LC-' . $ultimaAsignacion->conductor->doc_usuario,
+                'ruta' => $ultimaAsignacion->ruta ? $ultimaAsignacion->ruta->nombre_ruta : 'Sin ruta'
+            ] : null,
+            'documentos' => $documentos
+        ];
+    }
+
+    /**
+     * Obtener datos del propietario por documento para autocompletar
+     */
+    public function getOwnerData($doc_propietario)
+    {
+        return Bus::where('doc_propietario', $doc_propietario)
+            ->select('nombre_propietario', 'telefono', 'correo', 'doc_propietario')
+            ->first();
     }
 
     /**

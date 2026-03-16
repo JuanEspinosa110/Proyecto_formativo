@@ -16,6 +16,29 @@
         </button>
     </div>
 
+    @if(isset($licenciasAlerta) && $licenciasAlerta->count() > 0)
+        <div class="mb-4">
+            @foreach($licenciasAlerta as $licencia)
+                <div class="alert alert-{{ $licencia->status_color }} alert-dismissible fade show d-flex align-items-center shadow-sm py-2" role="alert">
+                    <span class="material-symbols-rounded flex-shrink-0 me-2">
+                        {{ $licencia->estado_expiracion == 'VENCIDO' ? 'error' : 'warning' }}
+                    </span>
+                    <div>
+                        <strong>Licencia {{ ucfirst(strtolower($licencia->estado_expiracion)) }}:</strong> 
+                        El conductor <strong>{{ $licencia->usuario->primer_nombre ?? 'N/A' }} {{ $licencia->usuario->primer_apellido ?? '' }}</strong> (Doc: {{ $licencia->doc_usuario }}) 
+                        tiene su licencia de conducción 
+                        @if($licencia->estado_expiracion == 'VENCIDO')
+                            vencida desde el {{ $licencia->fecha_vencimiento->format('d/m/Y') }}.
+                        @else
+                            que vence el {{ $licencia->fecha_vencimiento->format('d/m/Y') }}.
+                        @endif
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
     <div class="card border-0 shadow-sm mb-4 rounded-3">
         <div class="card-body p-3">
             <form method="GET" action="" class="row g-2 align-items-center">
@@ -113,6 +136,10 @@
                                        data-estado="{{ $u->nombre_estado }}"
                                        data-ciudad="{{ $u->nombre_city }}"
                                        data-foto="{{ $u->foto_usuario }}"
+                                       data-licencia-exp="{{ isset($docs_licencia[$u->doc_usuario]) ? \Carbon\Carbon::parse($docs_licencia[$u->doc_usuario]->fecha_expedicion)->format('Y-m-d') : '' }}"
+                                       data-licencia-venc="{{ isset($docs_licencia[$u->doc_usuario]) ? \Carbon\Carbon::parse($docs_licencia[$u->doc_usuario]->fecha_vencimiento)->format('Y-m-d') : '' }}"
+                                       data-licencia-estado="{{ isset($docs_licencia[$u->doc_usuario]) ? $docs_licencia[$u->doc_usuario]->estado_expiracion : '' }}"
+                                       data-licencia-archivo="{{ isset($docs_licencia[$u->doc_usuario]) ? $docs_licencia[$u->doc_usuario]->archivo : '' }}"
                                        data-bs-toggle="modal"
                                        data-bs-target="#modalVerUsuario">
                                         <span class="material-symbols-rounded fs-5">visibility</span>
@@ -130,6 +157,9 @@
                                        data-rol="{{ $u->id_tipo_usuario }}"
                                        data-estado_id="{{ $u->id_estado }}"
                                        data-foto="{{ $u->foto_usuario }}"
+                                       data-fecha-nacimiento="{{ $u->fecha_nacimiento }}"
+                                       data-licencia-exp="{{ isset($docs_licencia[$u->doc_usuario]) ? \Carbon\Carbon::parse($docs_licencia[$u->doc_usuario]->fecha_expedicion)->format('Y-m-d') : '' }}"
+                                       data-licencia-venc="{{ isset($docs_licencia[$u->doc_usuario]) ? \Carbon\Carbon::parse($docs_licencia[$u->doc_usuario]->fecha_vencimiento)->format('Y-m-d') : '' }}"
                                        data-bs-toggle="modal"
                                        data-bs-target="#modalEditarUsuario">
                                         <span class="material-symbols-rounded fs-5">edit</span>
@@ -269,6 +299,38 @@
                             <small class="text-muted fs-xs">Si se deja vacío, se generará una contraseña aleatoria.</small>
                         </div>
 
+                        <!-- SECCIÓN EXCLUSIVA PARA CONDUCTORES -->
+                        <div class="col-12" id="wrapper_licencia_crear" style="display: none;">
+                            <hr class="my-3 border-light">
+                            <h6 class="text-primary small fw-bold mb-3 d-flex align-items-center">
+                                <span class="material-symbols-rounded fs-5 me-1">id_card</span>
+                                INFORMACIÓN DE LICENCIA (SOLO CONDUCTORES)
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Fecha de Nacimiento <span class="text-danger">*</span></label>
+                                    <input type="date" name="fecha_nacimiento" id="fecha_nac_crear" class="form-control form-control-sm @error('fecha_nacimiento') is-invalid @enderror" value="{{ old('fecha_nacimiento') }}" max="{{ date('Y-m-d', strtotime('-18 years')) }}">
+                                    @error('fecha_nacimiento') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Fecha de Expedición <span class="text-danger">*</span></label>
+                                    <input type="date" name="fecha_expedicion" id="fecha_exp_crear" class="form-control form-control-sm @error('fecha_expedicion') is-invalid @enderror" value="{{ old('fecha_expedicion') }}" max="{{ date('Y-m-d') }}">
+                                    @error('fecha_expedicion') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Fecha de Vencimiento <span class="text-danger">*</span></label>
+                                    <input type="date" name="fecha_vencimiento" id="fecha_venc_crear" class="form-control form-control-sm bg-light @error('fecha_vencimiento') is-invalid @enderror" value="{{ old('fecha_vencimiento') }}" readonly placeholder="Calculado automáticamente">
+                                    @error('fecha_vencimiento') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                    <small class="text-muted fs-xs">Automático según ley (<60: 3 años, ≥60: 1 año)</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Archivo Licencia (PDF/PNG) <span class="text-danger">*</span></label>
+                                    <input type="file" name="archivo_licencia" id="archivo_lic_crear" class="form-control form-control-sm @error('archivo_licencia') is-invalid @enderror" accept=".pdf,.png">
+                                    @error('archivo_licencia') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -376,6 +438,31 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        <!-- SECCIÓN EXCLUSIVA PARA EDITAR LICENCIA GESTIÓN DE CONDUCTORES -->
+                        <div class="col-12" id="wrapper_licencia_editar" style="display: none;">
+                            <hr class="my-3 border-light">
+                            <h6 class="text-primary small fw-bold mb-3 d-flex align-items-center">
+                                <span class="material-symbols-rounded fs-5 me-1">id_card</span>
+                                ACTUALIZAR LICENCIA DE CONDUCCIÓN
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Fecha de Expedición</label>
+                                    <input type="date" name="fecha_expedicion" id="editLicExp" class="form-control form-control-sm" max="{{ date('Y-m-d') }}">
+                                    <small class="text-muted fs-xs">Al cambiarla, se recalculará el vencimiento.</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nueva Fecha Vencimiento</label>
+                                    <input type="date" name="fecha_vencimiento" id="editLicVenc" class="form-control form-control-sm bg-light" readonly>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Renovar Archivo Licencia (PDF/PNG)</label>
+                                    <input type="file" name="archivo_licencia" class="form-control form-control-sm" accept=".pdf,.png">
+                                    <small class="text-muted fs-xs">Deje en blanco para mantener el documento actual.</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-3 bg-light">
@@ -433,6 +520,35 @@
                                 <div class="col-12 border-top pt-2">
                                     <label class="d-block text-muted small fw-bold text-uppercase ls-1">Teléfono de Contacto</label>
                                     <span id="verTelefono" class="fw-medium text-dark"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- SECCIÓN DE LICENCIA (SE MUESTRA SOLO A CONDUCTORES) -->
+                    <div class="col-12" id="verSeccionLicencia" style="display: none;">
+                        <h6 class="text-primary small fw-bold mt-2 mb-2 d-flex align-items-center text-uppercase ls-1 border-bottom pb-2">
+                            <span class="material-symbols-rounded fs-5 me-1">id_card</span>
+                            Información de Licencia
+                        </h6>
+                        <div class="p-3 bg-primary bg-opacity-10 rounded-3 border border-primary border-opacity-25">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label class="d-block text-muted small fw-bold text-uppercase ls-1">Fecha Expedición</label>
+                                    <span id="verLicExp" class="fw-medium text-dark"></span>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <label class="d-block text-muted small fw-bold text-uppercase ls-1">Estado Licencia</label>
+                                    <span id="verLicEstado" class="badge rounded-pill"></span>
+                                </div>
+                                <div class="col-6 border-top pt-2">
+                                    <label class="d-block text-muted small fw-bold text-uppercase ls-1">Fecha Vencimiento</label>
+                                    <span id="verLicVenc" class="fw-medium text-dark"></span>
+                                </div>
+                                <div class="col-6 border-top pt-2 text-end">
+                                    <label class="d-block text-muted small fw-bold text-uppercase ls-1">Documento Licencia</label>
+                                    <a href="#" id="verLicArchivoBtn" target="_blank" class="btn btn-sm btn-primary py-1 px-3 d-inline-flex align-items-center fw-bold shadow-sm" style="display: none !important;">
+                                        <span class="material-symbols-rounded fs-6 me-1">download</span> Doc
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -521,6 +637,41 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
+                // Lógica para mostrar la sección de la licencia si es un conductor
+                const seccionLicencia = document.getElementById('verSeccionLicencia');
+                if (seccionLicencia) {
+                    if (btnVer.getAttribute('data-rol') && btnVer.getAttribute('data-rol').toLowerCase().includes('conductor')) {
+                        seccionLicencia.style.display = 'block';
+                        document.getElementById('verLicExp').textContent = btnVer.getAttribute('data-licencia-exp') || 'No registrada';
+                        document.getElementById('verLicVenc').textContent = btnVer.getAttribute('data-licencia-venc') || 'No registrada';
+                        
+                        const estadoLic = btnVer.getAttribute('data-licencia-estado');
+                        const verLicEstado = document.getElementById('verLicEstado');
+                        if(estadoLic) {
+                            verLicEstado.textContent = estadoLic;
+                            verLicEstado.className = 'badge rounded-pill px-3 py-1';
+                            if(estadoLic === 'VIGENTE') verLicEstado.classList.add('bg-success-subtle', 'text-success');
+                            else if(estadoLic === 'VENCIDO') verLicEstado.classList.add('bg-danger-subtle', 'text-danger');
+                            else verLicEstado.classList.add('bg-warning-subtle', 'text-warning');
+                        } else {
+                            verLicEstado.textContent = 'Sin estado';
+                            verLicEstado.className = 'badge rounded-pill bg-secondary px-3 py-1';
+                        }
+                        
+                        const docArchivo = btnVer.getAttribute('data-licencia-archivo');
+                        const btnArchivo = document.getElementById('verLicArchivoBtn');
+                        if (docArchivo) {
+                            btnArchivo.href = '/storage/' + docArchivo;
+                            btnArchivo.style.setProperty('display', 'inline-flex', 'important');
+                        } else {
+                            btnArchivo.href = '#';
+                            btnArchivo.style.setProperty('display', 'none', 'important');
+                        }
+                    } else {
+                        seccionLicencia.style.display = 'none';
+                    }
+                }
+
                 const modalEl = document.getElementById('modalVerUsuario');
                 if (modalEl && typeof bootstrap !== 'undefined') {
                     bootstrap.Modal.getOrCreateInstance(modalEl).show();
@@ -543,6 +694,48 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('editRol').value = btnEdit.getAttribute('data-rol');
                 document.getElementById('editEstado').value = btnEdit.getAttribute('data-estado_id');
                 
+                // Lógica Licencia
+                const editLicExp = document.getElementById('editLicExp');
+                const editLicVenc = document.getElementById('editLicVenc');
+                const wrapperLicEditar = document.getElementById('wrapper_licencia_editar');
+                
+                const fechaNacEdit = btnEdit.getAttribute('data-fecha-nacimiento');
+                
+                let selectedRolText = '';
+                const editRolOptions = document.getElementById('editRol').options;
+                for(let i=0; i<editRolOptions.length; i++) {
+                    if(editRolOptions[i].value == btnEdit.getAttribute('data-rol')) {
+                        selectedRolText = editRolOptions[i].text.toLowerCase();
+                        break;
+                    }
+                }
+                
+                if (selectedRolText.includes('conductor')) {
+                    wrapperLicEditar.style.display = 'block';
+                    editLicExp.value = btnEdit.getAttribute('data-licencia-exp');
+                    editLicVenc.value = btnEdit.getAttribute('data-licencia-venc');
+                    
+                    const calcVencEdit = () => {
+                        if(fechaNacEdit && editLicExp.value) {
+                            const fn = new Date(fechaNacEdit);
+                            const fe = new Date(editLicExp.value);
+                            let ageAtExp = fe.getFullYear() - fn.getFullYear();
+                            if (fe.getMonth() < fn.getMonth() || (fe.getMonth() === fn.getMonth() && fe.getDate() < fn.getDate())) {
+                                ageAtExp--;
+                            }
+                            let diffYears = (ageAtExp < 60) ? 3 : 1;
+                            let fv = new Date(fe);
+                            fv.setFullYear(fv.getFullYear() + diffYears);
+                            editLicVenc.value = fv.toISOString().split('T')[0];
+                        }
+                    };
+                    editLicExp.removeEventListener('change', window.calcVencEditFn); 
+                    window.calcVencEditFn = calcVencEdit;
+                    editLicExp.addEventListener('change', window.calcVencEditFn);
+                } else {
+                    wrapperLicEditar.style.display = 'none';
+                }
+
                 const form = document.getElementById('formEditarUsuario');
                 if (form) {
                     form.action = '/admin/usuarios/' + btnEdit.getAttribute('data-doc');
@@ -629,15 +822,42 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Lógica para el campo de contraseña según el rol
     const selectRol = document.getElementById('select_id_tipo_usuario');
     const wrapperPass = document.getElementById('wrapper_password_crear');
     const msgPass = document.getElementById('msg_pass_obligatorio');
+    const wrapperLicencia = document.getElementById('wrapper_licencia_crear');
+    
+    // Inputs de licencia
+    const fechaNac = document.getElementById('fecha_nac_crear');
+    const fechaExp = document.getElementById('fecha_exp_crear');
+    const fechaVenc = document.getElementById('fecha_venc_crear');
+    const archivoLic = document.getElementById('archivo_lic_crear');
+
+    const calcVencimiento = () => {
+        if(fechaNac && fechaExp && fechaVenc && fechaNac.value && fechaExp.value) {
+            const fn = new Date(fechaNac.value);
+            const fe = new Date(fechaExp.value);
+            let ageAtExp = fe.getFullYear() - fn.getFullYear();
+            if (fe.getMonth() < fn.getMonth() || (fe.getMonth() === fn.getMonth() && fe.getDate() < fn.getDate())) {
+                ageAtExp--;
+            }
+            let diffYears = (ageAtExp < 60) ? 3 : 1;
+            let fv = new Date(fe);
+            fv.setFullYear(fv.getFullYear() + diffYears);
+            fechaVenc.value = fv.toISOString().split('T')[0];
+        }
+    };
+
+    if (fechaNac && fechaExp) {
+        fechaNac.addEventListener('change', calcVencimiento);
+        fechaExp.addEventListener('change', calcVencimiento);
+    }
 
     if (selectRol && wrapperPass) {
         const checkRol = () => {
-            const val = selectRol.value;
-            if (val == "6" || val == "9") { // Propietario
+            const val = selectRol.options[selectRol.selectedIndex].text.toLowerCase();
+            
+            if (val.includes('propietario')) {
                 wrapperPass.style.display = 'block';
                 msgPass.textContent = '(Recomendado para propietarios)';
                 msgPass.classList.remove('text-info');
@@ -647,6 +867,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 msgPass.textContent = '(Opcional)';
                 msgPass.classList.remove('text-warning');
                 msgPass.classList.add('text-info');
+            }
+            
+            if (wrapperLicencia) {
+                if (val.includes('conductor')) {
+                    wrapperLicencia.style.display = 'block';
+                    if(fechaNac) fechaNac.required = true;
+                    if(fechaExp) fechaExp.required = true;
+                    if(fechaVenc) fechaVenc.required = true;
+                    if(archivoLic) archivoLic.required = true;
+                } else {
+                    wrapperLicencia.style.display = 'none';
+                    if(fechaNac) fechaNac.required = false;
+                    if(fechaExp) fechaExp.required = false;
+                    if(fechaVenc) fechaVenc.required = false;
+                    if(archivoLic) archivoLic.required = false;
+                }
             }
         };
 

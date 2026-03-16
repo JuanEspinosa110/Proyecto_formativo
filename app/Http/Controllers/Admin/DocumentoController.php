@@ -61,9 +61,9 @@ class DocumentoController extends Controller
         }
 
         if ($esCreacion) {
-            $reglas['archivo'] = 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120';
+            $reglas['archivo'] = 'required|file|mimes:pdf,jpg,jpeg,png|max:2048';
         } else {
-            $reglas['archivo'] = 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:5120';
+            $reglas['archivo'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048';
         }
 
         return $reglas;
@@ -82,8 +82,8 @@ class DocumentoController extends Controller
 
             'archivo.required' => ' Debes seleccionar un archivo para subir.',
             'archivo.file' => ' El archivo no es válido.',
-            'archivo.mimes' => ' El archivo debe ser PDF, JPG, PNG, DOC o DOCX.',
-            'archivo.max' => ' El archivo es demasiado grande. Máximo permitido: 5MB.',
+            'archivo.mimes' => ' El archivo debe ser PDF, JPG o PNG.',
+            'archivo.max' => ' El archivo es demasiado grande. Máximo permitido: 2MB.',
 
             'fecha_expedicion.required' => ' La fecha de expedición es obligatoria.',
             'fecha_expedicion.date' => ' La fecha de expedición no es válida.',
@@ -116,7 +116,7 @@ class DocumentoController extends Controller
     /**
      * Mostrar lista de documentos de la empresa del admin logueado
      */
-    public function index()
+    public function index(Request $request)
     {
         $empresa = $this->getEmpresaAdmin();
 
@@ -124,10 +124,26 @@ class DocumentoController extends Controller
             return redirect()->route('admin.dashboard')->with('error', '  No tiene empresa asignada');
         }
 
-        $documentos = Documento::where('NIT', $empresa->NIT)
-            ->with(['tipoDocumento', 'estado'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
+        $query = Documento::where('NIT', $empresa->NIT)
+            ->with(['tipoDocumento', 'estado', 'bus'])
+            ->whereNotNull('placa'); // Centrarse en documentos de vehículos
+
+        // Filtros
+        if ($request->filled('tipo')) {
+            $query->where('id_tipo_documento', $request->tipo);
+        }
+        if ($request->filled('estado')) {
+            $query->where('id_estado', $request->estado);
+        }
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nombre', 'like', "%$search%")
+                  ->orWhere('placa', 'like', "%$search%");
+            });
+        }
+
+        $documentos = $query->orderBy('fecha_vencimiento', 'asc')->paginate(20);
 
         $tiposDocumento = TipoDocumento::where('id_estado', 1)->get();
         $estados = Estado::all();
@@ -185,12 +201,7 @@ class DocumentoController extends Controller
                     return redirect()->back()->with('error', '  El archivo no pudo ser validado correctamente.');
                 }
 
-                $nombreArchivo = $this->generarNombreArchivoSeguro($archivo);
-                $ruta = $archivo->storeAs(
-                    'documentos/' . $empresa->NIT,
-                    $nombreArchivo,
-                    'public'
-                );
+                $ruta = $archivo->store('documentos', 'public');
 
                 if (!$ruta) {
                     return redirect()->back()->with('error', '  Error al guardar el archivo. Intenta de nuevo.');
@@ -201,9 +212,6 @@ class DocumentoController extends Controller
 
             // Asignar NIT de la empresa
             $validated['NIT'] = $empresa->NIT;
-
-            // Generar ID único
-            $validated['id_documento'] = $this->generarIdDocumento();
 
             // Crear documento
             Documento::create($validated);
@@ -279,12 +287,7 @@ class DocumentoController extends Controller
                     Storage::disk('public')->delete($documento->archivo);
                 }
 
-                $nombreArchivo = $this->generarNombreArchivoSeguro($archivo);
-                $ruta = $archivo->storeAs(
-                    'documentos/' . $empresa->NIT,
-                    $nombreArchivo,
-                    'public'
-                );
+                $ruta = $archivo->store('documentos', 'public');
 
                 if (!$ruta) {
                     return redirect()->back()->with('error', '  Error al guardar el archivo. Intenta de nuevo.');
@@ -368,62 +371,61 @@ class DocumentoController extends Controller
     }
 
     /**
-     * Exportar documentos a CSV
+     * Exportar documentos a XLSX (Excel)
      */
     public function export()
     {
         $empresa = $this->getEmpresaAdmin();
 
         if (!$empresa) {
-            return redirect()->route('admin.dashboard')->with('error', '  No tiene empresa asignada');
+            return redirect()->back()->with('error', 'No tiene empresa asignada');
         }
 
         $documentos = Documento::where('NIT', $empresa->NIT)
-            ->with(['tipoDocumento', 'estado'])
+            ->with(['tipoDocumento', 'estado', 'bus'])
+            ->whereNotNull('placa')
             ->get();
 
-        $filename = 'documentos_' . $empresa->NIT . '_' . now()->format('Y-m-d_His') . '.csv';
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Documentos Vehículos');
 
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename=' . $filename,
-        ];
+        // Encabezados
+        $headers = ['PLACA', 'PROPIETARIO', 'TIPO DOCUMENTO', 'FECHA VENCIMIENTO', 'ESTADO EXPIRACIÓN', 'FECHA EXPEDICIÓN'];
+        $sheet->fromArray($headers, NULL, 'A1');
 
-        $callback = function () use ($documentos) {
-            $file = fopen('php://output', 'w');
+        // Estilo encabezados
+        $sheet->getStyle('A1:F1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:F1')->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFD3D3D3');
 
-            // Headers del CSV
-            fputcsv($file, [
-                'ID Documento',
-                'Nombre',
-                'Tipo de Documento',
-                'Fecha Expedición',
-                'Fecha Vencimiento',
-                'Estado',
-                'Usuario',
-                'Placa Bus',
-                'Creado en'
-            ]);
+        // Datos
+        $row = 2;
+        foreach ($documentos as $doc) {
+            $sheet->setCellValue('A' . $row, $doc->placa);
+            $sheet->setCellValue('B' . $row, $doc->bus->nombre_propietario ?? 'N/A');
+            $sheet->setCellValue('C' . $row, $doc->tipoDocumento->nombre ?? 'N/A');
+            $sheet->setCellValue('D' . $row, $doc->fecha_vencimiento->format('d/m/Y'));
+            $sheet->setCellValue('E' . $row, $doc->estado_expiracion);
+            $sheet->setCellValue('F' . $row, $doc->fecha_expedicion->format('d/m/Y'));
+            $row++;
+        }
 
-            // Datos
-            foreach ($documentos as $doc) {
-                fputcsv($file, [
-                    $doc->id_documento,
-                    $doc->nombre,
-                    $doc->tipoDocumento->nombre ?? 'N/A',
-                    $doc->fecha_expedicion,
-                    $doc->fecha_vencimiento,
-                    $doc->estado->nombre_estado ?? 'N/A',
-                    $doc->doc_usuario ?? 'N/A',
-                    $doc->placa ?? 'N/A',
-                    $doc->created_at->format('Y-m-d H:i:s')
-                ]);
-            }
+        // Auto-size columnas
+        foreach (range('A', 'F') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
 
-            fclose($file);
-        };
+        $filename = 'Reporte_Documentos_' . date('Ymd_His') . '.xlsx';
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
 
-        return response()->stream($callback, 200, $headers);
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save('php://output');
+        exit;
     }
 
     /**
@@ -441,6 +443,13 @@ class DocumentoController extends Controller
                 if (isset($usuario->NIT) && $usuario->NIT != $empresa->NIT) {
                     throw ValidationException::withMessages([
                         'doc_usuario' => ' El usuario con documento "' . $datos['doc_usuario'] . '" no pertenece a su empresa.',
+                    ]);
+                }
+
+                // Bloquear documento a administradores
+                if ($usuario->tipoUsuario && stripos($usuario->tipoUsuario->nombre_tipo, 'admin') !== false) {
+                    throw ValidationException::withMessages([
+                        'doc_usuario' => ' No se puede asignar documentos a usuarios con rol de Administrador.',
                     ]);
                 }
             }
@@ -511,9 +520,7 @@ class DocumentoController extends Controller
         $tiposPermitidos = [
             'application/pdf',
             'image/jpeg',
-            'image/png',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            'image/png'
         ];
 
         if (!in_array($archivo->getMimeType(), $tiposPermitidos)) {
@@ -521,7 +528,7 @@ class DocumentoController extends Controller
         }
 
         // Validar extension
-        $extensionesPermitidas = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'];
+        $extensionesPermitidas = ['pdf', 'jpg', 'jpeg', 'png'];
         $extension = strtolower($archivo->getClientOriginalExtension());
 
         if (!in_array($extension, $extensionesPermitidas)) {

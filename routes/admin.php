@@ -20,6 +20,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('buses/{bus:placa}', [BusController::class, 'update'])->name('buses.update');
         Route::delete('buses/{bus:placa}', [BusController::class, 'destroy'])->name('buses.destroy');
         Route::get('buses/export', [BusController::class, 'export'])->name('buses.export');
+        Route::get('buses/{placa}/historial-documental', [BusController::class, 'historialDocumental'])->name('buses.historialDocumental');
+        Route::get('buses/{placa}/gastos', [BusController::class, 'getGastos'])->name('buses.gastos');
+        Route::get('buses/{placa}', [BusController::class, 'show'])->name('buses.show');
+        Route::get('buses/propietario/{doc_propietario}', [BusController::class, 'getPropietario'])->name('buses.propietario');
 
         // Módulo de Asignaciones
         Route::resource('asignaciones', AsignacionController::class)

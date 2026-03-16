@@ -43,7 +43,7 @@
 
                 <a href="{{ route('admin.documentos.index') }}" class="sigu-sb-link {{ request()->is('admin/documentos*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">description</span></span>
-                    <span>Documentos</span>
+                    <span>Docs. Vehículos</span>
                 </a>
 
                 <a href="{{ url('admin/buses') }}" class="sigu-sb-link {{ request()->is('admin/buses*') ? 'active' : '' }}">
@@ -61,12 +61,6 @@
                     <span>Rutas</span>
                 </a>
 
-                @if(auth()->check() && (auth()->user()->id_tipo_usuario == 6 || auth()->user()->id_tipo_usuario == 9))
-                <a href="{{ route('propietario.dashboard') }}" class="sigu-sb-link {{ request()->routeIs('propietario.*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">person_pin</span></span>
-                    <span>Mi Vehículo</span>
-                </a>
-                @endif
 
             </nav>
 

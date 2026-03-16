@@ -83,6 +83,24 @@ class StoreUsuarioRequest extends FormRequest
                 'string',
                 'min:8'
             ],
+            'fecha_nacimiento' => [
+                'nullable',
+                'date'
+            ],
+            'fecha_expedicion' => [
+                'nullable',
+                'date'
+            ],
+            'fecha_vencimiento' => [
+                'nullable',
+                'date'
+            ],
+            'archivo_licencia' => [
+                'nullable',
+                'file',
+                'mimes:pdf,png,jpg,jpeg',
+                'max:2048'
+            ],
         ];
     }
 
