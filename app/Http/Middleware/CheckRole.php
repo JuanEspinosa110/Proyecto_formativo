@@ -11,24 +11,25 @@ class CheckRole
 {
     // Mapa de nombre de rol → id_tipo_usuario en tabla tipo_usuario
     private const ROLES = [
-        'admin'        => 1,
-        'pasajero'     => 2,
-        'conductor'    => 3,
-        'gestor_setp'  => 11,
+        'admin' => 1,
+        'pasajero' => 2,
+        'conductor' => 3,
+        'gestor_setp' => 6,
+        'jefe_mantenimiento' => 7,
     ];
 
     public function handle(Request $request, Closure $next, string $role): Response
     {
         $user = auth()->user();
 
-        if (! $user) {
+        if (!$user) {
             return redirect()->route('login')
                 ->with('error', 'Debe iniciar sesión para continuar.');
         }
 
         $idEsperado = self::ROLES[$role] ?? null;
 
-        if ($idEsperado === null || (int) $user->id_tipo_usuario !== $idEsperado) {
+        if ($idEsperado === null || (int)$user->id_tipo_usuario !== $idEsperado) {
             abort(403, 'No tiene permiso para acceder a esta sección.');
         }
 

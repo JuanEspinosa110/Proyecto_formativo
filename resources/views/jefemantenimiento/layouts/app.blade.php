@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'SIGU') — Sistema Integral de Seguimiento Urbano</title>
+    <title>@yield('title', 'Mantenimiento') — SIGU</title>
 
-    <!-- Tipografías y utilidades compartidas -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/jefemantenimiento.css') }}">
     <link rel="stylesheet" href="{{ asset('css/validacion.css') }}">
 
     @stack('styles')
@@ -22,56 +22,37 @@
 
     <aside class="sigu-sidebar" id="sigu-sidebar">
         <div class="sigu-sidebar-inner">
-            <a href="{{ route('admin.dashboard') }}" class="sigu-brand">
-                <div class="sigu-brand-mark" aria-hidden="true"><span class="material-symbols-rounded">route</span></div>
+            <a href="{{ route('jefemantenimiento.dashboard') }}" class="sigu-brand">
+                <div class="sigu-brand-mark" aria-hidden="true">
+                    <span class="material-symbols-rounded">build</span>
+                </div>
                 <div class="sigu-brand-text">
                     <span class="sigu-brand-name">SIGU</span>
-                    <span class="sigu-brand-sub">Administración</span>
+                    <span class="sigu-brand-sub">Mantenimiento</span>
                 </div>
             </a>
 
-            <nav class="sigu-sidebar-nav" aria-label="Administrador">
-                <a href="{{ route('admin.dashboard') }}" class="sigu-sb-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+            <nav class="sigu-sidebar-nav" aria-label="Jefe de Mantenimiento">
+
+                <a href="{{ route('jefemantenimiento.dashboard') }}"
+                   class="sigu-sb-link {{ request()->routeIs('jefemantenimiento.dashboard') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">dashboard</span></span>
-                    <span>Dashboard</span>
+                    <span>Inicio</span>
                 </a>
 
-                <a href="{{ route('admin.usuarios.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
-                    <span>Usuarios</span>
-                </a>
+                <div class="sigu-sb-divider"></div>
+                <p class="sigu-sb-section">Operaciones</p>
 
-                <a href="{{ route('admin.documentos.index') }}" class="sigu-sb-link {{ request()->is('admin/documentos*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">description</span></span>
-                    <span>Documentos</span>
-                </a>
-
-                <a href="{{ url('admin/buses') }}" class="sigu-sb-link {{ request()->is('admin/buses*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">directions_bus</span></span>
-                    <span>Buses</span>
-                </a>
-
-                <a href="{{ route('admin.asignaciones.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.asignaciones.*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">assignment</span></span>
-                    <span>Asignaciones</span>
-                </a>
-
-                <a href="{{ route('admin.rutas.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.rutas.*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">map</span></span>
-                    <span>Rutas</span>
-                </a>
-
-                <div class="sigu-sb-divider" style="height:1px; background:rgba(255,255,255,0.1); margin:1rem 0;"></div>
-                <p class="small text-uppercase px-4 mb-2" style="font-size:10px; opacity:0.6; letter-spacing:1px;">Mantenimiento</p>
-
-                <a href="{{ route('admin.mantenimiento.reportes') }}" class="sigu-sb-link {{ request()->routeIs('admin.mantenimiento.reportes') ? 'active' : '' }}">
+                <a href="{{ route('jefemantenimiento.reportes') }}"
+                   class="sigu-sb-link {{ request()->routeIs('jefemantenimiento.reportes*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">notification_important</span></span>
                     <span>Reportes de Fallas</span>
                 </a>
 
-                <a href="{{ route('admin.mantenimiento.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.mantenimiento.*') && !request()->routeIs('admin.mantenimiento.reportes') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">build</span></span>
-                    <span>Mantenimiento</span>
+                <a href="{{ route('jefemantenimiento.index') }}"
+                   class="sigu-sb-link {{ request()->routeIs('jefemantenimiento.index*') || request()->routeIs('jefemantenimiento.create') || request()->routeIs('jefemantenimiento.show') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">engineering</span></span>
+                    <span>Historial / Taller</span>
                 </a>
 
             </nav>
@@ -94,7 +75,7 @@
 
     <footer class="sigu-footer">
         <span class="sigu-footer-brand">SIGU</span>
-        <span class="sigu-footer-full">Sistema Integral de Seguimiento Urbano</span>
+        <span class="sigu-footer-full">Sistema Integral de Seguimiento Urbano - Mantenimiento</span>
         <span class="sigu-footer-sep">·</span>
         <span>© {{ date('Y') }}</span>
     </footer>
@@ -118,7 +99,7 @@
 
     <script>
         function showToast(message, type = 'success') {
-            const toastEl = document.getElementById('siguToast');
+            const toastEl   = document.getElementById('siguToast');
             const toastBody = document.getElementById('toastMessage');
             const toastIcon = document.getElementById('toastIcon');
 
@@ -136,8 +117,7 @@
             }
 
             toastBody.textContent = message;
-            const toast = new bootstrap.Toast(toastEl);
-            toast.show();
+            new bootstrap.Toast(toastEl).show();
         }
 
         @if(session('success'))
@@ -155,7 +135,7 @@
             <div class="modal-content rounded-4 border-0 shadow">
                 <div class="modal-body text-center p-4">
                     <span class="material-symbols-rounded mb-3 d-block" id="confirmIcon"
-                          style="font-size:3rem; color:#f6820c;">help</span>
+                          style="font-size:3rem; color:var(--jm-accent, #f6820c);">help</span>
                     <h6 class="fw-bold mb-1" id="confirmTitle">¿Estás seguro?</h6>
                     <p class="text-muted mb-0 small" id="confirmMessage">Esta acción no se puede deshacer.</p>
                 </div>
@@ -164,7 +144,7 @@
                             style="border:1.5px solid #cbd5e0; color:#4a5568; border-radius:0.5rem; padding:0.35rem 1.2rem;"
                             data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" id="confirmOkBtn" class="btn btn-sm"
-                            style="background:var(--p); color:#fff; border:none; border-radius:0.5rem; padding:0.35rem 1.2rem;">
+                            style="background:var(--jm-accent,#f6820c); color:#fff; border:none; border-radius:0.5rem; padding:0.35rem 1.2rem;">
                         Confirmar
                     </button>
                 </div>
@@ -173,7 +153,6 @@
     </div>
 
     <script>
-        // Delegación global para botones con data-confirm-form
         document.addEventListener('click', function(e) {
             const btn = e.target.closest('[data-confirm-form]');
             if (!btn) return;

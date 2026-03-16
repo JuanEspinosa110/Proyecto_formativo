@@ -44,8 +44,12 @@ class LoginController extends Controller
 
                 case 3:
                     return redirect()->route('empresa.dashboard');
-                case 11:
+
+                case 6: // SETP
                     return redirect()->route('gestor-setp.dashboard');
+
+                case 7: // JEFE_MANTENIMIENTO
+                    return redirect()->route('jefemantenimiento.dashboard');
 
                 default:
                     Auth::guard('web')->logout();

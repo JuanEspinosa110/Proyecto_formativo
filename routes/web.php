@@ -31,6 +31,8 @@ require base_path('routes/admin.php');
 require base_path('routes/gestor-setp.php');
 // Rutas del Pasajero
 require base_path('routes/pasajero.php');
+// Rutas del Jefe de Mantenimiento
+require base_path('routes/jefemantenimiento.php');
 
 use App\Http\Controllers\LandingController;
 
