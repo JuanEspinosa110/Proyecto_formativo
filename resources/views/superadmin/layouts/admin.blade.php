@@ -160,6 +160,15 @@
                         <i class="bi bi-tools"></i> Tipo de Mantenimiento
                     </a>
                 </li>
+<<<<<<< HEAD
+=======
+                <li>
+                    <a class="dropdown-item"
+                    href="{{ route('superadmin.configuracion.tipo-documento.index') }}">
+                        <i class="bi bi-file-earmark-text"></i> Tipo de Documento
+                    </a>
+                </li>
+>>>>>>> feature-cambios-bus
 
                 {{-- TIPO DE DOCUMENTOS --}}
                 <li>
