@@ -48,6 +48,78 @@
 
     </div>
 
+    {{-- ─── Alertas de Mantenimiento Preventivo ─── --}}
+    @if(count($alertasMantenimiento) > 0)
+    <div class="row g-3 mt-1 mb-2">
+        <div class="col-12">
+            <div class="bg-white rounded-lg shadow-sm p-4 border-start border-4 border-warning">
+                <div class="d-flex align-items-center mb-3">
+                    <span class="material-symbols-rounded text-warning me-2" style="font-size:1.5rem;">warning</span>
+                    <h6 class="fw-bold mb-0 text-dark">Alertas de Mantenimiento Preventivo (Próximos o Vencidos)</h6>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="table-light text-muted small">
+                            <tr>
+                                <th>Bus</th>
+                                <th>Fecha Requerida</th>
+                                <th>KMs Requeridos</th>
+                                <th>KM Actual</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($alertasMantenimiento as $alerta)
+                                <tr>
+                                    <td class="fw-bold">{{ $alerta->placa }}</td>
+                                    <td>
+                                        @if($alerta->fecha_proximo)
+                                            @php $vencidoFecha = strtotime($alerta->fecha_proximo) < strtotime(date('Y-m-d')); @endphp
+                                            <span class="{{ $vencidoFecha ? 'text-danger fw-bold' : 'text-warning text-dark' }}">
+                                                {{ date('d/m/Y', strtotime($alerta->fecha_proximo)) }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted">N/A</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($alerta->km_proximo)
+                                            @php $vencidoKm = $alerta->km_proximo <= $alerta->km_actual; @endphp
+                                            <span class="{{ $vencidoKm ? 'text-danger fw-bold' : 'text-warning text-dark' }}">
+                                                {{ number_format($alerta->km_proximo, 0, ',', '.') }} km
+                                            </span>
+                                        @else
+                                            <span class="text-muted">N/A</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ number_format($alerta->km_actual, 0, ',', '.') }} km</td>
+                                    <td>
+                                        @if(
+                                            ($alerta->fecha_proximo && strtotime($alerta->fecha_proximo) < strtotime(date('Y-m-d'))) || 
+                                            ($alerta->km_proximo && $alerta->km_proximo <= $alerta->km_actual)
+                                        )
+                                            <span class="badge bg-danger rounded-pill">Vencido</span>
+                                        @else
+                                            <span class="badge bg-warning text-dark rounded-pill">Próximo</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('jefemantenimiento.create', ['placa' => $alerta->placa]) }}" class="btn btn-sm" style="background:var(--p); color:white; border-radius:0.5rem; padding:0.2rem 0.6rem; font-size:0.8rem;">
+                                            Programar
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- ─── Dos columnas: en curso + reportes recientes ─── --}}
     <div class="row g-3 mt-1">
 

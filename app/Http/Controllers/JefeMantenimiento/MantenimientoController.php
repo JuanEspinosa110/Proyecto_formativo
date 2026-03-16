@@ -42,13 +42,36 @@ class MantenimientoController extends Controller
             ->take(5)
             ->get();
 
+        // Alertas de mantenimiento preventivo (Próximos o Vencidos)
+        // Buscamos mantenimientos finales donde su fecha_proximo o km_proximo estén cerca o vencidos
+        // comparados con el kilometraje actual del bus y la fecha actual.
+        $alertasMantenimiento = DB::select("
+            SELECT m.id_mantenimiento, m.fecha_proximo, m.km_proximo, b.placa, b.kilometraje as km_actual
+            FROM mantenimiento m
+            JOIN bus b ON m.placa = b.placa
+            WHERE m.id_mantenimiento = (
+                SELECT sub.id_mantenimiento
+                FROM mantenimiento sub
+                WHERE sub.placa = b.placa AND sub.id_estado = 1
+                ORDER BY sub.fecha_mantenimiento DESC
+                LIMIT 1
+            )
+            AND (
+                (m.fecha_proximo IS NOT NULL AND m.fecha_proximo <= CURRENT_DATE + INTERVAL 7 DAY)
+                OR
+                (m.km_proximo IS NOT NULL AND m.km_proximo <= b.kilometraje + 500)
+            )
+            AND b.id_estado != 7
+        ");
+
         return view('jefemantenimiento.dashboard', compact(
             'busesEnTaller',
             'reportesPendientes',
             'trabajosEnCurso',
             'trabajosFinalizados',
             'enCurso',
-            'reportesRecientes'
+            'reportesRecientes',
+            'alertasMantenimiento'
         ));
     }
 
@@ -102,7 +125,25 @@ class MantenimientoController extends Controller
             'detalles'                         => 'required|array|min:1',
             'detalles.*.id_tipo_mantenimiento' => 'required|exists:tipo_mantenimiento,id_tipo_mantenimiento',
             'detalles.*.descripcion'           => 'required|string',
+            'detalles.*.evidencia_foto'        => 'nullable|image|max:4096',
+            'detalles.*.fecha_proximo'         => 'nullable|date|after_or_equal:fecha_mantenimiento',
+            'detalles.*.km_proximo'            => 'nullable|numeric|min:0',
             'origen'                           => 'nullable|in:admin,jefe',
+        ], [
+            'placa.required'                            => 'Debe seleccionar un bus.',
+            'placa.exists'                              => 'El bus seleccionado no existe en el sistema.',
+            'fecha_mantenimiento.required'              => 'La fecha de mantenimiento es obligatoria.',
+            'fecha_mantenimiento.date'                  => 'La fecha de mantenimiento no es válida.',
+            'costo_total.required'                      => 'Debe indicar un costo total estimado (puede ser 0).',
+            'costo_total.numeric'                       => 'El costo total debe ser un número.',
+            'costo_total.min'                           => 'El costo total no puede ser negativo.',
+            'detalles.required'                         => 'Debe agregar al menos una tarea de mantenimiento.',
+            'detalles.min'                              => 'Debe agregar al menos una tarea de mantenimiento.',
+            'detalles.*.descripcion.required'           => 'Todas las tareas deben tener una descripción.',
+            'detalles.*.evidencia_foto.image'           => 'El archivo subido como foto debe ser una imagen.',
+            'detalles.*.evidencia_foto.max'             => 'La foto no debe pesar más de 4MB.',
+            'detalles.*.fecha_proximo.after_or_equal'   => 'La fecha del próximo mantenimiento no puede ser anterior a la del mantenimiento actual.',
+            'detalles.*.km_proximo.min'                 => 'El próximo kilometraje no puede ser menor a cero.'
         ]);
 
         try {
@@ -110,20 +151,46 @@ class MantenimientoController extends Controller
 
             $bus = Bus::where('placa', $request->placa)->firstOrFail();
 
+            // Calcular el 'fecha_proximo' y 'km_proximo' global basado en todos los detalles
+            $minFechaProximo = null;
+            $minKmProximo = null;
+
+            foreach ($request->detalles as $detalle) {
+                if (!empty($detalle['fecha_proximo'])) {
+                    if (is_null($minFechaProximo) || strtotime($detalle['fecha_proximo']) < strtotime($minFechaProximo)) {
+                        $minFechaProximo = $detalle['fecha_proximo'];
+                    }
+                }
+                if (!empty($detalle['km_proximo'])) {
+                    if (is_null($minKmProximo) || $detalle['km_proximo'] < $minKmProximo) {
+                        $minKmProximo = $detalle['km_proximo'];
+                    }
+                }
+            }
+
             $mantenimiento = Mantenimiento::create([
                 'placa'               => $request->placa,
                 'NIT'                 => $bus->NIT,
                 'kilometraje'         => $bus->kilometraje,
                 'fecha_mantenimiento' => $request->fecha_mantenimiento,
+                'fecha_proximo'       => $minFechaProximo,
+                'km_proximo'          => $minKmProximo,
                 'costo_total'         => $request->costo_total,
                 'id_estado'           => ESTADO_MANT_EN_TALLER,
             ]);
 
-            foreach ($request->detalles as $detalle) {
+            foreach ($request->detalles as $i => $detalle) {
+                $fotoPath = null;
+                if ($request->hasFile("detalles.{$i}.evidencia_foto")) {
+                    $file = $request->file("detalles.{$i}.evidencia_foto");
+                    $fotoPath = $file->store('mantenimientos', 'public');
+                }
+
                 DetalleMantenimiento::create([
                     'id_mantenimiento'      => $mantenimiento->id_mantenimiento,
                     'id_tipo_mantenimiento' => $detalle['id_tipo_mantenimiento'],
                     'descripcion'           => $detalle['descripcion'],
+                    'evidencia_foto'        => $fotoPath,
                 ]);
             }
 

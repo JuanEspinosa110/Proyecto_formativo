@@ -116,6 +116,14 @@
                         <div class="list-group-item px-0 py-3">
                             <h6 class="mb-1 fw-bold">{{ $detalle->tipoMantenimiento->nombre ?? 'General' }}</h6>
                             <p class="mb-1 text-muted">{{ $detalle->descripcion }}</p>
+                            @if($detalle->evidencia_foto)
+                                <div class="mt-2 text-start d-print-none">
+                                    <a href="{{ asset('storage/' . $detalle->evidencia_foto) }}" target="_blank" class="d-inline-flex align-items-center gap-1 text-primary small text-decoration-none">
+                                        <span class="material-symbols-rounded" style="font-size:1.1rem;">image</span>
+                                        Ver Evidencia
+                                    </a>
+                                </div>
+                            @endif
                         </div>
                     @empty
                         <p class="text-center py-4 text-muted">No hay tareas especificadas.</p>

@@ -133,12 +133,22 @@
         <div class="col-md-8">
             <div class="bg-white rounded-lg shadow-sm p-4">
                 <h6 class="text-uppercase small fw-bold text-muted mb-3">Tareas realizadas</h6>
-                @forelse($mantenimiento->detalles as $detalle)
-                    <div class="py-3 border-bottom">
-                        <h6 class="mb-1 fw-bold">{{ $detalle->tipoMantenimiento->nombre ?? 'General' }}</h6>
-                        <p class="mb-0 text-muted">{{ $detalle->descripcion }}</p>
-                    </div>
-                @empty
+                    @forelse($mantenimiento->detalles as $detalle)
+                        <div class="list-group-item px-0 py-3">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1 fw-bold">{{ $detalle->tipoMantenimiento->nombre ?? 'General' }}</h6>
+                            </div>
+                            <p class="mb-1 text-muted">{{ $detalle->descripcion }}</p>
+                            @if($detalle->evidencia_foto)
+                                <div class="mt-2 text-start d-print-none">
+                                    <a href="{{ asset('storage/' . $detalle->evidencia_foto) }}" target="_blank" class="d-inline-flex align-items-center gap-1 text-primary small text-decoration-none">
+                                        <span class="material-symbols-rounded" style="font-size:1.1rem;">image</span>
+                                        Ver Evidencia
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    @empty
                     <p class="text-center py-4 text-muted">Sin tareas registradas.</p>
                 @endforelse
             </div>

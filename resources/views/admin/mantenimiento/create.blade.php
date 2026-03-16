@@ -13,7 +13,22 @@
     </div>
 
     <div class="bg-white rounded-lg shadow-sm p-4 mt-4" style="max-width:800px;">
-        <form action="{{ route('admin.mantenimiento.store') }}" method="POST">
+        
+        @if ($errors->any())
+            <div class="alert alert-danger" style="border-radius:0.5rem; border-left:4px solid #c53030; background-color:#fff5f5; color:#c53030;">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="material-symbols-rounded me-2" style="font-size:1.2rem;">error</span>
+                    <strong>Por favor, corrija los siguientes errores:</strong>
+                </div>
+                <ul class="mb-0 small ps-4">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="{{ route('admin.mantenimiento.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="hidden" name="origen" value="admin">
 
@@ -55,22 +70,41 @@
             <div id="detalles-container">
                 <div class="detalle-row mb-3 p-3 rounded" style="background:#f8fafc; border:1px solid #e2e8f0;">
                     <div class="row align-items-end">
-                        <div class="col-md-4 mb-2">
+                        <div class="col-md-3 mb-2">
                             <label class="form-label small">Tipo</label>
-                            <select name="detalles[0][id_tipo_mantenimiento]" class="form-select" required>
+                            <select name="detalles[0][id_tipo_mantenimiento]" class="form-select tipo-mantenimiento-select" required>
                                 @foreach($tipos as $tipo)
                                     <option value="{{ $tipo->id_tipo_mantenimiento }}">{{ $tipo->nombre }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-7 mb-2">
+                        <div class="col-md-4 mb-2">
                             <label class="form-label small">Descripción</label>
                             <input type="text" name="detalles[0][descripcion]" class="form-control" placeholder="Ej. Cambio de aceite completo" required>
                         </div>
-                        <div class="col-md-1 mb-2 d-flex align-items-end">
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label small">Foto (Opcional)</label>
+                            <input type="file" name="detalles[0][evidencia_foto]" class="form-control" accept="image/*">
+                        </div>
+                        <div class="col-md-1 mb-2 pb-1 d-flex justify-content-center">
                             <button type="button" class="btn btn-sm text-muted" disabled title="La primera tarea no se puede eliminar" style="opacity:0.3;">
                                 <span class="material-symbols-rounded">delete</span>
                             </button>
+                        </div>
+                    </div>
+
+                    {{-- Sub-panel preventivo dinámico por fila --}}
+                    <div class="preventivo-panel mt-2 p-2 rounded" style="background:#fff; border:1px dashed #cbd5e1; display:none;">
+                        <span class="d-block small fw-bold text-primary mb-2">Mantenimiento Preventivo</span>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small mb-1">Próximo (Fecha)</label>
+                                <input type="date" name="detalles[0][fecha_proximo]" class="form-control form-control-sm fecha-input">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small mb-1">Próximo (Km)</label>
+                                <input type="number" name="detalles[0][km_proximo]" class="form-control form-control-sm km-input" placeholder="Ej. 150000" min="0">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -109,21 +143,43 @@ document.getElementById('add-detalle').addEventListener('click', () => {
     row.style.cssText = 'background:#f8fafc; border:1px solid #e2e8f0;';
     row.innerHTML = `
         <div class="row align-items-end">
-            <div class="col-md-4 mb-2">
-                <label class="form-label small">Tipo</label>
-                <select name="detalles[${idx}][id_tipo_mantenimiento]" class="form-select" required>${opts}</select>
+                <div class="col-md-3 mb-2">
+                    <label class="form-label small">Tipo</label>
+                    <select name="detalles[${idx}][id_tipo_mantenimiento]" class="form-select tipo-mantenimiento-select" required>${opts}</select>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <label class="form-label small">Descripción</label>
+                    <input type="text" name="detalles[${idx}][descripcion]" class="form-control" placeholder="Ej. Revisión de frenos" required>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <label class="form-label small">Foto (Opcional)</label>
+                    <input type="file" name="detalles[${idx}][evidencia_foto]" class="form-control" accept="image/*">
+                </div>
+                <div class="col-md-1 mb-2 pb-1 d-flex justify-content-center">
+                    <button type="button" class="btn text-danger remove-detalle p-2" title="Eliminar tarea">
+                        <span class="material-symbols-rounded">delete</span>
+                    </button>
+                </div>
             </div>
-            <div class="col-md-7 mb-2">
-                <label class="form-label small">Descripción</label>
-                <input type="text" name="detalles[${idx}][descripcion]" class="form-control" placeholder="Ej. Revisión de frenos" required>
-            </div>
-            <div class="col-md-1 mb-2 d-flex align-items-end">
-                <button type="button" class="btn btn-sm text-danger remove-detalle" title="Eliminar tarea">
-                    <span class="material-symbols-rounded">delete</span>
-                </button>
-            </div>
-        </div>`;
+            
+            <div class="preventivo-panel mt-2 p-2 rounded" style="background:#fff; border:1px dashed #cbd5e1; display:none;">
+                <span class="d-block small fw-bold text-primary mb-2">Mantenimiento Preventivo</span>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label small mb-1">Próximo (Fecha)</label>
+                        <input type="date" name="detalles[${idx}][fecha_proximo]" class="form-control form-control-sm fecha-input">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label small mb-1">Próximo (Km)</label>
+                        <input type="number" name="detalles[${idx}][km_proximo]" class="form-control form-control-sm km-input" placeholder="Ej. 150000" min="0">
+                    </div>
+                </div>
+            </div>`;
     document.getElementById('detalles-container').appendChild(row);
+    
+    // Ejecutar chequeo una vez agregado
+    togglePreventivoRow(row.querySelector('.tipo-mantenimiento-select'));
+    
     idx++;
 });
 
@@ -132,6 +188,29 @@ document.getElementById('detalles-container').addEventListener('click', e => {
     const btn = e.target.closest('.remove-detalle');
     if (btn) btn.closest('.detalle-row').remove();
 });
+
+function togglePreventivoRow(selectElement) {
+    const row = selectElement.closest('.detalle-row');
+    const panel = row.querySelector('.preventivo-panel');
+    if (selectElement.value == "1") {
+        panel.style.display = 'block';
+    } else {
+        panel.style.display = 'none';
+        // Limpiar valores al ocultar
+        row.querySelector('.fecha-input').value = '';
+        row.querySelector('.km-input').value = '';
+    }
+}
+
+// Escuchar cambios de tipo de mantenimiento
+document.getElementById('detalles-container').addEventListener('change', e => {
+    if (e.target.classList.contains('tipo-mantenimiento-select')) {
+        togglePreventivoRow(e.target);
+    }
+});
+
+// Iniciar visibilidad para la primera fila
+togglePreventivoRow(document.querySelector('.tipo-mantenimiento-select'));
 </script>
 @endpush
 @endsection
