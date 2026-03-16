@@ -12,6 +12,7 @@ use App\Models\VentaViaje;
 use App\Models\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Models\Ruta;
 use App\Models\Viaje;
@@ -28,57 +29,49 @@ class DashboardController extends Controller
      */
     public function stats(Request $request)
     {
-        $user = Auth::guard('web')->user();
-        $doc_usuario = $user->doc_usuario;
-        $nit = $user->NIT ?? null;
+        try {
+            $user = Auth::guard('web')->user();
+            if (!$user) {
+                return response()->json(['error' => 'No autenticado'], 401);
+            }
+            $nit = $user->NIT ?? null;
 
-        // Empresa
-        $empresa = $nit ? Empresa::where('NIT', $nit)->first() : null;
+            // Empresa
+            $empresa = $nit ? Empresa::where('NIT', $nit)->first() : null;
 
-        // Usuarios de la empresa
-        $usuarios = $nit ? Usuario::where('NIT', $nit)->get() : collect();
+            // Usuarios de la empresa
+            $usuarios = $nit ? Usuario::where('NIT', $nit)->get() : collect();
 
-        // Documentos de la empresa
-        $documentos = $nit ? Documento::where('NIT', $nit)->get() : collect();
+            // Documentos de la empresa
+            $documentos = $nit ? Documento::where('NIT', $nit)->get() : collect();
 
-        // Buses de la empresa
-        $buses = $nit ? Bus::where('NIT', $nit)->get() : collect();
+            // Buses de la empresa (con estado)
+            $buses = $nit ? Bus::with('estado')->where('NIT', $nit)->get() : collect();
 
-        // Rutas de la empresa
-        $rutas = $nit ? Ruta::whereHas('ciudad', function($q) use ($nit) {
-            $q->where('NIT', $nit);
-        })->get() : collect();
+            // Viajes de la empresa (con ruta)
+            $viajes = $nit ? Viaje::with('ruta')->whereHas('ruta', function($q) use ($nit) {
+                $q->where('NIT', $nit);
+            })->get() : collect();
 
-        // Asignaciones (viajes) donde el usuario logueado es conductor
-        $asignaciones = Viaje::where('doc_us', $doc_usuario)->get();
+            $totalUsuarios = $usuarios->count();
+            $totalDocumentos = $documentos->count();
+            $totalBuses = $buses->count();
 
-        // Viajes de la empresa
-        $viajes = $nit ? Viaje::whereHas('ruta', function($q) use ($nit) {
-            $q->where('NIT', $nit);
-        })->get() : collect();
-
-        // Ventas de viajes de la empresa
-        $ventas = $nit ? VentaViaje::whereHas('viaje.ruta', function($q) use ($nit) {
-            $q->where('NIT', $nit);
-        })->get() : collect();
-
-        // Totales para la gráfica
-        $totalUsuarios = $usuarios->count();
-        $totalDocumentos = $documentos->count();
-
-        return response()->json([
-            'empresa' => $empresa,
-            'usuarios' => $usuarios,
-            'documentos' => $documentos,
-            'buses' => $buses,
-            'rutas' => $rutas,
-            'asignaciones' => $asignaciones,
-            'viajes' => $viajes,
-            'ventas' => $ventas,
-            'totales' => [
-                'usuarios' => $totalUsuarios,
-                'documentos' => $totalDocumentos
-            ]
-        ]);
+            return response()->json([
+                'empresa' => $empresa,
+                'usuarios' => $usuarios,
+                'documentos' => $documentos,
+                'buses' => $buses,
+                'viajes' => $viajes,
+                'totales' => [
+                    'usuarios' => $totalUsuarios,
+                    'documentos' => $totalDocumentos,
+                    'buses' => $totalBuses
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('Error en DashboardController@stats: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json(['error' => 'Error interno: '.$e->getMessage()], 500);
+        }
     }
 }
