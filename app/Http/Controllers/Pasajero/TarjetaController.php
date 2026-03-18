@@ -15,6 +15,25 @@ use Carbon\Carbon;
 
 class TarjetaController extends Controller
 {
+    // ── index ──────────────────────────────────────────────────
+    /**
+     * Mi Tarjeta: redirige al saldo si tiene tarjeta, o a sin-tarjeta si no.
+     */
+    public function index()
+    {
+        $user = auth()->user();
+
+        $tieneTarjeta = TitularidadTarjeta::where('doc_usuario', $user->doc_usuario)
+            ->where('id_estado', 1)
+            ->exists();
+
+        if ($tieneTarjeta) {
+            return redirect()->route('pasajero.saldo');
+        }
+
+        return redirect()->route('pasajero.tarjeta.sin-tarjeta');
+    }
+
     // ── sinTarjeta ─────────────────────────────────────────────
     /**
      * Vista de onboarding: el pasajero no tiene tarjeta activa.
@@ -400,5 +419,60 @@ class TarjetaController extends Controller
             ]);
             $tarjetaNueva->update(['saldo' => $saldoATraspasar]);
         }
+    }
+
+    /**
+     * Muestra el formulario para recargar saldo con Stripe.
+     */
+    public function recargar()
+    {
+        $user = auth()->user();
+        $titularidad = \App\Models\TitularidadTarjeta::where('doc_usuario', $user->doc_usuario)
+            ->whereNull('fecha_fin')
+            ->where('id_estado', 1)
+            ->first();
+        $tarjeta = $titularidad?->tarjeta;
+
+        if (!$tarjeta) {
+            return redirect()->route('pasajero.saldo')->with('error', 'No tienes una tarjeta activa.');
+        }
+
+        return view('pasajero.tarjeta.recargar', compact('tarjeta'));
+    }
+
+    /**
+     * Procesa la recarga y redirige a Stripe Checkout.
+     */
+    public function procesarRecarga(Request $request)
+    {
+        $request->validate([
+            'id_tarjeta' => 'required|string|exists:tarjeta,id_tarjeta',
+            'monto' => 'required|numeric|min:1000',
+        ]);
+
+        \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        $session = \Stripe\Checkout\Session::create([
+            'payment_method_types' => ['card'],
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'cop',
+                    'product_data' => [
+                        'name' => 'Recarga Tarjeta SIGU',
+                    ],
+                    'unit_amount' => $request->monto * 100, // Stripe usa centavos
+                ],
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'success_url' => route('pasajero.saldo') . '?success=1',
+            'cancel_url' => route('pasajero.saldo') . '?cancel=1',
+            'metadata' => [
+                'id_tarjeta' => $request->id_tarjeta,
+                'user_id' => auth()->id(),
+            ],
+        ]);
+
+        return redirect($session->url);
     }
 }

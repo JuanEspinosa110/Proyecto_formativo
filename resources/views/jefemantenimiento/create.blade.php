@@ -1,0 +1,209 @@
+@extends('jefemantenimiento.layouts.app')
+
+@section('title', 'Registrar Mantenimiento — SIGU')
+
+@section('content')
+<div class="sigu-fade">
+    <div class="sigu-page-hd">
+        <div>
+            <h1 class="sigu-page-title">Registrar Mantenimiento</h1>
+            <p class="sigu-page-sub">Cree un nuevo registro de mantenimiento para un vehículo.</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm p-4 mt-4" style="max-width:800px;">
+        
+        @if ($errors->any())
+            <div class="alert alert-danger" style="border-radius:0.5rem; border-left:4px solid #c53030; background-color:#fff5f5; color:#c53030;">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="material-symbols-rounded me-2" style="font-size:1.2rem;">error</span>
+                    <strong>Por favor, corrija los siguientes errores:</strong>
+                </div>
+                <ul class="mb-0 small ps-4">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form action="{{ route('jefemantenimiento.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="hidden" name="origen" value="jefe">
+            @if($reporte_id)
+                <input type="hidden" name="reporte_id" value="{{ $reporte_id }}">
+            @endif
+
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <label for="placa" class="form-label">Vehículo (Placa)</label>
+                    <select name="placa" id="placa" class="form-select" required @if($placa_predefinida) disabled @endif>
+                        <option value="">Seleccione un bus...</option>
+                        @foreach($buses as $bus)
+                            <option value="{{ $bus->placa }}" @if($placa_predefinida == $bus->placa) selected @endif>
+                                {{ $bus->placa }} - {{ $bus->modelo }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @if($placa_predefinida)
+                        <input type="hidden" name="placa" value="{{ $placa_predefinida }}">
+                    @endif
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="fecha_mantenimiento" class="form-label">Fecha del Trabajo</label>
+                    <input type="date" name="fecha_mantenimiento" id="fecha_mantenimiento" class="form-control" value="{{ date('Y-m-d') }}" required>
+                </div>
+            </div>
+
+            <hr class="mb-4">
+            
+            <h4 class="mb-3">Detalles de la Reparación</h4>
+            <div id="detalles-container">
+                <div class="detalle-row mb-3 p-3 rounded" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                    <div class="row align-items-end">
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label small">Tipo de Mantenimiento</label>
+                            <select name="detalles[0][id_tipo_mantenimiento]" class="form-select tipo-mantenimiento-select" required>
+                                @foreach($tipos as $tipo)
+                                    <option value="{{ $tipo->id_tipo_mantenimiento }}">{{ $tipo->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label small">Descripción de la tarea</label>
+                            <input type="text" name="detalles[0][descripcion]" class="form-control" placeholder="Ej. Cambio de pastillas delanteras" required>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label small">Foto (Opcional)</label>
+                            <input type="file" name="detalles[0][evidencia_foto]" class="form-control" accept="image/*">
+                        </div>
+                        <div class="col-md-1 mb-2 pb-1 d-flex justify-content-center">
+                            <button type="button" class="btn btn-sm text-muted" disabled title="La primera tarea no se puede eliminar" style="opacity:0.3;">
+                                <span class="material-symbols-rounded">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {{-- Sub-panel preventivo dinámico por fila --}}
+                    <div class="preventivo-panel mt-2 p-2 rounded" style="background:#fff; border:1px dashed #cbd5e1; display:none;">
+                        <span class="d-block small fw-bold text-primary mb-2">Mantenimiento Preventivo</span>
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small mb-1">Próximo (Fecha)</label>
+                                <input type="date" name="detalles[0][fecha_proximo]" class="form-control form-control-sm fecha-input">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label small mb-1">Próximo (Km)</label>
+                                <input type="number" name="detalles[0][km_proximo]" class="form-control form-control-sm km-input" placeholder="Ej. 150000" min="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" id="add-detalle" class="btn btn-sm mb-4" style="border:1px dashed var(--p); color:var(--p);">
+                + Agregar otra tarea
+            </button>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label for="costo_total" class="form-label">Costo Total ($)</label>
+                    <input type="number" name="costo_total" id="costo_total" class="form-control" placeholder="0.00" required>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 mt-4">
+                <button type="submit" class="btn" style="background:var(--p); color:white; padding:0.5rem 2rem;">
+                    Guardar Registro
+                </button>
+                <a href="{{ route('jefemantenimiento.index') }}" class="btn btn-light" style="padding:0.5rem 2rem;">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    let detalleIndex = 1;
+    const tiposOpts = @json($tipos->map(fn($t) => ['id' => $t->id_tipo_mantenimiento, 'nombre' => $t->nombre]));
+
+    document.getElementById('add-detalle').addEventListener('click', function() {
+        const opts = tiposOpts.map(t => `<option value="${t.id}">${t.nombre}</option>`).join('');
+        const row = document.createElement('div');
+        row.className = 'detalle-row mb-3 p-3 rounded';
+        row.style.cssText = 'background:#f8fafc; border:1px solid #e2e8f0;';
+        row.innerHTML = `
+            <div class="row align-items-end">
+                <div class="col-md-3 mb-2">
+                    <label class="form-label small">Tipo de Mantenimiento</label>
+                    <select name="detalles[${detalleIndex}][id_tipo_mantenimiento]" class="form-select tipo-mantenimiento-select" required>${opts}</select>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <label class="form-label small">Descripción de la tarea</label>
+                    <input type="text" name="detalles[${detalleIndex}][descripcion]" class="form-control" placeholder="Ej. Revisión de niveles" required>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <label class="form-label small">Foto (Opcional)</label>
+                    <input type="file" name="detalles[${detalleIndex}][evidencia_foto]" class="form-control" accept="image/*">
+                </div>
+                <div class="col-md-1 mb-2 pb-1 d-flex justify-content-center">
+                    <button type="button" class="btn text-danger remove-detalle p-2" title="Eliminar tarea">
+                        <span class="material-symbols-rounded">delete</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="preventivo-panel mt-2 p-2 rounded" style="background:#fff; border:1px dashed #cbd5e1; display:none;">
+                <span class="d-block small fw-bold text-primary mb-2">Mantenimiento Preventivo</span>
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label small mb-1">Próximo (Fecha)</label>
+                        <input type="date" name="detalles[${detalleIndex}][fecha_proximo]" class="form-control form-control-sm fecha-input">
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label small mb-1">Próximo (Km)</label>
+                        <input type="number" name="detalles[${detalleIndex}][km_proximo]" class="form-control form-control-sm km-input" placeholder="Ej. 150000" min="0">
+                    </div>
+                </div>
+            </div>`;
+        document.getElementById('detalles-container').appendChild(row);
+        
+        // Ejecutar chequeo una vez agregado
+        togglePreventivoRow(row.querySelector('.tipo-mantenimiento-select'));
+        
+        detalleIndex++;
+    });
+
+    // Eliminar fila por delegación
+    document.getElementById('detalles-container').addEventListener('click', e => {
+        const btn = e.target.closest('.remove-detalle');
+        if (btn) btn.closest('.detalle-row').remove();
+    });
+
+    function togglePreventivoRow(selectElement) {
+        const row = selectElement.closest('.detalle-row');
+        const panel = row.querySelector('.preventivo-panel');
+        if (selectElement.value == "1") {
+            panel.style.display = 'block';
+        } else {
+            panel.style.display = 'none';
+            // Limpiar valores al ocultar
+            row.querySelector('.fecha-input').value = '';
+            row.querySelector('.km-input').value = '';
+        }
+    }
+
+    // Escuchar cambios de tipo de mantenimiento
+    document.getElementById('detalles-container').addEventListener('change', e => {
+        if (e.target.classList.contains('tipo-mantenimiento-select')) {
+            togglePreventivoRow(e.target);
+        }
+    });
+
+    // Iniciar visibilidad para la primera fila
+    togglePreventivoRow(document.querySelector('.tipo-mantenimiento-select'));
+</script>
+@endpush
+@endsection

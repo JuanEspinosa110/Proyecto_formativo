@@ -25,8 +25,11 @@ class UsuarioController extends Controller
             return redirect()->route('admin.dashboard')->with('error', 'Empresa no asociada a este usuario.');
         }
 
-        $roles = DB::table('tipo_usuario')->orderBy('id_tipo_usuario')->get();
-        $estados = DB::table('estado')->whereIn('id_estado', [1,2,3])->get();
+        $roles = DB::table('tipo_usuario')
+            ->whereIn('id_tipo_usuario', [1, 3, 4, 5, 7]) // Solo roles de empresa
+            ->orderBy('id_tipo_usuario')
+            ->get();
+        $estados = DB::table('estado')->whereIn('id_estado', [1, 2, 3])->get();
 
         $query = DB::table('usuario')
             ->leftJoin('estado', 'usuario.id_estado', '=', 'estado.id_estado')
@@ -52,17 +55,17 @@ class UsuarioController extends Controller
 
             // Usamos los nombres de campos que vienen del formulario
             $data = [
-                'primer_nombre'   => $request->primer_nombre,
-                'segundo_nombre'  => $request->segundo_nombre,
+                'primer_nombre' => $request->primer_nombre,
+                'segundo_nombre' => $request->segundo_nombre,
                 'primer_apellido' => $request->primer_apellido,
-                'segundo_apellido'=> $request->segundo_apellido,
-                'doc_usuario'     => $request->doc_usuario,
-                'correo'          => $request->correo,
-                'telefono'        => $request->telefono,
+                'segundo_apellido' => $request->segundo_apellido,
+                'doc_usuario' => $request->doc_usuario,
+                'correo' => $request->correo,
+                'telefono' => $request->telefono,
                 'id_tipo_usuario' => $request->id_tipo_usuario,
-                'id_estado'       => 1,
-                'password'        => Hash::make($passwordGenerada),
-                'NIT'             => Auth::user()->NIT
+                'id_estado' => 1,
+                'password' => Hash::make($passwordGenerada),
+                'NIT' => Auth::user()->NIT
             ];
 
             if ($request->hasFile('foto_usuario')) {
@@ -76,7 +79,8 @@ class UsuarioController extends Controller
                 ->route('admin.usuarios.index')
                 ->with('success', 'Registro creado correctamente. Contraseña: ' . $passwordGenerada);
 
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             return back()->withInput()->with('error', 'Error al crear: ' . $e->getMessage());
         }
     }
@@ -116,14 +120,14 @@ class UsuarioController extends Controller
         ]);
 
         $data = $request->except(['_token', '_method', 'foto_usuario', 'form_type']);
-        
+
         if ($request->hasFile('foto_usuario')) {
             // Opcional: Eliminar foto anterior si existe
             $userToUpdate = Usuario::find($doc_usuario);
             if ($userToUpdate && $userToUpdate->foto_usuario) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($userToUpdate->foto_usuario);
             }
-            
+
             $path = $request->file('foto_usuario')->store('usuarios', 'public');
             $data['foto_usuario'] = $path;
         }
@@ -132,7 +136,7 @@ class UsuarioController extends Controller
 
         // Si el usuario editado es el que está en sesión y se inactiva o bloquea, cerrar sesión
         $usuarioEditado = Auth::user();
-        if ($usuarioEditado && $usuarioEditado->doc_usuario == $doc_usuario && in_array($request->id_estado, [2,3])) {
+        if ($usuarioEditado && $usuarioEditado->doc_usuario == $doc_usuario && in_array($request->id_estado, [2, 3])) {
             Auth::logout();
             return redirect('/login')->with('error', 'Tu cuenta ha sido inactivada o bloqueada.');
         }
