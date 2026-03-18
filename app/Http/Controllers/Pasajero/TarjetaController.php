@@ -15,6 +15,25 @@ use Carbon\Carbon;
 
 class TarjetaController extends Controller
 {
+    // ── index ──────────────────────────────────────────────────
+    /**
+     * Mi Tarjeta: redirige al saldo si tiene tarjeta, o a sin-tarjeta si no.
+     */
+    public function index()
+    {
+        $user = auth()->user();
+
+        $tieneTarjeta = TitularidadTarjeta::where('doc_usuario', $user->doc_usuario)
+            ->where('id_estado', 1)
+            ->exists();
+
+        if ($tieneTarjeta) {
+            return redirect()->route('pasajero.saldo');
+        }
+
+        return redirect()->route('pasajero.tarjeta.sin-tarjeta');
+    }
+
     // ── sinTarjeta ─────────────────────────────────────────────
     /**
      * Vista de onboarding: el pasajero no tiene tarjeta activa.
