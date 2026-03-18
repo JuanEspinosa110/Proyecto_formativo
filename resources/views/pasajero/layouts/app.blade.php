@@ -30,12 +30,19 @@
 
 <body>
 
+@php
+    // Detectar si el usuario autenticado tiene tarjeta activa (para el navbar)
+    $tieneTarjeta = \App\Models\TitularidadTarjeta::where('doc_usuario', auth()->user()->doc_usuario)
+        ->where('id_estado', 1)
+        ->exists();
+@endphp
+
     <!-- ── Navbar ──────────────────────────────────────────────── -->
     <nav class="sigu-nav">
         <div class="sigu-nav-inner">
 
             <!-- Brand -->
-            <a href="{{ route('pasajero.saldo') }}" class="sigu-brand">
+            <a href="{{ route('pasajero.dashboard') }}" class="sigu-brand">
                 <div class="sigu-brand-mark">
                     <span class="material-symbols-rounded"
                         style="font-variation-settings:var(--ms-on)">directions_transit</span>
@@ -45,9 +52,13 @@
 
             <!-- Links desktop -->
             <div class="sigu-nav-links" id="navLinks">
-                <a href="{{ route('pasajero.saldo') }}"
-                    class="sigu-nl {{ request()->routeIs('pasajero.saldo') ? 'active' : '' }}">
-                    <span class="material-symbols-rounded">credit_card</span> Inicio / Mi tarjeta
+                <a href="{{ route('pasajero.dashboard') }}"
+                    class="sigu-nl {{ request()->routeIs('pasajero.dashboard') ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">home</span> Inicio
+                </a>
+                <a href="{{ route('pasajero.tarjeta.index') }}"
+                    class="sigu-nl {{ request()->routeIs('pasajero.saldo', 'pasajero.tarjeta.sin-tarjeta', 'pasajero.tarjeta.cambiar', 'pasajero.tarjeta.verificar-cambio') ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">credit_card</span> Mi tarjeta
                 </a>
                 <a href="{{ route('pasajero.rutas.index') }}"
                     class="sigu-nl {{ request()->routeIs('pasajero.rutas.*') ? 'active' : '' }}">
@@ -57,10 +68,12 @@
                     class="sigu-nl {{ request()->routeIs('pasajero.recargas.*') ? 'active' : '' }}">
                     <span class="material-symbols-rounded">store</span> Recargas
                 </a>
+                @if($tieneTarjeta)
                 <a href="{{ route('pasajero.historial.index') }}"
                     class="sigu-nl {{ request()->routeIs('pasajero.historial.*') ? 'active' : '' }}">
                     <span class="material-symbols-rounded">history</span> Historial
                 </a>
+                @endif
                 <a href="{{ route('pasajero.mapa') }}"
                     class="sigu-nl {{ request()->routeIs('pasajero.mapa') ? 'active' : '' }}">
                     <span class="material-symbols-rounded">map</span> Mapa
@@ -70,7 +83,7 @@
             <!-- Perfil dropdown -->
             <div class="sigu-nav-end">
                 <!-- Hamburger Menu Mobile Toggle -->
-                <button class="sigu-hamburger d-md-none" id="navToggle">
+                <button class="sigu-hamburger d-lg-none" id="navToggle">
                     <span class="material-symbols-rounded">menu</span>
                 </button>
 
@@ -127,9 +140,13 @@
             </button>
         </div>
         <div class="sigu-drawer-body">
-            <a href="{{ route('pasajero.saldo') }}"
-                class="sigu-drawer-link {{ request()->routeIs('pasajero.saldo') ? 'active' : '' }}">
-                <span class="material-symbols-rounded">credit_card</span> Inicio / Mi tarjeta
+            <a href="{{ route('pasajero.dashboard') }}"
+                class="sigu-drawer-link {{ request()->routeIs('pasajero.dashboard') ? 'active' : '' }}">
+                <span class="material-symbols-rounded">home</span> Inicio
+            </a>
+            <a href="{{ route('pasajero.tarjeta.index') }}"
+                class="sigu-drawer-link {{ request()->routeIs('pasajero.saldo', 'pasajero.tarjeta.sin-tarjeta', 'pasajero.tarjeta.cambiar', 'pasajero.tarjeta.verificar-cambio') ? 'active' : '' }}">
+                <span class="material-symbols-rounded">credit_card</span> Mi tarjeta
             </a>
             <a href="{{ route('pasajero.rutas.index') }}"
                 class="sigu-drawer-link {{ request()->routeIs('pasajero.rutas.*') ? 'active' : '' }}">
@@ -139,10 +156,12 @@
                 class="sigu-drawer-link {{ request()->routeIs('pasajero.recargas.*') ? 'active' : '' }}">
                 <span class="material-symbols-rounded">store</span> Puntos de recarga
             </a>
+            @if($tieneTarjeta)
             <a href="{{ route('pasajero.historial.index') }}"
                 class="sigu-drawer-link {{ request()->routeIs('pasajero.historial.*') ? 'active' : '' }}">
                 <span class="material-symbols-rounded">history</span> Historial
             </a>
+            @endif
             <a href="{{ route('pasajero.mapa') }}"
                 class="sigu-drawer-link {{ request()->routeIs('pasajero.mapa') ? 'active' : '' }}">
                 <span class="material-symbols-rounded">map</span> Mapa de paradas
