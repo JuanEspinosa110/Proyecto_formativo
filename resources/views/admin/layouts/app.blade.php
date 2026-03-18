@@ -43,7 +43,7 @@
 
                 <a href="{{ route('admin.documentos.index') }}" class="sigu-sb-link {{ request()->is('admin/documentos*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">description</span></span>
-                    <span>Documentos</span>
+                    <span>Docs. Vehículos</span>
                 </a>
 
                 <a href="{{ url('admin/buses') }}" class="sigu-sb-link {{ request()->is('admin/buses*') ? 'active' : '' }}">
@@ -100,7 +100,7 @@
     </footer>
 
     <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1085;">
-        <div id="siguToast" class="toast align-items-center text-white border-0 shadow-lg rounded-4" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+        <div id="siguToast" class="toast align-items-center text-white border-0 shadow-lg rounded-4" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="8000">
             <div class="d-flex">
                 <div class="toast-body d-flex align-items-center gap-3 py-3 px-4">
                     <div id="toastIconWrap" class="rounded-circle d-flex align-items-center justify-content-center" style="width:32px; height:32px; background: rgba(255,255,255,0.2)">

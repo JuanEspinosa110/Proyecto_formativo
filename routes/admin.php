@@ -11,7 +11,7 @@ use App\Http\Controllers\JefeMantenimiento\MantenimientoController;
 use App\Http\Controllers\JefeMantenimiento\ReporteFallaController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::middleware(['auth:web'])->group(function () {
+    Route::middleware(['auth:web', 'role:1'])->group(function () {
         // Dashboard
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
@@ -22,6 +22,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('buses/{bus:placa}', [BusController::class, 'update'])->name('buses.update');
         Route::delete('buses/{bus:placa}', [BusController::class, 'destroy'])->name('buses.destroy');
         Route::get('buses/export', [BusController::class, 'export'])->name('buses.export');
+        Route::get('buses/{placa}/historial-documental', [BusController::class, 'historialDocumental'])->name('buses.historialDocumental');
+        Route::get('buses/{placa}/gastos', [BusController::class, 'getGastos'])->name('buses.gastos');
+        Route::get('buses/{placa}', [BusController::class, 'show'])->name('buses.show');
+        Route::get('buses/propietario/{doc_propietario}', [BusController::class, 'getPropietario'])->name('buses.propietario');
 
         // Módulo de Asignaciones
         Route::resource('asignaciones', AsignacionController::class)
@@ -31,6 +35,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
 
         Route::post('/usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
+        Route::put('/usuarios/{doc_usuario}', [UsuarioController::class, 'update'])->name('usuarios.update');
 
         // Módulo de Rutas (Admin)
         Route::get('/rutas', [RutaController::class, 'index'])->name('rutas.index');

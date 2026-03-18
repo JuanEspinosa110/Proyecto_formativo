@@ -35,6 +35,8 @@ class BusRequest extends FormRequest
         $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
         $bus = $this->route('bus');
         $currentPlaca = $bus instanceof \App\Models\Bus ? $bus->placa : $bus;
+        $user = auth()->user();
+        $nit = $user ? $user->getActiveNit() : null;
 
         return [
             'placa' => [
@@ -42,7 +44,9 @@ class BusRequest extends FormRequest
                 'string',
                 'size:6',
                 'regex:/^[A-Z]{3}[0-9]{3}$/',
-                \Illuminate\Validation\Rule::unique('bus', 'placa')->ignore($currentPlaca, 'placa')
+                \Illuminate\Validation\Rule::unique('bus', 'placa')
+                    ->where(fn ($query) => $query->where('NIT', $nit))
+                    ->ignore($currentPlaca, 'placa')
             ],
 
             'modelo' => [
@@ -50,7 +54,7 @@ class BusRequest extends FormRequest
                 'string',
                 'min:3',
                 'max:100',
-                'regex:/^[A-Za-z0-9\s\-]+$/'
+                'regex:/^[\pLÁÉÍÓÚáéíóúÑñ\s]+\s[0-9]{4}$/u'
             ],
 
             'capacidad_pasajeros' => [
@@ -76,35 +80,36 @@ class BusRequest extends FormRequest
             'linc_transito' => [
                 $isUpdate ? 'sometimes' : 'required',
                 'numeric',
-                'regex:/^[1-9][0-9]{8,19}$/' // Ajustado a 9 dígitos como en Usuarios
+                'digits:8'
             ],
 
             'numero_chasis' => [
                 $isUpdate ? 'sometimes' : 'required',
-                'string',
-                'size:17',
-                'regex:/^[A-HJ-NPR-Z0-9]+$/'
+                'numeric',
+                'digits:17',
+                \Illuminate\Validation\Rule::unique('bus', 'numero_chasis')->ignore($currentPlaca, 'placa')
             ],
 
             'numero_motor' => [
                 $isUpdate ? 'sometimes' : 'required',
-                'string',
-                'min:5',
-                'max:14',
-                'regex:/^[A-Z0-9]+$/'
+                'numeric',
+                'min_digits:8',
+                'max_digits:17',
+                \Illuminate\Validation\Rule::unique('bus', 'numero_motor')->ignore($currentPlaca, 'placa')
             ],
 
             'doc_propietario' => [
                 $isUpdate ? 'sometimes' : 'required',
                 'numeric',
-                'regex:/^[1-9][0-9]{8,14}$/' // Ajustado a 9 dígitos como en Usuarios
+                'min_digits:6',
+                'max_digits:10'
             ],
 
             'nombre_propietario' => [
                 $isUpdate ? 'sometimes' : 'required',
                 'string',
                 'min:2',
-                'regex:/^[\pL\s]+$/u'
+                'regex:/^[\pLÁÉÍÓÚáéíóúÑñ\s]+$/u'
             ],
 
             'telefono' => [
@@ -126,33 +131,38 @@ class BusRequest extends FormRequest
         return [
             'placa.required' => 'La placa es obligatoria.',
             'placa.size' => 'La placa debe tener 6 caracteres.',
-            'placa.regex' => 'Formato de placa inválido (3 letras y 3 números).',
-            'placa.unique' => 'Esta placa ya está registrada.',
+            'placa.regex' => 'La placa debe tener 3 letras y 3 números (Ej: ABC123).',
+            'placa.unique' => 'Este bus ya está registrado en su empresa.',
        
             'modelo.required' => 'El modelo es obligatorio.',
-            'modelo.min' => 'El modelo debe tener mínimo 3 caracteres.',
-
-            'capacidad_pasajeros.required' => 'La capacidad es obligatoria.',
-            'kilometraje.required' => 'El kilometraje es obligatorio.',
-            'id_estado.required' => 'El estado es obligatorio.',
+            'modelo.regex' => 'El modelo debe incluir Marca y Año (Ej: Toyota 2019).',
 
             'linc_transito.required' => 'La licencia de tránsito es obligatoria.',
-            'linc_transito.regex' => 'La licencia debe tener mínimo 9 dígitos y no iniciar con 0.',
+            'linc_transito.digits' => 'La licencia debe tener exactamente 8 caracteres numéricos.',
+            
             'numero_chasis.required' => 'El número de chasis es obligatorio.',
+            'numero_chasis.digits' => 'El chasis debe tener exactamente 17 caracteres numéricos.',
+            'numero_chasis.unique' => 'Este número de chasis ya está registrado en el sistema.',
+            
             'numero_motor.required' => 'El número de motor es obligatorio.',
+            'numero_motor.min_digits' => 'El motor debe tener entre 8 y 17 caracteres numéricos.',
+            'numero_motor.max_digits' => 'El motor debe tener entre 8 y 17 caracteres numéricos.',
+            'numero_motor.numeric' => 'El motor solo debe contener números.',
+            'numero_motor.unique' => 'Este número de motor ya está registrado en el sistema.',
+
             'doc_propietario.required' => 'El documento del propietario es obligatorio.',
-            'doc_propietario.regex' => 'El documento debe tener mínimo 9 dígitos y no iniciar con 0.',
+            'doc_propietario.numeric' => 'El documento solo debe contener números.',
+            'doc_propietario.min_digits' => 'El documento debe tener mínimo 6 dígitos.',
+            'doc_propietario.max_digits' => 'El documento no debe superar los 10 dígitos.',
 
             'nombre_propietario.required' => 'El nombre del propietario es obligatorio.',
-            'nombre_propietario.min' => 'El nombre debe tener mínimo 2 caracteres.',
-            'nombre_propietario.regex' => 'El nombre solo puede contener letras.',
+            'nombre_propietario.regex' => 'El nombre solo puede contener letras y espacios.',
 
             'telefono.required' => 'El teléfono es obligatorio.',
-            'telefono.digits' => 'El teléfono debe tener exactamente 10 dígitos.',
+            'telefono.digits' => 'El teléfono debe tener exactamente 10 dígitos numéricos.',
 
             'correo.required' => 'El correo electrónico es obligatorio.',
-            'correo.email' => 'Debe ingresar un correo electrónico válido.',
-            'correo.max' => 'El correo electrónico no puede superar los 150 caracteres.',
-        ];
+            'correo.email' => 'Ingrese un correo electrónico válido.',
+    ];
     }
 }

@@ -124,43 +124,44 @@
                         </a>
                     </li>
 
-                {{-- TIPOS DE USUARIO --}}
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.configuracion.tipo-usuario.index') }}">
-                        <i class="bi bi-people"></i> Tipos de Usuario
-                    </a>
-                </li>
+                    {{-- TIPOS DE USUARIO --}}
+                    <li>
+                        <a class="dropdown-item"
+                        href="{{ route('superadmin.configuracion.tipo-usuario.index') }}">
+                            <i class="bi bi-people"></i> Tipos de Usuario
+                        </a>
+                    </li>
 
-                {{-- ESTADOS --}}
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.configuracion.estados.index') }}">
-                        <i class="bi bi-toggle-on"></i> Estados
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.configuracion.tipo-mantenimiento.index') }}">
-                        <i class="bi bi-tools"></i> Tipo de Mantenimiento
-                    </a>
-                </li>
-                {{-- TIPO DE DOCUMENTOS --}}
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.configuracion.tipo-documento.index') }}">
-                        <i class="bi bi-file-earmark-text"></i> Tipos de Documento
-                    </a>
-                </li>
-                {{-- TIPO DE ASIGNACIÓN --}}
+                    {{-- ESTADOS --}}
+                    <li>
+                        <a class="dropdown-item"
+                        href="{{ route('superadmin.configuracion.estados.index') }}">
+                            <i class="bi bi-toggle-on"></i> Estados
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item"
+                        href="{{ route('superadmin.configuracion.tipo-mantenimiento.index') }}">
+                            <i class="bi bi-tools"></i> Tipo de Mantenimiento
+                        </a>
+                    </li>
 
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.configuracion.tipo-asignacion.index') }}">
-                        <i class="bi bi-journal-check"></i> Tipo de Asignación
-                    </a>
-                </li>
-            </ul>
+                    {{-- TIPOS DE DOCUMENTO --}}
+                    <li>
+                        <a class="dropdown-item"
+                        href="{{ route('superadmin.configuracion.tipo-documento.index') }}">
+                            <i class="bi bi-file-earmark-text"></i> Tipos de Documento
+                        </a>
+                    </li>
+
+                    {{-- TIPO DE ASIGNACIÓN --}}
+                    <li>
+                        <a class="dropdown-item"
+                        href="{{ route('superadmin.configuracion.tipo-asignacion.index') }}">
+                            <i class="bi bi-journal-check"></i> Tipo de Asignación
+                        </a>
+                    </li>
+                </ul>
         </div>
 
             {{-- FOOTER --}}

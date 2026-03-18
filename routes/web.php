@@ -6,7 +6,8 @@ use App\Http\Controllers\SuperAdmin\Reportes\ReporteFinancieroController;
 use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
-use  App\Http\Controllers\Admin\ReporteController;
+use App\Http\Controllers\Admin\ReporteController;
+use App\Http\Controllers\PropietarioController;
 
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
@@ -45,15 +46,10 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
-Route::get('/superadmin/dashboard', function () {
-    return view('admin.dashboard');
-});
 
 Route::view('/register', 'auth.register')->name('register');
 Route::post('/register', [RegistroController::class, 'store'])
     ->name('register.store');
-
-Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
 
 Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
 
@@ -90,8 +86,24 @@ Route::post(
 
 Route::middleware('auth:web')->group(function () {
 
+    Route::get('/pasajero/dashboard', fn() => view('pasajeros.index'))
+        ->name('pasajero.dashboard')->middleware('role:2');
     Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
-        ->name('empresa.dashboard');
+        ->name('empresa.dashboard')->middleware('role:3');
+
+});
+
+// ==========================================
+// RAMP: PANEL PROPIETARIO (Independiente)
+// ==========================================
+Route::middleware(['auth:web', 'role:6,9'])->prefix('propietario')->name('propietario.')->group(function () {
+    Route::get('/dashboard', [PropietarioController::class, 'dashboard'])->name('dashboard');
+    Route::post('/documento', [PropietarioController::class, 'subirDocumento'])->name('subirDocumento');
+    Route::post('/gasto', [PropietarioController::class, 'registrarGasto'])->name('registrarGasto');
+    Route::put('/documento/{id}', [PropietarioController::class, 'actualizarDocumento'])->name('actualizarDocumento');
+    Route::get('/bus/{placa}/detalles', [PropietarioController::class, 'verVehiculo'])->name('verVehiculo');
+    Route::get('/bus/{placa}/historial-documental', [PropietarioController::class, 'historialDocumental'])->name('historialDocumental');
+    Route::get('/asignacion/{id}/detalle', [PropietarioController::class, 'getDetalleAsignacion'])->name('detalleAsignacion');
 });
 
 
@@ -103,7 +115,6 @@ Route::middleware('auth:superadmin')->group(function () {
 });
 
 
-Route::get('/superadmin/dashboard/stats', [DashboardController::class, 'superAdminStats'])->name('superadmin.dashboard.stats');
 
 Route::prefix('superadmin')
     ->name('superadmin.')
@@ -200,12 +211,14 @@ Route::prefix('superadmin')
         Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
             ->name('tarjetas.update');
 
+        // Estadísticas de SuperAdmin
+        Route::get('/dashboard/stats', [DashboardController::class, 'superAdminStats'])
+            ->name('dashboard.stats');
+
+        // Ruta de inactivar usuarios (SuperAdmin)
+        Route::patch('usuarios/{doc}/inactivar', [UsuarioController::class, 'inactivar'])
+            ->name('superadmin.usuarios.inactivar');
+
 
     });
 
-    Route::patch(
-    'usuarios/{doc}/inactivar',
-    [UsuarioController::class, 'inactivar']
-)->name('admin.usuarios.inactivar');
-
-    Route::put('admin/usuarios/{doc_usuario}', [\App\Http\Controllers\Admin\UsuarioController::class, 'update'])->name('admin.usuarios.update');

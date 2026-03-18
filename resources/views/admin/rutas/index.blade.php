@@ -15,53 +15,74 @@
                 <span class="material-symbols-rounded" style="font-size: 1.2rem;">download</span>
                 Exportar Excel
             </a>
-            <button class="btn btn-primary d-flex align-items-center gap-2 px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCreateRuta">
-                <span class="material-symbols-rounded">add_location_alt</span>
-                Registrar Ruta
-            </button>
         </div>
     </div>
 
     <!-- Barra de Filtros Estilizada -->
     <div class="card border-0 shadow-sm mb-4 rounded-3 pt-1">
         <div class="card-body p-3">
-            <form method="GET" action="{{ route('admin.rutas.index') }}" class="row g-2 align-items-center">
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted">
-                            <span class="material-symbols-rounded">map</span>
-                        </span>
-                        <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Buscar origen/destino..." value="{{ request('search') }}">
-                    </div>
+            <form method="GET" action="{{ route('admin.rutas.index') }}" class="row g-4 align-items-end">
+                <!-- Primera Fila: Filtros Rápidos -->
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted text-uppercase mb-1">Código</label>
+                    <input type="text" name="codigo_ruta" class="form-control bg-light border-0" placeholder="Ej: 101" value="{{ request('codigo_ruta') }}">
                 </div>
                 <div class="col-md-3">
+                    <label class="form-label small fw-bold text-muted text-uppercase mb-1">Buscar Trayecto (Origen → Destino)</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0 text-muted">
-                            <span class="material-symbols-rounded">map</span>
+                        <span class="input-group-text bg-light border-0 text-muted">
+                            <span class="material-symbols-rounded fs-5">search</span>
                         </span>
-                        <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Buscar origen/destino..." value="{{ request('search') }}">
+                        <input type="text" name="trayecto" class="form-control bg-light border-0" placeholder="Ej: Jordán Centro" value="{{ request('trayecto') }}">
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <select name="id_estado" class="form-select bg-light">
-                        <option value="">Estados (Todos)</option>
-                        @foreach($estados as $est)
-                        <option value="{{ $est->id_estado }}" {{ request('id_estado') == $est->id_estado ? 'selected' : '' }}>
-                            {{ $est->nombre_estado }}
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted text-uppercase mb-1">Ciudad</label>
+                    <select name="id_ciudad" class="form-select bg-light border-0">
+                        <option value="">Todas...</option>
+                        @foreach($ciudades as $ciu)
+                        <option value="{{ $ciu->id_ciudad }}" {{ request('id_ciudad') == $ciu->id_ciudad ? 'selected' : '' }}>
+                            {{ $ciu->nombre_city }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                
+                <!-- Segunda Fila: Puntos Específicos -->
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold text-muted text-uppercase mb-1">Barrio Origen</label>
+                    <select name="id_barrio_origen" class="form-select bg-light border-0">
+                        <option value="">Origen...</option>
+                        @foreach($barrios as $bar)
+                        <option value="{{ $bar->id_barrio }}" {{ request('id_barrio_origen') == $bar->id_barrio ? 'selected' : '' }}>
+                            {{ $bar->nombre }}
                         </option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button type="submit" class="btn btn-dark w-100 fw-semibold">Consultar</button>
+                    <label class="form-label small fw-bold text-muted text-uppercase mb-1">Barrio Destino</label>
+                    <select name="id_barrio_destino" class="form-select bg-light border-0">
+                        <option value="">Destino...</option>
+                        @foreach($barrios as $bar)
+                        <option value="{{ $bar->id_barrio }}" {{ request('id_barrio_destino') == $bar->id_barrio ? 'selected' : '' }}>
+                            {{ $bar->nombre }}
+                        </option>
+                        @endforeach
+                    </select>
                 </div>
-                @if(request()->hasAny(['search', 'id_estado']))
-                <div class="col-md-1">
-                    <a href="{{ route('admin.rutas.index') }}" class="btn btn-light w-100 text-muted" title="Restablecer">
-                        <span class="material-symbols-rounded" style="font-size: 1.2rem;">filter_list_off</span>
-                    </a>
+
+                <!-- Botones -->
+                <div class="col-md-1 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary fw-bold shadow-sm px-3" title="Aplicar Filtros">
+                        <span class="material-symbols-rounded">filter_alt</span>
+                    </button>
+                    @if(request()->hasAny(['codigo_ruta', 'id_ciudad', 'id_barrio_origen', 'id_barrio_destino', 'trayecto']))
+                        <a href="{{ route('admin.rutas.index') }}" class="btn btn-outline-secondary border-0" title="Limpiar todo">
+                            <span class="material-symbols-rounded">close</span>
+                        </a>
+                    @endif
                 </div>
-                @endif
             </form>
         </div>
     </div>
@@ -76,8 +97,7 @@
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Ciudad</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Barrio Origen</th>
                         <th class="py-3 text-uppercase small fw-bold text-muted border-0">Barrio Destino</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Estado</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0 text-end pe-4">Acciones</th>
+                        <th class="py-3 text-uppercase small fw-bold text-muted border-0 pe-4">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -99,7 +119,7 @@
                                 <span class="fw-semibold text-dark">{{ optional($ruta->barrioDestino)->nombre ?? '—' }}</span>
                             </div>
                         </td>
-                        <td>
+                        <td class="pe-4">
                             @php
                             $bad = match($ruta->id_estado) {
                             1, 9 => 'success',
@@ -110,26 +130,6 @@
                             <span class="badge bg-{{ $bad }}-subtle text-{{ $bad }} border border-{{ $bad }} rounded-pill px-3 py-1 fw-bold fs-xs">
                                 {{ optional($ruta->estado)->nombre_estado ?? '—' }}
                             </span>
-                        </td>
-                        <td class="text-end pe-4">
-                            <div class="d-flex justify-content-end gap-3">
-                                <a href="#" 
-                                   class="text-info text-decoration-none d-flex align-items-center view-ruta"
-                                   title="Ver recorrido"
-                                   data-json="{{ json_encode($ruta) }}"
-                                   data-ciudad="{{ optional($ruta->ciudad)->nombre_city }}"
-                                   data-origen="{{ optional($ruta->barrioOrigen)->nombre }}"
-                                   data-destino="{{ optional($ruta->barrioDestino)->nombre }}"
-                                   data-estado="{{ optional($ruta->estado)->nombre_estado }}">
-                                    <span class="material-symbols-rounded fs-5">visibility</span>
-                                </a>
-                                <a href="#" 
-                                   class="text-primary text-decoration-none d-flex align-items-center edit-ruta"
-                                   title="Modificar ruta"
-                                   data-json="{{ json_encode($ruta) }}">
-                                    <span class="material-symbols-rounded fs-5">edit</span>
-                                </a>
-                            </div>
                         </td>
                     </tr>
                     @empty

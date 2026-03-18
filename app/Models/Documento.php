@@ -72,20 +72,53 @@ class Documento extends Model
     }
 
     // Métodos auxiliares
+    public function getEstadoExpiracionAttribute()
+    {
+        if ($this->id_estado == 2 || $this->id_estado == 22) {
+            return 'ARCHIVADO';
+        }
+
+        $hoy = now()->startOfDay();
+        $vencimiento = $this->fecha_vencimiento->startOfDay();
+
+        if ($vencimiento->lt($hoy)) {
+            return 'VENCIDO';
+        }
+
+        if ($hoy->diffInDays($vencimiento) <= 15) {
+            return 'PRÓXIMO A VENCER';
+        }
+
+        return 'VIGENTE';
+    }
+
+    public function getStatusColorAttribute()
+    {
+        return match($this->estado_expiracion) {
+            'VENCIDO' => 'danger',
+            'PRÓXIMO A VENCER' => 'warning',
+            'ARCHIVADO' => 'secondary',
+            default => 'success',
+        };
+    }
+
     public function isVigente()
     {
-        return $this->fecha_vencimiento >= now()->toDateString() && $this->id_estado == 1;
+        return $this->estado_expiracion === 'VIGENTE';
     }
 
     public function isVencido()
     {
-        return $this->fecha_vencimiento < now()->toDateString();
+        return $this->estado_expiracion === 'VENCIDO';
+    }
+
+    public function isProximoAVencer()
+    {
+        return $this->estado_expiracion === 'PRÓXIMO A VENCER';
     }
 
     public function diasParaVencimiento()
     {
-        return now()->toDateString() < $this->fecha_vencimiento
-            ? now()->diffInDays($this->fecha_vencimiento)
-            : 0;
+        return now()->diffInDays($this->fecha_vencimiento, false);
     }
 }

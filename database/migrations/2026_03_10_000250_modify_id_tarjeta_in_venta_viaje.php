@@ -12,8 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('venta_viaje', function (Blueprint $table) {
-            $table->string('id_tarjeta', 20)->change();
-        });
+        // Elimina la FK antes de modificar la columna
+        $table->dropForeign(['id_tarjeta']);
+    });
+
+    Schema::table('venta_viaje', function (Blueprint $table) {
+        // Ahora puedes modificar la columna
+        $table->bigInteger('id_tarjeta')->change();
+    });
+
+    // Si necesitas, vuelve a crear la FK después de modificar la columna
+    Schema::table('venta_viaje', function (Blueprint $table) {
+        $table->foreign('id_tarjeta')->references('id_tarjeta')->on('tarjeta');
+    });
     }
 
     /**
@@ -22,7 +33,17 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('venta_viaje', function (Blueprint $table) {
-            $table->bigInteger('id_tarjeta')->change();
-        });
+        $table->dropForeign(['id_tarjeta']);
+    });
+
+    Schema::table('venta_viaje', function (Blueprint $table) {
+        // Revertir el tipo de columna según lo que era antes
+        $table->integer('id_tarjeta')->change();
+    });
+
+    // Vuelve a crear la FK si era necesaria
+    Schema::table('venta_viaje', function (Blueprint $table) {
+        $table->foreign('id_tarjeta')->references('id_tarjeta')->on('tarjeta');
+    });
     }
 };

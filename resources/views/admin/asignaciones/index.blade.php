@@ -25,25 +25,40 @@
     <!-- Filtros de Búsqueda -->
     <div class="card border-0 shadow-sm mb-4 rounded-3">
         <div class="card-body p-3">
-            <form method="GET" action="{{ route('admin.asignaciones.index') }}" class="row g-2 align-items-center">
-                <div class="col-md-7">
-                    <div class="input-group">
-                        <span class="input-group-text bg-light border-end-0">
-                            <span class="material-symbols-rounded text-muted">search</span>
-                        </span>
-                        <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Buscar por placa o conductor..." value="{{ request('search') }}">
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-dark w-100 fw-semibold">Filtrar Asignaciones</button>
-                </div>
-                @if(request()->has('search') && request('search') != '')
+            <form method="GET" action="{{ route('admin.asignaciones.index') }}" class="row g-3 align-items-center">
                 <div class="col-md-2">
-                    <a href="{{ route('admin.asignaciones.index') }}" class="btn btn-light w-100 text-muted" title="Limpiar filtros">
-                        <span class="material-symbols-rounded" style="font-size: 1.2rem;">filter_alt_off</span>
-                    </a>
+                    <input type="text" name="id_viaje" class="form-control bg-light" placeholder="ID Asignación" value="{{ request('id_viaje') }}">
                 </div>
-                @endif
+                <div class="col-md-2">
+                    <select name="placa" class="form-select bg-light">
+                        <option value="">Placa...</option>
+                        @foreach($buses as $bus)
+                        <option value="{{ $bus->placa }}" {{ request('placa') == $bus->placa ? 'selected' : '' }}>{{ $bus->placa }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="id_ruta" class="form-select bg-light">
+                        <option value="">Ruta...</option>
+                        @foreach($rutas as $ruta)
+                        <option value="{{ $ruta->id_ruta }}" {{ request('id_ruta') == $ruta->id_ruta ? 'selected' : '' }}>{{ $ruta->nombre_ruta ?? 'Ruta '.$ruta->id_ruta }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" name="conductor" class="form-control bg-light" placeholder="Conductor..." value="{{ request('conductor') }}">
+                </div>
+                <div class="col-md-2">
+                    <input type="time" name="hora" class="form-control bg-light" value="{{ request('hora') }}" title="Filtrar por hora exacta">
+                </div>
+                <div class="col-md-2 ms-auto d-flex gap-2">
+                    <button type="submit" class="btn btn-dark fw-semibold px-3 w-100">Filtrar</button>
+                    @if(request()->hasAny(['id_viaje', 'placa', 'id_ruta', 'id_estado', 'conductor', 'hora']))
+                        <a href="{{ route('admin.asignaciones.index') }}" class="btn btn-light text-muted" title="Limpiar">
+                            <span class="material-symbols-rounded" style="font-size: 1.2rem;">filter_alt_off</span>
+                        </a>
+                    @endif
+                </div>
             </form>
         </div>
     </div>
@@ -219,15 +234,28 @@
                                 @endforeach
                             </select>
                             @error('doc_us') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            <small class="text-muted d-block mt-1" style="font-size: 0.65rem;">* Máximo una jornada laboral por día (8h).</small>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Fecha y Hora <span class="text-danger">*</span></label>
-                            <input type="datetime-local" name="fecha" class="form-control form-control-sm @error('fecha') is-invalid @enderror" value="{{ old('fecha') }}" required>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Hora Inicio <span class="text-danger">*</span></label>
+                            <input type="datetime-local" name="fecha" id="create_fecha" class="form-control form-control-sm @error('fecha') is-invalid @enderror" value="{{ old('fecha') }}" required>
                             @error('fecha') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="col-md-6">
+                            <input type="text" id="create_hora_fin" class="form-control form-control-sm bg-light" readonly placeholder="Calculado +8h">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1 d-block mb-2">Franjas Rápidas (Turnos 8h)</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button type="button" class="btn btn-xs btn-outline-primary py-1 px-3 small quick-time" data-time="04:30">04:30 - 12:30</button>
+                                <button type="button" class="btn btn-xs btn-outline-primary py-1 px-3 small quick-time" data-time="12:30">12:30 - 20:30</button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Estado <span class="text-danger">*</span></label>
                             <select name="id_estado" class="form-select form-select-sm @error('id_estado') is-invalid @enderror" required>
                                 @foreach($estados as $est)
@@ -265,23 +293,24 @@
                 <div class="modal-body p-4">
                     <div class="row g-3">
                         <div class="col-md-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Vehículo (Placa) <span class="text-danger">*</span></label>
-                            <select name="placa" id="edit_placa" class="form-select form-select-sm @error('placa') is-invalid @enderror" required>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Vehículo (Bloqueado) <span class="text-danger">*</span></label>
+                            <input type="hidden" name="placa" id="edit_placa_hidden">
+                            <select id="edit_placa" class="form-select form-select-sm bg-light" disabled>
                                 @foreach($buses as $bus)
-                                <option value="{{ $bus->placa }}" @if(old('placa') == $bus->placa) selected @endif>{{ $bus->placa }} - {{ $bus->modelo }}</option>
+                                <option value="{{ $bus->placa }}">{{ $bus->placa }} - {{ $bus->modelo }}</option>
                                 @endforeach
                             </select>
-                            @error('placa') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            <small class="text-muted fs-xs">El vehículo no puede modificarse en una asignación existente.</small>
                         </div>
 
                         <div class="col-md-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Ruta <span class="text-danger">*</span></label>
-                            <select name="id_ruta" id="edit_id_ruta" class="form-select form-select-sm @error('id_ruta') is-invalid @enderror" required>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Ruta (Bloqueada) <span class="text-danger">*</span></label>
+                            <input type="hidden" name="id_ruta" id="edit_id_ruta_hidden">
+                            <select id="edit_id_ruta" class="form-select form-select-sm bg-light" disabled>
                                 @foreach($rutas as $ruta)
-                                <option value="{{ $ruta->id_ruta }}" @if(old('id_ruta') == $ruta->id_ruta) selected @endif>{{ $ruta->nombre_ruta ?? 'Ruta #'.$ruta->id_ruta }}</option>
+                                <option value="{{ $ruta->id_ruta }}">{{ $ruta->nombre_ruta ?? 'Ruta #'.$ruta->id_ruta }}</option>
                                 @endforeach
                             </select>
-                            @error('id_ruta') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="col-md-12">
@@ -292,15 +321,21 @@
                                 @endforeach
                             </select>
                             @error('doc_us') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            <small class="text-muted d-block mt-1" style="font-size: 0.65rem;">* El conductor solo puede tener un turno por día.</small>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Fecha y Hora <span class="text-danger">*</span></label>
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Hora Inicio <span class="text-danger">*</span></label>
                             <input type="datetime-local" name="fecha" id="edit_fecha" class="form-control form-control-sm @error('fecha') is-invalid @enderror" value="{{ old('fecha') }}" required>
                             @error('fecha') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Hora Fin (Estimada)</label>
+                            <input type="text" id="edit_hora_fin" class="form-control form-control-sm bg-light" readonly placeholder="Calculado +8h">
+                        </div>
+
+                        <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Estado <span class="text-danger">*</span></label>
                             <select name="id_estado" id="edit_id_estado" class="form-select form-select-sm @error('id_estado') is-invalid @enderror" required>
                                 @foreach($estados as $est)
@@ -421,7 +456,9 @@
             try {
                 const data = JSON.parse(btnEdit.dataset.json);
                 document.getElementById('edit_placa').value = data.placa;
+                document.getElementById('edit_placa_hidden').value = data.placa;
                 document.getElementById('edit_id_ruta').value = data.id_ruta;
+                document.getElementById('edit_id_ruta_hidden').value = data.id_ruta;
                 document.getElementById('edit_doc_us').value = data.doc_us;
                 document.getElementById('edit_id_estado').value = data.id_estado;
                 
@@ -430,9 +467,10 @@
                     const offset = date.getTimezoneOffset() * 60000;
                     const localISOTime = (new Date(date - offset)).toISOString().slice(0, 16);
                     document.getElementById('edit_fecha').value = localISOTime;
+                    updateHoraFin('edit_fecha', 'edit_hora_fin');
                 }
 
-                const action = `asignaciones/${data.id_viaje}`; // RELATIVA
+                const action = "{{ route('admin.asignaciones.index') }}/" + data.id_viaje;
                 document.getElementById('formEditAsignacion').action = action;
                 document.getElementById('edit_action_hidden').value = action;
                 
@@ -442,14 +480,51 @@
         }
     });
 
+    // Función para calcular hora fin (+8h)
+    function updateHoraFin(inputId, outputId) {
+        const startInput = document.getElementById(inputId);
+        const output = document.getElementById(outputId);
+        if (!startInput || !startInput.value) {
+            output.value = '';
+            return;
+        }
+
+        const startDate = new Date(startInput.value);
+        if (isNaN(startDate.getTime())) return;
+
+        const endDate = new Date(startDate.getTime() + (8 * 60 * 60 * 1000));
+        const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+        output.value = endDate.toLocaleTimeString([], options);
+    }
+
+    // Listeners para cambio de fecha
+    document.getElementById('create_fecha').addEventListener('change', () => updateHoraFin('create_fecha', 'create_hora_fin'));
+    document.getElementById('edit_fecha').addEventListener('change', () => updateHoraFin('edit_fecha', 'edit_hora_fin'));
+
+    // Botones de franjas rápidas
+    document.querySelectorAll('.quick-time').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const time = this.dataset.time;
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            
+            document.getElementById('create_fecha').value = `${year}-${month}-${day}T${time}`;
+            updateHoraFin('create_fecha', 'create_hora_fin');
+        });
+    });
+
     @if($errors->any())
     document.addEventListener('DOMContentLoaded', function() {
         @if(old('form_type') == 'edit')
             var modal = new bootstrap.Modal(document.getElementById('modalEditAsignacion'));
             modal.show();
+            updateHoraFin('edit_fecha', 'edit_hora_fin');
         @else
             var modal = new bootstrap.Modal(document.getElementById('modalCreateAsignacion'));
             modal.show();
+            updateHoraFin('create_fecha', 'create_hora_fin');
         @endif
     });
     @endif

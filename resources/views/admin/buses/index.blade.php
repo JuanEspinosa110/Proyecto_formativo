@@ -26,7 +26,7 @@
     <div class="card border-0 shadow-sm mb-4 rounded-3">
         <div class="card-body p-3">
             <form method="GET" action="{{ route('admin.buses.index') }}" class="row g-2 align-items-center">
-                <div class="col-md-5">
+                <div class="col-md-7">
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0">
                             <span class="material-symbols-rounded text-muted">search</span>
@@ -44,8 +44,8 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-dark w-100 fw-semibold">Filtrar Resultados</button>
+                <div class="col-md-2 text-end">
+                    <button type="submit" class="btn btn-dark w-100 fw-semibold">Consultar</button>
                 </div>
                 @if(request()->hasAny(['search', 'id_estado']))
                 <div class="col-md-1">
@@ -143,7 +143,7 @@
                                    title="Ver expediente"
                                    data-bs-toggle="modal"
                                    data-bs-target="#modalViewBus"
-                                   data-json="{{ json_encode($bus) }}"
+                                   data-json='@json($bus)'
                                    data-estado="{{ optional($bus->estado)->nombre_estado }}">
                                     <span class="material-symbols-rounded fs-5">visibility</span>
                                 </a>
@@ -152,7 +152,7 @@
                                    title="Editar vehículo"
                                    data-bs-toggle="modal"
                                    data-bs-target="#modalEditBus"
-                                   data-json="{{ json_encode($bus) }}">
+                                   data-json='@json($bus)'>
                                     <span class="material-symbols-rounded fs-5">edit</span>
                                 </a>
                             </div>
@@ -205,57 +205,64 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Placa <span class="text-danger">*</span></label>
                             <input type="text" name="placa" class="form-control form-control-sm fw-bold" placeholder="ABC123" required style="text-transform:uppercase" maxlength="6">
+                            <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Modelo / Ref. <span class="text-danger">*</span></label>
-                            <input type="text" name="modelo" class="form-control form-control-sm" placeholder="Ej: Bus 2024" required>
+                            <input type="text" name="modelo" class="form-control form-control-sm" placeholder="Ej: Toyota 2019" required>
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Pasajeros <span class="text-danger">*</span></label>
-                            <input type="text" name="capacidad_pasajeros" class="form-control form-control-sm" required min="10" placeholder="00">
+                            <input type="text" name="capacidad_pasajeros" class="form-control form-control-sm" required placeholder="00">
+                            <div class="real-time-error"></div>
                         </div>
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Kilometraje <span class="text-danger">*</span></label>
                             <input type="text" name="kilometraje" class="form-control form-control-sm" required placeholder="0">
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Licencia Tránsito <span class="text-danger">*</span></label>
-                            <input type="text" name="linc_transito" class="form-control form-control-sm" required minlength="9" pattern="[1-9][0-9]{8,19}" placeholder="No. Licencia"
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch){this.setCustomValidity('La licencia debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
-                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
+                            <input type="text" name="linc_transito" class="form-control form-control-sm" required maxlength="12" placeholder="8 dígitos">
+                            <div class="real-time-error"></div>
                         </div>
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Doc. Propietario <span class="text-danger">*</span></label>
-                            <input type="text" name="doc_propietario" class="form-control form-control-sm" required minlength="9" pattern="[1-9][0-9]{8,14}" placeholder="Cédula/NIT"
-                                oninvalid="if(this.validity.valueMissing){this.setCustomValidity('Este campo es obligatorio')}else if(this.validity.patternMismatch){this.setCustomValidity('El documento debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
-                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
+                            <input type="text" name="doc_propietario" class="form-control form-control-sm" required maxlength="15" placeholder="Máx. 10 dígitos">
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-12 text-input-validate" data-type="text">
+                        <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre Propietario <span class="text-danger">*</span></label>
-                            <input type="text" name="nombre_propietario" class="form-control form-control-sm" placeholder="Nombre Completo" required minlength="2" pattern="[a-zA-ZÁÉÍÓÚáéíóúÑñ\s]{2,}">
+                            <input type="text" name="nombre_propietario" class="form-control form-control-sm" placeholder="Nombre completo" required>
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Teléfono <span class="text-danger">*</span></label>
-                            <input type="text" name="telefono" class="form-control form-control-sm" required minlength="10" maxlength="10">
+                            <input type="text" name="telefono" class="form-control form-control-sm" required maxlength="10" placeholder="312...">
+                            <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Correo <span class="text-danger">*</span></label>
-                            <input type="email" name="correo" class="form-control form-control-sm" placeholder="prop@sigu.com" required>
+                            <input type="email" name="correo" class="form-control form-control-sm" placeholder="ejemplo@correo.com" required>
+                            <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Chasis</label>
-                            <input type="text" name="numero_chasis" class="form-control form-control-sm" maxlength="17">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Chasis <span class="text-danger">*</span></label>
+                            <input type="text" name="numero_chasis" class="form-control form-control-sm" required maxlength="17" placeholder="17 dígitos">
+                            <small class="text-muted fs-xs">Debe contener exactamente 17 dígitos numéricos.</small>
+                            <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Motor</label>
-                            <input type="text" name="numero_motor" class="form-control form-control-sm" maxlength="14">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Motor <span class="text-danger">*</span></label>
+                            <input type="text" name="numero_motor" class="form-control form-control-sm" required maxlength="17" placeholder="8-17 dígitos">
+                            <small class="text-muted fs-xs">Debe contener entre 8 y 17 dígitos numéricos según el fabricante.</small>
+                            <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-12">
@@ -319,53 +326,59 @@
 
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Modelo / Referencia <span class="text-danger">*</span></label>
-                            <input type="text" name="modelo" id="edit_modelo" class="form-control form-control-sm" required>
+                            <input type="text" name="modelo" id="edit_modelo" class="form-control form-control-sm" required placeholder="Ej: Toyota 2019">
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Capacidad</label>
                             <input type="text" name="capacidad_pasajeros" id="edit_capacidad" class="form-control form-control-sm" required>
+                            <div class="real-time-error"></div>
                         </div>
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Kilometraje</label>
                             <input type="text" name="kilometraje" id="edit_kilometraje" class="form-control form-control-sm" required>
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Licencia Tránsito</label>
-                            <input type="text" name="linc_transito" id="edit_linc_transito" class="form-control form-control-sm" minlength="9" pattern="[1-9][0-9]{8,19}"
-                                oninvalid="if(this.validity.patternMismatch){this.setCustomValidity('La licencia debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
-                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
+                            <input type="text" name="linc_transito" id="edit_linc_transito" class="form-control form-control-sm" required maxlength="12" placeholder="8 dígitos">
+                            <div class="real-time-error"></div>
                         </div>
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Doc. Propietario</label>
-                            <input type="text" name="doc_propietario" id="edit_doc_propietario" class="form-control form-control-sm" minlength="9" pattern="[1-9][0-9]{8,14}"
-                                oninvalid="if(this.validity.patternMismatch){this.setCustomValidity('El documento debe tener mínimo 9 dígitos y no iniciar con 0')}else{this.setCustomValidity('')}"
-                                oninput="this.setCustomValidity('')">
-                            <small class="text-muted fs-xs">Mín. 9 dígitos, no inicie con 0.</small>
+                            <input type="text" name="doc_propietario" id="edit_doc_propietario" class="form-control form-control-sm" required maxlength="15" placeholder="Máx. 10 dígitos">
+                            <div class="real-time-error"></div>
                         </div>
-                        <div class="col-md-12 text-input-validate" data-type="text">
+                        <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre Propietario</label>
                             <input type="text" name="nombre_propietario" id="edit_nombre_propietario" class="form-control form-control-sm" required>
+                            <div class="real-time-error"></div>
                         </div>
 
-                        <div class="col-md-6 text-input-validate" data-type="number">
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Teléfono</label>
-                            <input type="text" name="telefono" id="edit_telefono" class="form-control form-control-sm">
+                            <input type="text" name="telefono" id="edit_telefono" class="form-control form-control-sm" required maxlength="10">
+                            <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Correo</label>
-                            <input type="email" name="correo" id="edit_correo" class="form-control form-control-sm">
+                            <input type="email" name="correo" id="edit_correo" class="form-control form-control-sm" required>
+                            <div class="real-time-error"></div>
                         </div>
 
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Chasis</label>
-                            <input type="text" name="numero_chasis" id="edit_numero_chasis" class="form-control form-control-sm" maxlength="17">
+                            <input type="text" name="numero_chasis" id="edit_numero_chasis" class="form-control form-control-sm" required maxlength="17" placeholder="17 dígitos">
+                            <small class="text-muted fs-xs">Debe contener exactamente 17 dígitos numéricos.</small>
+                            <div class="real-time-error"></div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Motor</label>
-                            <input type="text" name="numero_motor" id="edit_numero_motor" class="form-control form-control-sm" maxlength="14">
+                            <input type="text" name="numero_motor" id="edit_numero_motor" class="form-control form-control-sm" required maxlength="17" placeholder="8-17 dígitos">
+                            <small class="text-muted fs-xs">Debe contener entre 8 y 17 dígitos numéricos según el fabricante.</small>
+                            <div class="real-time-error"></div>
                         </div>
                     </div>
                 </div>
@@ -380,51 +393,156 @@
 
 <!-- Modal VER BUS -->
 <div class="modal fade" id="modalViewBus" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-light py-3">
-                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
-                    <span class="material-symbols-rounded text-info me-2 fs-5">directions_bus</span>
-                    DETALLES DEL VEHÍCULO
-                </h6>
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 p-4 bg-light">
+                <h5 class="modal-title fw-black text-dark d-flex align-items-center gap-3">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle">
+                        <span class="material-symbols-rounded text-primary">analytics</span>
+                    </div>
+                    Expediente del Vehículo: <span id="view_bus_placa" class="text-primary">---</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
-            <div class="modal-body p-4">
-                <div class="mb-4 d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center gap-3">
-                        <div>
-                            <h4 id="view_bus_placa" class="fw-bold mb-0 text-dark"></h4>
-                            <p class="text-muted small mb-0" id="view_bus_modelo"></p>
+            <div class="modal-body p-4 bg-light">
+                <!-- 1. Información General y Conductor -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-body p-4">
+                                <h6 class="fw-bold text-muted text-uppercase mb-4 d-flex align-items-center gap-2">
+                                    <span class="material-symbols-rounded fs-5 text-primary">info</span>
+                                    Información Técnica
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-md-3 col-6">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <label class="d-block text-muted fw-bold text-uppercase x-small mb-1">Capacidad</label>
+                                            <span class="text-dark fw-bold"><span id="view_bus_capacidad"></span> pasj.</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <label class="d-block text-muted fw-bold text-uppercase x-small mb-1">Kilometraje</label>
+                                            <span class="text-dark fw-bold"><span id="view_bus_kilometraje"></span> km</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <label class="d-block text-muted fw-bold text-uppercase x-small mb-1">Licencia</label>
+                                            <span id="view_bus_licencia" class="text-dark fw-bold small"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="p-3 bg-light rounded-3 border h-100">
+                                            <label class="d-block text-muted fw-bold text-uppercase x-small mb-1">Estado</label>
+                                            <span id="view_bus_estado" class="badge rounded-pill x-small px-3"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 border-top pt-3">
+                                        <label class="d-block text-muted fw-bold text-uppercase x-small ls-1">Propietario</label>
+                                        <span id="view_bus_nombre_prop" class="text-dark fw-bold d-block"></span>
+                                        <div class="d-flex gap-3 x-small text-muted mt-1">
+                                            <span>NIT/CC: <span id="view_bus_doc_prop" class="fw-medium"></span></span>
+                                            <span>TEL: <span id="view_bus_tel_prop" class="fw-medium"></span></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 border-top pt-3">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label class="d-block text-muted fw-bold text-uppercase x-small ls-1">Chasis</label>
+                                                <span id="view_bus_chasis" class="text-dark family-monospace small fw-bold"></span>
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="d-block text-muted fw-bold text-uppercase x-small ls-1">Motor</label>
+                                                <span id="view_bus_motor" class="text-dark family-monospace small fw-bold"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <span id="view_bus_estado" class="badge rounded-pill"></span>
+                    
+                    <div class="col-lg-4">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-body p-4">
+                                <h6 class="fw-bold text-muted text-uppercase mb-4 d-flex align-items-center gap-2">
+                                    <span class="material-symbols-rounded fs-5 text-primary">person</span>
+                                    Servicio Actual
+                                </h6>
+                                <div id="view_bus_no_asignacion" class="alert alert-light text-center small py-4 mb-0">
+                                    <span class="material-symbols-rounded fs-1 opacity-25 d-block mb-2">person_off</span>
+                                    Sin servicio asignado.
+                                </div>
+                                <div id="view_bus_con_asignacion" class="d-none">
+                                    <div class="d-flex align-items-center gap-3 mb-3">
+                                        <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+                                            <span class="material-symbols-rounded fs-2">person</span>
+                                        </div>
+                                        <div>
+                                            <h5 class="fw-black mb-0" id="view_cond_nombre">---</h5>
+                                            <span class="badge bg-primary-subtle text-primary x-small" id="view_ruta_nombre">---</span>
+                                        </div>
+                                    </div>
+                                    <div class="p-3 bg-light rounded-4 border small d-flex flex-column gap-2">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">Documento:</span>
+                                            <span id="view_cond_doc" class="fw-bold">---</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">Licencia:</span>
+                                            <span id="view_cond_lic" class="fw-bold">---</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="row g-3">
-                    <div class="col-12">
-                        <div class="p-3 bg-light rounded-3 border border-light-subtle">
-                            <div class="row g-3 small">
-                                <div class="col-6">
-                                    <label class="d-block text-muted fw-bold text-uppercase ls-1">Capacidad</label>
-                                    <span class="text-dark fw-medium"><span id="view_bus_capacidad"></span> pasajeros</span>
-                                </div>
-                                <div class="col-6">
-                                    <label class="d-block text-muted fw-bold text-uppercase ls-1">Kilometraje</label>
-                                    <span id="view_bus_kilometraje" class="text-dark fw-medium"></span> <small class="text-muted">KM</small>
-                                </div>
-                                <div class="col-12 border-top pt-2">
-                                    <label class="d-block text-muted fw-bold text-uppercase ls-1">Propietario</label>
-                                    <span id="view_bus_nombre_prop" class="text-dark fw-medium d-block"></span>
-                                    <small class="text-muted">Doc: <span id="view_bus_doc_prop"></span></small>
-                                </div>
-                                <div class="col-6 border-top pt-2">
-                                    <label class="d-block text-muted fw-bold text-uppercase ls-1">Teléfono</label>
-                                    <span id="view_bus_tel_prop" class="text-dark fw-medium"></span>
-                                </div>
-                                <div class="col-6 border-top pt-2">
-                                    <label class="d-block text-muted fw-bold text-uppercase ls-1">Licencia</label>
-                                    <span id="view_bus_licencia" class="text-dark fw-medium"></span>
+                <!-- 2. Documentos y Gastos -->
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                            <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center">
+                                <h6 class="fw-bold text-dark text-uppercase mb-0 d-flex align-items-center gap-2">
+                                    <span class="material-symbols-rounded text-primary">folder_shared</span>
+                                    Documentación Legal
+                                </h6>
+                                <button type="button" class="btn btn-sm btn-outline-dark d-flex align-items-center gap-1 fw-bold rounded-pill px-3" id="btn_abrir_boveda_admin" data-placa="">
+                                    <span class="material-symbols-rounded fs-6">history_edu</span>
+                                    Bóveda Histórica
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="ps-4 border-0 small fw-bold text-muted">DOCUMENTO</th>
+                                            <th class="border-0 small fw-bold text-muted">VENCIMIENTO</th>
+                                            <th class="border-0 small fw-bold text-muted text-center">ESTADO</th>
+                                            <th class="border-0 small fw-bold text-muted text-center pe-4">VER</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="view_bus_docs_body">
+                                        <!-- Documentos via AJAX -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-body p-4">
+                                <h6 class="fw-bold text-danger text-uppercase mb-4 d-flex align-items-center gap-2">
+                                    <span class="material-symbols-rounded fs-5">receipt_long</span>
+                                    Gastos Propietario
+                                </h6>
+                                <div id="view_bus_gastos_container" class="bg-light rounded-4 p-2 border overflow-auto" style="max-height: 250px;">
+                                    <!-- Gastos via AJAX -->
                                 </div>
                             </div>
                         </div>
@@ -432,8 +550,54 @@
                 </div>
             </div>
             
-            <div class="modal-footer border-0 p-3 bg-light">
-                <button type="button" class="btn btn-sm btn-dark w-100 fw-bold" data-bs-dismiss="modal">CERRAR EXPEDIENTE</button>
+            <div class="modal-footer border-0 p-4 bg-light">
+                <button type="button" class="btn btn-dark w-100 fw-bold px-5 rounded-pill" data-bs-dismiss="modal">CERRAR EXPEDIENTE</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Bóveda Histórica Admin -->
+<div class="modal fade" id="modalBovedaHistorialAdmin" tabindex="-1" aria-hidden="true" style="z-index: 1055;">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom p-4" style="background: #f8fafc;">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-3 text-dark">
+                    <span class="material-symbols-rounded text-primary">history_edu</span>
+                    Expediente Histórico del Vehículo: <span id="boveda_admin_placa" class="text-primary">---</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 bg-light">
+                <div id="boveda_admin_content" class="d-flex flex-column gap-4">
+                    <!-- Contenido dinámico -->
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 bg-light">
+                <button type="button" class="btn btn-dark fw-bold px-5 rounded-pill" data-bs-dismiss="modal">Cerrar Bóveda</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Visor de Documentos -->
+<div class="modal fade" id="modalVisorDocumento" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pt-4 px-4 bg-dark text-white">
+                <h5 class="modal-title fw-bold" id="visor_titulo">Visualización de Documento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 bg-secondary bg-opacity-10" style="height: 70vh;">
+                <iframe id="visor_iframe" class="w-100 h-100 d-none border-0" src=""></iframe>
+                <div id="visor_image_container" class="w-100 h-100 d-none d-flex align-items-center justify-content-center p-3">
+                    <img id="visor_img" src="" class="img-fluid rounded-3 shadow-sm" style="max-height: 100%;">
+                </div>
+                <div id="visor_error" class="w-100 h-100 d-none d-flex flex-column align-items-center justify-content-center text-muted">
+                    <span class="material-symbols-rounded display-1 mb-3">error</span>
+                    <p class="fw-bold">No se puede previsualizar este archivo.</p>
+                    <a id="visor_download" href="#" class="btn btn-primary rounded-pill px-4" download>Descargar Archivo</a>
+                </div>
             </div>
         </div>
     </div>
@@ -463,10 +627,17 @@
             }
         });
 
-        function handleVerBus(btn) {
+        async function handleVerBus(btn) {
             try {
-                const data = JSON.parse(btn.dataset.json);
-                const estado = btn.dataset.estado;
+                const placa = JSON.parse(btn.dataset.json).placa;
+                
+                // Cargar datos completos vía AJAX (incluye asignación)
+                const respBus = await fetch(`/admin/buses/${placa}`);
+                const fullData = await respBus.json();
+                
+                const data = fullData.bus;
+                const asignacion = fullData.asignacion;
+                const estado = data.estado ? data.estado.nombre_estado : 'N/D';
 
                 document.getElementById('view_bus_placa').textContent = data.placa;
                 document.getElementById('view_bus_modelo').textContent = data.modelo || 'N/A';
@@ -479,9 +650,80 @@
                 document.getElementById('view_bus_doc_prop').textContent = data.doc_propietario || '—';
                 document.getElementById('view_bus_tel_prop').textContent = data.telefono || '—';
 
+                // Asignación
+                const noAsign = document.getElementById('view_bus_no_asignacion');
+                const conAsign = document.getElementById('view_bus_con_asignacion');
+                
+                if (asignacion) {
+                    noAsign.classList.add('d-none');
+                    conAsign.classList.remove('d-none');
+                    document.getElementById('view_cond_nombre').textContent = asignacion.conductor;
+                    document.getElementById('view_cond_doc').textContent = asignacion.doc_conductor;
+                    document.getElementById('view_cond_lic').textContent = asignacion.licencia;
+                    document.getElementById('view_ruta_nombre').textContent = asignacion.ruta;
+                } else {
+                    noAsign.classList.remove('d-none');
+                    conAsign.classList.add('d-none');
+                }
+
+                document.getElementById('btn_abrir_boveda_admin').setAttribute('data-placa', data.placa);
+
+                // Documentos
+                const dBody = document.getElementById('view_bus_docs_body');
+                dBody.innerHTML = '';
+                
+                if (fullData.documentos && fullData.documentos.length > 0) {
+                    fullData.documentos.forEach(doc => {
+                        const tr = document.createElement('tr');
+                        const fechaVenc = new Date(doc.fecha_vencimiento).toLocaleDateString();
+                        
+                        tr.innerHTML = `
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="material-symbols-rounded text-${doc.status_color} small">description</span>
+                                    <span class="small fw-bold text-dark">${doc.tipo_documento.nombre}</span>
+                                </div>
+                            </td>
+                            <td class="small text-muted">${fechaVenc}</td>
+                            <td class="text-center">
+                                <span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} border border-${doc.status_color} x-small rounded-pill px-2">
+                                    ${doc.status_vigencia}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <button class="btn btn-sm btn-light border p-1 rounded-circle btn-visor-admin" data-url="${doc.url_archivo}" data-nombre="${doc.tipo_documento.nombre}">
+                                        <span class="material-symbols-rounded fs-6">visibility</span>
+                                    </button>
+                                    <a href="${doc.url_archivo}" class="btn btn-sm btn-light border p-1 rounded-circle text-primary" download>
+                                        <span class="material-symbols-rounded fs-6">download</span>
+                                    </a>
+                                </div>
+                            </td>
+                        `;
+                        dBody.appendChild(tr);
+                    });
+
+                    // Eventos Visor para Admin
+                    document.querySelectorAll('.btn-visor-admin').forEach(bv => {
+                        bv.addEventListener('click', function() {
+                           const url = this.getAttribute('data-url');
+                           const nombre = this.getAttribute('data-nombre');
+                           if (typeof mostrarVisor === 'function') {
+                               mostrarVisor(url, nombre);
+                           } else {
+                               window.open(url, '_blank');
+                           }
+                        });
+                    });
+
+                } else {
+                    dBody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted small">Sin documentos registrados.</td></tr>';
+                }
+
                 const viewEst = document.getElementById('view_bus_estado');
                 viewEst.textContent = estado;
-                viewEst.className = 'badge rounded-pill px-4 py-2 fs-6 fw-bold';
+                viewEst.className = 'badge rounded-pill px-3 py-1 x-small fw-bold';
                 
                 const stateId = parseInt(data.id_estado);
                 if (stateId === 1) {
@@ -494,18 +736,162 @@
                     viewEst.classList.add('bg-warning-subtle', 'text-warning', 'border', 'border-warning-subtle');
                 }
 
-                const modalEl = document.getElementById('modalViewBus');
-                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                // Gastos
+                const gContainer = document.getElementById('view_bus_gastos_container');
+                gContainer.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
+                
+                try {
+                    const respG = await fetch(`/admin/buses/${data.placa}/gastos`);
+                    const gastos = await respG.json();
+                    
+                    if (gastos.length === 0) {
+                        gContainer.innerHTML = '<div class="text-center py-3 text-muted x-small">No hay gastos registrados.</div>';
+                    } else {
+                        let html = '<table class="table table-sm table-borderless mb-0"><tbody>';
+                        gastos.forEach(g => {
+                            html += `
+                                <tr class="border-bottom x-small">
+                                    <td class="text-muted">${new Date(g.fecha).toLocaleDateString()}</td>
+                                    <td class="fw-bold">${g.tipo_gasto}</td>
+                                    <td class="text-end text-danger fw-bold">-$${Number(g.valor).toLocaleString()}</td>
+                                </tr>
+                            `;
+                        });
+                        html += '</tbody></table>';
+                        gContainer.innerHTML = html;
+                    }
+                } catch (e) {
+                    gContainer.innerHTML = '<div class="text-center py-3 text-danger x-small">Error.</div>';
+                }
+
             } catch (err) { console.error('Ver Bus Error:', err); }
         }
+
+        // Bóveda Histórica Admin
+        const btnBovedaAdmin = document.getElementById('btn_abrir_boveda_admin');
+        const modalBovedaAdmin = new bootstrap.Modal(document.getElementById('modalBovedaHistorialAdmin'));
+        
+        btnBovedaAdmin.addEventListener('click', async function() {
+            const placa = this.getAttribute('data-placa');
+            if(!placa) return;
+            
+            try {
+                const response = await fetch(`/admin/buses/${placa}/historial-documental`);
+                if(!response.ok) throw new Error('Error de red');
+                const data = await response.json();
+                
+                document.getElementById('boveda_admin_placa').innerText = data.placa;
+                const content = document.getElementById('boveda_admin_content');
+                content.innerHTML = '';
+
+                const isObjectEmpty = (obj) => {
+                    return Object.keys(obj).length === 0;
+                };
+
+                if (isObjectEmpty(data.grupos)) {
+                    content.innerHTML = '<div class="alert alert-light text-center border-0 shadow-sm rounded-4 p-5"><span class="material-symbols-rounded display-1 opacity-25 d-block mb-3">folder_off</span><h5 class="fw-bold">Sin Historial</h5><p class="mb-0 text-muted">No hay documentos registrados para este vehículo.</p></div>';
+                } else {
+                    for (const [tipo, docs] of Object.entries(data.grupos)) {
+                        let rows = '';
+                        docs.forEach(doc => {
+                            const isArchivado = doc.es_archivado;
+                            const trClass = isArchivado ? 'opacity-75 bg-light' : '';
+                            rows += `
+                            <tr class="${trClass}">
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark small text-truncate" style="max-width: 250px;" title="${doc.nombre}">${doc.nombre}</div>
+                                    ${isArchivado ? '<span class="badge bg-secondary-subtle text-secondary x-small border border-secondary mt-1">Archivado</span>' : '<span class="badge bg-success-subtle text-success x-small border border-success mt-1">Documento Activo</span>'}
+                                </td>
+                                <td class="text-muted small">${doc.fecha_carga}</td>
+                                <td class="fw-bold text-dark small">${doc.fecha_vencimiento}</td>
+                                <td><span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} px-3 py-1 x-small border border-${doc.status_color} rounded-pill fw-bold">${doc.status_vigencia}</span></td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        ${doc.url_archivo ? `
+                                        <button class="btn btn-sm btn-light border p-2 rounded-circle text-dark" onclick="mostrarVisor('${doc.url_archivo}', '${tipo}')" title="Vista Previa"><span class="material-symbols-rounded fs-6">visibility</span></button>
+                                        <a href="${doc.url_archivo}" download class="btn btn-sm btn-light border text-primary p-2 rounded-circle" title="Descargar PDF"><span class="material-symbols-rounded fs-6">download</span></a>
+                                        ` : '<span class="text-muted small">N/A</span>'}
+                                    </div>
+                                </td>
+                            </tr>`;
+                        });
+
+                        content.innerHTML += `
+                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-3">
+                            <div class="card-header bg-white border-0 p-4">
+                                <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 text-uppercase letter-spacing-1 small">
+                                    <span class="material-symbols-rounded text-primary fs-5">folder_open</span>
+                                    ${tipo}
+                                </h6>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="ps-4 py-3 border-0 small text-muted fw-bold">NOMBRES Y ESTADO</th>
+                                            <th class="py-3 border-0 small text-muted fw-bold">CARGA</th>
+                                            <th class="py-3 border-0 small text-muted fw-bold">VENCIMIENTO</th>
+                                            <th class="py-3 border-0 small text-muted fw-bold">VIGENCIA</th>
+                                            <th class="py-3 border-0 text-end pe-4 small text-muted fw-bold">ACCIONES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${rows}</tbody>
+                                </table>
+                            </div>
+                        </div>`;
+                    }
+                }
+                modalBovedaAdmin.show();
+            } catch (e) {
+                console.error(e);
+                alert("No se pudo cargar la información de la bóveda histórica.");
+            }
+        });
+
+        // Visor de Documentos Global
+        window.mostrarVisor = function(url, nombre) {
+            const modalViewer = new bootstrap.Modal(document.getElementById('modalVisorDocumento'));
+            const iframe = document.getElementById('visor_iframe');
+            const imgContainer = document.getElementById('visor_image_container');
+            const img = document.getElementById('visor_img');
+            const error = document.getElementById('visor_error');
+            const download = document.getElementById('visor_download');
+            
+            document.getElementById('visor_titulo').innerText = 'Documento: ' + nombre;
+            
+            // Reset
+            iframe.classList.add('d-none');
+            imgContainer.classList.add('d-none');
+            error.classList.add('d-none');
+            iframe.src = '';
+            img.src = '';
+            download.href = url;
+
+            if (!url) {
+                error.classList.remove('d-none');
+            } else {
+                const ext = url.split('.').pop().toLowerCase();
+                if (ext === 'pdf') {
+                    iframe.src = url;
+                    iframe.classList.remove('d-none');
+                } else if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+                    img.src = url;
+                    imgContainer.classList.remove('d-none');
+                } else {
+                    error.classList.remove('d-none');
+                }
+            }
+            modalViewer.show();
+        };
 
         function handleEditBus(btn) {
             try {
                 const data = JSON.parse(btn.dataset.json);
+                console.log('Editing bus:', data);
                 const form = document.getElementById('formEditBus');
                 if (!form) return;
 
-                document.getElementById('edit_placa_display').value = data.placa;
+                document.getElementById('edit_placa_display').value = data.placa || '';
                 document.getElementById('edit_modelo').value = data.modelo || '';
                 document.getElementById('edit_capacidad').value = data.capacidad_pasajeros || 0;
                 document.getElementById('edit_kilometraje').value = data.kilometraje || 0;
@@ -541,37 +927,195 @@
             @endif
         @endif
 
-        // Validaciones de Entrada (Solo números / Solo letras)
-        document.querySelectorAll('.text-input-validate').forEach(container => {
-            const input = container.querySelector('input');
-            const type = container.getAttribute('data-type');
+        // Función para mostrar/ocultar errores en tiempo real
+        function toggleError(input, show, message = '') {
+            const container = input.closest('.col-md-6, .col-md-12, .col-12');
+            const errorDiv = container.querySelector('.real-time-error');
             
-            if (input) {
-                input.addEventListener('input', function(e) {
-                    if (type === 'number') {
-                        this.value = this.value.replace(/[^0-9]/g, '');
-                    } else if (type === 'text') {
-                        this.value = this.value.replace(/[0-9]/g, '');
+            if (show) {
+                input.classList.add('is-invalid');
+                if (errorDiv) {
+                    errorDiv.textContent = message;
+                    errorDiv.style.display = 'block';
+                }
+            } else {
+                input.classList.remove('is-invalid');
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                }
+            }
+        }
+
+        // Delegación de eventos para validar mientras se escribe
+        document.addEventListener('input', function(e) {
+            const input = e.target;
+            const name = input.name;
+            if (!name) return;
+
+            let isValid = true;
+            let message = '';
+
+            // Limpiar solo números para campos específicos
+            if (['linc_transito', 'telefono', 'doc_propietario', 'numero_chasis', 'numero_motor', 'capacidad_pasajeros', 'kilometraje'].includes(name)) {
+                input.value = input.value.replace(/[^0-9]/g, '');
+            }
+
+            // Validaciones específicas
+            switch(name) {
+                case 'placa':
+                    let val = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                    if (val.length <= 3) val = val.replace(/[^A-Z]/g, '');
+                    else val = val.substring(0,3).replace(/[^A-Z]/g, '') + val.substring(3).replace(/[^0-9]/g, '');
+                    input.value = val.substring(0,6);
+                    
+                    if (input.value.length > 0 && !/^[A-Z]{3}[0-9]{3}$/.test(input.value)) {
+                        isValid = false;
+                        message = 'Formato requerido: AAA000 (3 letras y 3 números).';
+                    }
+                    break;
+
+                case 'linc_transito':
+                    if (input.value.length > 0 && input.value.length !== 8) {
+                        isValid = false;
+                        message = 'La licencia debe tener exactamente 8 caracteres numéricos.';
+                    }
+                    break;
+
+                case 'modelo':
+                    // Marca (letras) + Espacio + Año (4 números)
+                    if (input.value.length > 0) {
+                        // Regex: Letras (incluyendo tildes) + un espacio + 4 números
+                        const modelRegex = /^[\p{L}ÁÉÍÓÚáéíóúÑñ\s]+\s[0-9]{4}$/u;
+                        if (!modelRegex.test(input.value)) {
+                            isValid = false;
+                            message = 'Formato: Marca Año (Ej: Toyota 2019).';
+                        }
+                    }
+                    break;
+
+                case 'doc_propietario':
+                    if (input.value.length > 10) {
+                        isValid = false;
+                        message = 'El documento no debe superar los 10 dígitos.';
+                    } else if (input.value.length > 0 && input.value.length < 6) {
+                        isValid = false;
+                        message = 'El documento debe tener al menos 6 dígitos.';
+                    }
+                    break;
+
+                case 'nombre_propietario':
+                    if (input.value.length > 0 && !/^[\p{L}ÁÉÍÓÚáéíóúÑñ\s]+$/u.test(input.value)) {
+                        isValid = false;
+                        message = 'Solo se permiten letras y espacios.';
+                    }
+                    break;
+
+                case 'telefono':
+                    if (input.value.length > 0 && input.value.length !== 10) {
+                        isValid = false;
+                        message = 'El teléfono debe tener exactamente 10 dígitos.';
+                    }
+                    break;
+
+                case 'correo':
+                    if (input.value.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) {
+                        isValid = false;
+                        message = 'Formato de correo inválido.';
+                    }
+                    break;
+
+                case 'numero_chasis':
+                    if (input.value.length > 0 && input.value.length !== 17) {
+                        isValid = false;
+                        message = 'El chasis debe tener exactamente 17 números.';
+                    }
+                    break;
+
+                case 'numero_motor':
+                    if (input.value.length > 0 && (input.value.length < 8 || input.value.length > 17)) {
+                        isValid = false;
+                        message = 'El motor debe tener entre 8 y 17 números.';
+                    }
+                    break;
+            }
+
+            toggleError(input, !isValid, message);
+        });
+
+        // Autocompletado de Propietario por Doc/NIT
+        const docInput = document.querySelector('#formCreateBus input[name="doc_propietario"]');
+        if (docInput) {
+            docInput.addEventListener('blur', async function() {
+                const doc = this.value.trim();
+                const container = this.closest('.col-md-6');
+                let feedback = container.querySelector('.autocomplete-feedback');
+                
+                if (doc.length >= 6) {
+                    if (!feedback) {
+                        feedback = document.createElement('div');
+                        feedback.className = 'autocomplete-feedback small fw-bold mt-1';
+                        container.appendChild(feedback);
+                    }
+                    
+                    feedback.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"></div> <span class="ms-1">Consultando...</span>';
+                    feedback.className = 'autocomplete-feedback text-primary small fw-bold mt-1';
+                    feedback.style.display = 'block';
+
+                    try {
+                        const response = await fetch(`/admin/buses/propietario/${doc}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data) {
+                                // Rellenar campos
+                                const fields = {
+                                    'nombre_propietario': data.nombre_propietario,
+                                    'telefono': data.telefono,
+                                    'correo': data.correo
+                                };
+
+                                Object.entries(fields).forEach(([name, value]) => {
+                                    const input = document.querySelector(`#formCreateBus input[name="${name}"]`);
+                                    if (input && value) {
+                                        input.value = value;
+                                        // Disparar evento input para limpiar errores previos si los hubiera
+                                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                                    }
+                                });
+
+                                feedback.innerHTML = '<span class="material-symbols-rounded fs-xs align-middle">verified</span> Datos encontrados y cargados';
+                                feedback.className = 'autocomplete-feedback text-success small fw-bold mt-1';
+                                setTimeout(() => feedback.style.display = 'none', 5000);
+                            } else {
+                                feedback.style.display = 'none';
+                            }
+                        } else {
+                            feedback.style.display = 'none';
+                        }
+                    } catch (error) {
+                        console.error('Error en autocompletado:', error);
+                        feedback.style.display = 'none';
+                    }
+                } else {
+                    if (feedback) feedback.style.display = 'none';
+                }
+            });
+        }
+
+        // Validar antes de enviar
+        const forms = ['formCreateBus', 'formEditBus'];
+        forms.forEach(id => {
+            const f = document.getElementById(id);
+            if (f) {
+                f.addEventListener('submit', function(e) {
+                    const invalidInputs = this.querySelectorAll('.is-invalid');
+                    if (invalidInputs.length > 0) {
+                        e.preventDefault();
+                        invalidInputs[0].focus();
+                        alert('Por favor corrija los errores en el formulario antes de continuar.');
                     }
                 });
             }
         });
-
-        // Formateo de placa
-        const placaInput = document.querySelector('[name="placa"]');
-        if (placaInput) {
-            placaInput.addEventListener('input', function(e) {
-                let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-                if (value.length <= 3) {
-                    value = value.replace(/[^A-Z]/g, '');
-                } else {
-                    let letters = value.substring(0,3).replace(/[^A-Z]/g, '');
-                    let numbers = value.substring(3).replace(/[^0-9]/g, '');
-                    value = letters + numbers;
-                }
-                e.target.value = value.substring(0,6);
-            });
-        }
     });
 </script>
 
@@ -619,6 +1163,19 @@
     .invalid-feedback {
         font-weight: 500;
         font-size: 0.8rem;
+    }
+
+    .real-time-error {
+        color: #dc3545;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+        display: none; /* Se muestra vía JS */
+        font-weight: 500;
+    }
+
+    .form-control.is-invalid {
+        border-color: #dc3545 !important;
+        background-image: none !important;
     }
 </style>
 @endpush

@@ -40,6 +40,55 @@ class RutaService
             $query->where('id_estado', $request->id_estado);
         }
 
+        // Filtro por código de ruta
+        if ($request->filled('codigo_ruta')) {
+            $query->where('codigo_ruta', 'like', "%{$request->codigo_ruta}%");
+        }
+
+        // Filtro por ciudad
+        if ($request->filled('id_ciudad')) {
+            $query->where('id_ciudad', $request->id_ciudad);
+        }
+
+        // Filtro por barrio origen
+        if ($request->filled('id_barrio_origen')) {
+            $query->where('id_barrio_origen', $request->id_barrio_origen);
+        }
+
+        // Filtro por barrio destino
+        if ($request->filled('id_barrio_destino')) {
+            $query->where('id_barrio_destino', $request->id_barrio_destino);
+        }
+
+        // Filtro Pro: Trayecto (Origen -> Destino)
+        if ($request->filled('trayecto')) {
+            $trayecto = trim($request->trayecto);
+            $parts = explode(' ', $trayecto);
+            
+            if (count($parts) >= 2) {
+                // Si hay 2 o más palabras, asumimos que intenta Origen y Destino
+                $origenSearch = $parts[0];
+                $destinoSearch = $parts[1];
+                
+                $query->where(function($q) use ($origenSearch, $destinoSearch) {
+                    $q->whereHas('barrioOrigen', function($sq) use ($origenSearch) {
+                        $sq->where('nombre', 'like', "%{$origenSearch}%");
+                    })->whereHas('barrioDestino', function($sq) use ($destinoSearch) {
+                        $sq->where('nombre', 'like', "%{$destinoSearch}%");
+                    });
+                });
+            } else {
+                // Si es solo una palabra, buscamos en ambos campos (O en cualquiera)
+                $query->where(function($q) use ($trayecto) {
+                    $q->whereHas('barrioOrigen', function($sq) use ($trayecto) {
+                        $sq->where('nombre', 'like', "%{$trayecto}%");
+                    })->orWhereHas('barrioDestino', function($sq) use ($trayecto) {
+                        $sq->where('nombre', 'like', "%{$trayecto}%");
+                    });
+                });
+            }
+        }
+
         return $query->orderBy('id_ruta', 'asc')->paginate(5)->withQueryString();
     }
 
@@ -112,6 +161,55 @@ class RutaService
 
         if ($request->filled('id_estado')) {
             $query->where('id_estado', $request->id_estado);
+        }
+
+        // Filtro por código de ruta
+        if ($request->filled('codigo_ruta')) {
+            $query->where('codigo_ruta', 'like', "%{$request->codigo_ruta}%");
+        }
+
+        // Filtro por ciudad
+        if ($request->filled('id_ciudad')) {
+            $query->where('id_ciudad', $request->id_ciudad);
+        }
+
+        // Filtro por barrio origen
+        if ($request->filled('id_barrio_origen')) {
+            $query->where('id_barrio_origen', $request->id_barrio_origen);
+        }
+
+        // Filtro por barrio destino
+        if ($request->filled('id_barrio_destino')) {
+            $query->where('id_barrio_destino', $request->id_barrio_destino);
+        }
+
+        // Filtro Pro: Trayecto (Origen -> Destino) en Exportación
+        if ($request->filled('trayecto')) {
+            $trayecto = trim($request->trayecto);
+            $parts = explode(' ', $trayecto);
+            
+            if (count($parts) >= 2) {
+                // Si hay 2 o más palabras, asumimos que intenta Origen y Destino
+                $origenSearch = $parts[0];
+                $destinoSearch = $parts[1];
+                
+                $query->where(function($q) use ($origenSearch, $destinoSearch) {
+                    $q->whereHas('barrioOrigen', function($sq) use ($origenSearch) {
+                        $sq->where('nombre', 'like', "%{$origenSearch}%");
+                    })->whereHas('barrioDestino', function($sq) use ($destinoSearch) {
+                        $sq->where('nombre', 'like', "%{$destinoSearch}%");
+                    });
+                });
+            } else {
+                // Si es solo una palabra, buscamos en ambos campos (O en cualquiera)
+                $query->where(function($q) use ($trayecto) {
+                    $q->whereHas('barrioOrigen', function($sq) use ($trayecto) {
+                        $sq->where('nombre', 'like', "%{$trayecto}%");
+                    })->orWhereHas('barrioDestino', function($sq) use ($trayecto) {
+                        $sq->where('nombre', 'like', "%{$trayecto}%");
+                    });
+                });
+            }
         }
 
         $rutas = $query->orderBy('id_ruta', 'asc')->get();
