@@ -15,7 +15,8 @@ class CheckRole
         'pasajero' => 2,
         'conductor' => 3,
         'gestor_setp' => 6,
-        'jefe_mantenimiento' => 7,
+        'jefe_mantenimiento'  => 7,
+        'controlador_tiempo'  => 8,
     ];
 
     public function handle(Request $request, Closure $next, string $role): Response

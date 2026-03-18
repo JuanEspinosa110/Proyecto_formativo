@@ -37,4 +37,9 @@ class Bus extends Model
     {
         return $this->belongsTo(Empresa::class, 'NIT', 'NIT');
     }
+
+    public function asignaciones()
+    {
+        return $this->hasMany(Asignacion::class, 'placa', 'placa');
+    }
 }

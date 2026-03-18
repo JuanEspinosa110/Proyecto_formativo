@@ -58,10 +58,11 @@ class Usuario extends Authenticatable
             // Mapeo de Rol (string de validación a ID real de base de datos)
             if (isset($usuario->rol)) {
                 $usuario->id_tipo_usuario = match ($usuario->rol) {
-                    'admin'    => 1, // ID para Admin
-                    'operador' => 4, // ID para Operador (según tabla tipo_usuario)
-                    'usuario'  => 3, // ID para Conductor/Usuario según lista permitida en vista
-                    default    => 1
+                    'admin'              => 1,
+                    'operador'           => 4,
+                    'usuario'            => 3,
+                    'controlador_tiempo' => 8,
+                    default              => 1
                 };
             }
 

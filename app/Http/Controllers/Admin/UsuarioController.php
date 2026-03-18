@@ -26,7 +26,7 @@ class UsuarioController extends Controller
         }
 
         $roles = DB::table('tipo_usuario')
-            ->whereIn('id_tipo_usuario', [1, 3, 4, 5, 7]) // Solo roles de empresa
+            ->whereIn('id_tipo_usuario', [1, 3, 4, 5, 7, 8]) // Solo roles de empresa
             ->orderBy('id_tipo_usuario')
             ->get();
         $estados = DB::table('estado')->whereIn('id_estado', [1, 2, 3])->get();

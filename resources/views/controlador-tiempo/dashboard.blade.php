@@ -1,0 +1,120 @@
+@extends('controlador-tiempo.layouts.app')
+
+@section('title', 'Panel — Controlador de Tiempo')
+
+@section('content')
+<div class="sigu-fade">
+
+    {{-- Saludo --}}
+    <div class="sigu-page-hd">
+        <h1 class="sigu-page-title">Panel de Control</h1>
+        <p class="sigu-page-sub">Bienvenido, {{ Auth::user()->primer_nombre }}. Aquí tienes el resumen operativo de la flota.</p>
+    </div>
+
+    {{-- ─── KPIs ─────────────────────────────────────────────────── --}}
+    <div class="row g-3 mt-2">
+
+        <div class="col-6 col-md-3">
+            <div class="bg-white rounded-3 shadow-sm p-4 h-100 d-flex flex-column ct-kpi">
+                <span class="material-symbols-rounded mb-2 ct-kpi-icon" style="font-size:1.8rem;">directions_bus</span>
+                <span class="fs-1 fw-bold lh-1">{{ $totalBuses }}</span>
+                <span class="text-muted small mt-1">Buses en flota</span>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="bg-white rounded-3 shadow-sm p-4 h-100 d-flex flex-column ct-kpi">
+                <span class="material-symbols-rounded mb-2 ct-kpi-icon" style="font-size:1.8rem;">radar</span>
+                <span class="fs-1 fw-bold lh-1">{{ $busesEnRuta }}</span>
+                <span class="text-muted small mt-1">Buses activos</span>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="bg-white rounded-3 shadow-sm p-4 h-100 d-flex flex-column ct-kpi">
+                <span class="material-symbols-rounded mb-2 ct-kpi-icon" style="font-size:1.8rem;">alt_route</span>
+                <span class="fs-1 fw-bold lh-1">{{ $rutasActivas }}</span>
+                <span class="text-muted small mt-1">Rutas operativas</span>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="bg-white rounded-3 shadow-sm p-4 h-100 d-flex flex-column ct-kpi">
+                <span class="material-symbols-rounded mb-2" style="font-size:1.8rem; color:#e53e3e;">warning</span>
+                <span class="fs-1 fw-bold lh-1">{{ $busesInactivos }}</span>
+                <span class="text-muted small mt-1">Buses inactivos / taller</span>
+            </div>
+        </div>
+
+    </div>
+
+    {{-- ─── Accesos rápidos ──────────────────────────────────────── --}}
+    <div class="row g-3 mt-2">
+        <div class="col-md-4">
+            <a href="{{ route('controlador-tiempo.despacho.index') }}" class="text-decoration-none">
+                <div class="bg-white rounded-3 shadow-sm p-4 h-100 d-flex align-items-center gap-3 border border-transparent" style="transition:.2s; cursor:pointer;" onmouseover="this.style.borderColor='var(--ct-accent)'" onmouseout="this.style.borderColor='transparent'">
+                    <span class="material-symbols-rounded fs-2" style="color:var(--ct-accent);">directions_bus</span>
+                    <div>
+                        <div class="fw-bold text-dark">Módulo de Despacho</div>
+                        <div class="text-muted small">Turnos, intervalos y relevos</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{{ route('controlador-tiempo.monitoreo.index') }}" class="text-decoration-none">
+                <div class="bg-white rounded-3 shadow-sm p-4 h-100 d-flex align-items-center gap-3 border border-transparent" style="transition:.2s; cursor:pointer;" onmouseover="this.style.borderColor='var(--ct-accent)'" onmouseout="this.style.borderColor='transparent'">
+                    <span class="material-symbols-rounded fs-2" style="color:var(--ct-accent);">radar</span>
+                    <div>
+                        <div class="fw-bold text-dark">Monitoreo en Vivo</div>
+                        <div class="text-muted small">Estado y ubicación de buses</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{{ route('controlador-tiempo.planillas.index') }}" class="text-decoration-none">
+                <div class="bg-white rounded-3 shadow-sm p-4 h-100 d-flex align-items-center gap-3 border border-transparent" style="transition:.2s; cursor:pointer;" onmouseover="this.style.borderColor='var(--ct-accent)'" onmouseout="this.style.borderColor='transparent'">
+                    <span class="material-symbols-rounded fs-2" style="color:var(--ct-accent);">assignment</span>
+                    <div>
+                        <div class="fw-bold text-dark">Planillas de Despacho</div>
+                        <div class="text-muted small">Documentación y novedades</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    {{-- ─── Últimas asignaciones ─────────────────────────────────── --}}
+    <div class="row g-3 mt-2">
+        <div class="col-12">
+            <div class="bg-white rounded-3 shadow-sm p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold mb-0">Asignaciones Recientes</h6>
+                    <a href="{{ route('controlador-tiempo.despacho.index') }}" class="small" style="color:var(--ct-accent); text-decoration:none;">Ver todas →</a>
+                </div>
+
+                @forelse($asignaciones as $asig)
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="material-symbols-rounded text-muted" style="font-size:1.2rem;">directions_bus</span>
+                            <div>
+                                <span class="fw-semibold">{{ $asig->placa ?? $asig->bus->placa ?? '—' }}</span>
+                                <span class="text-muted small ms-2">
+                                    {{ $asig->ruta->barrioOrigen->nombre ?? '?' }} → {{ $asig->ruta->barrioDestino->nombre ?? '?' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge-ct">Activa</span>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-muted small text-center py-3">No hay asignaciones registradas.</p>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
+</div>
+@endsection

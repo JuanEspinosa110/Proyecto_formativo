@@ -47,6 +47,14 @@ class Asignacion extends Model
     }
 
     /**
+     * Alias para conductor para compatibilidad con las vistas
+     */
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'doc_us', 'doc_usuario');
+    }
+
+    /**
      * Relación con el Estado
      */
     public function estado()

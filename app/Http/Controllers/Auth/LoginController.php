@@ -51,6 +51,9 @@ class LoginController extends Controller
                 case 7: // JEFE_MANTENIMIENTO
                     return redirect()->route('jefemantenimiento.dashboard');
 
+                case 8: // CONTROLADOR_TIEMPO
+                    return redirect()->route('controlador-tiempo.dashboard');
+
                 default:
                     Auth::guard('web')->logout();
                     return back()->withErrors([
