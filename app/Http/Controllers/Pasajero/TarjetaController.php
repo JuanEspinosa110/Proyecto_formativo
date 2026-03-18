@@ -51,7 +51,7 @@ class TarjetaController extends Controller
             return redirect()->route('pasajero.dashboard');
         }
 
-        return view('pasajero.tarjeta.dashboard');
+        return view('pasajero.tarjeta.sin-tarjeta');
     }
 
     // ── registrar ──────────────────────────────────────────────
