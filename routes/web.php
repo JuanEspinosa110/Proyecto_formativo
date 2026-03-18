@@ -35,6 +35,7 @@ require base_path('routes/pasajero.php');
 require base_path('routes/jefemantenimiento.php');
 
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\StripeWebhookController;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
@@ -198,12 +199,13 @@ Route::prefix('superadmin')
         Route::put('/tarjetas/{tarjeta}', [TarjetaController::class, 'update'])
             ->name('tarjetas.update');
 
-
     });
 
     Route::patch(
     'usuarios/{doc}/inactivar',
-    [UsuarioController::class, 'inactivar']
-)->name('admin.usuarios.inactivar');
+    [UsuarioController::class, 'inactivar'])->name('admin.usuarios.inactivar');
 
     Route::put('admin/usuarios/{doc_usuario}', [\App\Http\Controllers\Admin\UsuarioController::class, 'update'])->name('admin.usuarios.update');
+
+// Webhook de Stripe
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle']);

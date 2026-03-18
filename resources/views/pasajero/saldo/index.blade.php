@@ -24,25 +24,26 @@
                 </div>
             </div>
 
-            {{-- Accesos Rápidos (Nuevo bloque para hacer la vista más rica) --}}
-            <div class="pas-accesos mt-4">
-                <a href="{{ route('pasajero.recargas.index') }}" class="pas-acceso-item">
-                    <span class="material-symbols-rounded">store</span>
-                    <span class="lbl">Puntos de recarga</span>
+            {{-- Accesos Rápidos (mejorados) --}}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start pas-accesos mt-4">
+                <a href="{{ route('pasajero.recargas.index') }}" class="btn btn-outline-primary btn-lg d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded">store</span> Puntos de recarga
                 </a>
-                <a href="{{ route('pasajero.historial.index') }}" class="pas-acceso-item">
-                    <span class="material-symbols-rounded">history</span>
-                    <span class="lbl">Ver Historial</span>
+                <a href="{{ route('pasajero.historial.index') }}" class="btn btn-outline-secondary btn-lg d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded">history</span> Ver Historial
                 </a>
-                <a href="{{ route('pasajero.rutas.index') }}" class="pas-acceso-item">
-                    <span class="material-symbols-rounded">alt_route</span>
-                    <span class="lbl">Explorar Rutas</span>
+                <a href="{{ route('pasajero.rutas.index') }}" class="btn btn-outline-success btn-lg d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded">alt_route</span> Explorar Rutas
                 </a>
-                <a href="{{ route('pasajero.mapa') }}" class="pas-acceso-item">
-                    <span class="material-symbols-rounded">map</span>
-                    <span class="lbl">Mapa de Paradas</span>
+                <a href="{{ route('pasajero.mapa') }}" class="btn btn-outline-info btn-lg d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded">map</span> Mapa de Paradas
                 </a>
             </div>
+
+            {{-- Botón de recarga con Stripe --}}
+            <a href="{{ route('pasajero.tarjeta.recargar') }}" class="btn btn-success btn-lg w-100 fw-bold py-2 d-flex justify-content-center align-items-center gap-2 mt-3">
+                Recargar con Stripe <span class="material-symbols-rounded">credit_score</span>
+            </a>
 
             {{-- Bloque de Cambio de Tarjeta --}}
             <div class="pas-card mt-4 support-banner">
