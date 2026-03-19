@@ -14,7 +14,7 @@ body.sigu-conductor-body {
     z-index: 1000;
     background: #FFFFFF;
     border-bottom: 1px solid #DADDE1;
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1.5rem;
     box-shadow: 0 1px 2px rgba(47, 47, 58, .06);
 }
 
@@ -97,43 +97,52 @@ body.sigu-conductor-body {
     gap: 0.65rem;
     background: #FFFFFF;
     border: 1.5px solid #DADDE1;
-    padding: 0.3rem 0.7rem 0.3rem 0.35rem;
+    padding: 0.25rem 0.8rem 0.25rem 0.35rem;
     border-radius: 40px;
     cursor: pointer;
     transition: all 0.17s;
+    line-height: 1.2;
 }
 
 .sigu-user-pill:hover,
 .sigu-user-pill[aria-expanded="true"] {
     border-color: #5E548E;
-    box-shadow: 0 4px 14px rgba(94, 84, 142, .28);
+    box-shadow: 0 4px 12px rgba(94, 84, 142, .15);
+}
+
+.sigu-user-pill::after {
+    display: none; /* Quitamos la flecha por defecto de bootstrap para mejor control */
 }
 
 .sigu-user-ava {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     background: linear-gradient(135deg, #5E548E, #4A4E69);
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .sigu-user-ava .material-symbols-rounded {
-    font-size: 0.95rem;
+    font-size: 1.1rem;
 }
 
 .sigu-user-name {
-    font-size: 0.78rem;
-    font-weight: 600;
+    font-size: 0.8rem;
+    font-weight: 700;
     color: #2F2F3A;
+    display: block;
+    white-space: nowrap;
 }
 
 .sigu-user-role {
-    font-size: 0.64rem;
+    font-size: 0.65rem;
     color: #6B6F88;
     display: block;
+    margin-top: -1px;
 }
 
 .document-list {

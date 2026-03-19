@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Viaje;
 use App\Models\Recorrido;
 use App\Models\Documento;
-use App\Models\FallaMecanica;
+use App\Models\ReporteFalla;
 use App\Models\Tarjeta;
 use App\Models\VentaViaje;
 use Illuminate\Support\Facades\Auth;
@@ -52,7 +52,7 @@ class ConductorController extends Controller
         // 4. Estado del vehículo (Fallas activas)
         $fallasBus = collect();
         if ($asignacionActiva) {
-            $fallasBus = FallaMecanica::where('placa', $asignacionActiva->placa)
+            $fallasBus = ReporteFalla::where('placa', $asignacionActiva->placa)
                 ->where('id_estado', 19) // 19 = PENDIENTE
                 ->get();
         }
@@ -89,7 +89,7 @@ class ConductorController extends Controller
             ->get();
 
         // 7. Historial de Fallas (Resumen para el Dashboard)
-        $historialFallas = FallaMecanica::with('bus')
+        $historialFallas = ReporteFalla::with('bus')
             ->where('doc_usuario', $conductor->doc_usuario)
             ->orderBy('created_at', 'desc')
             ->limit(5)
@@ -129,7 +129,7 @@ class ConductorController extends Controller
             'nivel_urgencia' => 'nullable|in:Bajo,Medio,Alto'
         ]);
 
-        FallaMecanica::create([
+        ReporteFalla::create([
             'placa' => $request->placa,
             'doc_usuario' => Auth::guard('web')->id(),
             'descripcion' => $request->descripcion,
@@ -313,7 +313,7 @@ class ConductorController extends Controller
         $conductor = Auth::guard('web')->user();
         $filtro = $request->get('filtro', 'todos');
         
-        $query = FallaMecanica::with('bus')
+        $query = ReporteFalla::with('bus')
             ->where('doc_usuario', $conductor->doc_usuario)
             ->orderBy('created_at', 'desc');
 

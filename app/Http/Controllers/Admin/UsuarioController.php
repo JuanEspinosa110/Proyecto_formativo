@@ -53,7 +53,7 @@ class UsuarioController extends Controller
             $query->where('usuario.id_tipo_usuario', $selectedRole);
         }
 
-        $usuarios = $query->orderBy('usuario.doc_usuario', 'ASC')->paginate(5)->withQueryString();
+        $usuarios = $query->orderBy('usuario.doc_usuario', 'ASC')->paginate(10)->withQueryString();
 
         $docs_licencia = \App\Models\Documento::whereIn('doc_usuario', collect($usuarios->items())->pluck('doc_usuario'))
             ->where('id_tipo_documento', 3)

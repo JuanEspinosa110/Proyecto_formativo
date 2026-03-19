@@ -42,4 +42,9 @@ class Bus extends Model
     {
         return $this->hasMany(Asignacion::class, 'placa', 'placa');
     }
+
+    public function recorridos()
+    {
+        return $this->hasMany(Recorrido::class, 'placa', 'placa');
+    }
 }

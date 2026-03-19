@@ -48,6 +48,63 @@
 
     </div>
 
+    {{-- ─── Estado de Frecuencias ────────────────────────────────── --}}
+    <div class="row g-3 mt-2">
+        <div class="col-12">
+            <div class="bg-white rounded-3 shadow-sm p-4">
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <span class="material-symbols-rounded text-primary">timer</span>
+                    <h6 class="fw-bold mb-0">Monitor de Frecuencias (Hoy)</h6>
+                </div>
+                
+                <div class="row g-3">
+                    @forelse($rutasDetalle as $ruta)
+                        @php
+                            $min = $ruta->minutos_desde_salida;
+                            $status = 'text-success';
+                            $bg = 'bg-success';
+                            $msg = 'Frecuencia óptima';
+                            
+                            if($min === null) {
+                                $status = 'text-muted'; $bg = 'bg-secondary'; $msg = 'Sin despachos hoy';
+                            } elseif($min > 15) {
+                                $status = 'text-danger'; $bg = 'bg-danger'; $msg = 'Retraso crítico (>15 min)';
+                            } elseif($min > 10) {
+                                $status = 'text-warning'; $bg = 'bg-warning text-dark'; $msg = 'Alerta de intervalo (>10 min)';
+                            }
+                        @endphp
+                        <div class="col-md-6 col-lg-4">
+                            <div class="p-3 border rounded-3 h-100 shadow-none border-light-subtle bg-light bg-opacity-10">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="small fw-extrabold text-uppercase tracking-wider text-muted">{{ $ruta->nombre_ruta ?? ('Ruta #'.$ruta->id_ruta) }}</div>
+                                    <span class="badge {{ $bg }} rounded-pill ps-2 pe-3 py-1 fw-bold" style="font-size: 0.65rem;">
+                                        <i class="opacity-75 me-1">•</i> {{ $msg }}
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-baseline gap-2 mt-1">
+                                    <span class="fs-2 fw-bold {{ $status }}">{{ is_numeric($min) ? round($min) : '—' }}</span>
+                                    <span class="text-dark fw-medium" style="opacity: 0.6;">minutos</span>
+                                </div>
+                                <div class="mt-2 pt-2 border-top border-light d-flex justify-content-between align-items-center">
+                                    <div class="small text-muted">
+                                        {{ $ruta->barrioOrigen->nombre ?? '?' }} ↔ {{ $ruta->barrioDestino->nombre ?? '?' }}
+                                    </div>
+                                    @if($ruta->ultimo_bus)
+                                        <div class="badge bg-light text-dark border fw-bold" style="font-size: 0.7rem;">🚌 {{ $ruta->ultimo_bus }}</div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-12 text-center py-4">
+                            <p class="text-muted">No hay rutas configuradas para esta empresa.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- ─── Accesos rápidos ──────────────────────────────────────── --}}
     <div class="row g-3 mt-2">
         <div class="col-md-4">

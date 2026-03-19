@@ -104,6 +104,12 @@
                     <span>Monitoreo en Vivo</span>
                 </a>
 
+                <a href="{{ route('controlador-tiempo.verificacion.scanner') }}"
+                   class="sigu-sb-link {{ request()->routeIs('controlador-tiempo.verificacion*') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">qr_code_scanner</span></span>
+                    <span>Escaneo de Bus</span>
+                </a>
+
                 <a href="{{ route('controlador-tiempo.planillas.index') }}"
                    class="sigu-sb-link {{ request()->routeIs('controlador-tiempo.planillas*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">assignment</span></span>

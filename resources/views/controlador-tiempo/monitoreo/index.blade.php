@@ -83,6 +83,27 @@
                         {{ number_format($bus->kilometraje ?? 0, 0, ',', '.') }} km
                     </div>
 
+                    {{-- Recorrido (Viaje en curso) --}}
+                    @if($bus->recorridos->isNotEmpty())
+                        @php $rec = $bus->recorridos->first(); @endphp
+                        <div class="mt-2 pt-2 border-top border-primary border-opacity-10">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="badge bg-primary bg-opacity-10 text-primary border-0 small">RECORRIDO ACTUAL</span>
+                                <span class="small fw-bold {{ $rec->hora_llegada ? 'text-success' : 'text-primary' }}">
+                                    {{ $rec->hora_llegada ? 'Completado' : 'En Tránsito' }}
+                                </span>
+                            </div>
+                            <div class="text-muted small d-flex justify-content-between">
+                                <span><span class="fw-semibold text-dark">Inicio:</span> {{ \Carbon\Carbon::parse($rec->hora_salida)->format('h:i A') }}</span>
+                                @if($rec->hora_llegada)
+                                <span><span class="fw-semibold text-dark">Fin:</span> {{ \Carbon\Carbon::parse($rec->hora_llegada)->format('h:i A') }}</span>
+                                @else
+                                <span class="text-primary fw-bold">—:—</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
                     {{-- Asignación activa --}}
                     @if($bus->asignaciones->isNotEmpty())
                         @php $asig = $bus->asignaciones->first(); @endphp

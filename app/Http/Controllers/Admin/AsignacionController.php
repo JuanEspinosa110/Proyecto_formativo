@@ -79,12 +79,8 @@ class AsignacionController extends Controller
         // Datos para los modales
         $buses = Bus::where('NIT', $nit)->get();
         $rutas = Ruta::orderBy('id_ruta', 'asc')->get();
-        $adminRoleIds = \Illuminate\Support\Facades\DB::table('tipo_usuario')
-            ->where('nombre_tipo', 'like', '%admin%')
-            ->pluck('id_tipo_usuario');
-
         $conductores = Usuario::where('NIT', $nit)
-            ->whereNotIn('id_tipo_usuario', $adminRoleIds)
+            ->where('id_tipo_usuario', 3)
             ->get();
         $estados = Estado::whereIn('nombre_estado', ['ACTIVO', 'INACTIVO'])->get();
 

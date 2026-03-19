@@ -31,12 +31,33 @@ class DashboardController extends Controller
             ->with(['barrioOrigen', 'barrioDestino'])
             ->count();
 
+        // ─── LÓGICA DE FRECUENCIAS ───
+        $rutasDetalle = Ruta::whereHas('asignaciones.bus', fn($q) => $q->where('NIT', $user->NIT))
+            ->with(['barrioOrigen', 'barrioDestino'])
+            ->get();
+
+        foreach ($rutasDetalle as $ruta) {
+            $ultimoRecorrido = \App\Models\Recorrido::where('id_ruta', $ruta->id_ruta)
+                ->whereDate('hora_salida', \Carbon\Carbon::today())
+                ->orderBy('hora_salida', 'desc')
+                ->first();
+
+            if ($ultimoRecorrido) {
+                $ruta->minutos_desde_salida = \Carbon\Carbon::parse($ultimoRecorrido->hora_salida)->diffInMinutes(\Carbon\Carbon::now());
+                $ruta->ultimo_bus = $ultimoRecorrido->placa;
+            } else {
+                $ruta->minutos_desde_salida = null;
+                $ruta->ultimo_bus = null;
+            }
+        }
+
         return view('controlador-tiempo.dashboard', compact(
             'totalBuses',
             'busesEnRuta',
             'busesInactivos',
             'asignaciones',
-            'rutasActivas'
+            'rutasActivas',
+            'rutasDetalle'
         ));
     }
 }

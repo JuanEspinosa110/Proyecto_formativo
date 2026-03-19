@@ -34,7 +34,7 @@
                         <div class="sigu-user-ava">
                             <span class="material-symbols-rounded">person</span>
                         </div>
-                        <div class="d-none d-md-block text-start">
+                        <div class="d-none d-md-flex flex-column justify-content-center text-start">
                             <span class="sigu-user-name">{{ auth()->user()->primer_nombre }} {{ auth()->user()->primer_apellido }}</span>
                             <span class="sigu-user-role">Conductor • {{ auth()->user()->doc_usuario }}</span>
                         </div>

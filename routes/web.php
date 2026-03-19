@@ -36,6 +36,7 @@ require base_path('routes/pasajero.php');
 require base_path('routes/jefemantenimiento.php');
 // Rutas del Controlador de Tiempo
 require base_path('routes/controlador-tiempo.php');
+require base_path('routes/conductor.php');
 
 use App\Http\Controllers\LandingController;
 
@@ -88,7 +89,7 @@ Route::middleware('auth:web')->group(function () {
 
     Route::get('/pasajero/dashboard', fn() => view('pasajeros.index'))
         ->name('pasajero.dashboard')->middleware('role:2');
-    Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
+    Route::get('/empresa/dashboard', fn() => redirect()->route('conductor.dashboard'))
         ->name('empresa.dashboard')->middleware('role:3');
 
 });

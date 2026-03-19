@@ -122,41 +122,52 @@
                 <!-- Tarjeta Operación en Curso (Aparece al iniciar turno) -->
                 @if($enCurso)
                 <div class="col-12 mt-3">
-                    <div class="card {{ $recorridoActivo ? 'bg-white border text-dark' : 'bg-dark text-white' }} border-0 shadow rounded-4 p-4 text-center">
-                        <span class="{{ $recorridoActivo ? 'text-primary' : 'text-white-50' }} text-uppercase fw-bold small mb-2 d-block">Control y Validación en Pista</span>
-                        
-                        @if(!$recorridoActivo)
-                            <h4 class="fw-bold mb-3 mt-2 text-dark">Ningún recorrido en progreso</h4>
-                            <button class="btn btn-primary px-5 py-3 mt-2 fw-bold text-white rounded-pill btn-lg shadow-sm d-inline-flex justify-content-center align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalIniciarRuta">
-                                <span class="material-symbols-rounded fs-3">play_arrow</span> <span style="font-size: 1.15rem;">Iniciar Nuevo Recorrido</span>
-                            </button>
-                            <p class="text-muted small mt-3 mb-0">Presione el botón justo al salir del punto de partida</p>
-                        @else
-                            <div class="text-center py-2">
-                                <h5 class="fw-bold mb-3 text-primary d-inline-flex align-items-center gap-2" style="font-size: 1.3rem;">
-                                    <span class="spinner-grow text-success" style="width: 1.25rem; height: 1.25rem;" role="status"></span>
-                                    Recorrido en Progreso
-                                </h5>
-                                <div class="bg-light p-4 rounded-4 my-3 mx-auto" style="max-width: 450px; border: 2px dashed #cbd5e1;">
-                                    <p class="mb-2 text-muted fw-bold text-uppercase small letter-spacing-1">Dirigiéndose en sentido</p>
-                                    <h2 class="fw-black text-dark mb-0 d-flex align-items-center justify-content-center gap-2">
-                                        <span class="material-symbols-rounded fs-2 text-primary">{{ $recorridoActivo->sentido == 'IDA' ? 'trending_flat' : 'sync_alt' }}</span>
-                                        {{ $recorridoActivo->sentido }}
-                                    </h2>
-                                </div>
-                                <p class="mb-4 d-flex justify-content-center align-items-center gap-2 text-muted" style="font-size: 1.1rem;">
-                                    <span class="material-symbols-rounded">schedule</span>
-                                    Hora de salida: <strong class="text-dark">{{ \Carbon\Carbon::parse($recorridoActivo->hora_salida)->format('h:i A') }}</strong>
-                                </p>
-                                
-                                <form action="{{ route('conductor.finalizarRecorrido', $recorridoActivo->id_recorrido) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-warning py-3 fw-bold text-dark rounded-pill shadow-sm d-inline-flex border-0 justify-content-center align-items-center gap-2 transition-all w-100" style="font-size: 1.25rem; max-width: 450px;">
-                                        <span class="material-symbols-rounded fs-3">sports_score</span> Llegada a Destino Final
+                    <div class="card {{ $recorridoActivo ? 'bg-white border text-dark' : 'bg-dark text-white' }} border-0 shadow rounded-4 p-4">
+                        <div class="text-center">
+                            <span class="{{ $recorridoActivo ? 'text-primary' : 'text-white-50' }} text-uppercase fw-bold small mb-2 d-block">Control y Validación en Pista</span>
+                            
+                            @if(!$recorridoActivo)
+                                <h4 class="fw-bold mb-3 mt-2 text-dark text-center w-100">Ningún recorrido en progreso</h4>
+                                <div class="text-center w-100">
+                                    <button class="btn btn-primary px-5 py-3 mt-2 fw-bold text-white rounded-pill btn-lg shadow-sm d-inline-flex justify-content-center align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalIniciarRuta">
+                                        <span class="material-symbols-rounded fs-3">play_arrow</span> <span style="font-size: 1.15rem;">Iniciar Nuevo Recorrido</span>
                                     </button>
-                                </form>
-                            </div>
-                        @endif
+                                </div>
+                                <p class="text-muted small mt-3 mb-0 text-center w-100">Presione el botón justo al salir del punto de partida</p>
+                            @else
+                                <div class="text-center py-2">
+                                    <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+                                        <h5 class="fw-bold mb-0 text-primary d-inline-flex align-items-center gap-2" style="font-size: 1.3rem;">
+                                            <span class="spinner-grow text-success" style="width: 1.25rem; height: 1.25rem;" role="status"></span>
+                                            Recorrido en Progreso
+                                        </h5>
+                                        <button class="btn btn-dark rounded-pill px-3 py-2 d-flex align-items-center gap-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalQRViaje">
+                                            <span class="material-symbols-rounded">qr_code_2</span> 
+                                            <span class="small fw-bold">Ver QR de Viaje</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="bg-light p-4 rounded-4 my-3 mx-auto" style="max-width: 450px; border: 2px dashed #cbd5e1;">
+                                        <p class="mb-2 text-muted fw-bold text-uppercase small letter-spacing-1">Dirigiéndose en sentido</p>
+                                        <h2 class="fw-black text-dark mb-0 d-flex align-items-center justify-content-center gap-2">
+                                            <span class="material-symbols-rounded fs-2 text-primary">{{ $recorridoActivo->sentido == 'IDA' ? 'trending_flat' : 'sync_alt' }}</span>
+                                            {{ $recorridoActivo->sentido }}
+                                        </h2>
+                                    </div>
+                                    <p class="mb-4 d-flex justify-content-center align-items-center gap-2 text-muted" style="font-size: 1.1rem;">
+                                        <span class="material-symbols-rounded">schedule</span>
+                                        Hora de salida: <strong class="text-dark">{{ \Carbon\Carbon::parse($recorridoActivo->hora_salida)->format('h:i A') }}</strong>
+                                    </p>
+                                    
+                                    <form action="{{ route('conductor.finalizarRecorrido', $recorridoActivo->id_recorrido) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-warning py-3 fw-bold text-dark rounded-pill shadow-sm d-inline-flex border-0 justify-content-center align-items-center gap-2 transition-all w-100" style="font-size: 1.25rem; max-width: 450px;">
+                                            <span class="material-symbols-rounded fs-3">sports_score</span> Llegada a Destino Final
+                                        </button>
+                                    </form>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
                 @endif
@@ -475,10 +486,71 @@
 </div>
 @endif
 
+<!-- MODAL QR DE VIAJE -->
+@if(isset($recorridoActivo) && $recorridoActivo)
+<div class="modal fade" id="modalQRViaje" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-dark text-white border-0 py-3">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded text-primary">qr_code_scanner</span> <span class="text-white-50">Código de Validación</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-toggle="modal" data-bs-target="#modalQRViaje"></button>
+            </div>
+            <div class="modal-body p-5 text-center bg-white">
+                <p class="text-secondary fw-bold text-uppercase small mb-4">Muestre este código al controlador de tiempo</p>
+                
+                <div class="d-inline-block p-3 bg-white border rounded-4 shadow-sm mb-4">
+                    <div id="qrcode-container"></div>
+                </div>
+
+                <div class="mt-2">
+                    <h4 class="fw-black text-dark mb-0">{{ $recorridoActivo->bus->placa ?? '...' }}</h4>
+                    <p class="text-primary small fw-bold text-uppercase">Ruta: {{ $recorridoActivo->ruta->nombre_ruta ?? '...' }}</p>
+                </div>
+
+                <div class="alert alert-dark bg-dark border-0 rounded-4 mt-4 text-start p-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="material-symbols-rounded fs-5 text-primary">info</span>
+                        <span class="fw-bold text-white small">Información del Código</span>
+                    </div>
+                    <p class="small text-white opacity-75 mb-0">
+                        Este código contiene su ID de recorrido actual. El controlador podrá verificar sus tiempos y pasajeros escaneándolo.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pb-4">
+                <button type="button" class="btn btn-dark w-100 py-3 rounded-pill fw-bold" data-bs-dismiss="modal">Listo, Entendido</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
 @endsection
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+@if(isset($recorridoActivo) && $recorridoActivo)
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const qrContainer = document.getElementById("qrcode-container");
+        if (qrContainer) {
+            // Generamos el QR con el ID del recorrido
+            new QRCode(qrContainer, {
+                text: "{{ $recorridoActivo->id_recorrido }}",
+                width: 250,
+                height: 250,
+                colorDark: "#212529",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+    });
+</script>
+@endif
 @if(request('view') == 'calendario')
 <!-- SOLO Renderizar calendario si estamos en la vista calendario para ahorrar memoria -->
 <script>

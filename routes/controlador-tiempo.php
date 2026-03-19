@@ -24,4 +24,11 @@ Route::prefix('controlador-tiempo')
         Route::get('planillas', [PlanillaController::class, 'index'])->name('planillas.index');
         Route::post('planillas', [PlanillaController::class, 'store'])->name('planillas.store');
         Route::post('planillas/{id}/novedad', [PlanillaController::class, 'registrarNovedad'])->name('planillas.novedad');
+
+        // Verificación QR
+        Route::prefix('verificacion')->name('verificacion.')->group(function() {
+            Route::get('/scanner', [App\Http\Controllers\ControladorTiempo\VerificacionController::class, 'scanner'])->name('scanner');
+            Route::get('/{id}', [App\Http\Controllers\ControladorTiempo\VerificacionController::class, 'show'])->name('show');
+            Route::post('/{id}/checkpoint', [App\Http\Controllers\ControladorTiempo\VerificacionController::class, 'registrarCheckpoint'])->name('checkpoint');
+        });
     });
