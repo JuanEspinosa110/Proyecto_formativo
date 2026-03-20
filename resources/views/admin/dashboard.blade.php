@@ -22,7 +22,12 @@
                             <span class="material-symbols-rounded">description</span>
                         </div>
                         <div>
-                            <h6 class="fw-bold mb-1 text-dark">Solicitudes de Documentos</h6>
+                            <h6 class="fw-bold mb-1 text-dark d-flex align-items-center gap-1">
+                                Solicitudes de Documentos
+                                @if(isset($documentosPendientes) && $documentosPendientes > 0)
+                                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill" style="font-size: 0.75rem; padding: 0.35em 0.65em;">{{ $documentosPendientes }}</span>
+                                @endif
+                            </h6>
                             <span class="small text-primary fw-semibold">Gestionar Solicitudes &rarr;</span>
                         </div>
                     </div>

@@ -18,6 +18,13 @@
         </div>
     </div>
 
+    @if($documentos->total() > 0)
+    <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center gap-2 mb-4">
+        <span class="material-symbols-rounded text-warning">warning</span>
+        <span class="fw-medium">Tienes <strong class="text-dark">{{ $documentos->total() }}</strong> documentos pendientes por revisar.</span>
+    </div>
+    @endif
+
     <!-- Filtros -->
     <div class="card border-0 shadow-sm mb-4 rounded-3">
         <div class="card-body p-3">

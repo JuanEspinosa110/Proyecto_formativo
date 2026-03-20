@@ -68,7 +68,7 @@ class UsuarioController extends Controller
 
         $docs_licencia = \App\Models\Documento::whereIn('doc_usuario', collect($usuarios->items())->pluck('doc_usuario'))
             ->where('id_tipo_documento', 3)
-            ->where('id_estado', 1)
+            ->whereIn('id_estado', [1, 21])
             ->get()->keyBy('doc_usuario');
 
         // Alertas globales de licencias para el Admin
@@ -143,20 +143,24 @@ class UsuarioController extends Controller
                 $data['foto_usuario'] = $path;
             }
 
+            // Validar licencia de conducción si es conductor
+            if ($esConductor) {
+                $fecha_nac = \Carbon\Carbon::parse($request->fecha_nacimiento);
+                $fecha_exp = \Carbon\Carbon::parse($request->fecha_expedicion);
+                $edad = $fecha_exp->diffInYears($fecha_nac);
+                $fecha_venc = ($edad < 60) ? $fecha_exp->copy()->addYears(3) : $fecha_exp->copy()->addYear();
+
+                if ($fecha_venc->isPast()) {
+                    $data['id_estado'] = 2; // INACTIVO
+                    session()->flash('warning', 'El conductor tiene la licencia vencida, por lo tanto su estado se ha definido como INACTIVO.');
+                }
+            }
+
             Usuario::create($data);
 
             // Si es conductor, crear el documento
             if ($esConductor && $request->hasFile('archivo_licencia')) {
-                // Cálculo de vigencia en Backend según normas de Colombia
-                $fecha_nac = \Carbon\Carbon::parse($request->fecha_nacimiento);
-                $fecha_exp = \Carbon\Carbon::parse($request->fecha_expedicion);
-                $edad = $fecha_exp->diffInYears($fecha_nac);
-
-                if ($edad < 60) {
-                    $fecha_venc = $fecha_exp->copy()->addYears(3);
-                } else {
-                    $fecha_venc = $fecha_exp->copy()->addYear();
-                }
+                // Cálculo de vigencia en Backend (Precalculado arriba)
 
                 $pathLicencia = $request->file('archivo_licencia')->store('documentos', 'public');
                 \App\Models\Documento::create([
@@ -167,7 +171,7 @@ class UsuarioController extends Controller
                     'id_tipo_documento' => 3, // ID de la licencia
                     'doc_usuario' => $request->doc_usuario,
                     'NIT' => Auth::user()->NIT,
-                    'id_estado' => 1
+                    'id_estado' => $fecha_venc->isPast() ? 21 : 1
                 ]);
             }
 

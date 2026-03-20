@@ -102,7 +102,12 @@
                 <!-- Documentos -->
                 <div class="col-md-4">
                     <a href="{{ route('empresa.documentos.solicitudes') }}" class="card h-100 border-0 shadow-sm rounded-4 p-3 bg-white hover-up transition text-decoration-none">
-                        <div class="card-body d-flex flex-column text-center">
+                        <div class="card-body d-flex flex-column text-center position-relative">
+                            @if(isset($documentosPendientes) && $documentosPendientes > 0)
+                                <span class="position-absolute badge rounded-pill bg-danger shadow-sm" style="top: -5px; right: -5px; font-size: 0.75rem; padding: 0.4em 0.6em;">
+                                    {{ $documentosPendientes }}
+                                </span>
+                            @endif
                             <div class="bg-info-subtle rounded-4 p-3 mb-3 mx-auto" style="width: 55px; height: 55px; display: flex; align-items: center; justify-content: center;">
                                 <span class="material-symbols-rounded fs-2 text-info">folder_shared</span>
                             </div>

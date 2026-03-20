@@ -83,7 +83,14 @@ class AsignacionController extends Controller
             ->where('nombre_tipo', 'like', '%admin%')
             ->pluck('id_tipo_usuario');
 
+        $licenciasVigentes = \App\Models\Documento::where('id_tipo_documento', 3)
+            ->where('id_estado', 1) // Activo/Vigente
+            ->whereDate('fecha_vencimiento', '>=', now()->format('Y-m-d'))
+            ->pluck('doc_usuario');
+
         $conductores = Usuario::where('NIT', $nit)
+            ->where('id_estado', 1) // ACTIVO
+            ->whereIn('doc_usuario', $licenciasVigentes)
             ->whereNotIn('id_tipo_usuario', $adminRoleIds)
             ->get();
         $estados = Estado::whereIn('nombre_estado', ['ACTIVO', 'INACTIVO'])->get();

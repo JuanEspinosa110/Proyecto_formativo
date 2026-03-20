@@ -79,6 +79,12 @@ class DashboardController extends Controller
             ->where('id_estado', 2) // Inactivo
             ->get();
 
+        $documentosPendientes = DB::table('documento')
+            ->where('NIT', $nit)
+            ->whereNotNull('placa')
+            ->whereNotIn('id_estado', [24, 25])
+            ->count();
+
         return view('auxiliar.dashboard', compact(
             'totalConductores', 
             'totalPropietarios', 
@@ -86,7 +92,8 @@ class DashboardController extends Controller
             'docsVencidos', 
             'docsProximos',
             'alertasDocumentos',
-            'busesInactivos'
+            'busesInactivos',
+            'documentosPendientes'
         ));
     }
 }

@@ -74,6 +74,10 @@ class Documento extends Model
     // Métodos auxiliares
     public function getEstadoExpiracionAttribute()
     {
+        if ($this->id_tipo_documento == 6) {
+            return 'VIGENTE';
+        }
+
         if ($this->id_estado == 2 || $this->id_estado == 22) {
             return 'ARCHIVADO';
         }

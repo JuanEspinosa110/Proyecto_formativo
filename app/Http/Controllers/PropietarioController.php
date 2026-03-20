@@ -204,13 +204,18 @@ class PropietarioController extends Controller
             return redirect()->back()->with('error', 'No tienes un vehículo asociado para subir documentos.');
         }
 
-        $request->validate([
+        $rules = [
             'placa' => 'required|in:' . implode(',', $buses),
             'id_tipo_documento' => 'required|exists:tipo_documento,id_tipo_documento|not_in:3',
             'archivo' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'fecha_expedicion' => 'required|date|before_or_equal:today',
-            'fecha_vencimiento' => 'required|date|after_or_equal:today',
-        ], [
+        ];
+
+        if ($request->id_tipo_documento != 6) {
+            $rules['fecha_vencimiento'] = 'required|date|after_or_equal:today';
+        }
+
+        $request->validate($rules, [
             'fecha_vencimiento.after_or_equal' => 'El documento que intentas subir ya se encuentra vencido. Por favor, sube un documento vigente.',
             'fecha_expedicion.before_or_equal' => 'La fecha de expedición no puede ser una fecha futura.'
         ]);
@@ -240,7 +245,11 @@ class PropietarioController extends Controller
             }
         } else {
             // Otros (o si viene en el request)
-            $fecha_venc = $request->fecha_vencimiento ? \Carbon\Carbon::parse($request->fecha_vencimiento) : $fecha_exp->copy()->addYear();
+            if ($request->id_tipo_documento == 6) {
+                $fecha_venc = \Carbon\Carbon::parse('2099-12-31');
+            } else {
+                $fecha_venc = $request->fecha_vencimiento ? \Carbon\Carbon::parse($request->fecha_vencimiento) : $fecha_exp->copy()->addYear();
+            }
         }
 
         try {
@@ -303,11 +312,16 @@ class PropietarioController extends Controller
             ->whereIn('placa', $busIds)
             ->firstOrFail();
 
-        $request->validate([
+        $rules = [
             'archivo' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'fecha_expedicion' => 'required|date|before_or_equal:today',
-            'fecha_vencimiento' => 'required|date|after:fecha_expedicion',
-        ]);
+        ];
+
+        if ($documento->id_tipo_documento != 6) {
+            $rules['fecha_vencimiento'] = 'required|date|after:fecha_expedicion';
+        }
+
+        $request->validate($rules);
 
         try {
             $data = [

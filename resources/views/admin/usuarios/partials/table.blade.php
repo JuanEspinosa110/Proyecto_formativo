@@ -38,6 +38,16 @@
                             <span class="badge bg-light text-dark border px-2 fw-semibold">
                                 {{ $u->nombre_tipo ?? 'N/A' }}
                             </span>
+                            @if(isset($docs_licencia[$u->doc_usuario]))
+                                @php $lic = $docs_licencia[$u->doc_usuario]; @endphp
+                                @if(!$lic->isVigente())
+                                    <div class="mt-1">
+                                        <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2 d-inline-flex align-items-center gap-1" style="font-size: 0.65rem;">
+                                            <span class="material-symbols-rounded" style="font-size: 0.8rem;">error</span> Licencia Vencida
+                                        </span>
+                                    </div>
+                                @endif
+                            @endif
                         </td>
                         <td>
                             @php
