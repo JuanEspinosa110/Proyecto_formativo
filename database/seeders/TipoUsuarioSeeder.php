@@ -9,10 +9,7 @@ class TipoUsuarioSeeder extends Seeder
 {
     public function run()
     {
-        // Vacía la tabla y reinicia el autoincrement
-        DB::table('tipo_usuario')->truncate();
-
-        DB::table('tipo_usuario')->insert([
+        DB::table('tipo_usuario')->insertOrIgnore([
             ['nombre_tipo' => 'Admin'],
             ['nombre_tipo' => 'Pasajero'],
             ['nombre_tipo' => 'CONDUCTOR'],

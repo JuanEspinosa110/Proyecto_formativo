@@ -27,24 +27,22 @@ class InitialDataSeeder extends Seeder
                 ['nombre_estado' => $estado['nombre_estado']]
             );
         }
-        // Limpiar la tabla para evitar duplicados
-        DB::table('tipo_usuario')->delete();
         // 1. Estados
-        DB::table('estado')->insert([
+        DB::table('estado')->insertOrIgnore([
             ['id_estado' => 1, 'nombre_estado' => 'ACTIVO', 'descripcion' => 'Operativo'],
             ['id_estado' => 2, 'nombre_estado' => 'INACTIVO', 'descripcion' => 'No operativo'],
         ]);
 
         // 2. Departamento & Ciudad
-        DB::table('departamento')->insert(['id_departamento' => '73', 'nombre_departamento' => 'TOLIMA']);
-        DB::table('ciudad')->insert(['id_ciudad' => '730001', 'nombre_city' => 'IBAGUE', 'id_departamento' => '73']);
+        DB::table('departamento')->insertOrIgnore(['id_departamento' => '73', 'nombre_departamento' => 'TOLIMA']);
+        DB::table('ciudad')->insertOrIgnore(['id_ciudad' => '730001', 'nombre_city' => 'IBAGUE', 'id_departamento' => '73']);
 
         // 3. Tipos
-        DB::table('tipo_empresa')->insert(['id_tipo_empresa' => 1, 'nombre_tipo' => 'COOPERATIVA']);
-        DB::table('tipo_usuario')->insert(['id_tipo_usuario' => 1, 'nombre_tipo' => 'ADMINISTRADOR']);
+        DB::table('tipo_empresa')->insertOrIgnore(['id_tipo_empresa' => 1, 'nombre_tipo' => 'COOPERATIVA']);
+        DB::table('tipo_usuario')->insertOrIgnore(['id_tipo_usuario' => 1, 'nombre_tipo' => 'ADMINISTRADOR']);
 
         // 4. Empresa de prueba
-        DB::table('empresa')->insert([
+        DB::table('empresa')->insertOrIgnore([
             'NIT' => 900123456,
             'nombre_empresa' => 'TRANSPORTE TEST SAS',
             'doc_representante' => 1000000001,
@@ -56,14 +54,14 @@ class InitialDataSeeder extends Seeder
         ]);
 
         // 5. Barrio (Ibagué)
-        DB::table('barrio')->insert([
+        DB::table('barrio')->insertOrIgnore([
             ['id_barrio' => 1, 'nombre' => 'EL SALADO', 'id_ciudad' => '730001'],
             ['id_barrio' => 2, 'nombre' => 'PICALEÑA', 'id_ciudad' => '730001'],
             ['id_barrio' => 3, 'nombre' => 'CENTRO', 'id_ciudad' => '730001'],
             ['id_barrio' => 4, 'nombre' => 'JORDAN', 'id_ciudad' => '730001'],
         ]);
         // 5. Super Administrador
-        DB::table('super_administrador')->insert([
+        DB::table('super_administrador')->insertOrIgnore([
             'doc_super_admin' => 1000000001,
             'nombre' => 'Admin Sistema',
             'correo' => 'admin@sigu.com',
@@ -74,7 +72,7 @@ class InitialDataSeeder extends Seeder
         ]);
 
         // 6. Planes de Licencia
-        DB::table('planes_licencia')->insert([
+        DB::table('planes_licencia')->insertOrIgnore([
             [
                 'id_plan' => 1,
                 'nombre_plan' => 'Básico',
@@ -101,7 +99,7 @@ class InitialDataSeeder extends Seeder
             ],
         ]);
         // 7. Rutas (Ibagué)
-        DB::table('ruta')->insert([
+        DB::table('ruta')->insertOrIgnore([
             [
                 'id_ruta' => 123456,
                 'codigo_ruta' => 1,

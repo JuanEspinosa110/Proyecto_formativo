@@ -13,14 +13,18 @@ class SuperAdministradorSeeder extends Seeder
      */
     public function run(): void
     {
-        SuperAdministrador::create([
-            'doc_super_admin' => 1105463369, // Cambia por tu documento
-            'nombre' => 'Juanes',
-            'correo' => 'juanitosexy09@gmail.com',
-            'telefono' => '3228881996',
-            'foto_perfil' => null,
-            'password' => Hash::make('Juanes110*'), // Cambia por tu contraseña
-            'id_estado' => 1,
-        ]);
+        SuperAdministrador::firstOrCreate(
+            [
+                'doc_super_admin' => 1105463369
+            ],
+            [
+                'nombre' => 'Juanes',
+                'correo' => 'juanitosexy09@gmail.com',
+                'telefono' => '3228881996',
+                'foto_perfil' => null,
+                'password' => Hash::make('Juanes110*'),
+                'id_estado' => 1,
+            ]
+        );
     }
 }

@@ -9,10 +9,7 @@ class TipoEmpresaSeeder extends Seeder
 {
     public function run()
     {
-        // Vacía la tabla y reinicia el autoincrement
-        DB::table('tipo_empresa')->truncate();
-
-        DB::table('tipo_empresa')->insert([
+        DB::table('tipo_empresa')->insertOrIgnore([
             ['nombre_tipo' => 'EMPRESA DE TRANSPORTE'],
             ['nombre_tipo' => 'EMPRESA DE MANTENIMIENTO'],
             ['nombre_tipo' => 'EMPRESA DE RECARGA'],
