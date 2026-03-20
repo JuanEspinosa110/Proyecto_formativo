@@ -1,6 +1,6 @@
-@extends('auxiliar.layouts.app')
+@extends('admin.layouts.app')
 
-@section('title', 'Generar Reportes — Auxiliar')
+@section('title', 'Generar Reportes — SIGU')
 
 @section('content')
 <div class="container-fluid pt-0 pb-4">
@@ -24,8 +24,7 @@
                     <span class="material-symbols-rounded text-primary">analytics</span> Configurar Reporte
                 </h5>
 
-                <form method="POST" action="{{ route('auxiliar.reportes.export') }}">
-                    @csrf
+                <form method="GET" action="{{ route('empresa.reportes.export') }}">
                     
                     <div class="row g-3">
                         <!-- Tipo de Reporte -->
@@ -39,6 +38,15 @@
                                 <option value="documentos">Inventario de Documentación</option>
                             </select>
                             @error('tipo_reporte') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <!-- Formato de Reporte -->
+                        <div class="col-12">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Formato de Descarga <span class="text-danger">*</span></label>
+                            <select name="formato" id="formato" class="form-select" required>
+                                <option value="excel" selected>Excel (.xlsx)</option>
+                                <option value="pdf">PDF (.pdf)</option>
+                            </select>
                         </div>
 
                         <!-- Rango de Fechas (Condicional) -->
@@ -55,8 +63,8 @@
                         </div>
 
                         <div class="col-12 mt-4 d-grid">
-                            <button type="submit" class="btn btn-success fw-bold rounded-pill shadow-sm py-2">
-                                <span class="material-symbols-rounded fs-5 align-middle me-1">download_for_offline</span> Descargar Excel
+                            <button type="submit" class="btn btn-primary fw-bold rounded-pill shadow-sm py-2">
+                                <span class="material-symbols-rounded fs-5 align-middle me-1">download</span> Descargar Reporte
                             </button>
                         </div>
                     </div>
@@ -112,10 +120,51 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             wrapIni.classList.add('d-none');
             wrapFin.classList.add('d-none');
-            // Limpiar inputs
             wrapIni.querySelector('input').value = '';
             wrapFin.querySelector('input').value = '';
         }
+    });
+
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Descargando...';
+
+        const formData = new FormData(form);
+        const params = new URLSearchParams(formData).toString();
+        const url = form.action + '?' + params;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error('Error en descarga');
+                const contentType = response.headers.get('content-type');
+                const isExcel = contentType && (contentType.includes('spreadsheet') || contentType.includes('excel') || contentType.includes('xlsx'));
+                const extension = isExcel ? 'xlsx' : 'pdf';
+                return response.blob().then(blob => ({ blob, extension }));
+            })
+            .then(({ blob, extension }) => {
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                const tipo = selectTipo.value || 'reporte';
+                a.download = `reporte_${tipo}_${new Date().getTime()}.${extension}`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(downloadUrl);
+            })
+            .catch(err => {
+                alert('No se pudo descargar el reporte. Intente nuevamente.');
+                console.error(err);
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            });
     });
 });
 </script>

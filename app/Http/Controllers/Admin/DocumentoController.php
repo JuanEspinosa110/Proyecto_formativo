@@ -135,6 +135,15 @@ class DocumentoController extends Controller
         if ($request->filled('estado')) {
             $query->where('id_estado', $request->estado);
         }
+        if ($request->filled('placa')) {
+            $query->where('placa', 'like', '%' . $request->placa . '%');
+        }
+        if ($request->filled('propietario')) {
+            $query->whereHas('bus', function($q) use ($request) {
+                $q->where('nombre_propietario', 'like', '%' . $request->propietario . '%')
+                  ->orWhere('doc_propietario', 'like', '%' . $request->propietario . '%');
+            });
+        }
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -148,7 +157,43 @@ class DocumentoController extends Controller
         $tiposDocumento = TipoDocumento::where('id_estado', 1)->get();
         $estados = Estado::all();
 
+        if ($request->ajax()) {
+            return view('admin.documentos.partials.table', compact('documentos'));
+        }
+
         return view('admin.documentos.index', compact('documentos', 'tiposDocumento', 'estados', 'empresa'));
+    }
+
+    /**
+     * Mostrar solicitudes de aprobación de documentos (Pendientes)
+     */
+    public function solicitudes(Request $request)
+    {
+        $empresa = $this->getEmpresaAdmin();
+
+        if (!$empresa) {
+            return redirect()->route('admin.dashboard')->with('error', ' No tiene empresa asignada');
+        }
+
+        $query = Documento::where('NIT', $empresa->NIT)
+            ->with(['tipoDocumento', 'estado', 'bus'])
+            ->whereNotNull('placa'); 
+
+        // Filtrar solicitudes: Excluir Aprobados (24) y Rechazados (25)
+        $query->whereNotIn('id_estado', [24, 25]);
+
+        if ($request->filled('placa')) {
+            $query->where('placa', 'like', '%' . $request->placa . '%');
+        }
+        if ($request->filled('propietario')) {
+            $query->whereHas('bus', function($q) use ($request) {
+                $q->where('nombre_propietario', 'like', '%' . $request->propietario . '%');
+            });
+        }
+
+        $documentos = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        return view('admin.documentos.solicitudes', compact('documentos', 'empresa'));
     }
 
     /**
@@ -578,5 +623,44 @@ class DocumentoController extends Controller
     private function generarIdDocumento()
     {
         return (Documento::max('id_documento') ?? 0) + 1;
+    }
+    /**
+     * Aprobar documento y actualizar estado del Bus
+     */
+    public function aprobar($id)
+    {
+        $documento = Documento::findOrFail($id);
+        $documento->id_estado = 24; // APROBADO
+        $documento->save();
+
+        if ($documento->placa) {
+            $bus = $documento->bus;
+            if ($bus) {
+                $bus->id_estado = $bus->isOperable() ? 1 : 2; 
+                $bus->save();
+            }
+        }
+
+        return redirect()->back()->with('success', 'Documento APROBADO. Estado del vehículo actualizado.');
+    }
+
+    /**
+     * Rechazar documento y actualizar estado del Bus
+     */
+    public function rechazar($id)
+    {
+        $documento = Documento::findOrFail($id);
+        $documento->id_estado = 25; // RECHAZADO
+        $documento->save();
+
+        if ($documento->placa) {
+            $bus = $documento->bus;
+            if ($bus) {
+                $bus->id_estado = 2; // Inactivo
+                $bus->save();
+            }
+        }
+
+        return redirect()->back()->with('success', 'Documento RECHAZADO. El vehículo ha sido INACTIVADO.');
     }
 }

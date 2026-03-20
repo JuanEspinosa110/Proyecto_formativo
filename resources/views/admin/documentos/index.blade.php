@@ -26,10 +26,10 @@
 <!-- Filtros -->
 <div class="sa-filters-section">
     <form method="GET" action="{{ route('admin.documentos.index') }}" class="row g-3 align-items-end">
-        <div class="col-md-3">
-            <label for="tipo" class="form-label small fw-bold text-muted text-uppercase">Tipo de Documento</label>
+        <div class="col-md-2">
+            <label for="tipo" class="form-label small fw-bold text-muted text-uppercase">Tipo</label>
             <select name="tipo" id="tipo" class="form-select bg-light border-0">
-                <option value="">Todos los tipos</option>
+                <option value="">Todos</option>
                 @foreach ($tiposDocumento as $tipo)
                 <option value="{{ $tipo->id_tipo_documento }}" {{ request('tipo') == $tipo->id_tipo_documento ? 'selected' : '' }}>
                     {{ $tipo->nombre }}
@@ -38,10 +38,10 @@
             </select>
         </div>
 
-        <div class="col-md-3">
-            <label for="estado" class="form-label small fw-bold text-muted text-uppercase">Estado Revisión</label>
+        <div class="col-md-2">
+            <label for="estado" class="form-label small fw-bold text-muted text-uppercase">Estado</label>
             <select name="estado" id="estado" class="form-select bg-light border-0">
-                <option value="">Todos los estados</option>
+                <option value="">Todos</option>
                 @foreach ($estados as $est)
                 <option value="{{ $est->id_estado }}" {{ request('estado') == $est->id_estado ? 'selected' : '' }}>
                     {{ $est->nombre_estado }}
@@ -50,9 +50,14 @@
             </select>
         </div>
 
+        <div class="col-md-2">
+            <label for="placa" class="form-label small fw-bold text-muted text-uppercase">Placa</label>
+            <input type="text" name="placa" id="placa" class="form-control bg-light border-0" placeholder="Ej: ABC123" value="{{ request('placa') }}">
+        </div>
+
         <div class="col-md-4">
-            <label for="search" class="form-label small fw-bold text-muted text-uppercase">Buscar Vehículo</label>
-            <input type="text" name="search" id="search" class="form-control bg-light border-0" placeholder="Ingrese placa..." value="{{ request('search') }}">
+            <label for="propietario" class="form-label small fw-bold text-muted text-uppercase">Propietario / ID</label>
+            <input type="text" name="propietario" id="propietario" class="form-control bg-light border-0" placeholder="Nombre o Cédula..." value="{{ request('propietario') }}">
         </div>
 
         <div class="col-md-2">
@@ -63,100 +68,8 @@
     </form>
 </div>
 
-<!-- Tabla de Documentos -->
-<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-    <div class="table-responsive">
-        @if($documentos->count() > 0)
-        <table class="table table-hover align-middle mb-0">
-            <thead class="bg-light">
-                <tr>
-                    <th class="ps-4 py-3 text-uppercase small fw-bold text-muted border-0">Vehículo / Placa</th>
-                    <th class="py-3 text-uppercase small fw-bold text-muted border-0">Propietario</th>
-                    <th class="py-3 text-uppercase small fw-bold text-muted border-0">Tipo</th>
-                    <th class="py-3 text-uppercase small fw-bold text-muted border-0">Vencimiento</th>
-                    <th class="py-3 text-uppercase small fw-bold text-muted border-0">Estado Flota</th>
-                    <th class="py-3 text-uppercase small fw-bold text-muted border-0 text-center">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($documentos as $documento)
-                <tr>
-                    <td class="ps-4">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-3">
-                                <span class="material-symbols-rounded">directions_bus</span>
-                            </div>
-                            <div>
-                                <strong class="d-block text-dark fs-6">{{ $documento->placa }}</strong>
-                                <small class="text-muted">{{ $documento->nombre }}</small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="text-dark fw-medium small">{{ $documento->bus->nombre_propietario ?? 'No asignado' }}</div>
-                        <small class="text-muted">ID: {{ $documento->bus->doc_propietario ?? '---' }}</small>
-                    </td>
-                    <td>
-                        <span class="badge bg-light text-dark border fw-medium px-3 rounded-pill">
-                            {{ $documento->tipoDocumento->nombre ?? 'N/A' }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="fw-bold text-dark">
-                            {{ $documento->fecha_vencimiento->format('d/m/Y') }}
-                        </div>
-                        <span class="badge bg-{{ $documento->status_color }}-subtle text-{{ $documento->status_color }} small rounded-pill px-2 border border-{{ $documento->status_color }}" style="font-size: 0.65rem; font-weight: 700;">
-                            {{ $documento->estado_expiracion }}
-                        </span>
-                    </td>
-                    <td>
-                        @php
-                        $badgeClass = match($documento->id_estado) {
-                            1 => 'bg-success',
-                            20 => 'bg-success',
-                            21 => 'bg-danger',
-                            default => 'bg-secondary'
-                        };
-                        @endphp
-                        <span class="badge {{ $badgeClass }} rounded-pill px-3">
-                            {{ $documento->estado->nombre_estado ?? 'N/A' }}
-                        </span>
-                    </td>
-                    <td class="text-center">
-                        <div class="d-flex justify-content-center gap-2">
-                            <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold btn-visor" 
-                                data-url="{{ asset('storage/' . $documento->archivo) }}" 
-                                data-nombre="{{ $documento->nombre }}"
-                                title="Previsualizar">
-                                <span class="material-symbols-rounded fs-5">visibility</span>
-                            </button>
-                            <a href="{{ route('admin.documentos.download', $documento->id_documento) }}"
-                                class="btn btn-sm btn-light rounded-pill px-3 fw-bold" title="Descargar PDF">
-                                <span class="material-symbols-rounded fs-5">download</span>
-                            </a>
-                            <a href="{{ route('admin.documentos.edit', $documento->id_documento) }}"
-                                class="btn btn-sm btn-light rounded-pill px-3 fw-bold" title="Revisar / Cambiar Estado">
-                                <span class="material-symbols-rounded fs-5">edit</span>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+    @include('admin.documentos.partials.table')
 
-        <!-- Paginación -->
-        <div class="mt-4">
-            {{ $documentos->links('pagination::bootstrap-5') }}
-        </div>
-        @else
-        <div class="alert alert-info">
-            <span class="material-symbols-rounded">info</span>
-            No hay documentos registrados. <a href="{{ route('admin.documentos.create') }}">Crear uno ahora</a>
-        </div>
-        @endif
-    </div>
-</div>
 
 <style>
     .sa-content-header {

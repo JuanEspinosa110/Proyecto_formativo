@@ -21,6 +21,12 @@
 
     <style>
         /* Ajustes específicos para el layout horizontal del propietario */
+        .sigu-body {
+            background: linear-gradient(150deg, #e5dcf8ff 0%, #8271a6ff 100%) !important;
+            background-attachment: fixed !important;
+            min-height: 100vh;
+        }
+
         .sigu-navbar {
             position: sticky;
             top: 0;

@@ -43,11 +43,16 @@ class LoginController extends Controller
                     return redirect()->route('pasajero.dashboard');
 
                 case 3:
+                    return redirect()->route('conductor.dashboard');
+
+                case 4:
                     return redirect()->route('empresa.dashboard');
                 
+                case 5:
+                    return redirect()->route('empresa.dashboard'); // Auxiliar
+
                 case 6:
-                case 9:
-                    return redirect()->route('propietario.dashboard');
+                    return redirect()->route('propietario.dashboard'); // Propietario
 
                 default:
                     Auth::guard('web')->logout();

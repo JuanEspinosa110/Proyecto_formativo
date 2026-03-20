@@ -29,8 +29,17 @@ class ConductorController extends Controller
         // 2. Estado de la jornada actual
         // Buscar si tiene un turno activo (1 = Activo) o en curso (12 = En curso) programado para HOY
         $asignacionActiva = $asignaciones->filter(function($asig) use ($hoy) {
-            return in_array($asig->id_estado, [1, 12]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
+            return in_array($asig->id_estado, [1, 12, 8]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
         })->first();
+
+        // **Auto-vencer turno si pasan más de 4 horas sin iniciar**
+        if ($asignacionActiva && $asignacionActiva->id_estado == 1) {
+            $horaProgramada = Carbon::parse($asignacionActiva->fecha);
+            if (Carbon::now()->greaterThan($horaProgramada->copy()->addHours(4))) {
+                $asignacionActiva->id_estado = 8; // Vencida
+                $asignacionActiva->save();
+            }
+        }
 
         // Buscar si ya finalizó su turno hoy (8 = FUERA DE SERVICIO)
         $turnoFinalizadoHoy = $asignaciones->filter(function($asig) use ($hoy) {
@@ -61,6 +70,16 @@ class ConductorController extends Controller
         $recorridoActivo = Recorrido::where('doc_us', $conductor->doc_usuario)
             ->whereNull('hora_llegada')
             ->first();
+
+        // **Auto-finalizar recorrido si lleva más de 30 minutos**
+        if ($recorridoActivo) {
+            $horaSalida = Carbon::parse($recorridoActivo->hora_salida);
+            if ($horaSalida->addMinutes(30)->isPast()) {
+                $recorridoActivo->hora_llegada = $horaSalida->copy()->addMinutes(30);
+                $recorridoActivo->save();
+                $recorridoActivo = null; // Limpiar
+            }
+        }
 
         // 6. Historial de Recorridos (Trazabilidad dia actual y generales)
         // Primero obtener TODOS los recorridos de hoy para los contadores totales
@@ -137,13 +156,50 @@ class ConductorController extends Controller
             'id_estado' => 19 // PENDIENTE
         ]);
 
-        return redirect()->back()->with('success', 'Reporte de falla mecánica enviado exitosamente.');
+        // Cierre automático de turno si hay uno activo
+        $conductor = Auth::guard('web')->user();
+        $hoy = Carbon::today();
+        
+        $asignacionActiva = Viaje::where('doc_us', $conductor->doc_usuario)
+            ->whereIn('id_estado', [1, 12]) // EN_CURSO o PROGRAMADO
+            ->where('placa', $request->placa)
+            ->first();
+
+        if ($asignacionActiva) {
+            $asignacionActiva->id_estado = 8; // FUERA_DE_SERVICIO
+            $asignacionActiva->save();
+
+            // También finalizar recorrido activo en pista si existe
+            $recorridoActivo = Recorrido::where('doc_us', $conductor->doc_usuario)
+                ->whereNull('hora_llegada')
+                ->first();
+            if ($recorridoActivo) {
+                $recorridoActivo->hora_llegada = Carbon::now();
+                $recorridoActivo->save();
+            }
+        }
+
+        return redirect()->back()->with('success', 'Reporte de falla enviado exitosamente. Su turno ha sido FINALIZADO preventivamente.');
     }
 
     // LÓGICA DE JORNADA
     public function iniciarTurno($id_viaje)
     {
         $viaje = Viaje::findOrFail($id_viaje);
+
+        // **Validación de Estado para iniciar turno**
+        if ($viaje->id_estado != 1) { // 1 = Activo/Programado
+            return redirect()->back()->with('error', 'El turno no se encuentra en estado programado o ya fue procesado.');
+        }
+        
+        // Validación de Horario (30 min antes - 4h después)
+        $horaProgramada = Carbon::parse($viaje->fecha);
+        $ahora = Carbon::now();
+        $puedeIniciar = $ahora->between($horaProgramada->copy()->subMinutes(30), $horaProgramada->copy()->addHours(4));
+
+        if (!$puedeIniciar) {
+            return redirect()->back()->with('error', 'No puede iniciar el turno fuera del horario permitido (30 min antes o hasta 4h después de la hora programada).');
+        }
         
         // Bloqueo de seguridad si la licencia está vencida (validar de nuevo backend)
         $docs = Documento::where('doc_usuario', Auth::guard('web')->id())->get();
@@ -179,6 +235,11 @@ class ConductorController extends Controller
     public function iniciarRecorrido(Request $request, $id_viaje)
     {
         $viaje = Viaje::findOrFail($id_viaje);
+
+        // Validar que el turno esté en curso (12) antes de iniciar recorrido
+        if ($viaje->id_estado != 12) {
+            return redirect()->back()->with('error', 'Debe iniciar su turno antes de comenzar un recorrido.');
+        }
         
         $request->validate([
             'sentido' => 'required|string|in:IDA,VUELTA'

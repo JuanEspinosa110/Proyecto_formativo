@@ -69,227 +69,12 @@
     </div>
     @endif
 
-    <!-- Tabla de Datos Reales -->
-    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th class="ps-4 py-3 text-uppercase small fw-bold text-muted border-0">Vehículo / Propietario</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Datos Técnicos</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Capacidad</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Kilometraje</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Estado</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0 text-end pe-4">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($buses as $bus)
-                    <tr class="border-top">
-                        <td class="ps-4">
-                            <div class="d-flex align-items-center gap-3">
-                                <div>
-                                    <span class="d-block fw-bold text-dark fs-6">{{ $bus->placa }}</span>
-                                    <small class="text-muted d-block" style="font-size: 0.75rem;">
-                                        <span class="material-symbols-rounded fs-xs align-middle">person</span>
-                                        {{ $bus->doc_propietario ?? 'Sin propietario' }}
-                                    </small>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="lh-sm">
-                                <span class="fw-medium d-block text-dark">{{ $bus->modelo ?? 'N/D' }}</span>
-                                <small class="text-muted" style="font-size: 0.7rem;">
-                                    <strong>Chasis:</strong> {{ $bus->numero_chasis ?? '—' }} |
-                                    <strong>Motor:</strong> {{ $bus->numero_motor ?? '—' }}
-                                </small>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge bg-light text-dark border px-2 fw-medium">
-                                <span class="material-symbols-rounded fs-6 align-middle me-1">group</span>
-                                {{ $bus->capacidad_pasajeros }} pasj.
-                            </span>
-                        </td>
-                        <td class="text-muted small">
-                            <div class="d-flex align-items-center gap-1">
-                                <span class="material-symbols-rounded fs-6 opacity-50">speed</span>
-                                {{ number_format($bus->kilometraje) }} km
-                            </div>
-                            @if($bus->linc_transito)
-                            <small class="text-primary d-block mt-1" style="font-size: 0.65rem;">
-                                <strong>LIC:</strong> {{ $bus->linc_transito }}
-                            </small>
-                            @endif
-                        </td>
-                        <td>
-                            @php
-                            $c = match((int)$bus->id_estado) {
-                            1 => 'success', // Activo
-                            2 => 'danger', // Inactivo
-                            7 => 'info', // En mantenimiento
-                            default => 'warning'
-                            };
-                            @endphp
-                            <span class="badge bg-{{ $c }}-subtle text-{{ $c }} border border-{{ $c }} rounded-pill px-3">
-                                {{ optional($bus->estado)->nombre_estado ?? 'Desconocido' }}
-                            </span>
-                        </td>
-                        <td class="text-end pe-4">
-                            <div class="d-flex justify-content-end gap-3">
-                                <a href="#" 
-                                   class="text-info text-decoration-none d-flex align-items-center"
-                                   title="Ver expediente"
-                                   data-bs-toggle="modal"
-                                   data-bs-target="#modalViewBus"
-                                   data-json='@json($bus)'
-                                   data-estado="{{ optional($bus->estado)->nombre_estado }}">
-                                    <span class="material-symbols-rounded fs-5">visibility</span>
-                                </a>
-                                <a href="#" 
-                                   class="text-primary text-decoration-none d-flex align-items-center"
-                                   title="Editar vehículo"
-                                   data-bs-toggle="modal"
-                                   data-bs-target="#modalEditBus"
-                                   data-json='@json($bus)'>
-                                    <span class="material-symbols-rounded fs-5">edit</span>
-                                </a>
-                                <form action="{{ route('admin.buses.destroy', $bus->placa) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar este vehículo? Todas las asignaciones relacionadas podrían verse afectadas.')">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="p-0 border-0 bg-transparent text-danger d-flex align-items-center" title="Eliminar">
-                                        <span class="material-symbols-rounded fs-5">delete</span>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">
-                            <span class="material-symbols-rounded display-4 opacity-25">directions_bus</span>
-                            <p class="mt-2 fw-medium">No se encontraron buses que coincidan con los criterios.</p>
-                            <small>Verifica los filtros activos o agrega un nuevo registro.</small>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        <div class="p-3 border-top">
-            {{ $buses->links() }}
-        </div>
-    </div>
+    @include('admin.buses.partials.table')
+
 </div>
 
-<!-- Modal CREAR -->
-<div class="modal fade" id="modalCreateBus" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-light py-3">
-                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
-                    <span class="material-symbols-rounded text-primary me-2 fs-5">add_circle</span>
-                    REGISTRAR NUEVO VEHÍCULO
-                </h6>
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <form id="formCreateBus" action="{{ route('admin.buses.store') }}" method="POST">
-                @csrf
-                <div class="modal-body p-4">
-                    {{-- Errores de validación --}}
-                    @if($errors->any() && !old('_method'))
-                        <div class="alert alert-danger shadow-sm py-2 small mb-4">
-                            <ul class="mb-0">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
+@include('admin.buses.partials.create_modal')
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Placa <span class="text-danger">*</span></label>
-                            <input type="text" name="placa" class="form-control form-control-sm fw-bold" placeholder="ABC123" required style="text-transform:uppercase" maxlength="6">
-                            <div class="real-time-error"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Modelo / Ref. <span class="text-danger">*</span></label>
-                            <input type="text" name="modelo" class="form-control form-control-sm" placeholder="Ej: Toyota 2019" required>
-                            <div class="real-time-error"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Pasajeros <span class="text-danger">*</span></label>
-                            <input type="text" name="capacidad_pasajeros" class="form-control form-control-sm" required placeholder="00">
-                            <div class="real-time-error"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Kilometraje <span class="text-danger">*</span></label>
-                            <input type="text" name="kilometraje" class="form-control form-control-sm" required placeholder="0">
-                            <div class="real-time-error"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Licencia Tránsito <span class="text-danger">*</span></label>
-                            <input type="text" name="linc_transito" class="form-control form-control-sm" required maxlength="12" placeholder="8 dígitos">
-                            <div class="real-time-error"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Doc. Propietario <span class="text-danger">*</span></label>
-                            <input type="text" name="doc_propietario" class="form-control form-control-sm" required maxlength="15" placeholder="Máx. 10 dígitos">
-                            <div class="real-time-error"></div>
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Nombre Propietario <span class="text-danger">*</span></label>
-                            <input type="text" name="nombre_propietario" class="form-control form-control-sm" placeholder="Nombre completo" required>
-                            <div class="real-time-error"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Teléfono <span class="text-danger">*</span></label>
-                            <input type="text" name="telefono" class="form-control form-control-sm" required maxlength="10" placeholder="312...">
-                            <div class="real-time-error"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Correo <span class="text-danger">*</span></label>
-                            <input type="email" name="correo" class="form-control form-control-sm" placeholder="ejemplo@correo.com" required>
-                            <div class="real-time-error"></div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Chasis <span class="text-danger">*</span></label>
-                            <input type="text" name="numero_chasis" class="form-control form-control-sm" required maxlength="17" placeholder="17 dígitos">
-                            <small class="text-muted fs-xs">Debe contener exactamente 17 dígitos numéricos.</small>
-                            <div class="real-time-error"></div>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Serial Motor <span class="text-danger">*</span></label>
-                            <input type="text" name="numero_motor" class="form-control form-control-sm" required maxlength="17" placeholder="8-17 dígitos">
-                            <small class="text-muted fs-xs">Debe contener entre 8 y 17 dígitos numéricos según el fabricante.</small>
-                            <div class="real-time-error"></div>
-                        </div>
-
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Estado Operativo <span class="text-danger">*</span></label>
-                            <select name="id_estado" class="form-select form-select-sm" required>
-                                <option value="" selected disabled>Seleccionar...</option>
-                                @foreach($estados as $est)
-                                <option value="{{ $est->id_estado }}">{{ $est->nombre_estado }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 p-3 bg-light">
-                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
-                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold shadow-sm">GUARDAR BUS</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <!-- Modal EDITAR -->
 <div class="modal fade" id="modalEditBus" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
@@ -638,7 +423,8 @@
                 const placa = JSON.parse(btn.dataset.json).placa;
                 
                 // Cargar datos completos vía AJAX (incluye asignación)
-                const respBus = await fetch(`/admin/buses/${placa}`);
+                const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
+                const respBus = await fetch(`/${prefix}/buses/${placa}`);
                 const fullData = await respBus.json();
                 
                 const data = fullData.bus;
@@ -747,7 +533,8 @@
                 gContainer.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
                 
                 try {
-                    const respG = await fetch(`/admin/buses/${data.placa}/gastos`);
+                    const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
+                    const respG = await fetch(`/${prefix}/buses/${data.placa}/gastos`);
                     const gastos = await respG.json();
                     
                     if (gastos.length === 0) {
@@ -782,7 +569,8 @@
             if(!placa) return;
             
             try {
-                const response = await fetch(`/admin/buses/${placa}/historial-documental`);
+                const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
+                const response = await fetch(`/${prefix}/buses/${placa}/historial-documental`);
                 if(!response.ok) throw new Error('Error de red');
                 const data = await response.json();
                 
@@ -911,7 +699,8 @@
                 document.getElementById('edit_numero_chasis').value = data.numero_chasis || '';
                 document.getElementById('edit_numero_motor').value = data.numero_motor || '';
 
-                form.action = "{{ url('admin/buses') }}/" + data.placa;
+                const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
+                form.action = '/' + prefix + '/buses/' + data.placa;
                 sessionStorage.setItem('last_edit_bus_placa', data.placa);
 
                 const modalEl = document.getElementById('modalEditBus');
@@ -925,7 +714,8 @@
                 const lastPlaca = sessionStorage.getItem('last_edit_bus_placa');
                 if (lastPlaca) {
                     const form = document.getElementById('formEditBus');
-                    form.action = "{{ url('admin/buses') }}/" + lastPlaca;
+                    const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
+                    form.action = '/' + prefix + '/buses/' + lastPlaca;
                     new bootstrap.Modal(document.getElementById('modalEditBus')).show();
                 }
             @else
@@ -1068,7 +858,8 @@
                     feedback.style.display = 'block';
 
                     try {
-                        const response = await fetch(`/admin/buses/propietario/${doc}`);
+                        const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
+                        const response = await fetch(`/${prefix}/buses/propietario/${doc}`);
                         if (response.ok) {
                             const data = await response.json();
                             if (data) {

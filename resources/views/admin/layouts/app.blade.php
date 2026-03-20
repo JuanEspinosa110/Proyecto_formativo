@@ -26,41 +26,51 @@
                 <div class="sigu-brand-mark" aria-hidden="true"><span class="material-symbols-rounded">route</span></div>
                 <div class="sigu-brand-text">
                     <span class="sigu-brand-name">SIGU</span>
-                    <span class="sigu-brand-sub">Administración</span>
+                    <span class="sigu-brand-sub">{{ Auth::user()->id_tipo_usuario == 1 ? 'Administración' : 'Auxiliar' }}</span>
                 </div>
             </a>
 
+            @php
+            $routePrefix = Auth::user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
+            @endphp
+
             <nav class="sigu-sidebar-nav" aria-label="Administrador">
-                <a href="{{ route('admin.dashboard') }}" class="sigu-sb-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <a href="{{ route($routePrefix . '.dashboard') }}" class="sigu-sb-link {{ request()->routeIs($routePrefix . '.dashboard') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">dashboard</span></span>
                     <span>Dashboard</span>
                 </a>
 
-                <a href="{{ route('admin.usuarios.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.usuarios.*') ? 'active' : '' }}">
+                <a href="{{ route($routePrefix . '.usuarios.index') }}" class="sigu-sb-link {{ request()->routeIs($routePrefix . '.usuarios.*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
                     <span>Usuarios</span>
                 </a>
 
-                <a href="{{ route('admin.documentos.index') }}" class="sigu-sb-link {{ request()->is('admin/documentos*') ? 'active' : '' }}">
+                <a href="{{ route($routePrefix . '.documentos.index') }}" class="sigu-sb-link {{ request()->routeIs($routePrefix . '.documentos.*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">description</span></span>
                     <span>Docs. Vehículos</span>
                 </a>
 
-                <a href="{{ url('admin/buses') }}" class="sigu-sb-link {{ request()->is('admin/buses*') ? 'active' : '' }}">
+                <a href="{{ route($routePrefix . '.buses.index') }}" class="sigu-sb-link {{ request()->routeIs($routePrefix . '.buses.*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">directions_bus</span></span>
                     <span>Buses</span>
                 </a>
 
-                <a href="{{ route('admin.asignaciones.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.asignaciones.*') ? 'active' : '' }}">
+                <a href="{{ route($routePrefix . '.asignaciones.index') }}" class="sigu-sb-link {{ request()->routeIs($routePrefix . '.asignaciones.*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">assignment</span></span>
                     <span>Asignaciones</span>
                 </a>
 
+                <a href="{{ route('empresa.reportes.index') }}" class="sigu-sb-link {{ request()->routeIs('empresa.reportes.*') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">analytics</span></span>
+                    <span>Reportes</span>
+                </a>
+
+                @if(Auth::user()->id_tipo_usuario == 1)
                 <a href="{{ route('admin.rutas.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.rutas.*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">map</span></span>
                     <span>Rutas</span>
                 </a>
-
+                @endif
 
             </nav>
 

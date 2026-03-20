@@ -25,7 +25,14 @@ class UsuarioController extends Controller
             return redirect()->route('admin.dashboard')->with('error', 'Empresa no asociada a este usuario.');
         }
 
-        $roles = DB::table('tipo_usuario')->orderBy('id_tipo_usuario')->get();
+        $roles = DB::table('tipo_usuario')
+            ->orderBy('id_tipo_usuario')
+            ->when($user->id_tipo_usuario != 1, function ($q) {
+                $q->where(function($sub) {
+                    $sub->where('nombre_tipo', 'like', '%conductor%')
+                        ->orWhere('nombre_tipo', 'like', '%propietario%');
+                });
+            })->get();
         $estados = DB::table('estado')->whereIn('id_estado', [1,2,3])->get();
 
         $query = DB::table('usuario')
@@ -34,6 +41,13 @@ class UsuarioController extends Controller
             ->leftJoin('tipo_usuario', 'usuario.id_tipo_usuario', '=', 'tipo_usuario.id_tipo_usuario')
             ->where('usuario.NIT', $nit)
             ->select('usuario.*', 'estado.nombre_estado', 'ciudad.nombre_city', 'tipo_usuario.nombre_tipo');
+
+        if ($user->id_tipo_usuario != 1) {
+            $query->where(function($q) {
+                $q->where('tipo_usuario.nombre_tipo', 'like', '%conductor%')
+                  ->orWhere('tipo_usuario.nombre_tipo', 'like', '%propietario%');
+            });
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -67,6 +81,10 @@ class UsuarioController extends Controller
                 return $doc->estado_expiracion !== 'VIGENTE';
             });
 
+        if ($request->ajax()) {
+            return view('admin.usuarios.partials.table', compact('usuarios', 'estados', 'docs_licencia'));
+        }
+
         return view('admin.usuarios.index', compact('usuarios', 'roles', 'selectedRole', 'estados', 'docs_licencia', 'licenciasAlerta'));
     }
 
@@ -76,6 +94,13 @@ class UsuarioController extends Controller
             // Validaciones adicionales para CONDUCTOR
             $tipoUsuario = DB::table('tipo_usuario')->where('id_tipo_usuario', $request->id_tipo_usuario)->first();
             $esConductor = $tipoUsuario && stripos($tipoUsuario->nombre_tipo, 'conductor') !== false;
+            $esPropietario = $tipoUsuario && stripos($tipoUsuario->nombre_tipo, 'propietario') !== false;
+
+            if (Auth::user()->id_tipo_usuario != 1) { 
+                if (!$esConductor && !$esPropietario) {
+                    return redirect()->back()->with('error', 'Solo tiene permisos para crear Conductores y Propietarios.');
+                }
+            }
 
             if ($esConductor) {
                 $request->validate([
@@ -147,7 +172,7 @@ class UsuarioController extends Controller
             }
 
             return redirect()
-                ->route('admin.usuarios.index')
+                ->back()
                 ->with('success', 'Registro creado correctamente. Contraseña: ' . $passwordGenerada);
 
         } catch (\Exception $e) {

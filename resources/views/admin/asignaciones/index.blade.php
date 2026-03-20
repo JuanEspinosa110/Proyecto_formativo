@@ -85,195 +85,12 @@
     @endif
 
     <!-- Tabla de Asignaciones -->
-    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="bg-light">
-                    <tr>
-                        <th class="ps-4 py-3 text-uppercase small fw-bold text-muted border-0">ID</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Vehículo</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Ruta Asignada</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Conductor</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Fecha / Hora</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0">Estado</th>
-                        <th class="py-3 text-uppercase small fw-bold text-muted border-0 text-end pe-4">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($asignaciones as $asig)
-                    <tr class="border-top">
-                        <td class="ps-4 fw-bold text-muted">#{{ $asig->id_viaje }}</td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fw-bold text-dark">{{ $asig->placa }}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="lh-1">
-                                <span class="d-block fw-medium text-dark">{{ $asig->ruta->nombre_ruta ?? 'Ruta #'.$asig->id_ruta }}</span>
-                                <small class="text-muted" style="font-size: 0.7rem;">ID Sistema: {{ $asig->id_ruta }}</small>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="material-symbols-rounded text-muted fs-5">person</span>
-                                <span class="text-dark">{{ optional($asig->conductor)->primer_nombre }} {{ optional($asig->conductor)->primer_apellido }}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex align-items-center gap-1 text-muted small">
-                                <span class="material-symbols-rounded fs-6 opacity-50">calendar_today</span>
-                                {{ \Carbon\Carbon::parse($asig->fecha)->format('d/m/Y H:i') }}
-                            </div>
-                        </td>
-                        <td>
-                            @php
-                            $c = match((int)$asig->id_estado) {
-                                1 => 'success',
-                                2 => 'danger',
-                                default => 'warning'
-                            };
-                            @endphp
-                            <span class="badge bg-{{ $c }}-subtle text-{{ $c }} border border-{{ $c }} rounded-pill px-3">
-                                {{ optional($asig->estado)->nombre_estado ?? 'N/A' }}
-                            </span>
-                        </td>
-                        <td class="text-end pe-4">
-                            <div class="d-flex justify-content-end gap-3">
-                                <a href="#" 
-                                   class="text-info text-decoration-none d-flex align-items-center view-asignacion"
-                                   title="Ver detalles"
-                                   data-json="{{ json_encode($asig) }}"
-                                   data-conductor="{{ optional($asig->conductor)->primer_nombre }} {{ optional($asig->conductor)->primer_apellido }}"
-                                   data-ruta="{{ $asig->ruta->nombre_ruta ?? 'Ruta #'.$asig->id_ruta }}"
-                                   data-estado="{{ optional($asig->estado)->nombre_estado }}">
-                                    <span class="material-symbols-rounded fs-5">visibility</span>
-                                </a>
-                                <a href="#" 
-                                   class="text-primary text-decoration-none d-flex align-items-center edit-asignacion"
-                                   title="Editar asignación"
-                                   data-bs-toggle="modal"
-                                   data-bs-target="#modalEditAsignacion"
-                                   data-json="{{ json_encode($asig) }}">
-                                    <span class="material-symbols-rounded fs-5">edit</span>
-                                </a>
-                                <form action="{{ route('admin.asignaciones.destroy', $asig->id_viaje) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar esta asignación?')">
-                                    @csrf @method('DELETE')
-                                    <input type="hidden" name="form_type" value="delete">
-                                    <button type="submit" class="p-0 border-0 bg-transparent text-danger d-flex align-items-center" title="Eliminar">
-                                        <span class="material-symbols-rounded fs-5">delete</span>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">
-                            <span class="material-symbols-rounded display-4 opacity-25">assignment_late</span>
-                            <p class="mt-2 fw-medium">No se encontraron asignaciones activas.</p>
-                            <small>Comience vinculando un bus y un conductor a una ruta.</small>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        @if($asignaciones->hasPages())
-        <div class="p-4 border-top">
-            {{ $asignaciones->links() }}
-        </div>
-        @endif
-    </div>
+    @include('admin.asignaciones.partials.table')
+
 </div>
 
-<!-- Modal CREAR -->
-<div class="modal fade @if($errors->any() && old('form_type') == 'create') show @endif" id="modalCreateAsignacion" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-light py-3">
-                <h6 class="modal-title fw-bold text-dark d-flex align-items-center small">
-                    <span class="material-symbols-rounded text-primary me-2 fs-5">add_circle</span>
-                    NUEVA ASIGNACIÓN
-                </h6>
-                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <form id="formCreateAsignacion" action="{{ route('admin.asignaciones.store') }}" method="POST">
-                @csrf
-                <input type="hidden" name="form_type" value="create">
-                <div class="modal-body p-4">
-                    <div class="row g-3">
-                        <div class="col-md-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Vehículo (Placa) <span class="text-danger">*</span></label>
-                            <select name="placa" class="form-select form-select-sm @error('placa') is-invalid @enderror" required>
-                                <option value="" selected disabled>Seleccionar...</option>
-                                @foreach($buses as $bus)
-                                <option value="{{ $bus->placa }}" @if(old('placa') == $bus->placa) selected @endif>{{ $bus->placa }} - {{ $bus->modelo }}</option>
-                                @endforeach
-                            </select>
-                            @error('placa') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
+@include('admin.asignaciones.partials.create_modal')
 
-                        <div class="col-md-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Ruta <span class="text-danger">*</span></label>
-                            <select name="id_ruta" class="form-select form-select-sm @error('id_ruta') is-invalid @enderror" required>
-                                <option value="" selected disabled>Seleccionar...</option>
-                                @foreach($rutas as $ruta)
-                                <option value="{{ $ruta->id_ruta }}" @if(old('id_ruta') == $ruta->id_ruta) selected @endif>{{ $ruta->nombre_ruta ?? 'Ruta #'.$ruta->id_ruta }}</option>
-                                @endforeach
-                            </select>
-                            @error('id_ruta') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Conductor <span class="text-danger">*</span></label>
-                            <select name="doc_us" class="form-select form-select-sm @error('doc_us') is-invalid @enderror" required>
-                                <option value="" selected disabled>Seleccionar...</option>
-                                @foreach($conductores as $con)
-                                <option value="{{ $con->doc_usuario }}" @if(old('doc_us') == $con->doc_usuario) selected @endif>{{ $con->primer_nombre }} {{ $con->primer_apellido }}</option>
-                                @endforeach
-                            </select>
-                            @error('doc_us') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            <small class="text-muted d-block mt-1" style="font-size: 0.65rem;">* Máximo una jornada laboral por día (8h).</small>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Hora Inicio <span class="text-danger">*</span></label>
-                            <input type="datetime-local" name="fecha" id="create_fecha" class="form-control form-control-sm @error('fecha') is-invalid @enderror" value="{{ old('fecha') }}" required>
-                            @error('fecha') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-
-                        <div class="col-md-6">
-                            <input type="text" id="create_hora_fin" class="form-control form-control-sm bg-light" readonly placeholder="Calculado +8h">
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1 d-block mb-2">Franjas Rápidas (Turnos 8h)</label>
-                            <div class="d-flex flex-wrap gap-2">
-                                <button type="button" class="btn btn-xs btn-outline-primary py-1 px-3 small quick-time" data-time="04:30">04:30 - 12:30</button>
-                                <button type="button" class="btn btn-xs btn-outline-primary py-1 px-3 small quick-time" data-time="12:30">12:30 - 20:30</button>
-                            </div>
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Estado <span class="text-danger">*</span></label>
-                            <select name="id_estado" class="form-select form-select-sm @error('id_estado') is-invalid @enderror" required>
-                                @foreach($estados as $est)
-                                <option value="{{ $est->id_estado }}" @if(old('id_estado', 1) == $est->id_estado) selected @endif>{{ $est->nombre_estado }}</option>
-                                @endforeach
-                            </select>
-                            @error('id_estado') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-0 p-3 bg-light">
-                    <button type="button" class="btn btn-sm btn-light px-3 fw-bold" data-bs-dismiss="modal">CANCELAR</button>
-                    <button type="submit" class="btn btn-sm btn-primary px-4 fw-bold shadow-sm">GUARDAR ASIGNACIÓN</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <!-- Modal EDITAR -->
 <div class="modal fade @if($errors->any() && old('form_type') == 'edit') show @endif" id="modalEditAsignacion" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
@@ -470,7 +287,8 @@
                     updateHoraFin('edit_fecha', 'edit_hora_fin');
                 }
 
-                const action = "{{ route('admin.asignaciones.index') }}/" + data.id_viaje;
+                const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
+                const action = '/' + prefix + '/asignaciones/' + data.id_viaje;
                 document.getElementById('formEditAsignacion').action = action;
                 document.getElementById('edit_action_hidden').value = action;
                 

@@ -25,6 +25,10 @@ class BusController extends Controller
         $buses = $this->busService->getBuses($request);
         $estados = $this->busService->getEstadosOperativos();
         
+        if ($request->ajax()) {
+            return view('admin.buses.partials.table', compact('buses', 'estados'));
+        }
+
         return view('admin.buses.index', compact('buses', 'estados'));
     }
 

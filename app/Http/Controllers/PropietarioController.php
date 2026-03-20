@@ -41,6 +41,9 @@ class PropietarioController extends Controller
         $conteoPasajeros = 0;
         $ingresosTotales = 0;
         $precioPasaje = 3300;
+        $gananciasHoy = 0;
+        $gananciasSemana = 0;
+        $gananciasMes = 0;
 
         if ($buses->isNotEmpty()) {
             $queryAsignaciones->whereIn('placa', $busIds);
@@ -57,7 +60,28 @@ class PropietarioController extends Controller
             
             // Ingresos y pasajeros desde la tabla recorridos
             $conteoPasajeros = \App\Models\Recorrido::whereIn('placa', $busIds)->sum('cantidad_pasajeros');
-            $ingresosTotales = \App\Models\Recorrido::whereIn('placa', $busIds)->sum('ingresos');
+            
+            // Filtro por Mes para Ganancias (Nuevo)
+            $mesFiltro = $request->query('mes_seleccionado'); // YYYY-MM
+            if ($mesFiltro) {
+                $ingresosTotales = \App\Models\Recorrido::whereIn('placa', $busIds)->where('hora_salida', 'like', $mesFiltro . '%')->sum('ingresos');
+            } else {
+                $ingresosTotales = \App\Models\Recorrido::whereIn('placa', $busIds)->sum('ingresos');
+            }
+
+            $hoy = \Carbon\Carbon::today();
+            $semana = \Carbon\Carbon::now()->startOfWeek();
+            $mes = \Carbon\Carbon::now()->startOfMonth();
+
+            $gananciasHoy = \App\Models\Recorrido::whereIn('placa', $busIds)->whereDate('hora_salida', $hoy)->sum('ingresos');
+            $gananciasSemana = \App\Models\Recorrido::whereIn('placa', $busIds)->where('hora_salida', '>=', $semana)->sum('ingresos');
+            $gananciasMes = \App\Models\Recorrido::whereIn('placa', $busIds)->where('hora_salida', '>=', $mes)->sum('ingresos');
+
+            // 3. Ingresos individuales por bus (Nuevo)
+            $ingresosPorBus = \App\Models\Recorrido::whereIn('placa', $busIds)
+                ->select('placa', \Illuminate\Support\Facades\DB::raw('SUM(ingresos) as total_ingresos'), \Illuminate\Support\Facades\DB::raw('SUM(cantidad_pasajeros) as total_pasajeros'))
+                ->groupBy('placa')
+                ->get();
 
             // 1. Filtros Independientes
             if ($request->filled('fecha')) {
@@ -105,10 +129,7 @@ class PropietarioController extends Controller
 
         // 3. Separación de Asignaciones (Simples) y Historial (Filtrado)
         // Las asignaciones recientes para el módulo de "Asignaciones"
-        $asignacionesRecientes = Viaje::with(['ruta', 'conductor', 'estado'])
-            ->whereIn('placa', $busIds)
-            ->orderBy('fecha', 'desc')
-            ->paginate(5, ['*'], 'page_rec');
+        $asignacionesRecientes = $queryAsignaciones->orderBy('fecha', 'desc')->paginate(5, ['*'], 'page_rec');
 
         // El historial filtrado para el módulo de "Historial"
         $historialAsignaciones = $queryAsignaciones->orderBy('fecha', 'desc')->paginate(5, ['*'], 'page_hist');
@@ -123,12 +144,12 @@ class PropietarioController extends Controller
         $busesPaginated = Bus::with('estado')->where('doc_propietario', $user->doc_usuario)->paginate(5, ['*'], 'page_bus');
         
         $documentos = $buses->isNotEmpty() 
-            ? Documento::whereIn('placa', $busIds)->where('id_estado', 1)->with(['tipoDocumento', 'estado'])->paginate(5, ['*'], 'page_doc') 
-            : collect();
+            ? Documento::whereIn('placa', $busIds)->with(['tipoDocumento', 'estado'])->orderBy('created_at', 'desc')->paginate(5, ['*'], 'page_doc') 
+            : Documento::whereRaw('1 = 0')->paginate(5, ['*'], 'page_doc');
             
         $historialCambios = $buses->isNotEmpty() 
             ? HistorialBus::whereIn('placa', $busIds)->with(['ruta', 'conductor'])->orderBy('created_at', 'desc')->paginate(5, ['*'], 'page_camb') 
-            : collect();
+            : HistorialBus::whereRaw('1 = 0')->paginate(5, ['*'], 'page_camb');
         
         // Datos adicionales
         $tiposDocumento = TipoDocumento::where('id_estado', 1)->where('id_tipo_documento', '!=', 3)->get();
@@ -163,7 +184,11 @@ class PropietarioController extends Controller
             'precioPasaje',
             'documentosAlerta',
             'conteoVencidos',
-            'conteoProximos'
+            'conteoProximos',
+            'gananciasHoy',
+            'gananciasSemana',
+            'gananciasMes',
+            'ingresosPorBus'
         ));
     }
 
@@ -242,8 +267,14 @@ class PropietarioController extends Controller
                         'placa' => $bus->placa,
                         'doc_usuario' => $user->doc_usuario,
                         'NIT' => $bus->NIT,
-                        'id_estado' => 1, // Activo / Vigente por defecto
+                        'id_estado' => 19, // 19 = PENDIENTE de aprobación
                     ]);
+
+                    // Inactivar el bus preventivamente ya que el documento requiere aprobación
+                    if ($bus) {
+                        $bus->id_estado = 2; // Inactivo
+                        $bus->save();
+                    }
 
                     return redirect()->back()->with('success', 'Documento almacenado correctamente.');
                 }
@@ -283,7 +314,13 @@ class PropietarioController extends Controller
                 'doc_usuario' => $user->doc_usuario,
                 'fecha_expedicion' => $request->fecha_expedicion,
                 'fecha_vencimiento' => $request->fecha_vencimiento,
+                'id_estado' => 19, // 19 = PENDIENTE de aprobación
             ];
+
+            // Inactivar el bus preventivamente ya que el documento requiere aprobación
+            if ($documento->bus) {
+                $documento->bus->update(['id_estado' => 2]); // 2 = Inactivo
+            }
 
             if ($request->hasFile('archivo')) {
                 // Eliminar archivo anterior si existe

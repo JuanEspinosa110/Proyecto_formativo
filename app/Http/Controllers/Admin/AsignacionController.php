@@ -88,6 +88,16 @@ class AsignacionController extends Controller
             ->get();
         $estados = Estado::whereIn('nombre_estado', ['ACTIVO', 'INACTIVO'])->get();
 
+        if ($request->ajax()) {
+            return view('admin.asignaciones.partials.table', compact(
+                'asignaciones',
+                'buses',
+                'rutas',
+                'conductores',
+                'estados'
+            ));
+        }
+
         return view('admin.asignaciones.index', compact(
             'asignaciones',
             'buses',
