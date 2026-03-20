@@ -40,8 +40,13 @@ class CheckRole
             return $next($request);
         }
 
-        // Redirección por seguridad si intenta entrar a donde no debe (lógica de origin/feature/conductor)
-        if ($user->id_tipo_usuario == 6 || $user->id_tipo_usuario == 9) {
+        // Redirección por seguridad si intenta entrar a donde no debe
+        if ($user->id_tipo_usuario == 5) {
+            return redirect()->route('empresa.dashboard')
+                ->with('error', 'Acceso restringido: Solo puedes acceder a tu panel de auxiliar.');
+        }
+
+        if ($user->id_tipo_usuario == 9) {
             return redirect()->route('propietario.dashboard')
                 ->with('error', 'Acceso restringido: Solo puedes acceder a tu panel de propietario.');
         }

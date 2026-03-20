@@ -45,8 +45,14 @@ class LoginController extends Controller
                 case 3:
                     return redirect()->route('conductor.dashboard');
 
+                case 4:
+                    return redirect()->route('empresa.dashboard');
+                
+                case 5:
+                    return redirect()->route('empresa.dashboard'); // Auxiliar
+
                 case 9:
-                    return redirect()->route('propietario.dashboard');
+                    return redirect()->route('propietario.dashboard'); // Propietario
 
                 case 6: // SETP
                     return redirect()->route('gestor-setp.dashboard');

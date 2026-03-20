@@ -65,16 +65,17 @@
     @if($asignacionActiva)
         @php
             $enCurso = $asignacionActiva->id_estado == 12; // En Servicio
+            $vencido = $asignacionActiva->id_estado == 8; // Vencido/No ejecutado
         @endphp
         <div class="col-md-8 col-xl-9">
             <div class="row g-3 h-100">
                 <!-- Tarjeta Principal de Turno -->
                 <div class="col-12">
-                    <div class="card bg-white border-0 shadow-sm rounded-4 p-4 status-card {{ $enCurso ? 'card-working' : 'card-active' }}">
+                    <div class="card bg-white border-0 shadow-sm rounded-4 p-4 status-card {{ $enCurso ? 'card-working' : ($vencido ? 'border border-danger border-2' : 'card-active') }}">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="text-uppercase fw-bold text-{{ $enCurso ? 'primary' : 'success' }} d-inline-block small label-turno">
-                                <span class="material-symbols-rounded fs-6 align-middle">{{ $enCurso ? 'sensors' : 'event_available' }}</span> 
-                                {{ $enCurso ? 'EN SERVICIO - JORNADA INICIADA' : 'PROGRAMADO PARA HOY' }}
+                            <span class="text-uppercase fw-bold text-{{ $enCurso ? 'primary' : ($vencido ? 'danger' : 'success') }} d-inline-block small label-turno">
+                                <span class="material-symbols-rounded fs-6 align-middle">{{ $enCurso ? 'sensors' : ($vencido ? 'error' : 'event_available') }}</span> 
+                                {{ $enCurso ? 'EN SERVICIO - JORNADA INICIADA' : ($vencido ? 'TURNO VENCIDO - NO EJECUTADO' : 'PROGRAMADO PARA HOY') }}
                             </span>
                             @if($enCurso)
                                 <div class="spinner-grow text-primary spinner-grow-sm" role="status"><span class="visually-hidden">Loading...</span></div>
@@ -99,19 +100,41 @@
                             <div class="col-sm-3 text-center text-sm-start">
                                 <span class="text-muted d-block small fw-medium text-uppercase letter-spacing-1">Opciones</span>
                                 
-                                @if(!$enCurso)
+                                @if(!$enCurso && !$vencido)
+                                    @php
+                                        $horaProgramada = \Carbon\Carbon::parse($asignacionActiva->fecha);
+                                        $ahora = now();
+                                        $puedeIniciar = $ahora->between($horaProgramada->copy()->subMinutes(30), $horaProgramada->copy()->addHours(4));
+                                    @endphp
                                     <form action="{{ route('conductor.iniciarTurno', $asignacionActiva->id_viaje) }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="btn btn-success rounded-pill fw-bold w-100 shadow-sm mt-1" {{ $licenciaVencida ? 'disabled' : '' }}>
+                                        <button type="submit" class="btn btn-success rounded-pill fw-bold w-100 shadow-sm mt-1" {{ $licenciaVencida || !$puedeIniciar ? 'disabled' : '' }}>
                                             <span class="material-symbols-rounded fs-6 align-middle">power_settings_new</span> Iniciar Turno
                                         </button>
+                                        @if(!$puedeIniciar)
+                                            <small class="text-danger d-block mt-1 text-center">Permitido: 30m antes o 4h después</small>
+                                        @endif
                                     </form>
+                                @elseif($vencido)
+                                    <div class="mt-1">
+                                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2 rounded-pill w-100 d-flex align-items-center justify-content-center gap-1 fw-bold">
+                                            <span class="material-symbols-rounded fs-6">lock_clock</span> EXPIRADO
+                                        </span>
+                                        <small class="text-muted d-block mt-1 text-center" style="font-size: 0.75rem;">No se inició en las 4h permitidas.</small>
+                                    </div>
                                 @else
+                                    @php
+                                        $horaInicio = \Carbon\Carbon::parse($asignacionActiva->fecha);
+                                        $puedeFinalizar = now()->greaterThan($horaInicio->copy()->addMinutes(30));
+                                    @endphp
                                     <form action="{{ route('conductor.finalizarTurno', $asignacionActiva->id_viaje) }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="btn btn-danger rounded-pill fw-bold w-100 shadow-sm mt-1" {{ $recorridoActivo ? 'disabled' : '' }}>
+                                        <button type="submit" class="btn btn-danger rounded-pill fw-bold w-100 shadow-sm mt-1" {{ $recorridoActivo || !$puedeFinalizar ? 'disabled' : '' }}>
                                             <span class="material-symbols-rounded fs-6 align-middle">stop_circle</span> Finalizar Turno
                                         </button>
+                                        @if(!$puedeFinalizar)
+                                            <small class="text-danger d-block mt-1 text-center">Disponible 30m después del inicio</small>
+                                        @endif
                                     </form>
                                 @endif
                             </div>
@@ -122,62 +145,58 @@
                 <!-- Tarjeta Operación en Curso (Aparece al iniciar turno) -->
                 @if($enCurso)
                 <div class="col-12 mt-3">
-                    <div class="card {{ $recorridoActivo ? 'bg-white border text-dark' : 'bg-dark text-white' }} border-0 shadow rounded-4 p-4">
-                        <div class="text-center">
-                            <span class="{{ $recorridoActivo ? 'text-primary' : 'text-white-50' }} text-uppercase fw-bold small mb-2 d-block">Control y Validación en Pista</span>
-                            
-                            @if(!$recorridoActivo)
-                                <h4 class="fw-bold mb-3 mt-2 text-dark text-center w-100">Ningún recorrido en progreso</h4>
-                                <div class="text-center w-100">
-                                    <button class="btn btn-primary px-5 py-3 mt-2 fw-bold text-white rounded-pill btn-lg shadow-sm d-inline-flex justify-content-center align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalIniciarRuta">
-                                        <span class="material-symbols-rounded fs-3">play_arrow</span> <span style="font-size: 1.15rem;">Iniciar Nuevo Recorrido</span>
+                    <div class="card {{ $recorridoActivo ? 'bg-white border text-dark' : 'bg-dark text-white' }} border-0 shadow rounded-4 p-4 text-center">
+                        <span class="{{ $recorridoActivo ? 'text-primary' : 'text-white-50' }} text-uppercase fw-bold small mb-2 d-block">Control y Validación en Pista</span>
+                        
+                        @if(!$recorridoActivo)
+                            <h4 class="fw-bold mb-3 mt-2 text-dark">Ningún recorrido en progreso</h4>
+                            <button class="btn btn-primary px-5 py-3 mt-2 fw-bold text-white rounded-pill btn-lg shadow-sm d-inline-flex justify-content-center align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalIniciarRuta">
+                                <span class="material-symbols-rounded fs-3">play_arrow</span> <span class="fs-btn-route">Iniciar Nuevo Recorrido</span>
+                            </button>
+                            <p class="text-muted small mt-3 mb-0">Presione el botón justo al salir del punto de partida</p>
+                        @else
+                            <div class="text-center py-2">
+                                <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+                                    <h5 class="fw-bold mb-0 text-primary d-inline-flex align-items-center gap-2 title-large">
+                                        <span class="spinner-grow text-success spinner-small" role="status"></span>
+                                        Recorrido en Progreso
+                                    </h5>
+                                    <button class="btn btn-dark rounded-pill px-3 py-2 d-flex align-items-center gap-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalQRViaje">
+                                        <span class="material-symbols-rounded">qr_code_2</span> 
+                                        <span class="small fw-bold">Ver QR de Viaje</span>
                                     </button>
                                 </div>
-                                <p class="text-muted small mt-3 mb-0 text-center w-100">Presione el botón justo al salir del punto de partida</p>
-                            @else
-                                <div class="text-center py-2">
-                                    <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
-                                        <h5 class="fw-bold mb-0 text-primary d-inline-flex align-items-center gap-2" style="font-size: 1.3rem;">
-                                            <span class="spinner-grow text-success" style="width: 1.25rem; height: 1.25rem;" role="status"></span>
-                                            Recorrido en Progreso
-                                        </h5>
-                                        <button class="btn btn-dark rounded-pill px-3 py-2 d-flex align-items-center gap-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalQRViaje">
-                                            <span class="material-symbols-rounded">qr_code_2</span> 
-                                            <span class="small fw-bold">Ver QR de Viaje</span>
-                                        </button>
-                                    </div>
 
-                                    <div class="bg-light p-4 rounded-4 my-3 mx-auto" style="max-width: 450px; border: 2px dashed #cbd5e1;">
-                                        <p class="mb-2 text-muted fw-bold text-uppercase small letter-spacing-1">Dirigiéndose en sentido</p>
-                                        <h2 class="fw-black text-dark mb-0 d-flex align-items-center justify-content-center gap-2">
-                                            <span class="material-symbols-rounded fs-2 text-primary">{{ $recorridoActivo->sentido == 'IDA' ? 'trending_flat' : 'sync_alt' }}</span>
-                                            {{ $recorridoActivo->sentido }}
-                                        </h2>
-                                    </div>
-                                    <p class="mb-4 d-flex justify-content-center align-items-center gap-2 text-muted" style="font-size: 1.1rem;">
-                                        <span class="material-symbols-rounded">schedule</span>
-                                        Hora de salida: <strong class="text-dark">{{ \Carbon\Carbon::parse($recorridoActivo->hora_salida)->format('h:i A') }}</strong>
-                                    </p>
-                                    
-                                    <form action="{{ route('conductor.finalizarRecorrido', $recorridoActivo->id_recorrido) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-warning py-3 fw-bold text-dark rounded-pill shadow-sm d-inline-flex border-0 justify-content-center align-items-center gap-2 transition-all w-100" style="font-size: 1.25rem; max-width: 450px;">
-                                            <span class="material-symbols-rounded fs-3">sports_score</span> Llegada a Destino Final
-                                        </button>
-                                    </form>
+                                <div class="bg-light p-4 rounded-4 my-3 mx-auto box-route-dashed" style="max-width: 450px;">
+                                    <p class="mb-2 text-muted fw-bold text-uppercase small letter-spacing-1">Dirigiéndose en sentido</p>
+                                    <h2 class="fw-black text-dark mb-0 d-flex align-items-center justify-content-center gap-2">
+                                        <span class="material-symbols-rounded fs-2 text-primary">{{ $recorridoActivo->sentido == 'IDA' ? 'trending_flat' : 'sync_alt' }}</span>
+                                        {{ $recorridoActivo->sentido }}
+                                    </h2>
                                 </div>
-                            @endif
-                        </div>
+                                <p class="mb-4 d-flex justify-content-center align-items-center gap-2 text-muted fs-route-title">
+                                    <span class="material-symbols-rounded">schedule</span>
+                                    Hora de salida: <strong class="text-dark">{{ \Carbon\Carbon::parse($recorridoActivo->hora_salida)->format('h:i A') }}</strong>
+                                </p>
+                                
+                                <form action="{{ route('conductor.finalizarRecorrido', $recorridoActivo->id_recorrido) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-warning py-3 fw-bold text-dark rounded-pill shadow-sm d-inline-flex border-0 justify-content-center align-items-center gap-2 transition-all w-100 btn-route-action" style="max-width: 450px;">
+                                        <span class="material-symbols-rounded fs-3">sports_score</span> Llegada a Destino Final
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
                     </div>
                 </div>
                 @endif
                 
                 <div class="col-12 mt-4 mt-lg-auto">
                     <!-- Botón Didáctico y grande para adultos mayores -->
-                    <button class="btn btn-danger py-3 px-3 w-100 shadow rounded-4 d-flex align-items-center justify-content-center gap-3 border-0 bg-opacity-10" data-bs-toggle="modal" data-bs-target="#fallaModal" style="transition: transform 0.2s;">
-                        <span class="material-symbols-rounded bg-white text-danger rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 55px; height: 55px; font-size: 2.2rem;">build</span> 
+                    <button class="btn btn-danger py-2 px-4 shadow rounded-4 d-flex align-items-center justify-content-center gap-2 border-0 bg-opacity-10 transition-transform max-width-falla mx-auto" data-bs-toggle="modal" data-bs-target="#fallaModal">
+                        <span class="material-symbols-rounded bg-white text-danger rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm falla-btn-icon">build</span> 
                         <div class="text-start text-white">
-                            <span class="d-block fw-bold" style="font-size: 1.35rem; line-height: 1.2;">Reportar Daño o Avería</span>
+                            <span class="d-block fw-bold falla-btn-title">Reportar Daño o Avería</span>
                             <span class="d-block small bg-black bg-opacity-25 px-2 py-1 rounded mt-1 d-inline-block fw-medium">Vehículo: {{ $asignacionActiva->placa }}</span>
                         </div>
                     </button>
@@ -187,7 +206,7 @@
     @elseif($turnoFinalizadoHoy)
         <div class="col-md-8 col-xl-9">
             <div class="card bg-success bg-opacity-10 border border-success border-opacity-25 shadow-sm rounded-4 h-100 p-5 d-flex flex-column justify-content-center text-center">
-                <span class="material-symbols-rounded text-success mb-3" style="font-size: 4rem;">task_alt</span>
+                <span class="material-symbols-rounded text-success mb-3 icon-large">task_alt</span>
                 <h3 class="fw-black text-dark mb-1">Turno Finalizado</h3>
                 <p class="text-success fw-bold flex-grow-1">Su jornada ha terminado por hoy. Excelente trabajo.</p>
                 <div class="w-100 d-flex justify-content-center flex-wrap gap-4 mt-4 bg-white p-3 rounded-4 shadow-sm">
@@ -200,12 +219,12 @@
     @else
         <div class="col-md-8 col-xl-9">
             <div class="card bg-white border-0 shadow-sm rounded-4 h-100 p-4 status-card card-inactive d-flex flex-column justify-content-center text-center">
-                <span class="material-symbols-rounded fs-1 text-muted mb-3 opacity-25" style="transform: scale(2.0);">block</span>
+                <span class="material-symbols-rounded fs-1 text-muted mb-3 opacity-25 scale-large">block</span>
                 <h4 class="fw-bold text-dark mb-1">Sin Jornada Activa</h4>
                 <p class="text-muted mb-0">Actualmente no posee una ruta activa asignada para el día de hoy.</p>
-                <button class="btn btn-danger py-3 px-4 mt-4 mx-auto fw-bold text-white shadow-sm rounded-pill d-flex align-items-center justify-content-center gap-3 border-0" data-bs-toggle="modal" data-bs-target="#fallaModal" style="max-width:380px;">
-                    <span class="material-symbols-rounded bg-white text-danger rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; font-size: 1.8rem;">build</span> 
-                    <span style="font-size: 1.2rem;">Reportar Daño del Bus</span>
+                <button class="btn btn-danger py-2 px-4 mt-4 mx-auto fw-bold text-white shadow-sm rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 max-width-falla" data-bs-toggle="modal" data-bs-target="#fallaModal">
+                    <span class="material-symbols-rounded bg-white text-danger rounded-circle d-flex align-items-center justify-content-center shadow-sm falla-btn-small-icon">build</span> 
+                    <span class="fs-btn-route">Reportar Daño del Bus</span>
                 </button>
             </div>
         </div>
@@ -475,13 +494,13 @@
 
 <!-- WIDGET FLOTANTE DE PASAJEROS -->
 @if(isset($recorridoActivo) && $recorridoActivo)
-<div class="position-fixed bottom-0 end-0 m-3 m-md-4 p-3 bg-white shadow-lg d-flex align-items-center gap-3" style="z-index: 1050; border-radius: 1.25rem; border: 3px solid var(--p);">
-    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 3.5rem; height: 3.5rem; box-shadow: 0 4px 14px rgba(42, 158, 106, 0.4);">
-        <span class="material-symbols-rounded" style="font-size: 2.2rem;">group</span>
+<div class="position-fixed bottom-0 end-0 m-3 m-md-4 p-3 bg-white shadow-lg d-flex align-items-center gap-3 widget-passengers">
+    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center widget-icon-box">
+        <span class="material-symbols-rounded widget-icon-fs">group</span>
     </div>
     <div class="pe-2">
-        <span class="d-block text-muted text-uppercase fw-bold pb-1" style="font-size: 0.8rem; letter-spacing: 0.5px;">Pasajeros</span>
-        <span class="d-block text-dark fw-black" style="font-size: 2.4rem; line-height: 1;" id="pasajeros-count">{{ $recorridoActivo->cantidad_pasajeros }}</span>
+        <span class="d-block text-muted text-uppercase fw-bold pb-1 widget-text-small">Pasajeros</span>
+        <span class="d-block text-dark fw-black widget-text-large" id="pasajeros-count">{{ $recorridoActivo->cantidad_pasajeros }}</span>
     </div>
 </div>
 @endif

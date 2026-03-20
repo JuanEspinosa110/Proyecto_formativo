@@ -51,11 +51,14 @@ class BusService
     }
 
     /**
-     * Crear un nuevo bus bajo el NIT del usuario autenticado
+     * Crear un nuevo bus bajo el NIT del usuario autenticado.
+     * Inicia como INACTIVO (2) hasta validar documentos.
      */
     public function storeBus(array $data)
     {
         $data['NIT'] = Auth::guard('web')->user()->getActiveNit();
+        $data['id_estado'] = 2; // INACTIVO por defecto
+        
         return Bus::create($data);
     }
 
