@@ -30,5 +30,6 @@ Route::prefix('controlador-tiempo')
             Route::get('/scanner', [App\Http\Controllers\ControladorTiempo\VerificacionController::class, 'scanner'])->name('scanner');
             Route::get('/{id}', [App\Http\Controllers\ControladorTiempo\VerificacionController::class, 'show'])->name('show');
             Route::post('/{id}/checkpoint', [App\Http\Controllers\ControladorTiempo\VerificacionController::class, 'registrarCheckpoint'])->name('checkpoint');
+            Route::post('/{id}/incidencia', [App\Http\Controllers\ControladorTiempo\VerificacionController::class, 'registrarIncidencia'])->name('incidencia');
         });
     });

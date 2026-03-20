@@ -33,6 +33,11 @@ class Recorrido extends Model
         return $this->belongsTo(Bus::class, 'placa', 'placa');
     }
 
+    public function novedades()
+    {
+        return $this->hasMany(NovedadRecorrido::class, 'id_recorrido', 'id_recorrido');
+    }
+
     public function ruta()
     {
         return $this->belongsTo(Ruta::class, 'id_ruta', 'id_ruta');

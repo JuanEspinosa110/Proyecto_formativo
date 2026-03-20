@@ -16,8 +16,8 @@
             <div class="bg-white rounded-3 shadow-sm p-3 ct-kpi d-flex align-items-center gap-3">
                 <span class="material-symbols-rounded fs-2 ct-kpi-icon">directions_bus</span>
                 <div>
-                    <div class="fs-3 fw-bold lh-1">{{ $busesDisponibles->count() }}</div>
-                    <div class="text-muted small">Buses disponibles</div>
+                    <div class="fs-3 fw-bold lh-1">{{ $busesIniciados }}</div>
+                    <div class="text-muted small">Buses en recorrido</div>
                 </div>
             </div>
         </div>
@@ -41,13 +41,51 @@
         </div>
     </div>
 
-    {{-- ─── Tabla de turnos ──────────────────────────────────────── --}}
-    <div class="bg-white rounded-3 shadow-sm overflow-hidden">
-        <div class="d-flex align-items-center justify-content-between p-4 pb-3">
-            <h6 class="fw-bold mb-0">Registro de Asignaciones (Turnos)</h6>
-            <span class="badge" style="background:var(--ct-accent-light); color:var(--ct-accent); font-size:0.8rem; border-radius:999px; padding:0.3em 0.9em;">
-                {{ $asignaciones->total() }} registros
-            </span>
+    {{-- ─── Tabla de turnos con Filtros ────────────────────────── --}}
+    <div class="bg-white rounded-4 shadow-sm overflow-hidden border-0 mb-4">
+        <div class="p-4 border-bottom bg-light bg-opacity-50">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h6 class="fw-bold mb-0">Gestión de Turnos y Asignaciones</h6>
+                <span class="badge" style="background:var(--ct-accent-light); color:var(--ct-accent); font-size:0.8rem; border-radius:999px; padding:0.3em 0.9em;">
+                    {{ $asignaciones->total() }} registros encontrados
+                </span>
+            </div>
+            
+            <form action="{{ route('controlador-tiempo.despacho.index') }}" method="GET" class="row g-2">
+                <div class="col-md-2">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text border-0 bg-white shadow-sm"><span class="material-symbols-rounded fs-6">search</span></span>
+                        <input type="text" name="placa" value="{{ request('placa') }}" class="form-control border-0 shadow-sm" placeholder="Bus / Placa...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text border-0 bg-white shadow-sm"><span class="material-symbols-rounded fs-6">alt_route</span></span>
+                        <input type="number" name="ruta_id" value="{{ request('ruta_id') }}" class="form-control border-0 shadow-sm" placeholder="ID Ruta...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text border-0 bg-white shadow-sm"><span class="material-symbols-rounded fs-6">person</span></span>
+                        <input type="number" name="doc_usuario" value="{{ request('doc_usuario') }}" class="form-control border-0 shadow-sm" placeholder="Doc. Conductor...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select name="estado" class="form-select form-select-sm border-0 shadow-sm">
+                        <option value="">Todos los estados</option>
+                        <option value="iniciado" {{ request('estado') == 'iniciado' ? 'selected' : '' }}>En Recorrido</option>
+                        <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendientes</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-ct btn-sm w-100 shadow-sm">Filtro</button>
+                    @if(request()->anyFilled(['placa', 'ruta_id', 'doc_usuario', 'estado']))
+                        <a href="{{ route('controlador-tiempo.despacho.index') }}" class="btn btn-light btn-sm shadow-sm">
+                            <span class="material-symbols-rounded fs-6 align-middle">close</span>
+                        </a>
+                    @endif
+                </div>
+            </form>
         </div>
 
         <div class="table-responsive">
@@ -56,9 +94,8 @@
                     <tr>
                         <th class="ps-4 py-3">Bus / Placa</th>
                         <th class="py-3">Conductor</th>
-                        <th class="py-3">Ruta</th>
-                        <th class="py-3">Tipo Asignación</th>
-                        <th class="py-3">Estado</th>
+                        <th class="py-3 text-center">Ruta ID</th>
+                        <th class="py-3 text-center">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,25 +113,19 @@
                                     <span class="text-muted">Sin conductor</span>
                                 @endif
                             </td>
-                            <td>
-                                @if($asig->ruta)
-                                    <span class="small fw-medium">
-                                        {{ $asig->ruta->barrioOrigen->nombre ?? '?' }}
-                                        <span class="text-muted">→</span>
-                                        {{ $asig->ruta->barrioDestino->nombre ?? '?' }}
-                                    </span>
-                                @else
-                                    <span class="text-muted small">Sin ruta</span>
-                                @endif
+                            <td class="text-center">
+                                <div class="badge bg-light text-primary border px-3 py-2 fw-black fs-6 mb-1" style="border-radius: 0.5rem;">
+                                    {{ $asig->id_ruta }}
+                                </div>
+                                <div class="small text-muted fw-medium" style="font-size: 0.7rem; letter-spacing: 0.3px;">
+                                    {{ $asig->ruta->barrioOrigen->nombre ?? '?' }}
+                                    <span class="opacity-50 mx-1">→</span>
+                                    {{ $asig->ruta->barrioDestino->nombre ?? '?' }}
+                                </div>
                             </td>
-                            <td>
-                                <span class="badge bg-light text-dark border px-2 fw-semibold">
-                                    {{ $asig->tipoAsignacion->nombre_tipo ?? 'N/A' }}
-                                </span>
-                            </td>
-                            <td>
+                            <td class="text-center">
                                 <span class="badge" style="background:var(--ct-accent-light); color:var(--ct-accent); border:1px solid var(--ct-accent-mid); border-radius:999px; padding:0.25em 0.8em; font-size:0.78rem; font-weight:600;">
-                                    Activa
+                                    {{ $asig->recorridos->isNotEmpty() ? 'EN CURSO' : 'PENDIENTE' }}
                                 </span>
                             </td>
                         </tr>

@@ -10,16 +10,19 @@ class Asignacion extends Model
      * El nombre de la tabla asociada al modelo.
      * Siguiendo el esquema actual donde 'viaje' representa la asignación de bus, ruta y conductor.
      */
-    protected $table = 'viaje';
-    protected $primaryKey = 'id_viaje';
+    protected $table = 'asignacion';
+    protected $primaryKey = 'id_asignacion';
     public $timestamps = false;
 
     protected $fillable = [
+        'id_tipo_asignacion',
         'placa',
+        'doc_usuario',
         'id_ruta',
-        'doc_us',
-        'fecha',
-        'id_estado'
+        'fecha_inicio',
+        'fecha_fin',
+        'id_estado',
+        'Nit'
     ];
 
     /**
@@ -43,7 +46,7 @@ class Asignacion extends Model
      */
     public function conductor()
     {
-        return $this->belongsTo(Usuario::class, 'doc_us', 'doc_usuario');
+        return $this->belongsTo(Usuario::class, 'doc_usuario', 'doc_usuario');
     }
 
     /**
@@ -51,7 +54,7 @@ class Asignacion extends Model
      */
     public function usuario()
     {
-        return $this->belongsTo(Usuario::class, 'doc_us', 'doc_usuario');
+        return $this->belongsTo(Usuario::class, 'doc_usuario', 'doc_usuario');
     }
 
     /**
@@ -60,5 +63,22 @@ class Asignacion extends Model
     public function estado()
     {
         return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
+    }
+
+    /**
+     * Relación con la Empresa
+     */
+    public function empresa()
+    {
+        return $this->belongsTo(Empresa::class, 'Nit', 'NIT');
+    }
+
+    /**
+     * Relación con los recorridos realizados durante este turno (vinculados por placa y conductor)
+     */
+    public function recorridos()
+    {
+        return $this->hasMany(Recorrido::class, 'placa', 'placa')
+            ->whereColumn('doc_us', 'doc_us');
     }
 }

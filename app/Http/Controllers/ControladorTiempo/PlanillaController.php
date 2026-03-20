@@ -15,10 +15,16 @@ class PlanillaController extends Controller
     {
         $user = Auth::user();
 
-        // Asignaciones del día ordenadas para generar la planilla de despacho
-        $planilla = Asignacion::with(['bus', 'usuario', 'ruta.barrioOrigen', 'ruta.barrioDestino'])
+        // Asignaciones del día con sus respectivos recorridos y novedades
+        $planilla = Asignacion::with([
+                'bus', 
+                'usuario', 
+                'ruta.barrioOrigen', 
+                'ruta.barrioDestino',
+                'recorridos.novedades'
+            ])
             ->whereHas('bus', fn($q) => $q->where('NIT', $user->NIT))
-            ->orderBy('id_viaje', 'asc')
+            ->orderBy('id_viaje', 'desc')
             ->paginate(20);
 
         // Novedades: buses en taller (mantenimiento) o inactivos como referencia

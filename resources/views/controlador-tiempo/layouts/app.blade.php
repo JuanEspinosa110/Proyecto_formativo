@@ -62,6 +62,13 @@
         /* KPI cards */
         .ct-kpi { border-left: 4px solid var(--ct-accent); }
         .ct-kpi-icon { color: var(--ct-accent); }
+
+        /* Timeline Styles */
+        .ct-timeline {
+            border-left: 2px dashed #eee;
+            margin-left: 10px;
+            padding-left: 20px;
+        }
     </style>
 
     @stack('styles')

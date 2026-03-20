@@ -44,7 +44,29 @@ class MonitoreoController extends Controller
             ->orderBy('placa')
             ->get();
 
-        $estados = Estado::all();
+        $buses = $buses->map(function($bus) use ($user) {
+            $ultimaSalida = $bus->recorridos->first();
+            $bus->intervalo_anterior = null;
+
+            if ($ultimaSalida && $bus->asignaciones->first()) {
+                $idRuta = $bus->asignaciones->first()->id_ruta;
+                
+                // Buscar el bus que salió inmediatamente antes por la misma ruta
+                $recorridoAnterior = \App\Models\Recorrido::where('id_ruta', $idRuta)
+                    ->where('id_recorrido', '!=', $ultimaSalida->id_recorrido)
+                    ->where('hora_salida', '<', $ultimaSalida->hora_salida)
+                    ->orderBy('hora_salida', 'desc')
+                    ->first();
+
+                if ($recorridoAnterior) {
+                    $bus->intervalo_anterior = \Carbon\Carbon::parse($recorridoAnterior->hora_salida)
+                        ->diffInMinutes(\Carbon\Carbon::parse($ultimaSalida->hora_salida));
+                }
+            }
+            return $bus;
+        });
+
+        $estados = \App\Models\Estado::all();
 
         return view('controlador-tiempo.monitoreo.index', compact(
             'buses',

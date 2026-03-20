@@ -76,15 +76,12 @@
                         </div>
                     </div>
                     <div class="col-sm-6">
-                        @php
-                            $retraso = $minutosEnRuta - 35; // Supongamos 35 min promedio
-                        @endphp
-                        <div class="p-4 bg-light rounded-4 border-start border-{{ $retraso > 0 ? 'danger' : 'success' }} border-4 h-100">
-                            <h2 class="fw-black mb-0 text-{{ $retraso > 0 ? 'danger' : 'success' }}">
-                                {{ $retraso > 0 ? '+'.round($retraso) : round($retraso) }}
+                        <div class="p-4 bg-light rounded-4 border-start border-primary border-4 h-100">
+                            <h2 class="fw-black mb-0 text-dark">
+                                {{ $intervaloAnterior ? $intervaloAnterior : '—' }}
                             </h2>
-                            <span class="text-muted fw-bold small text-uppercase">Diferencia Estimada (En minutos)</span>
-                            <div class="mt-2 small text-muted">Respecto al promedio</div>
+                            <span class="text-muted fw-bold small text-uppercase">Intervalo (Minutos)</span>
+                            <div class="mt-2 small text-muted">Respecto al bus anterior</div>
                         </div>
                     </div>
                 </div>
@@ -99,7 +96,8 @@
                             </button>
                         </form>
                         
-                        <button class="btn btn-outline-danger px-4 py-2 rounded-pill fw-bold d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-outline-danger px-4 py-2 rounded-pill fw-bold d-flex align-items-center gap-2" 
+                                data-bs-toggle="modal" data-bs-target="#modalNovedad">
                             <span class="material-symbols-rounded">warning</span> Reportar Novedad en Pista
                         </button>
                     </div>
@@ -111,6 +109,38 @@
                     </p>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Reportar Novedad -->
+<div class="modal fade" id="modalNovedad" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-danger text-white border-0 py-3">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded">report</span> Reportar Novedad en Pista
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('controlador-tiempo.verificacion.incidencia', $recorrido->id_recorrido) }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="alert alert-danger bg-danger bg-opacity-10 border-0 rounded-3 small mb-4">
+                        <span class="fw-bold">Atención:</span> Use este formulario para reportar retrasos significativos, fallas mecánicas menores o incumplimiento de normas del conductor.
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">Descripción de la Novedad</label>
+                        <textarea name="descripcion" class="form-control border-0 bg-light rounded-3" rows="4" 
+                                  placeholder="Describa brevemente lo ocurrido..." required minlength="5"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pb-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Enviar Reporte</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

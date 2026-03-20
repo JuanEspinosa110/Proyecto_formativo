@@ -93,12 +93,12 @@
                                     {{ $rec->hora_llegada ? 'Completado' : 'En Tránsito' }}
                                 </span>
                             </div>
-                            <div class="text-muted small d-flex justify-content-between">
-                                <span><span class="fw-semibold text-dark">Inicio:</span> {{ \Carbon\Carbon::parse($rec->hora_salida)->format('h:i A') }}</span>
-                                @if($rec->hora_llegada)
-                                <span><span class="fw-semibold text-dark">Fin:</span> {{ \Carbon\Carbon::parse($rec->hora_llegada)->format('h:i A') }}</span>
-                                @else
-                                <span class="text-primary fw-bold">—:—</span>
+                            <div class="text-muted small d-flex justify-content-between align-items-center">
+                                <span><span class="fw-semibold text-dark">Propio:</span> {{ \Carbon\Carbon::parse($rec->hora_salida)->format('h:i A') }}</span>
+                                @if($bus->intervalo_anterior)
+                                    <span class="badge bg-light text-dark border small fw-bold">
+                                        +{{ $bus->intervalo_anterior }} min gap
+                                    </span>
                                 @endif
                             </div>
                         </div>
