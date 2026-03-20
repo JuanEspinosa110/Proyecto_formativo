@@ -9,6 +9,26 @@ class InitialDataSeeder extends Seeder
 {
     public function run(): void
     {
+        // Estados completos
+        $estados = [
+            ['id_estado' => 1, 'nombre_estado' => 'ACTIVO'],
+            ['id_estado' => 2, 'nombre_estado' => 'INACTIVO'],
+            ['id_estado' => 3, 'nombre_estado' => 'SUSPENDIDO'],
+            ['id_estado' => 4, 'nombre_estado' => 'EN MANTENIMIENTO'],
+            ['id_estado' => 5, 'nombre_estado' => 'FINALIZADO'],
+            ['id_estado' => 6, 'nombre_estado' => 'PENDIENTE'],
+            ['id_estado' => 7, 'nombre_estado' => 'BLOQUEADA'],
+            ['id_estado' => 8, 'nombre_estado' => 'VENCIDA'],
+            ['id_estado' => 9, 'nombre_estado' => 'RENOVADA'],
+        ];
+        foreach ($estados as $estado) {
+            DB::table('estado')->updateOrInsert(
+                ['id_estado' => $estado['id_estado']],
+                ['nombre_estado' => $estado['nombre_estado']]
+            );
+        }
+        // Limpiar la tabla para evitar duplicados
+        DB::table('tipo_usuario')->delete();
         // 1. Estados
         DB::table('estado')->insert([
             ['id_estado' => 1, 'nombre_estado' => 'ACTIVO', 'descripcion' => 'Operativo'],
@@ -56,26 +76,26 @@ class InitialDataSeeder extends Seeder
         // 6. Planes de Licencia
         DB::table('planes_licencia')->insert([
             [
-                'id_plan' => 1, 
-                'nombre_plan' => 'Básico', 
-                'duracion_meses' => 1, 
-                'precio' => 50000, 
+                'id_plan' => 1,
+                'nombre_plan' => 'Básico',
+                'duracion_meses' => 1,
+                'precio' => 50000,
                 'descripcion' => 'Ideal para pequeñas empresas de transporte.',
                 'id_estado' => 1
             ],
             [
-                'id_plan' => 2, 
-                'nombre_plan' => 'Profesional', 
-                'duracion_meses' => 6, 
-                'precio' => 250000, 
+                'id_plan' => 2,
+                'nombre_plan' => 'Profesional',
+                'duracion_meses' => 6,
+                'precio' => 250000,
                 'descripcion' => 'Gestión completa para flotas medianas.',
                 'id_estado' => 1
             ],
             [
-                'id_plan' => 3, 
-                'nombre_plan' => 'Premium', 
-                'duracion_meses' => 12, 
-                'precio' => 450000, 
+                'id_plan' => 3,
+                'nombre_plan' => 'Premium',
+                'duracion_meses' => 12,
+                'precio' => 450000,
                 'descripcion' => 'Control total y reportes avanzados.',
                 'id_estado' => 1
             ],
@@ -84,6 +104,7 @@ class InitialDataSeeder extends Seeder
         DB::table('ruta')->insert([
             [
                 'id_ruta' => 123456,
+                'codigo_ruta' => 1,
                 'id_ciudad' => '730001',
                 'id_barrio_origen' => 1,
                 'id_barrio_destino' => 3,
@@ -91,6 +112,7 @@ class InitialDataSeeder extends Seeder
             ],
             [
                 'id_ruta' => 654321,
+                'codigo_ruta' => 2,
                 'id_ciudad' => '730001',
                 'id_barrio_origen' => 3,
                 'id_barrio_destino' => 4,

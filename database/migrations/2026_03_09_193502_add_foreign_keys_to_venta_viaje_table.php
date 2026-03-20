@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('venta_viaje', function (Blueprint $table) {
             $table->foreign(['id_viaje'], 'venta_viaje_ibfk_1')->references(['id_viaje'])->on('viaje')->onUpdate('restrict')->onDelete('restrict');
-            $table->foreign(['id_tarjeta'], 'venta_viaje_ibfk_2')->references(['id_tarjeta'])->on('tarjeta')->onUpdate('restrict')->onDelete('restrict');
+            // Eliminado: la FK de id_tarjeta se crea en la migración de creación
             $table->foreign(['id_estado'], 'venta_viaje_ibfk_3')->references(['id_estado'])->on('estado')->onUpdate('restrict')->onDelete('restrict');
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
     {
         Schema::table('venta_viaje', function (Blueprint $table) {
             $table->dropForeign('venta_viaje_ibfk_1');
-            $table->dropForeign('venta_viaje_ibfk_2');
+            // Eliminado: la FK de id_tarjeta ya no existe ni se elimina aquí
             $table->dropForeign('venta_viaje_ibfk_3');
         });
     }

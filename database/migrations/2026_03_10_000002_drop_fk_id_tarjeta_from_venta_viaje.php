@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('venta_viaje', function (Blueprint $table) {
-            $table->dropForeign('venta_viaje_ibfk_2');
-        });
+        // Eliminado: la FK de id_tarjeta ya no existe ni se elimina aquí
     }
 
     /**
@@ -21,10 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('venta_viaje', function (Blueprint $table) {
-            $table->foreign('id_tarjeta')
-                  ->references('id_tarjeta')->on('tarjeta')
-                  ->onDelete('restrict');
-        });
+        // Eliminado: la FK de id_tarjeta ya no existe ni se crea aquí
     }
 };

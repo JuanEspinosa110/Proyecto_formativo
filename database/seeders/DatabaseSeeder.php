@@ -15,7 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(InitialDataSeeder::class);
+        $this->call([
+            InitialDataSeeder::class,
+            SuperAdministradorSeeder::class,
+        ]);
 
         // User::create([
         //     'doc_usuario' => 1000000000,
