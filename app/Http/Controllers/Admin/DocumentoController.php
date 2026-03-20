@@ -135,6 +135,15 @@ class DocumentoController extends Controller
         if ($request->filled('estado')) {
             $query->where('id_estado', $request->estado);
         }
+        if ($request->filled('placa')) {
+            $query->where('placa', 'like', '%' . $request->placa . '%');
+        }
+        if ($request->filled('propietario')) {
+            $query->whereHas('bus', function($q) use ($request) {
+                $q->where('nombre_propietario', 'like', '%' . $request->propietario . '%')
+                  ->orWhere('doc_propietario', 'like', '%' . $request->propietario . '%');
+            });
+        }
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -578,5 +587,44 @@ class DocumentoController extends Controller
     private function generarIdDocumento()
     {
         return (Documento::max('id_documento') ?? 0) + 1;
+    }
+    /**
+     * Aprobar documento y actualizar estado del Bus
+     */
+    public function aprobar($id)
+    {
+        $documento = Documento::findOrFail($id);
+        $documento->id_estado = 24; // APROBADO
+        $documento->save();
+
+        if ($documento->placa) {
+            $bus = $documento->bus;
+            if ($bus) {
+                $bus->id_estado = $bus->isOperable() ? 1 : 2; 
+                $bus->save();
+            }
+        }
+
+        return redirect()->back()->with('success', 'Documento APROBADO. Estado del vehículo actualizado.');
+    }
+
+    /**
+     * Rechazar documento y actualizar estado del Bus
+     */
+    public function rechazar($id)
+    {
+        $documento = Documento::findOrFail($id);
+        $documento->id_estado = 25; // RECHAZADO
+        $documento->save();
+
+        if ($documento->placa) {
+            $bus = $documento->bus;
+            if ($bus) {
+                $bus->id_estado = 2; // Inactivo
+                $bus->save();
+            }
+        }
+
+        return redirect()->back()->with('success', 'Documento RECHAZADO. El vehículo ha sido INACTIVADO.');
     }
 }

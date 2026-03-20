@@ -1,0 +1,248 @@
+/* public/css/conductor-layout.css */
+
+/* Typography and Global Defaults */
+body.sigu-conductor-body {
+    background: #F4F4F6;
+    font-family: 'Inter Tight', sans-serif;
+    color: #2F2F3A;
+}
+
+/* Navbar Structure */
+.sigu-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #FFFFFF;
+    border-bottom: 1px solid #DADDE1;
+    padding: 0.75rem 1.5rem;
+    box-shadow: 0 1px 2px rgba(47, 47, 58, .06);
+}
+
+.sigu-navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Nav Links */
+.sigu-nav {
+    display: flex;
+    gap: 1.5rem;
+    margin-left: 2rem;
+}
+
+.sigu-nl {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: #6B6F88;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.sigu-nl:hover,
+.sigu-nl.active {
+    color: #5E548E;
+    background: #ECE9F5;
+}
+
+/* Logo and Branding */
+.sigu-logo-icon {
+    background: linear-gradient(135deg, #5E548E, #4A4E69);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 14px rgba(94, 84, 142, .28);
+}
+
+.sigu-logo-icon:hover {
+    transform: scale(1.05);
+}
+
+.sigu-logo-icon .material-symbols-rounded {
+    font-size: 1.2rem;
+}
+
+.sigu-logo-text {
+    line-height: 1;
+    font-family: 'Sora', sans-serif;
+    color: #5E548E !important;
+}
+
+/* Main Content Container */
+.sigu-main {
+    padding: 2rem 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: calc(100vh - 140px);
+    background: #F4F4F6;
+}
+
+/* User Pill / Profile Dropdown */
+.sigu-user-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: #FFFFFF;
+    border: 1.5px solid #DADDE1;
+    padding: 0.3rem 0.7rem 0.3rem 0.35rem;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: all 0.17s;
+}
+
+.sigu-user-pill:hover,
+.sigu-user-pill[aria-expanded="true"] {
+    border-color: #5E548E;
+    box-shadow: 0 4px 14px rgba(94, 84, 142, .28);
+}
+
+.sigu-user-ava {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #5E548E, #4A4E69);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sigu-user-ava .material-symbols-rounded {
+    font-size: 0.95rem;
+}
+
+.sigu-user-name {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #2F2F3A;
+}
+
+.sigu-user-role {
+    font-size: 0.64rem;
+    color: #6B6F88;
+    display: block;
+}
+
+.document-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Tarjeta */
+.doc-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 14px;
+    background: #f8fafc;
+    transition: all 0.2s ease;
+    border: 1px solid #e2e8f0;
+}
+
+.doc-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* Icono */
+.doc-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    font-size: 20px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Contenido */
+.doc-content {
+    flex: 1;
+}
+
+.doc-content h6 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.doc-content small {
+    display: block;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+/* Tiempo */
+.doc-time {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Estado */
+.doc-status {
+    font-size: 0.65rem;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+}
+
+/* Colores dinámicos */
+.doc-success {
+    border-left: 4px solid #22c55e;
+}
+
+.doc-success .doc-icon {
+    color: #22c55e;
+}
+
+.doc-success .doc-status {
+    background: #22c55e;
+    color: white;
+}
+
+.doc-warning {
+    border-left: 4px solid #f59e0b;
+}
+
+.doc-warning .doc-icon {
+    color: #f59e0b;
+}
+
+.doc-warning .doc-status {
+    background: #facc15;
+    color: #000;
+}
+
+.doc-danger {
+    border-left: 4px solid #ef4444;
+}
+
+.doc-danger .doc-icon {
+    color: #ef4444;
+}
+
+.doc-danger .doc-status {
+    background: #ef4444;
+    color: white;
+}

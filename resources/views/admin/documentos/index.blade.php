@@ -26,10 +26,10 @@
 <!-- Filtros -->
 <div class="sa-filters-section">
     <form method="GET" action="{{ route('admin.documentos.index') }}" class="row g-3 align-items-end">
-        <div class="col-md-3">
-            <label for="tipo" class="form-label small fw-bold text-muted text-uppercase">Tipo de Documento</label>
+        <div class="col-md-2">
+            <label for="tipo" class="form-label small fw-bold text-muted text-uppercase">Tipo</label>
             <select name="tipo" id="tipo" class="form-select bg-light border-0">
-                <option value="">Todos los tipos</option>
+                <option value="">Todos</option>
                 @foreach ($tiposDocumento as $tipo)
                 <option value="{{ $tipo->id_tipo_documento }}" {{ request('tipo') == $tipo->id_tipo_documento ? 'selected' : '' }}>
                     {{ $tipo->nombre }}
@@ -38,10 +38,10 @@
             </select>
         </div>
 
-        <div class="col-md-3">
-            <label for="estado" class="form-label small fw-bold text-muted text-uppercase">Estado Revisión</label>
+        <div class="col-md-2">
+            <label for="estado" class="form-label small fw-bold text-muted text-uppercase">Estado</label>
             <select name="estado" id="estado" class="form-select bg-light border-0">
-                <option value="">Todos los estados</option>
+                <option value="">Todos</option>
                 @foreach ($estados as $est)
                 <option value="{{ $est->id_estado }}" {{ request('estado') == $est->id_estado ? 'selected' : '' }}>
                     {{ $est->nombre_estado }}
@@ -50,9 +50,14 @@
             </select>
         </div>
 
+        <div class="col-md-2">
+            <label for="placa" class="form-label small fw-bold text-muted text-uppercase">Placa</label>
+            <input type="text" name="placa" id="placa" class="form-control bg-light border-0" placeholder="Ej: ABC123" value="{{ request('placa') }}">
+        </div>
+
         <div class="col-md-4">
-            <label for="search" class="form-label small fw-bold text-muted text-uppercase">Buscar Vehículo</label>
-            <input type="text" name="search" id="search" class="form-control bg-light border-0" placeholder="Ingrese placa..." value="{{ request('search') }}">
+            <label for="propietario" class="form-label small fw-bold text-muted text-uppercase">Propietario / ID</label>
+            <input type="text" name="propietario" id="propietario" class="form-control bg-light border-0" placeholder="Nombre o Cédula..." value="{{ request('propietario') }}">
         </div>
 
         <div class="col-md-2">
@@ -123,20 +128,32 @@
                         </span>
                     </td>
                     <td class="text-center">
-                        <div class="d-flex justify-content-center gap-2">
-                            <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold btn-visor" 
+                        <div class="d-flex justify-content-center gap-1">
+                            <button class="btn btn-sm btn-primary rounded-pill px-2 fw-bold btn-visor" 
                                 data-url="{{ asset('storage/' . $documento->archivo) }}" 
                                 data-nombre="{{ $documento->nombre }}"
                                 title="Previsualizar">
                                 <span class="material-symbols-rounded fs-5">visibility</span>
                             </button>
+
+                            @if($documento->id_estado == 19) <!-- PENDIENTE -->
+                                <form action="{{ route('admin.documentos.aprobar', $documento->id_documento) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-2 fw-bold" title="Aprobar">
+                                        <span class="material-symbols-rounded fs-5">check</span>
+                                    </button>
+                                </form>
+                                <form action="{{ route('admin.documentos.rechazar', $documento->id_documento) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-danger rounded-pill px-2 fw-bold" title="Rechazar">
+                                        <span class="material-symbols-rounded fs-5">close</span>
+                                    </button>
+                                </form>
+                            @endif
+
                             <a href="{{ route('admin.documentos.download', $documento->id_documento) }}"
-                                class="btn btn-sm btn-light rounded-pill px-3 fw-bold" title="Descargar PDF">
+                                class="btn btn-sm btn-light rounded-pill px-2 fw-bold" title="Descargar">
                                 <span class="material-symbols-rounded fs-5">download</span>
-                            </a>
-                            <a href="{{ route('admin.documentos.edit', $documento->id_documento) }}"
-                                class="btn btn-sm btn-light rounded-pill px-3 fw-bold" title="Revisar / Cambiar Estado">
-                                <span class="material-symbols-rounded fs-5">edit</span>
                             </a>
                         </div>
                     </td>

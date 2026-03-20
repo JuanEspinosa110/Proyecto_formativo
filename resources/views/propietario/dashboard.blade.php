@@ -8,19 +8,19 @@
     @if(isset($conteoVencidos) && ($conteoVencidos > 0 || $conteoProximos > 0))
     <div class="row mb-4 mt-2">
         <div class="col-12">
-            <div class="alert alert-{{ $conteoVencidos > 0 ? 'danger' : 'warning' }} border-0 shadow-sm rounded-4 p-4 mb-0 d-flex align-items-center gap-4">
-                <div class="bg-{{ $conteoVencidos > 0 ? 'danger' : 'warning' }} bg-opacity-10 text-{{ $conteoVencidos > 0 ? 'danger' : 'warning' }} p-3 rounded-circle">
-                    <span class="material-symbols-rounded fs-1">{{ $conteoVencidos > 0 ? 'warning' : 'info' }}</span>
+            <div class="card border-0 shadow-lg rounded-4 p-4 mb-0 d-flex flex-row align-items-center gap-4 text-white" style="background: linear-gradient(135deg, {{ $conteoVencidos > 0 ? '#ef4444 0%, #b91c1c' : '#f59e0b 0%, #d97706' }} 100%) !important;">
+                <div class="bg-white bg-opacity-20 p-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
+                    <span class="material-symbols-rounded fs-2 text-white">{{ $conteoVencidos > 0 ? 'gpp_maybe' : 'info' }}</span>
                 </div>
                 <div class="flex-grow-1">
-                    <h4 class="fw-bold mb-1">¡Atención! Pendientes de Documentación</h4>
-                    <p class="mb-0 text-dark opacity-75">
-                        Tu flota tiene <strong>{{ $conteoVencidos }}</strong> documentos vencidos y 
+                    <h5 class="fw-bold mb-1">¡Acción Requerida! Alerta de Documentos</h5>
+                    <p class="mb-0 opacity-90 small">
+                        Tu flota registra <strong>{{ $conteoVencidos }}</strong> documentos vencidos y 
                         <strong>{{ $conteoProximos }}</strong> próximos a vencer.
                     </p>
                 </div>
                 <div>
-                    <a href="{{ route('propietario.dashboard', ['section' => 'documentos']) }}" class="btn btn-{{ $conteoVencidos > 0 ? 'danger' : 'warning' }} fw-bold px-4 rounded-pill">Gestionar Ahora</a>
+                    <a href="{{ route('propietario.dashboard', ['section' => 'documentos']) }}" class="btn btn-light fw-bold px-4 rounded-pill shadow-sm text-{{ $conteoVencidos > 0 ? 'danger' : 'warning' }}">Gestionar</a>
                 </div>
             </div>
         </div>
@@ -145,7 +145,9 @@
                 <div class="card border-0 shadow-sm rounded-4 p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <h5 class="fw-bold mb-0">Estado de la Última Operación</h5>
-                        <a href="{{ route('propietario.dashboard', ['section' => 'asignaciones']) }}" class="btn btn-light btn-sm fw-bold">Ver Todo</a>
+                        <a href="{{ route('propietario.dashboard', ['section' => 'asignaciones']) }}" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm d-inline-flex align-items-center gap-1">
+                            Ver Todo <span class="material-symbols-rounded fs-5">arrow_forward</span>
+                        </a>
                     </div>
                     @if($ultimaAsignacion)
                     <div class="bg-light p-4 rounded-4 border-start border-4 border-primary">
@@ -176,7 +178,7 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-dark">
+                <div class="card border-0 shadow-lg rounded-4 p-4 h-100 text-white" style="background: linear-gradient(135deg, #110726 0%, #2c1654 100%) !important;">
                     <h5 class="fw-bold mb-4 text-white">Vehículos Vinculados</h5>
                     <div class="d-flex flex-column gap-3 overflow-auto" style="max-height: 200px;">
                         @forelse($buses as $b)
@@ -208,7 +210,7 @@
                 <h1 class="h3 fw-bold text-dark mb-1">Mis Vehículos</h1>
                 <p class="text-muted mb-0">Detalles técnicos e información operativa de tu flota registrada.</p>
             </div>
-            <button class="btn btn-dark d-flex align-items-center gap-2 px-4 py-2 fw-bold shadow-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#modalSubirDocumento">
+            <button class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 fw-bold shadow-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#modalSubirDocumento">
                 <span class="material-symbols-rounded fs-5">description</span>
                 Subir Documento
             </button>
@@ -322,6 +324,23 @@
             </div>
         </div>
 
+        <!-- Filtro por Placa -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <form action="{{ route('propietario.dashboard') }}" method="GET" class="row g-3">
+                <input type="hidden" name="section" value="asignaciones">
+                <div class="col-md-4">
+                    <label class="form-label small fw-bold text-muted text-uppercase">Bus (Placa)</label>
+                    <input type="text" name="placa" class="form-control rounded-3" placeholder="Ej: ABC-123" value="{{ request('placa') }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary rounded-pill fw-bold shadow-sm">Buscar</button>
+                    <a href="{{ route('propietario.dashboard', ['section' => 'asignaciones']) }}" class="btn btn-light rounded-circle shadow-sm">
+                        <span class="material-symbols-rounded">restart_alt</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+
         <div class="card border-0 shadow-sm rounded-4 p-4">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -330,8 +349,7 @@
                             <th class="ps-3 border-0">PLACA</th>
                             <th class="border-0">RUTA</th>
                             <th class="border-0">CONDUCTOR</th>
-                            <th class="border-0">INICIO</th>
-                            <th class="border-0">FIN (8h)</th>
+                            <th class="border-0">FECHA Y TURNO</th>
                             <th class="border-0 text-center">ESTADO</th>
                         </tr>
                     </thead>
@@ -341,8 +359,12 @@
                             <td class="ps-3"><span class="badge bg-primary bg-opacity-10 text-primary border-primary border px-2">{{ $asig->placa }}</span></td>
                             <td class="fw-bold text-dark">{{ $asig->ruta->nombre_ruta ?? 'N/A' }}</td>
                             <td class="text-muted">{{ $asig->conductor->primer_nombre }} {{ $asig->conductor->primer_apellido }}</td>
-                            <td class="small fw-bold">{{ \Carbon\Carbon::parse($asig->fecha)->format('H:i') }}</td>
-                            <td class="small text-muted">{{ \Carbon\Carbon::parse($asig->fecha)->addHours(8)->format('H:i') }}</td>
+                            <td>
+                                <div class="d-flex flex-column small">
+                                    <span class="text-dark fw-bold">{{ \Carbon\Carbon::parse($asig->fecha)->format('H:i') }} - {{ \Carbon\Carbon::parse($asig->fecha)->addHours(8)->format('H:i') }}</span>
+                                    <span class="text-muted">{{ \Carbon\Carbon::parse($asig->fecha)->format('d/m/Y') }}</span>
+                                </div>
+                            </td>
                             <td class="text-center">
                                 <span class="badge bg-{{ $asig->id_estado == 1 ? 'success' : 'warning' }} rounded-pill">{{ $asig->estado->nombre_estado }}</span>
                             </td>
@@ -388,7 +410,8 @@
                             <th class="py-3 text-uppercase small fw-bold text-muted border-0">Nombre del Archivo</th>
                             <th class="py-3 text-uppercase small fw-bold text-muted border-0">Fecha Carga</th>
                             <th class="py-3 text-uppercase small fw-bold text-muted border-0">Vencimiento</th>
-                            <th class="py-3 text-uppercase small fw-bold text-muted border-0">Estado</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted border-0">Vigencia</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted border-0">Validación</th>
                             <th class="py-3 text-uppercase small fw-bold text-muted border-0 text-center pe-4">Acciones</th>
                         </tr>
                     </thead>
@@ -422,6 +445,16 @@
                             <td>
                                 <span class="badge bg-{{ $doc->status_color }}-subtle text-{{ $doc->status_color }} border border-{{ $doc->status_color }} rounded-pill px-3 py-1 x-small fw-bold">
                                     {{ $doc->estado_expiracion }}
+                                </span>
+                            </td>
+                            <td>
+                                @php
+                                    $valColor = 'warning'; $valText = 'Pendiente';
+                                    if ($doc->id_estado == 24 || $doc->id_estado == 1) { $valColor = 'success'; $valText = 'Aprobado'; }
+                                    elseif ($doc->id_estado == 25 || $doc->id_estado == 2) { $valColor = 'danger'; $valText = 'Rechazado'; }
+                                @endphp
+                                <span class="badge bg-{{ $valColor }}-subtle text-{{ $valColor }} border border-{{ $valColor }} rounded-pill px-3 py-1 x-small fw-bold">
+                                    {{ $valText }}
                                 </span>
                             </td>
                             <td class="text-end pe-4">
@@ -511,8 +544,8 @@
                     <input type="time" name="horario" class="form-control rounded-3" value="{{ request('horario') }}">
                 </div>
                 <div class="col-md-2 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-primary w-100 rounded-3 fw-bold">Buscar</button>
-                    <a href="{{ route('propietario.dashboard', ['section' => 'historial']) }}" class="btn btn-light rounded-3">
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold shadow-sm">Buscar</button>
+                    <a href="{{ route('propietario.dashboard', ['section' => 'historial']) }}" class="btn btn-light rounded-circle shadow-sm">
                         <span class="material-symbols-rounded">restart_alt</span>
                     </a>
                 </div>
@@ -556,7 +589,7 @@
                                 <div class="fw-bold text-success">${{ number_format($asig->ventas->count() * $precioPasaje) }}</div>
                             </td>
                             <td class="text-center">
-                                <button class="btn btn-dark btn-sm rounded-pill px-3 fw-bold btn-detalle-asignacion" data-id="{{ $asig->id_viaje }}">
+                                <button class="btn btn-primary btn-sm rounded-pill px-3 fw-bold btn-detalle-asignacion" data-id="{{ $asig->id_viaje }}">
                                     Ver Detalle
                                 </button>
                             </td>
@@ -619,79 +652,188 @@
 
     <!-- 6. SECCIÓN GANANCIAS (INGRESOS) -->
     @if(request('section') == 'ganancias')
-    <div id="section-ganancias">
-        <div class="row mb-5">
-            <div class="col-12">
-                <h1 class="h3 fw-bold text-dark mb-1">Ganancias del Bus</h1>
-                <p class="text-muted mb-0">Resumen detallado de ingresos generados por la operación.</p>
+        <style>
+            .hover-lift {
+                transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            }
+            .hover-lift:hover {
+                transform: translateY(-4px) !important;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+            }
+            .btn-switch {
+                transition: all 0.2s;
+                color: rgba(255, 255, 255, 0.7);
+            }
+            .btn-switch:hover {
+                color: white;
+            }
+            .btn-switch.active {
+                background-color: white !important;
+                color: #0f172a !important;
+                font-weight: 700 !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            }
+            .card-gradient-earnings {
+                background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%) !important;
+            }
+        </style>
+
+        <!-- 1. ENCABEZADO: TÍTULO + FILTRO -->
+        <div class="d-flex align-items-center justify-content-between gap-4 mb-4 flex-wrap">
+            <div>
+                <h2 class="h4 fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded text-primary">analytics</span>
+                    Ganancias del Bus
+                </h2>
+                <p class="text-muted mb-0 small">Consulta detallada de los ingresos generados por la operación.</p>
+            </div>
+            <!-- Filtro por Mes Compacto -->
+            <div class="bg-white p-2 rounded-4 shadow-sm border">
+                <form action="{{ route('propietario.dashboard') }}" method="GET" class="d-flex align-items-center gap-2 m-0">
+                    <input type="hidden" name="section" value="ganancias">
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="form-label x-small fw-bold text-muted text-uppercase mb-0 text-nowrap">Mes:</label>
+                        <input type="month" name="mes_seleccionado" class="form-control form-control-sm border-0 bg-light rounded-3" value="{{ request('mes_seleccionado') }}" style="width: 140px;">
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">Refrescar</button>
+                </form>
             </div>
         </div>
 
-        <div class="row g-4 mb-5">
+        <!-- 2. TARJETA RESUMEN CON TABS -->
+        <div class="row g-4 mb-4">
             <div class="col-lg-12">
-                <div class="card border-0 shadow-sm rounded-5 overflow-hidden bg-dark p-5 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;">
+                <div class="card border-0 shadow-lg rounded-5 overflow-hidden p-4 text-white card-gradient-earnings">
                     <div class="row align-items-center">
-                        <div class="col-md-7">
-                            <span class="text-white-50 small fw-bold text-uppercase d-block mb-1">Ingresos Totales Generados</span>
-                            <h1 class="display-3 fw-black mb-3">${{ number_format($ingresosTotales) }}</h1>
-                            <div class="d-flex flex-wrap gap-3">
-                                <div class="bg-white bg-opacity-10 px-3 py-2 rounded-4 border border-white border-opacity-10">
-                                    <span class="small d-block text-white-50">Viajes Realizados</span>
-                                    <span class="fw-bold text-warning">{{ $conteoAsignaciones }} viajes</span>
+                        <div class="col-md-12">
+                            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                                <div>
+                                    <span class="text-white-50 small fw-bold text-uppercase d-block mb-1" id="earnings_label">Ingresos de Hoy</span>
+                                    <h1 class="display-5 fw-black mb-0 text-white" id="earnings_amount">${{ number_format($gananciasHoy ?? 0) }}</h1>
                                 </div>
-                                <div class="bg-white bg-opacity-10 px-3 py-2 rounded-4 border border-white border-opacity-10">
-                                    <span class="small d-block text-white-50">Pasajeros Transportados</span>
-                                    <span class="fw-bold text-success">{{ number_format($conteoPasajeros) }} pax</span>
-                                </div>
-                                <div class="bg-white bg-opacity-10 px-3 py-2 rounded-4 border border-white border-opacity-10">
-                                    <span class="small d-block text-white-50">Valor Pasaje Actual</span>
-                                    <span class="fw-bold">$3,300</span>
+                                <div class="d-flex gap-2 bg-white bg-opacity-10 p-1 rounded-pill">
+                                    <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch active" data-amount="{{ number_format($gananciasHoy ?? 0) }}" data-label="Ingresos de Hoy" onclick="switchEarnings(this)">Hoy</button>
+                                    <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch" data-amount="{{ number_format($gananciasSemana ?? 0) }}" data-label="Ingresos de la Semana" onclick="switchEarnings(this)">Semana</button>
+                                    <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch" data-amount="{{ number_format($gananciasMes ?? 0) }}" data-label="Ingresos del Mes" onclick="switchEarnings(this)">Mes</button>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-5 d-none d-md-block text-end">
-                            <span class="material-symbols-rounded" style="font-size: 10rem !important; opacity: 0.15; color: white;">monetization_on</span>
+                            
+                            <hr class="border-white border-opacity-10 my-4">
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
+                                        <div class="bg-warning bg-opacity-25 p-2 rounded-3 text-warning d-flex align-items-center justify-content-center">
+                                            <span class="material-symbols-rounded">local_shipping</span>
+                                        </div>
+                                        <div>
+                                            <span class="small d-block text-white-50">Viajes Realizados</span>
+                                            <span class="h5 fw-black text-warning mb-0">{{ $conteoAsignaciones }} viajes</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
+                                        <div class="bg-success bg-opacity-25 p-2 rounded-3 text-success d-flex align-items-center justify-content-center">
+                                            <span class="material-symbols-rounded">groups</span>
+                                        </div>
+                                        <div>
+                                            <span class="small d-block text-white-50">Pasajeros Transportados</span>
+                                            <span class="h5 fw-black text-success mb-0">{{ number_format($conteoPasajeros) }} pax</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
+                                        <div class="bg-info bg-opacity-25 p-2 rounded-3 text-info d-flex align-items-center justify-content-center">
+                                            <span class="material-symbols-rounded">payments</span>
+                                        </div>
+                                        <div>
+                                            <span class="small d-block text-white-50">Tarifa Promedio</span>
+                                            <span class="h5 fw-black text-info mb-0">$3,300</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- 3. INGRESO CONSOLIDADO POR VEHÍCULO -->
+        <h6 class="fw-bold text-muted text-uppercase small letter-spacing-1 mb-3 d-flex align-items-center gap-2">
+            <span class="material-symbols-rounded fs-5 text-primary">directions_bus</span>
+            Ingreso Consolidado por Vehículo
+        </h6>
+        <div class="row g-3 mb-4">
+            @forelse($ingresosPorBus as $bus)
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-3 bg-white hover-lift">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 rounded-pill fw-bold">{{ $bus->placa }}</span>
+                        <div class="d-flex align-items-center gap-1 text-muted small">
+                            <span class="material-symbols-rounded fs-6">groups</span>
+                            <span>{{ number_format($bus->total_pasajeros) }} Pax</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <span class="text-muted x-small text-uppercase fw-bold d-block">Ganancia Acumulada</span>
+                        <h3 class="fw-black mb-0 text-success">${{ number_format($bus->total_ingresos) }}</h3>
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white">
+                    <span class="material-symbols-rounded display-5 text-muted opacity-25 mb-2">money_off</span>
+                    <p class="text-muted small mb-0">No se registran ganancias vinculadas a los vehículos.</p>
+                </div>
+            </div>
+            @endforelse
+        </div>
+
+        <!-- 4. TABLA DE INGRESOS POR TRAYECTO -->
         <div class="card border-0 shadow-sm rounded-4 p-4">
-             <h5 class="fw-bold mb-4">Ingresos por Trayecto (Últimos viajes)</h5>
+             <h6 class="fw-bold text-dark d-flex align-items-center gap-2 mb-4">
+                 <span class="material-symbols-rounded text-primary">history</span>
+                 Ingresos por Trayecto (Últimos viajes)
+             </h6>
              <div class="table-responsive">
                  <table class="table table-hover align-middle mb-0">
-                     <thead class="bg-light">
+                     <thead>
                          <tr>
-                             <th class="ps-3 border-0">FECHA</th>
-                             <th class="border-0">PLACA</th>
-                             <th class="border-0">RUTA</th>
-                             <th class="border-0 text-center">PASAJEROS</th>
-                             <th class="border-0 text-end pe-3">INGRESO GENERADO</th>
+                             <th class="ps-3 py-3 text-uppercase small fw-bold border-0" style="background-color: rgba(111, 66, 193, 0.05); color: #6f42c1;">FECHA</th>
+                             <th class="py-3 text-uppercase small fw-bold border-0" style="background-color: rgba(111, 66, 193, 0.05); color: #6f42c1;">PLACA</th>
+                             <th class="py-3 text-uppercase small fw-bold border-0" style="background-color: rgba(111, 66, 193, 0.05); color: #6f42c1;">RUTA</th>
+                             <th class="py-3 text-uppercase small fw-bold border-0 text-center" style="background-color: rgba(111, 66, 193, 0.05); color: #6f42c1;">PASAJEROS</th>
+                             <th class="py-3 text-uppercase small fw-bold border-0 text-end pe-3" style="background-color: rgba(111, 66, 193, 0.05); color: #6f42c1;">INGRESO GENERADO</th>
                          </tr>
                      </thead>
                      <tbody>
-                         @forelse($asignacionesGanancias as $asig)
-                         <tr>
-                             <td class="ps-3 text-muted small">{{ \Carbon\Carbon::parse($asig->fecha)->format('d/m/Y H:i') }}</td>
-                             <td><span class="badge bg-primary bg-opacity-10 text-primary border px-2">{{ $asig->placa }}</span></td>
-                             <td class="text-dark fw-medium">{{ $asig->ruta->nombre_ruta ?? 'Ruta Express' }}</td>
-                             <td class="text-center">{{ $asig->ventas->count() }}</td>
-                             <td class="text-end pe-3 fw-bold text-success">${{ number_format($asig->ventas->count() * $precioPasaje) }}</td>
-                         </tr>
-                         @empty
-                         <tr>
-                             <td colspan="5" class="text-center py-5">
-                                 <span class="material-symbols-rounded fs-1 opacity-25">payments</span>
-                                 <p class="text-muted mt-2 mb-0">No se han registrado ingresos para este bus aún.</p>
-                             </td>
-                         </tr>
-                         @endforelse
+                          @forelse($asignacionesGanancias as $asig)
+                          <tr>
+                              <td class="ps-3 text-muted small">{{ \Carbon\Carbon::parse($asig->fecha)->format('d/m/Y H:i') }}</td>
+                              <td><span class="badge bg-primary bg-opacity-10 text-primary border px-2">{{ $asig->placa }}</span></td>
+                              <td class="text-dark fw-medium">{{ $asig->ruta->nombre_ruta ?? 'Ruta Express' }}</td>
+                              <td class="text-center">
+                                  <span class="badge bg-light text-dark border rounded-pill px-2">{{ $asig->ventas->count() }}</span>
+                              </td>
+                              <td class="text-end pe-3 fw-bold text-success">${{ number_format($asig->ventas->count() * $precioPasaje) }}</td>
+                          </tr>
+                          @empty
+                          <tr>
+                              <td colspan="5" class="text-center py-5">
+                                  <span class="material-symbols-rounded fs-1 opacity-25">payments</span>
+                                  <p class="text-muted mt-2 mb-0">No se han registrado ingresos para este bus aún.</p>
+                              </td>
+                          </tr>
+                          @endforelse
                      </tbody>
                  </table>
              </div>
              <div class="mt-4">
-                 {{ $asignacionesGanancias->appends(['section' => 'ganancias'])->links() }}
+                  {{ $asignacionesGanancias->appends(['section' => 'ganancias'])->links() }}
              </div>
         </div>
     </div>
@@ -1057,27 +1199,27 @@
                 <!-- Resumen Estadístico -->
                 <div class="row g-3">
                     <div class="col-md-3">
-                        <div class="alert alert-info border-0 rounded-4 p-3 mb-0">
+                        <div class="card border-0 shadow-sm rounded-4 p-3 mb-0 bg-white">
                             <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Viajes O → D</label>
-                            <span id="stat_od" class="h4 fw-bold mb-0">0</span>
+                            <h3 id="stat_od" class="fw-black text-dark mb-0">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="alert alert-info border-0 rounded-4 p-3 mb-0">
+                        <div class="card border-0 shadow-sm rounded-4 p-3 mb-0 bg-white">
                             <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Viajes D → O</label>
-                            <span id="stat_do" class="h4 fw-bold mb-0">0</span>
+                            <h3 id="stat_do" class="fw-black text-dark mb-0">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="alert alert-success border-0 rounded-4 p-3 mb-0">
+                        <div class="card border-0 shadow-sm rounded-4 p-3 mb-0 bg-white">
                             <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Total Pasajeros</label>
-                            <span id="stat_pax" class="h4 fw-bold mb-0">0</span>
+                            <h3 id="stat_pax" class="fw-black text-success mb-0">0</h3>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <div class="alert alert-primary border-0 rounded-4 p-3 mb-0 bg-primary text-white">
+                        <div class="card border-0 shadow-sm rounded-4 p-3 mb-0 text-white" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;">
                             <label class="text-white-50 x-small fw-bold text-uppercase d-block mb-1">Total Ingresos</label>
-                            <span id="stat_ingresos" class="h4 fw-bold mb-0">$0</span>
+                            <h3 id="stat_ingresos" class="fw-black mb-0">$0</h3>
                         </div>
                     </div>
                 </div>
@@ -1529,18 +1671,114 @@
                 }
             });
         });
+        // 6. Cambiar Vista de Ganancias (Hoy/Semana/Mes)
+        window.switchEarnings = function(btn) {
+            const container = btn.parentElement;
+            container.querySelectorAll('.btn-switch').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const amount = btn.getAttribute('data-amount');
+            const label = btn.getAttribute('data-label');
+
+            document.getElementById('earnings_amount').innerText = '$' + amount;
+            document.getElementById('earnings_label').innerText = label;
+        };
     });
 </script>
 
 <style>
-    .fw-black { font-weight: 900; }
-    .card { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-    .card:hover { transform: translateY(-3px); box-shadow: 0 1rem 3rem rgba(0,0,0,0.07) !important; }
-    .table-hover tbody tr:hover { background-color: rgba(93, 84, 142, 0.02) !important; }
-    .badge { font-weight: 700; letter-spacing: 0.2px; }
-    .text-primary { color: #5d548e !important; }
-    .bg-primary { background-color: #5d548e !important; }
-    .border-primary { border-color: #5d548e !important; }
+    @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap');
+    
+    .fw-black { font-weight: 800; }
+    
+    /* Estructura Especial para Secciones */
+    .section-header { margin-bottom: 2rem; }
+    
+    /* Tarjetas Modernas con Efecto de Escala */
+    .card { 
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease !important; 
+        border-width: 0 !important; 
+    }
+    .card:hover { 
+        transform: scale(1.02) translateY(-3px) !important; 
+        box-shadow: 0 20px 40px rgba(106, 81, 160, 0.12) !important; 
+    }
+    
+    /* Table hover */
+    .table-hover tbody tr { transition: background-color 0.15s; }
+    .table-hover tbody tr:hover { background-color: rgba(93, 84, 142, 0.03) !important; }
+    
+    /* Badges Rediseñados */
+    .badge { 
+        font-weight: 600; 
+        letter-spacing: 0.2px; 
+        padding: 0.5em 0.9em; 
+        border-radius: 50px !important;
+    }
+    
+    /* Primary Overrides (Purple) */
+    .text-primary { color: #6a51a0 !important; }
+    .bg-primary { background-color: #6a51a0 !important; }
+    .border-primary { border-color: #6a51a0 !important; }
+    
+    /* Botones con Gradiente y Sombras Flotantes */
+    .btn { 
+        transition: all 0.28s ease !important; 
+    }
+    .btn:hover { 
+        transform: translateY(-2px) scale(1.03) !important; 
+    }
+
+    .btn-primary { 
+        background: linear-gradient(135deg, #6a51a0 0%, #4c377a 100%) !important; 
+        border: none !important; 
+        color: white !important; 
+        box-shadow: 0 4px 12px rgba(106, 81, 160, 0.25) !important;
+    }
+    .btn-primary:hover { 
+        box-shadow: 0 6px 18px rgba(106, 81, 160, 0.35) !important; 
+    }
+    
+    .btn-success { 
+        background: linear-gradient(135deg, #10b981 0%, #047857 100%) !important; 
+        border: none !important; 
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+    }
+    
+    .btn-danger { 
+        background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important; 
+        border: none !important; 
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2) !important;
+    }
+
+    .btn-warning { 
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important; 
+        border: none !important; 
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2) !important;
+    }
+
+    /* Switch Buttons para Ganancias */
+    .btn-switch {
+        border: none !important;
+        color: white !important;
+        background: transparent !important;
+        transition: all 0.22s ease !important;
+    }
+    .btn-switch:hover {
+        background: rgba(255, 255, 255, 0.08) !important;
+    }
+    .btn-switch.active {
+        background-color: white !important;
+        color: #110726 !important;
+        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #6a51a044; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6a51a099; }
 </style>
 @endpush
 @endsection
