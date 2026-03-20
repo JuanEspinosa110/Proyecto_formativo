@@ -75,6 +75,13 @@ class AsignacionRequest extends FormRequest
             $proposedStart = $fechaObj->toDateTimeString();
             $proposedEnd = $fechaObj->copy()->addHours(8)->toDateTimeString();
 
+            // 0. Validación de operabilidad del BUS (Documentos Vigentes)
+            $busModel = \App\Models\Bus::where('placa', $this->placa)->first();
+            if ($busModel && !$busModel->isOperable()) {
+                $validator->errors()->add('placa', 'Este vehículo no se puede asignar porque no posee todos sus documentos vigentes y aprobados.');
+                return;
+            }
+
             // 2. Validación de conflictos para el BUS (dentro de la misma empresa)
             // Lógica de solapamiento: (InicioA < FinB) AND (FinA > InicioB)
             $conflictBus = \App\Models\Viaje::where('placa', $this->placa)

@@ -7,12 +7,13 @@ use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\PropietarioController;
+use App\Http\Controllers\ConductorController;
 
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
     RolController,
     UsuarioController,
-    EmpresaController,
+    EmpresaController as SuperAdminEmpresaController,
     DocumentoController,
     TarjetaController,
     LicenciaController,
@@ -24,6 +25,8 @@ use App\Http\Controllers\SuperAdmin\{
     RutaController,
     CiudadController,
 };
+
+use App\Http\Controllers\EmpresaController;
 
 require base_path('routes/superadmin.php');
 // Rutas Administrativas (Panel Empresas)
@@ -81,15 +84,27 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/pasajero/dashboard', fn() => view('pasajeros.index'))
         ->name('pasajero.dashboard')->middleware('role:2');
 
-    Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
-        ->name('empresa.dashboard')->middleware('role:3');
+    Route::prefix('conductor')->name('conductor.')->middleware('role:3')->group(function () {
+        Route::get('/dashboard', [ConductorController::class, 'dashboard'])->name('dashboard');
+        Route::post('/iniciar-turno/{id_viaje}', [ConductorController::class, 'iniciarTurno'])->name('iniciarTurno');
+        Route::post('/finalizar-turno/{id_viaje}', [ConductorController::class, 'finalizarTurno'])->name('finalizarTurno');
+        Route::post('/iniciar-recorrido/{id_viaje}', [ConductorController::class, 'iniciarRecorrido'])->name('iniciarRecorrido');
+        Route::post('/finalizar-recorrido/{id_recorrido}', [ConductorController::class, 'finalizarRecorrido'])->name('finalizarRecorrido');
+        Route::post('/registrar-pasajero/{id_recorrido}', [ConductorController::class, 'registrarPasajero'])->name('registrarPasajero');
+        Route::get('/recorridos', [ConductorController::class, 'historialRecorridos'])->name('recorridos');
+        Route::get('/fallas', [ConductorController::class, 'historialFallas'])->name('fallas');
+        Route::post('/reportar-falla', [ConductorController::class, 'reportarFalla'])->name('reportarFalla');
+    });
+
+    Route::get('/empresa/dashboard', [EmpresaController::class, 'dashboard'])
+        ->name('empresa.dashboard')->middleware('role:5'); // 5 = Auxiliar Empresa
 
 });
 
 // ==========================================
 // RAMP: PANEL PROPIETARIO (Independiente)
 // ==========================================
-Route::middleware(['auth:web', 'role:6,9'])->prefix('propietario')->name('propietario.')->group(function () {
+Route::middleware(['auth:web', 'role:6'])->prefix('propietario')->name('propietario.')->group(function () {
     Route::get('/dashboard', [PropietarioController::class, 'dashboard'])->name('dashboard');
     Route::post('/documento', [PropietarioController::class, 'subirDocumento'])->name('subirDocumento');
     Route::post('/gasto', [PropietarioController::class, 'registrarGasto'])->name('registrarGasto');
@@ -128,7 +143,7 @@ Route::prefix('superadmin')
         Route::get('perfil_seguridad/exportar-datos', [PerfilSeguridadController::class, 'exportarDatos'])->name('perfil.exportar-datos');
 
         Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
-        Route::get('/empresas', [EmpresaController::class, 'index'])->name('empresas.index');
+        Route::get('/empresas', [SuperAdminEmpresaController::class, 'index'])->name('empresas.index');
         Route::get('/documentos', [DocumentoController::class, 'index'])->name('documentos.index');
         Route::get('/tarjetas', [TarjetaController::class, 'index'])->name('tarjetas.index');
 
@@ -165,13 +180,13 @@ Route::prefix('superadmin')
 
 
         // Ruta para obtener ciudades por departamento (AJAX)
-        Route::get('/empresas/ciudades/{id_departamento}', [EmpresaController::class, 'getCiudadesByDepartamento'])
+        Route::get('/empresas/ciudades/{id_departamento}', [SuperAdminEmpresaController::class, 'getCiudadesByDepartamento'])
         ->name('superadmin.empresas.ciudades');
     
         // Rutas CRUD de Empresas
-        Route::resource('empresas', EmpresaController::class);
-        Route::get('empresas/export/csv', [EmpresaController::class, 'exportCsv'])->name('empresas.export.csv');
-        Route::get('empresas/export/excel', [EmpresaController::class, 'exportExcel'])->name('empresas.export.excel');
+        Route::resource('empresas', SuperAdminEmpresaController::class);
+        Route::get('empresas/export/csv', [SuperAdminEmpresaController::class, 'exportCsv'])->name('empresas.export.csv');
+        Route::get('empresas/export/excel', [SuperAdminEmpresaController::class, 'exportExcel'])->name('empresas.export.excel');
 
         // PLANES DE LICENCIA
         Route::get('planes', [PlanLicenciaController::class, 'index'])->name('planes.index');

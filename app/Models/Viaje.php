@@ -40,6 +40,7 @@ class Viaje extends Model
         'id_ruta',
         'doc_us',
         'fecha',
+        'fecha_asignacion',
         'id_estado'
     ];
 

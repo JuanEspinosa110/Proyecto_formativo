@@ -1,101 +1,276 @@
-/* public/css/conductor-dashboard.css */
-
-/* Variables base consistentes con otros módulos */
+/* =========================================
+   1. VARIABLES & BASE
+   ========================================= */
 :root {
     --primary-color: #5E548E;
+    --primary-light: rgba(94, 84, 142, 0.1);
     --success-color: #2A9E6A;
+    --success-light: rgba(42, 158, 106, 0.1);
     --warning-color: #C97B0C;
+    --warning-light: rgba(201, 123, 12, 0.1);
     --danger-color: #C43B3B;
+    --danger-light: rgba(196, 59, 59, 0.1);
     --bg-light: #F4F4F6;
     --text-dark: #2F2F3A;
     --text-muted: #6B6F88;
 }
 
 body {
-    background-color: var(--bg-light);
+    background: linear-gradient(135deg, rgba(94, 84, 142, 0.05) 0%, rgba(15, 23, 42, 0.02) 100%), #F8F9FA;
+    min-height: 100vh;
 }
 
-h1, h2, h3, h4, h5 { 
-    font-family: 'Sora', sans-serif; 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Sora', sans-serif;
 }
 
-/* Status Cards Enhancements */
-.status-card { 
-    transition: transform 0.2s, box-shadow 0.2s; 
-    border-left: 5px solid transparent; 
-}
-.status-card:hover { 
-    transform: translateY(-5px); 
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-.card-active { border-left-color: var(--success-color); }
-.card-working { border-left-color: var(--primary-color); }
-.card-inactive { border-left-color: var(--text-muted); }
-
-/* Document Status Colors */
-.doc-VIGENTE { color: var(--success-color); background: #ecfdf5; border: 1px solid #a7f3d0; }
-.doc-PROXIMO { color: var(--warning-color); background: #fffbeb; border: 1px solid #fde68a; }
-.doc-VENCIDO { color: var(--danger-color); background: #fef2f2; border: 1px solid #fecaca; }
-
-/* Table Styling */
-.table-hover tbody tr {
-    transition: background-color 0.2s;
-}
-.table-hover tbody tr:hover { 
-    background-color: #ECE9F5; 
+/* =========================================
+   2. CARDS
+   ========================================= */
+.card {
+    border-radius: 1.25rem !important;
+    /* rounded-4 equivalent */
+    border: none !important;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 
-/* Nav Pills Customization */
-.nav-pills .nav-link { 
-    border-radius: 50rem; 
-    font-weight: 600; 
-    padding: 0.6rem 1.25rem; 
-    color: var(--text-muted); 
-    transition: all 0.2s;
+.status-card {
+    border-left: 5px solid transparent;
 }
-.nav-pills .nav-link:hover {
-    background-color: #ECE9F5;
+
+.status-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(94, 84, 142, 0.08) !important;
 }
-.nav-pills .nav-link.active { 
-    background-color: var(--primary-color); 
-    color: white; 
-    box-shadow: 0 4px 6px -1px rgba(94, 84, 142, 0.4); 
+
+.card-active {
+    border-left-color: var(--success-color);
+}
+
+.card-working {
+    border-left-color: var(--primary-color);
+}
+
+.card-inactive {
+    border-left-color: var(--text-muted);
+}
+
+/* =========================================
+   3. BUTTONS
+   ========================================= */
+.btn {
+    transition: all 0.2s ease-in-out !important;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* =========================================
+   4. STATES & BADGES
+   ========================================= */
+.doc-card {
+    border-radius: 1rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s;
+}
+
+.doc-card:hover {
+    transform: translateY(-2px);
+}
+
+.doc-success {
+    color: var(--success-color);
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+}
+
+.doc-warning {
+    color: var(--warning-color);
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+}
+
+.doc-danger {
+    color: var(--danger-color);
+    background: #fef2f2;
+    border: 1px solid #fecaca;
 }
 
 /* RFID Input Simulation Focus */
 .rfid-input {
     transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
 }
-.rfid-input:focus { 
-    border-color: var(--success-color); 
-    box-shadow: 0 0 0 0.25rem rgba(42, 158, 106, 0.25); 
-    background-color: #E5F6EE !important; 
+
+.rfid-input:focus {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 0.25rem rgba(42, 158, 106, 0.25);
+    background-color: #E5F6EE !important;
 }
 
-/* Modals Refined */
+/* =========================================
+   5. NAVIGATION & TABS
+   ========================================= */
+.nav-pills .nav-link {
+    border-radius: 50rem;
+    font-weight: 600;
+    padding: 0.6rem 1.25rem;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.nav-pills .nav-link:hover {
+    background-color: #ECE9F5;
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 10px rgba(94, 84, 142, 0.3);
+}
+
+/* =========================================
+   6. TABLES & MODALS
+   ========================================= */
+.table-hover tbody tr {
+    transition: background-color 0.2s;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #ECE9F5;
+}
+
 .modal-content {
     border: none;
-    border-radius: 1rem;
+    border-radius: 1.25rem;
     overflow: hidden;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
 }
+
 .modal-header {
     background-color: var(--bg-light);
     border-bottom: 1px solid #e2e8f0;
 }
-.modal-header .btn-close {
-    opacity: 0.8;
+
+/* =========================================
+   7. UTILITY CLASSES (Remove Inline styles)
+   ========================================= */
+.fs-btn-route {
+    font-size: 1.15rem;
+}
+
+.title-large {
+    font-size: 1.3rem;
+}
+
+.spinner-small {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.box-route-dashed {
+    max-width: 450px;
+    border: 2px dashed #cbd5e1;
+}
+
+.fs-route-title {
+    font-size: 1.1rem;
+}
+
+.btn-route-action {
+    font-size: 1.25rem;
+    max-width: 450px;
+}
+
+.falla-btn-icon {
+    width: 45px; 
+    height: 45px; 
+    font-size: 1.6rem !important;
+}
+
+.falla-btn-title {
+    font-size: 1.1rem; 
+    line-height: 1.2;
+}
+
+.icon-large {
+    font-size: 4rem;
+}
+
+.scale-large {
+    transform: scale(2.0);
+}
+
+.max-width-falla {
+    max-width: 380px;
+}
+
+.falla-btn-small-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.8rem !important;
+}
+
+.fs-sub {
+    font-size: 0.75rem;
+}
+
+.transition-transform {
+    transition: transform 0.2s;
+}
+
+.letter-spacing-1 {
+    letter-spacing: 0.5px;
 }
 
 /* Calendar Overrides */
-.fc-event { 
-    border-radius: 4px; 
-    border: none; 
-    padding: 3px 6px; 
-    font-size: 0.85rem; 
+.fc-event {
+    border-radius: 4px;
+    border: none;
+    padding: 3px 6px;
+    font-size: 0.85rem;
     font-weight: 600;
 }
 
-/* Layout Utilities */
-.letter-spacing-1 {
+/* =========================================
+   8. WIDGETS
+   ========================================= */
+.widget-passengers {
+    z-index: 1050;
+    border-radius: 1.25rem !important;
+    border: 3px solid var(--primary-color) !important;
+}
+
+.widget-icon-box {
+    width: 3.5rem;
+    height: 3.5rem;
+    box-shadow: 0 4px 14px rgba(42, 158, 106, 0.4);
+}
+
+.widget-icon-fs {
+    font-size: 2.2rem !important;
+}
+
+.widget-text-small {
+    font-size: 0.8rem;
     letter-spacing: 0.5px;
+}
+
+.widget-text-large {
+    font-size: 2.4rem;
+    line-height: 1;
 }
