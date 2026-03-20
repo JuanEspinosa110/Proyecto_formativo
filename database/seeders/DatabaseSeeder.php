@@ -23,6 +23,9 @@ class DatabaseSeeder extends Seeder
             TipoDocumentoSeeder::class,
             TipoEmpresaSeeder::class,
             TipoUsuarioSeeder::class,
+            EmpresaSeeder::class,
+            UsuarioEmpresaSeeder::class,
+            LicenciaEmpresaSeeder::class,
             SuperAdministradorSeeder::class,
         ]);
 
