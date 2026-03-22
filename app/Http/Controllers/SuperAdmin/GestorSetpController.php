@@ -19,7 +19,7 @@ class GestorSetpController extends Controller
     // id del tipo de empresa Setp
     const ID_TIPO_EMPRESA_SETP  = 5;
     // id del tipo de usuario Gestor Setp
-    const ID_TIPO_USUARIO_GESTOR = 11;
+    const ID_TIPO_USUARIO_GESTOR = 6;
 
     // ── index ─────────────────────────────────────────────────────
     public function index(Request $request)

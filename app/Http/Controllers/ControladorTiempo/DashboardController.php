@@ -19,10 +19,9 @@ class DashboardController extends Controller
         $busesEnRuta    = Bus::where('NIT', $user->NIT)->where('id_estado', 1)->count();
         $busesInactivos = Bus::where('NIT', $user->NIT)->where('id_estado', '!=', 1)->count();
 
-        // Asignaciones vigentes de la empresa
         $asignaciones = Asignacion::with(['bus', 'usuario', 'ruta'])
             ->whereHas('bus', fn($q) => $q->where('NIT', $user->NIT))
-            ->orderBy('id_viaje', 'desc')
+            ->orderBy('id_asignacion', 'desc')
             ->take(10)
             ->get();
 
@@ -37,14 +36,17 @@ class DashboardController extends Controller
             ->get();
 
         foreach ($rutasDetalle as $ruta) {
-            $ultimoRecorrido = \App\Models\Recorrido::where('id_ruta', $ruta->id_ruta)
+            $ultimoRecorrido = \App\Models\Recorrido::with('viaje')
+                ->whereHas('viaje', function($q) use ($ruta) {
+                    $q->where('id_ruta', $ruta->id_ruta);
+                })
                 ->whereDate('hora_salida', \Carbon\Carbon::today())
                 ->orderBy('hora_salida', 'desc')
                 ->first();
 
             if ($ultimoRecorrido) {
                 $ruta->minutos_desde_salida = \Carbon\Carbon::parse($ultimoRecorrido->hora_salida)->diffInMinutes(\Carbon\Carbon::now());
-                $ruta->ultimo_bus = $ultimoRecorrido->placa;
+                $ruta->ultimo_bus = $ultimoRecorrido->viaje?->placa;
             } else {
                 $ruta->minutos_desde_salida = null;
                 $ruta->ultimo_bus = null;

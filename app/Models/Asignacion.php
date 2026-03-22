@@ -76,9 +76,13 @@ class Asignacion extends Model
     /**
      * Relación con los recorridos realizados durante este turno (vinculados por placa y conductor)
      */
+    public function viajes()
+    {
+        return $this->hasMany(Viaje::class, 'placa', 'placa');
+    }
+
     public function recorridos()
     {
-        return $this->hasMany(Recorrido::class, 'placa', 'placa')
-            ->whereColumn('doc_us', 'doc_us');
+        return $this->hasManyThrough(Recorrido::class, Viaje::class, 'placa', 'id_viaje', 'placa', 'id_viaje');
     }
 }

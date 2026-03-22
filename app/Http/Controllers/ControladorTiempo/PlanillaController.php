@@ -21,11 +21,24 @@ class PlanillaController extends Controller
                 'usuario', 
                 'ruta.barrioOrigen', 
                 'ruta.barrioDestino',
+                'ruta.barrioDestino',
+                'recorridos.viaje',
                 'recorridos.novedades'
             ])
             ->whereHas('bus', fn($q) => $q->where('NIT', $user->NIT))
-            ->orderBy('id_viaje', 'desc')
+            ->orderBy('id_asignacion', 'desc')
             ->paginate(20);
+
+        // Filtrar estrictamente los recorridos en memoria para que solo pertenezcan
+        // al conductor que está asignado, impidiendo que choferes vean turnos ajenos del mismo bus.
+        $planilla->getCollection()->transform(function ($asig) {
+            if ($asig->relationLoaded('recorridos')) {
+                $asig->setRelation('recorridos', $asig->recorridos->filter(function ($rec) use ($asig) {
+                    return $rec->viaje && $rec->viaje->doc_us == $asig->doc_usuario;
+                })->values());
+            }
+            return $asig;
+        });
 
         // Novedades: buses en taller (mantenimiento) o inactivos como referencia
         $novedades = Bus::with(['estado'])

@@ -55,33 +55,54 @@ class PropietarioController extends Controller
                 ->first();
 
             // Conteos consolidados basados en Recorridos Reales
-            $conteoAsignaciones = \App\Models\Recorrido::whereIn('placa', $busIds)->count();
+            // Conteos consolidados basados en Recorridos Reales
+            $conteoAsignaciones = \App\Models\Viaje::whereIn('placa', $busIds)->count();
             $conteoDocumentos = Documento::whereIn('placa', $busIds)->count();
             
             // Ingresos y pasajeros desde la tabla recorridos
-            $conteoPasajeros = \App\Models\Recorrido::whereIn('placa', $busIds)->sum('cantidad_pasajeros');
+            $conteoPasajeros = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                $q->whereIn('placa', $busIds);
+            })->count();
             
             // Filtro por Mes para Ganancias (Nuevo)
             $mesFiltro = $request->query('mes_seleccionado'); // YYYY-MM
             if ($mesFiltro) {
-                $ingresosTotales = \App\Models\Recorrido::whereIn('placa', $busIds)->where('hora_salida', 'like', $mesFiltro . '%')->sum('ingresos');
+                $ingresosTotales = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                    $q->whereIn('placa', $busIds);
+                })->where('fecha', 'like', $mesFiltro . '%')->sum('valor');
             } else {
-                $ingresosTotales = \App\Models\Recorrido::whereIn('placa', $busIds)->sum('ingresos');
+                $ingresosTotales = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                    $q->whereIn('placa', $busIds);
+                })->sum('valor');
             }
 
             $hoy = \Carbon\Carbon::today();
             $semana = \Carbon\Carbon::now()->startOfWeek();
             $mes = \Carbon\Carbon::now()->startOfMonth();
 
-            $gananciasHoy = \App\Models\Recorrido::whereIn('placa', $busIds)->whereDate('hora_salida', $hoy)->sum('ingresos');
-            $gananciasSemana = \App\Models\Recorrido::whereIn('placa', $busIds)->where('hora_salida', '>=', $semana)->sum('ingresos');
-            $gananciasMes = \App\Models\Recorrido::whereIn('placa', $busIds)->where('hora_salida', '>=', $mes)->sum('ingresos');
+            $gananciasHoy = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                $q->whereIn('placa', $busIds);
+            })->whereDate('fecha', $hoy)->sum('valor');
+            $gananciasSemana = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                $q->whereIn('placa', $busIds);
+            })->where('fecha', '>=', $semana)->sum('valor');
+            $gananciasMes = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                $q->whereIn('placa', $busIds);
+            })->where('fecha', '>=', $mes)->sum('valor');
 
             // 3. Ingresos individuales por bus (Nuevo)
-            $ingresosPorBus = \App\Models\Recorrido::whereIn('placa', $busIds)
-                ->select('placa', \Illuminate\Support\Facades\DB::raw('SUM(ingresos) as total_ingresos'), \Illuminate\Support\Facades\DB::raw('SUM(cantidad_pasajeros) as total_pasajeros'))
-                ->groupBy('placa')
+            $viajesTotalesBus = \App\Models\Viaje::whereIn('placa', $busIds)
+                ->withCount('ventas as total_pasajeros')
+                ->withSum('ventas as total_ingresos', 'valor')
                 ->get();
+                
+            $ingresosPorBus = $viajesTotalesBus->groupBy('placa')->map(function ($viajes, $placa) {
+                return (object)[
+                    'placa' => $placa,
+                    'total_ingresos' => $viajes->sum('total_ingresos') ?? 0,
+                    'total_pasajeros' => $viajes->sum('total_pasajeros') ?? 0
+                ];
+            })->values();
 
             // 1. Filtros Independientes
             if ($request->filled('fecha')) {
@@ -459,16 +480,17 @@ class PropietarioController extends Controller
         // Un detalle importante: los recorridos deben ser del mismo bus, conductor y ruta? 
         // El requerimiento dice "viajes realizados durante ese turno".
         // Generalmente un turno está asociado a un bus y un conductor.
-        $recorridos = \App\Models\Recorrido::where('placa', $asignacion->placa)
-            ->where('doc_us', $asignacion->doc_us)
+        $recorridos = \App\Models\Recorrido::whereHas('viaje', function($q) use ($asignacion) {
+                $q->where('placa', $asignacion->placa)->where('doc_us', $asignacion->doc_us);
+            })
             ->where('hora_salida', '>=', $horaInicio)
             ->where('hora_llegada', '<=', $horaFin)
             ->orderBy('hora_salida', 'asc')
             ->get();
 
-        // Totales
-        $totalPasajeros = $recorridos->sum('cantidad_pasajeros');
-        $totalIngresos = $recorridos->sum('ingresos');
+        // Totales referenciando tarjetas/ventas directamente a LA ASIGNACIÓN (Viaje), NO por recorrido
+        $totalPasajeros = \App\Models\VentaViaje::where('id_viaje', $asignacion->id_viaje)->count();
+        $totalIngresos = \App\Models\VentaViaje::where('id_viaje', $asignacion->id_viaje)->sum('valor');
         
         // Contar trayectos
         // Trayecto Origen -> Destino vs Destino -> Origen
@@ -502,15 +524,16 @@ class PropietarioController extends Controller
                 'fecha' => $horaInicio->format('d/m/Y')
             ],
             'recorridos' => $recorridos->map(function($r, $index) use ($ruta) {
-                $esRegreso = ($index % 2 != 0);
+                $esRegreso = ($r->sentido == 'VUELTA');
                 return [
                     'trayecto' => $esRegreso 
                         ? ($ruta->barrioDestino->nombre ?? 'Destino') . ' → ' . ($ruta->barrioOrigen->nombre ?? 'Origen')
                         : ($ruta->barrioOrigen->nombre ?? 'Origen') . ' → ' . ($ruta->barrioDestino->nombre ?? 'Destino'),
                     'hora_salida' => \Carbon\Carbon::parse($r->hora_salida)->format('H:i'),
-                    'hora_llegada' => \Carbon\Carbon::parse($r->hora_llegada)->format('H:i'),
-                    'cantidad_pasajeros' => $r->cantidad_pasajeros,
-                    'ingresos' => $r->ingresos,
+                    'hora_llegada' => $r->hora_llegada ? \Carbon\Carbon::parse($r->hora_llegada)->format('H:i') : 'En curso',
+                    'cantidad_pasajeros' => 'Reflejado en Turno',
+                    'ingresos' => 'Reflejado en Turno',
+                    'evidencia' => $r->foto_torniquete ? asset('storage/' . $r->foto_torniquete) : null,
                     'es_regreso' => $esRegreso
                 ];
             }),

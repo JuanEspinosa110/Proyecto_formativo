@@ -9,6 +9,22 @@
 
 @section('content')
 
+@if($errors->any())
+<div class="alert alert-danger border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center gap-4">
+    <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-circle">
+        <span class="material-symbols-rounded fs-1">error</span>
+    </div>
+    <div class="flex-grow-1">
+        <h5 class="fw-bold mb-1">Error al procesar la solicitud</h5>
+        <ul class="mb-0 text-danger" style="padding-left: 20px;">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+</div>
+@endif
+
 @if($licenciaVencida || $licenciaProxima)
 <div class="alert {{ $licenciaVencida ? 'alert-danger' : 'alert-warning' }} border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center gap-4">
     <div class="bg-{{ $licenciaVencida ? 'danger' : 'warning' }} bg-opacity-10 text-{{ $licenciaVencida ? 'danger' : 'warning' }} p-3 rounded-circle">
@@ -179,12 +195,9 @@
                                     Hora de salida: <strong class="text-dark">{{ \Carbon\Carbon::parse($recorridoActivo->hora_salida)->format('h:i A') }}</strong>
                                 </p>
                                 
-                                <form action="{{ route('conductor.finalizarRecorrido', $recorridoActivo->id_recorrido) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-warning py-3 fw-bold text-dark rounded-pill shadow-sm d-inline-flex border-0 justify-content-center align-items-center gap-2 transition-all w-100 btn-route-action" style="max-width: 450px;">
-                                        <span class="material-symbols-rounded fs-3">sports_score</span> Llegada a Destino Final
-                                    </button>
-                                </form>
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#modalFinalizarRuta" class="btn btn-warning py-3 fw-bold text-dark rounded-pill shadow-sm d-inline-flex border-0 justify-content-center align-items-center gap-2 transition-all w-100" style="font-size: 1.25rem; max-width: 450px;">
+                                    <span class="material-symbols-rounded fs-3">sports_score</span> Llegada a Destino Final
+                                </button>
                             </div>
                         @endif
                     </div>
@@ -211,7 +224,6 @@
                 <p class="text-success fw-bold flex-grow-1">Su jornada ha terminado por hoy. Excelente trabajo.</p>
                 <div class="w-100 d-flex justify-content-center flex-wrap gap-4 mt-4 bg-white p-3 rounded-4 shadow-sm">
                     <div><span class="small text-muted d-block text-uppercase fw-bold">Recorridos</span> <h4 class="fw-bold mb-0 text-dark">{{ $recorridosHoy->count() }}</h4></div>
-                    <div><span class="small text-muted d-block text-uppercase fw-bold">Pasajeros Totales</span> <h4 class="fw-bold mb-0 text-primary">{{ $recorridosHoy->sum('cantidad_pasajeros') }}</h4></div>
                     <div><span class="small text-muted d-block text-uppercase fw-bold">Tiempo Trabajado</span> <h4 class="fw-bold mb-0 text-success">{{ $tiempoTrabajadoFormato ?? '0h 0m' }}</h4></div>
                 </div>
             </div>
@@ -313,7 +325,7 @@
                         <tr>
                             <th class="ps-3 border-0">FECHA / SENTIDO</th>
                             <th class="border-0">TIEMPOS</th>
-                            <th class="border-0 text-center">PASAJEROS</th>
+                            <th class="border-0 text-center">EVIDENCIA</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -326,7 +338,13 @@
                                 <td>
                                     <div class="fw-bold text-dark small">{{ \Carbon\Carbon::parse($rec->hora_salida)->format('H:i') }} - @if($rec->hora_llegada) <span class="text-success">{{ \Carbon\Carbon::parse($rec->hora_llegada)->format('H:i') }}</span> @else <span class="badge bg-warning text-dark spinner-grow spinner-grow-sm" role="status"></span> @endif</div>
                                 </td>
-                                <td class="text-center fw-bold text-primary">{{ $rec->cantidad_pasajeros }}</td>
+                                <td class="text-center">
+                                    @if($rec->foto_torniquete)
+                                        <a href="{{ asset('storage/' . $rec->foto_torniquete) }}" target="_blank" class="text-decoration-none">Ver Foto</a>
+                                    @else
+                                        <span class="text-muted small">N/A</span>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr><td colspan="3" class="text-center py-4 text-muted small">No hay registros de recorridos.</td></tr>
@@ -395,6 +413,38 @@
 
 
 <!-- END OF VIEWS -->
+<!-- Modal de Validación de Final de Ruta -->
+<div class="modal fade" id="modalFinalizarRuta" tabindex="-1" aria-labelledby="modalFinalizarRutaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="modalFinalizarRutaLabel">
+                    <span class="material-symbols-rounded text-warning">photo_camera</span> Evidencia de Finalización
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center px-4 py-3">
+                <p class="text-muted small mb-4">Por favor, toma o selecciona una foto clara del torniquete para confirmar la visual del recorrido.</p>
+                
+                <form action="{{ $recorridoActivo ? route('conductor.finalizarRecorrido', $recorridoActivo->id_recorrido) : '#' }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-4 text-start">
+                        <label for="foto_torniquete" class="form-label fw-bold text-dark small text-uppercase">Adjuntar Fotografía</label>
+                        <input class="form-control bg-light rounded-3 py-2 px-3" type="file" id="foto_torniquete" name="foto_torniquete" accept="image/*" required>
+                        <div class="form-text small mt-2">Asegúrate de que los números sean legibles.</div>
+                    </div>
+                    
+                    <div class="modal-footer border-0 pb-4 px-0 pt-2 gap-2 w-100 d-flex justify-content-between">
+                        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" style="width: 48%" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold text-dark shadow-sm" style="width: 48%">
+                            Enviar Evidencia
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- MODAL REPORTE FALLA -->
 <div class="modal fade" id="fallaModal" tabindex="-1" aria-labelledby="fallaModalLabel" aria-hidden="true">
@@ -492,18 +542,7 @@
 </div>
 @endif
 
-<!-- WIDGET FLOTANTE DE PASAJEROS -->
-@if(isset($recorridoActivo) && $recorridoActivo)
-<div class="position-fixed bottom-0 end-0 m-3 m-md-4 p-3 bg-white shadow-lg d-flex align-items-center gap-3 widget-passengers">
-    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center widget-icon-box">
-        <span class="material-symbols-rounded widget-icon-fs">group</span>
-    </div>
-    <div class="pe-2">
-        <span class="d-block text-muted text-uppercase fw-bold pb-1 widget-text-small">Pasajeros</span>
-        <span class="d-block text-dark fw-black widget-text-large" id="pasajeros-count">{{ $recorridoActivo->cantidad_pasajeros }}</span>
-    </div>
-</div>
-@endif
+<!-- WIDGET FLOTANTE DE PASAJEROS REMOVIDO -->
 
 <!-- MODAL QR DE VIAJE -->
 @if(isset($recorridoActivo) && $recorridoActivo)
@@ -524,8 +563,8 @@
                 </div>
 
                 <div class="mt-2">
-                    <h4 class="fw-black text-dark mb-0">{{ $recorridoActivo->bus->placa ?? '...' }}</h4>
-                    <p class="text-primary small fw-bold text-uppercase">Ruta: {{ $recorridoActivo->ruta->nombre_ruta ?? '...' }}</p>
+                    <h4 class="fw-black text-dark mb-0">{{ $recorridoActivo->viaje->placa ?? '...' }}</h4>
+                    <p class="text-primary small fw-bold text-uppercase">Ruta: {{ $recorridoActivo->viaje->ruta->nombre_ruta ?? '...' }}</p>
                 </div>
 
                 <div class="alert alert-dark bg-dark border-0 rounded-4 mt-4 text-start p-3">
@@ -542,6 +581,35 @@
                 <button type="button" class="btn btn-dark w-100 py-3 rounded-pill fw-bold" data-bs-dismiss="modal">Listo, Entendido</button>
             </div>
         </div>
+    </div>
+</div>
+@endif
+
+<!-- MODAL FINALIZAR RECORRIDO Y FOTO TORNIQUETE -->
+@if(isset($recorridoActivo) && $recorridoActivo)
+<div class="modal fade" id="modalFinalizarRecorrido" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content border-0 shadow-lg rounded-4" action="{{ route('conductor.finalizarRecorrido', $recorridoActivo->id_recorrido) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-header border-0 pb-0 pt-4 px-4 bg-warning text-dark rounded-top-4 pb-3">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded">photo_camera</span> Fin de Recorrido: Cargar Evidencia
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-4 py-4 text-center">
+                <p class="text-muted fw-bold mb-4">¿Estás seguro de que deseas enviar esta foto y finalizar el recorrido en sentido <strong>{{ $recorridoActivo->sentido }}</strong>?</p>
+                <div class="mb-3 text-start">
+                    <label class="form-label fw-bold small text-uppercase">Foto del Torniquete</label>
+                    <input type="file" class="form-control form-control-lg bg-light" name="foto_torniquete" accept="image/*" capture="environment" required>
+                    <small class="text-muted d-block mt-2">Tome o suba una foto clara del contador del torniquete al finalizar el viaje.</small>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pb-4 px-4 pt-1">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm">Confirmar y Finalizar</button>
+            </div>
+        </form>
     </div>
 </div>
 @endif

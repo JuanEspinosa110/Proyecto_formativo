@@ -15,56 +15,59 @@ class MonitoreoController extends Controller
 
         // 1. Obtener estadísticas de TODA la flota de la empresa
         $todosLosBuses = Bus::where('NIT', $user->NIT)->get();
-        
+
         $estadisticas = [
-            'en_ruta'     => $todosLosBuses->where('id_estado', 1)->count(),
-            'inactivos'   => $todosLosBuses->where('id_estado', 2)->count(),
-            'en_taller'   => $todosLosBuses->where('id_estado', 7)->count(),
-            'total'       => $todosLosBuses->count(),
+            'en_ruta' => $todosLosBuses->where('id_estado', 1)->count(),
+            'inactivos' => $todosLosBuses->where('id_estado', 2)->count(),
+            'en_taller' => $todosLosBuses->where('id_estado', 7)->count(),
+            'total' => $todosLosBuses->count(),
         ];
 
         // 2. Obtener solo los buses con operación activa para el monitoreo
         // Buses con asignación activa (EN_CURSO = 12)
         $buses = Bus::with([
-                'estado', 
-                'asignaciones' => function($q) {
-                    $q->where('id_estado', 12); // Solo viajes activos
-                }, 
-                'asignaciones.usuario', 
-                'asignaciones.ruta.barrioOrigen', 
-                'asignaciones.ruta.barrioDestino',
-                'recorridos' => function($q) {
-                    $q->whereDate('hora_salida', \Carbon\Carbon::today())->orderBy('hora_salida', 'desc');
-                }
-            ])
+            'estado',
+            'asignaciones' => function ($q) {
+            $q->where('id_estado', 12); // Solo viajes activos
+        },
+            'asignaciones.usuario',
+            'asignaciones.ruta.barrioOrigen',
+            'asignaciones.ruta.barrioDestino',
+            'recorridos' => function ($q) {
+            $q->whereDate('hora_salida', \Carbon\Carbon::today())->orderBy('hora_salida', 'desc');
+        }
+        ])
             ->where('NIT', $user->NIT)
-            ->whereHas('asignaciones', function($q) {
-                $q->where('id_estado', 12);
-            })
+            ->whereHas('asignaciones', function ($q) {
+            $q->where('id_estado', 12);
+        })
             ->orderBy('placa')
             ->get();
 
-        $buses = $buses->map(function($bus) use ($user) {
+        $buses = $buses->map(function ($bus) use ($user) {
             $ultimaSalida = $bus->recorridos->first();
             $bus->intervalo_anterior = null;
 
             if ($ultimaSalida && $bus->asignaciones->first()) {
                 $idRuta = $bus->asignaciones->first()->id_ruta;
-                
-                // Buscar el bus que salió inmediatamente antes por la misma ruta
-                $recorridoAnterior = \App\Models\Recorrido::where('id_ruta', $idRuta)
-                    ->where('id_recorrido', '!=', $ultimaSalida->id_recorrido)
-                    ->where('hora_salida', '<', $ultimaSalida->hora_salida)
-                    ->orderBy('hora_salida', 'desc')
-                    ->first();
 
-                if ($recorridoAnterior) {
-                    $bus->intervalo_anterior = \Carbon\Carbon::parse($recorridoAnterior->hora_salida)
-                        ->diffInMinutes(\Carbon\Carbon::parse($ultimaSalida->hora_salida));
-                }
-            }
-            return $bus;
-        });
+                // Buscar el bus que salió inmediatamente antes por la misma ruta
+                $recorridoAnterior = \App\Models\Recorrido::whereHas('viaje', function ($q) use ($idRuta) {
+                            $q->where('id_ruta', $idRuta);
+                        }
+                        )
+                            ->where('id_recorrido', '!=', $ultimaSalida->id_recorrido)
+                            ->where('hora_salida', '<', $ultimaSalida->hora_salida)
+                            ->orderBy('hora_salida', 'desc')
+                            ->first();
+
+                        if ($recorridoAnterior) {
+                            $bus->intervalo_anterior = (int) round(\Carbon\Carbon::parse($recorridoAnterior->hora_salida)
+                                ->diffInMinutes(\Carbon\Carbon::parse($ultimaSalida->hora_salida)));
+                        }
+                    }
+                    return $bus;
+                });
 
         $estados = \App\Models\Estado::all();
 

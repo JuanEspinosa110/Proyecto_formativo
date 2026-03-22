@@ -19,14 +19,16 @@ class VerificacionController extends Controller
 
     public function show($id_recorrido)
     {
-        $recorrido = Recorrido::with(['bus', 'ruta.barrioOrigen', 'ruta.barrioDestino', 'conductor'])
+        $recorrido = Recorrido::with(['viaje.bus', 'viaje.ruta.barrioOrigen', 'viaje.ruta.barrioDestino', 'viaje.conductor'])
             ->findOrFail($id_recorrido);
 
         // Información adicional de pasajeros y tiempos
         $minutosEnRuta = Carbon::parse($recorrido->hora_salida)->diffInMinutes(Carbon::now());
         
         // Calcular frecuencia real: Diferencia con el bus anterior de la misma ruta
-        $recorridoAnterior = Recorrido::where('id_ruta', $recorrido->id_ruta)
+        $recorridoAnterior = Recorrido::whereHas('viaje', function($q) use ($recorrido) {
+                $q->where('id_ruta', $recorrido->viaje->id_ruta ?? null);
+            })
             ->where('id_recorrido', '!=', $recorrido->id_recorrido)
             ->where('hora_salida', '<', $recorrido->hora_salida)
             ->orderBy('hora_salida', 'desc')
@@ -55,7 +57,7 @@ class VerificacionController extends Controller
         ]);
         
         return redirect()->route('controlador-tiempo.dashboard')
-            ->with('success', 'Bus ' . $recorrido->placa . ': Checkpoint registrado exitosamente.');
+            ->with('success', 'Bus ' . ($recorrido->viaje->placa ?? 'N/A') . ': Checkpoint registrado exitosamente.');
     }
 
     public function registrarIncidencia(Request $request, $id_recorrido)
@@ -76,6 +78,6 @@ class VerificacionController extends Controller
         ]);
         
         return redirect()->route('controlador-tiempo.dashboard')
-            ->with('warning', 'Bus ' . $recorrido->placa . ': Incidencia reportada y documentada.');
+            ->with('warning', 'Bus ' . ($recorrido->viaje->placa ?? 'N/A') . ': Incidencia reportada y documentada.');
     }
 }

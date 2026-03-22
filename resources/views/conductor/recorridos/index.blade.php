@@ -34,7 +34,7 @@
                     <th class="border-0">VEHÍCULO</th>
                     <th class="border-0">SENTIDO</th>
                     <th class="border-0">TIEMPOS</th>
-                    <th class="border-0 text-center">PASAJEROS</th>
+                    <th class="border-0 text-center">EVIDENCIA</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,10 +44,10 @@
                             <span class="badge bg-light text-dark border px-2 py-1">{{ \Carbon\Carbon::parse($rec->hora_salida)->format('d/m/Y') }}</span>
                         </td>
                         <td>
-                            <div class="fw-bold text-dark">{{ $rec->ruta->nombre_ruta ?? 'N/A' }}</div>
+                            <div class="fw-bold text-dark">{{ $rec->viaje->ruta->nombre_ruta ?? 'N/A' }}</div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border">{{ $rec->placa }}</span>
+                            <span class="badge bg-light text-dark border">{{ $rec->viaje->placa ?? 'N/A' }}</span>
                         </td>
                         <td>
                             <div class="small fw-bold text-muted">{{ $rec->sentido ?? 'IDA' }}</div>
@@ -62,7 +62,15 @@
                                 @endif
                             </div>
                         </td>
-                        <td class="text-center fw-bold text-primary">{{ $rec->cantidad_pasajeros }}</td>
+                        <td class="text-center">
+                            @if($rec->foto_torniquete)
+                                <a href="{{ asset('storage/' . $rec->foto_torniquete) }}" target="_blank" class="fw-bold text-primary text-decoration-none d-flex align-items-center justify-content-center gap-1">
+                                    <span class="material-symbols-rounded fs-5">image</span> Ver Foto
+                                </a>
+                            @else
+                                <span class="badge bg-light text-muted border">Pendiente/N.A.</span>
+                            @endif
+                        </td>
                     </tr>
                 @empty
                     <tr>

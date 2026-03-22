@@ -39,7 +39,7 @@ class DespachoController extends Controller
             }
         }
 
-        $asignaciones = $query->orderBy('id_viaje', 'desc')->paginate(15)->withQueryString();
+        $asignaciones = $query->orderBy('id_asignacion', 'desc')->paginate(15)->withQueryString();
             
         // Buses que ya iniciaron su recorrido (tienen al menos un registro en la tabla recorridos)
         $busesIniciados = Asignacion::whereHas('bus', fn($q) => $q->where('NIT', $user->NIT))
