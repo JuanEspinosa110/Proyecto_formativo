@@ -28,7 +28,12 @@ class UsuarioController extends Controller
         $roles = DB::table('tipo_usuario')
             ->whereIn('id_tipo_usuario', [1, 3, 4, 5, 7, 8]) // Solo roles de empresa
             ->orderBy('id_tipo_usuario')
-            ->get();
+            ->when($user->id_tipo_usuario != 1, function ($q) {
+                $q->where(function($sub) {
+                    $sub->where('nombre_tipo', 'like', '%conductor%')
+                        ->orWhere('nombre_tipo', 'like', '%propietario%');
+                });
+            })->get();
         $estados = DB::table('estado')->whereIn('id_estado', [1, 2, 3])->get();
 
         $query = DB::table('usuario')
@@ -37,6 +42,13 @@ class UsuarioController extends Controller
             ->leftJoin('tipo_usuario', 'usuario.id_tipo_usuario', '=', 'tipo_usuario.id_tipo_usuario')
             ->where('usuario.NIT', $nit)
             ->select('usuario.*', 'estado.nombre_estado', 'ciudad.nombre_city', 'tipo_usuario.nombre_tipo');
+
+        if ($user->id_tipo_usuario != 1) {
+            $query->where(function($q) {
+                $q->where('tipo_usuario.nombre_tipo', 'like', '%conductor%')
+                  ->orWhere('tipo_usuario.nombre_tipo', 'like', '%propietario%');
+            });
+        }
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -57,7 +69,7 @@ class UsuarioController extends Controller
 
         $docs_licencia = \App\Models\Documento::whereIn('doc_usuario', collect($usuarios->items())->pluck('doc_usuario'))
             ->where('id_tipo_documento', 3)
-            ->where('id_estado', 1)
+            ->whereIn('id_estado', [1, 21])
             ->get()->keyBy('doc_usuario');
 
         // Alertas globales de licencias para el Admin
@@ -70,6 +82,10 @@ class UsuarioController extends Controller
                 return $doc->estado_expiracion !== 'VIGENTE';
             });
 
+        if ($request->ajax()) {
+            return view('admin.usuarios.partials.table', compact('usuarios', 'estados', 'docs_licencia'));
+        }
+
         return view('admin.usuarios.index', compact('usuarios', 'roles', 'selectedRole', 'estados', 'docs_licencia', 'licenciasAlerta'));
     }
 
@@ -79,6 +95,13 @@ class UsuarioController extends Controller
             // Validaciones adicionales para CONDUCTOR
             $tipoUsuario = DB::table('tipo_usuario')->where('id_tipo_usuario', $request->id_tipo_usuario)->first();
             $esConductor = $tipoUsuario && stripos($tipoUsuario->nombre_tipo, 'conductor') !== false;
+            $esPropietario = $tipoUsuario && stripos($tipoUsuario->nombre_tipo, 'propietario') !== false;
+
+            if (Auth::user()->id_tipo_usuario != 1) { 
+                if (!$esConductor && !$esPropietario) {
+                    return redirect()->back()->with('error', 'Solo tiene permisos para crear Conductores y Propietarios.');
+                }
+            }
 
             if ($esConductor) {
                 $request->validate([
@@ -121,20 +144,24 @@ class UsuarioController extends Controller
                 $data['foto_usuario'] = $path;
             }
 
+            // Validar licencia de conducción si es conductor
+            if ($esConductor) {
+                $fecha_nac = \Carbon\Carbon::parse($request->fecha_nacimiento);
+                $fecha_exp = \Carbon\Carbon::parse($request->fecha_expedicion);
+                $edad = $fecha_exp->diffInYears($fecha_nac);
+                $fecha_venc = ($edad < 60) ? $fecha_exp->copy()->addYears(3) : $fecha_exp->copy()->addYear();
+
+                if ($fecha_venc->isPast()) {
+                    $data['id_estado'] = 2; // INACTIVO
+                    session()->flash('warning', 'El conductor tiene la licencia vencida, por lo tanto su estado se ha definido como INACTIVO.');
+                }
+            }
+
             Usuario::create($data);
 
             // Si es conductor, crear el documento
             if ($esConductor && $request->hasFile('archivo_licencia')) {
-                // Cálculo de vigencia en Backend según normas de Colombia
-                $fecha_nac = \Carbon\Carbon::parse($request->fecha_nacimiento);
-                $fecha_exp = \Carbon\Carbon::parse($request->fecha_expedicion);
-                $edad = $fecha_exp->diffInYears($fecha_nac);
-
-                if ($edad < 60) {
-                    $fecha_venc = $fecha_exp->copy()->addYears(3);
-                } else {
-                    $fecha_venc = $fecha_exp->copy()->addYear();
-                }
+                // Cálculo de vigencia en Backend (Precalculado arriba)
 
                 $pathLicencia = $request->file('archivo_licencia')->store('documentos', 'public');
                 \App\Models\Documento::create([
@@ -145,12 +172,12 @@ class UsuarioController extends Controller
                     'id_tipo_documento' => 3, // ID de la licencia
                     'doc_usuario' => $request->doc_usuario,
                     'NIT' => Auth::user()->NIT,
-                    'id_estado' => 1
+                    'id_estado' => $fecha_venc->isPast() ? 21 : 1
                 ]);
             }
 
             return redirect()
-                ->route('admin.usuarios.index')
+                ->back()
                 ->with('success', 'Registro creado correctamente. Contraseña: ' . $passwordGenerada);
 
         }

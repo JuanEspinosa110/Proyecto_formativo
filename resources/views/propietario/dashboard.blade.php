@@ -884,7 +884,7 @@
                             <label class="form-label small fw-bold text-muted text-uppercase">Expedición</label>
                             <input type="date" name="fecha_expedicion" id="subir_fecha_expedicion" class="form-control rounded-3" required>
                         </div>
-                        <div class="col-6">
+                        <div class="col-6" id="div_fecha_vencimiento">
                             <label class="form-label small fw-bold text-muted text-uppercase">Vencimiento</label>
                             <input type="date" name="fecha_vencimiento" id="subir_fecha_vencimiento" class="form-control rounded-3" required>
                             <div class="invalid-feedback fw-bold">Fecha de vencimiento es inválida (ya expiró).</div>
@@ -1440,6 +1440,17 @@
         function calcularVencimiento() {
             const tipo = tipoDocInput.value;
             const expedicionStr = fechaExpInput.value;
+            const divVenc = document.getElementById('div_fecha_vencimiento');
+
+            if (tipo === '6') {
+                if (divVenc) divVenc.classList.add('d-none');
+                fechaVencInput.removeAttribute('required');
+                fechaVencInput.value = ''; // Limpiar
+                return;
+            } else {
+                if (divVenc) divVenc.classList.remove('d-none');
+                fechaVencInput.setAttribute('required', 'required');
+            }
             const placaSelect = document.getElementById('subir_placa');
             
             if (!tipo || !expedicionStr) return;
@@ -1623,7 +1634,7 @@
                                 <tr class="${trClass}">
                                     <td class="ps-4">
                                         <div class="fw-bold text-dark small text-truncate" style="max-width: 250px;" title="${doc.nombre}">${doc.nombre}</div>
-                                        ${isArchivado ? '<span class="badge bg-secondary-subtle text-secondary x-small border border-secondary mt-1">Archivado</span>' : '<span class="badge bg-success-subtle text-success x-small border border-success mt-1">Documento Activo</span>'}
+                                        ${isArchivado ? '<span class="badge bg-secondary-subtle text-secondary x-small border border-secondary mt-1">Archivado</span>' : (doc.status_vigencia === 'VENCIDO' ? '<span class="badge bg-danger-subtle text-danger x-small border border-danger mt-1">Vencido</span>' : '<span class="badge bg-success-subtle text-success x-small border border-success mt-1">Activo</span>')}
                                     </td>
                                     <td class="text-muted small">${doc.fecha_carga}</td>
                                     <td class="fw-bold text-dark small">${doc.fecha_vencimiento}</td>

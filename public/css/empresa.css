@@ -1,0 +1,320 @@
+/* Estilos específicos para el área de Administración.
+   Mantienen la estructura SIGU pero con una paleta y componentes más amables.
+   Los selectores están prefijados con .sigu-admin-layout para evitar conflictos. */
+
+.sigu-admin-layout {
+  /* Reuse global SIGU tokens from sigu-core.css for consistency */
+  --accent: var(--p);
+  --accent-2: var(--p-mid);
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.sigu-admin-layout .sigu-sidebar {
+  width: 260px;
+  /* slightly darker than main to create a clear visual separation */
+  background: linear-gradient(180deg, #eef2fb, #f6f7fb);
+  color: var(--text);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1rem 0;
+  box-shadow: 2px 6px 18px rgba(31,36,48,0.06);
+  border-right: 1px solid rgba(45,52,73,0.06);
+  z-index: 50;
+}
+
+.sigu-admin-layout .sigu-sidebar .sigu-brand {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+  padding: 0 1rem 1rem 1rem;
+  text-decoration: none;
+  color: inherit;
+}
+.sigu-admin-layout .sigu-brand-mark {
+  width: 44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(135deg, var(--p), var(--p-mid));
+  box-shadow: var(--sh-p);
+}
+.sigu-admin-layout .sigu-brand-text .sigu-brand-name { font-weight:700; font-size:1.05rem; }
+.sigu-admin-layout .sigu-brand-text .sigu-brand-sub { font-size:.78rem; opacity:.85; }
+
+.sigu-admin-layout .sigu-sidebar-nav { display: flex; flex-direction: column; padding: .5rem 0; gap: .25rem; }
+.sigu-admin-layout .sigu-sb-link {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+  padding: .8rem 1rem;
+  color: var(--text);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: background .12s ease, transform .06s ease, border-color .12s ease;
+  border-radius: 6px 0 0 6px;
+}
+.sigu-admin-layout .sigu-sb-link span.material-symbols-rounded{ font-size:1.15rem; opacity:.95 }
+.sigu-admin-layout .sigu-sb-link:hover{ background: var(--p-light); transform: translateX(2px); }
+.sigu-admin-layout .sigu-sb-link.active{
+  background: linear-gradient(90deg, rgba(106,76,197,0.12), rgba(155,132,227,0.06));
+  border-left-color: var(--p);
+  box-shadow: inset -6px 0 14px rgba(106,76,197,0.03);
+}
+.sigu-admin-layout .sigu-sb-link .material-symbols-rounded { color: var(--p-mid); transition: color .12s ease, transform .12s ease; }
+.sigu-admin-layout .sigu-sb-link.active .material-symbols-rounded { color: var(--p); transform: translateX(2px); }
+.sigu-admin-layout .sigu-sb-link span { color: var(--text); }
+
+.sigu-admin-layout .sigu-main-with-sidebar { margin-left: 260px; padding: 2rem; box-sizing: border-box; margin-top: 0; }
+
+/* Evitar que el footer quede debajo del sidebar sólo en el layout admin */
+.sigu-admin-layout .sigu-footer {
+  /* Keep footer visual style from core, but shift its content to the right
+     so it aligns with the main area (without changing footer's base styling). */
+  box-sizing: border-box;
+  position: relative;
+  z-index: 5;
+  background: transparent;
+  padding-left: calc(260px + 1.5rem);
+}
+
+/* Asegurar espacio inferior en el main para que el footer no lo cubra */
+.sigu-admin-layout .sigu-main-with-sidebar { padding-bottom: 6rem; }
+
+/* Footer del sidebar */
+.sigu-admin-layout .sigu-sidebar-footer { margin-top: auto; padding: 1rem; }
+
+/* KPIs */
+.sigu-admin-layout .sa-kpi-section { display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap; }
+.sigu-admin-layout .sa-kpi-card {
+  background: var(--surface);
+  padding:1rem 1.25rem; border-radius:12px; min-width:180px; box-shadow:var(--sh-sm);
+}
+.sigu-admin-layout .sa-kpi-card span{ display:block; color:var(--muted); font-size:.85rem; }
+.sigu-admin-layout .sa-kpi-card strong{ display:block; font-size:1.4rem; color:var(--text); margin-top:.35rem }
+
+/* Chart card */
+.sigu-admin-layout .sa-chart-card{ background: var(--card); border-radius:12px; padding:1rem; box-shadow:0 8px 30px rgba(31,36,48,0.06); }
+
+/* Tablas — estilos específicos para admin (prefijados para evitar conflictos) */
+.sigu-admin-layout .table {
+  width: 100%;
+  color: var(--text);
+  background: transparent;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+.sigu-admin-layout .table thead th{ background:transparent; border-bottom: none; }
+.sigu-admin-layout .table th,
+.sigu-admin-layout .table td {
+  padding: .75rem 1rem;
+  vertical-align: middle;
+}
+.sigu-admin-layout .table tbody tr{ background: var(--card); box-shadow:0 6px 18px rgba(31,36,48,0.04); border-radius:10px; }
+.sigu-admin-layout .table tbody tr td:first-child{ border-top-left-radius:8px; border-bottom-left-radius:8px; }
+.sigu-admin-layout .table tbody tr td:last-child{ border-top-right-radius:8px; border-bottom-right-radius:8px; }
+.sigu-admin-layout .table.table-striped tbody tr:nth-of-type(odd) { background: var(--card); }
+.sigu-admin-layout .table-responsive { overflow: auto; }
+
+/* Botones coherentes con paleta */
+.sigu-admin-layout .btn-primary{ background: var(--accent); border-color: transparent; color: #fff; box-shadow: 0 8px 20px rgba(106,76,197,0.12); }
+.sigu-admin-layout .btn-outline-primary{ border-color: rgba(106,76,197,0.16); color: var(--accent); }
+
+/* Separación específica para el form de filtro en la lista de usuarios */
+.sigu-admin-layout .admin-filter { margin-bottom: 1.75rem; }
+
+/* Circular icon container and active state */
+.sigu-admin-layout .sigu-sb-link .sb-ico{
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  margin-right: 12px;
+  background: transparent;
+  color: var(--p-mid, #6b3fa0);
+  transition: background .18s ease, color .18s ease, transform .12s ease;
+}
+.sigu-admin-layout .sigu-sb-link .sb-ico .material-symbols-rounded{
+  font-size: 20px;
+  line-height: 1;
+}
+.sigu-admin-layout .sigu-sb-link.active .sb-ico{
+  background: linear-gradient(180deg, var(--p, #5b2fa0), var(--p-mid, #6b3fa0));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(91,47,160,0.12);
+  transform: translateY(-1px) scale(1.02);
+}
+
+/* KPI cards: softer surface, small trend indicator */
+.sigu-admin-layout .sa-kpi-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.03);
+  padding: 14px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.sigu-admin-layout .sa-kpi-card .kpi-left{
+  display: flex;
+  flex-direction: column;
+}
+.sigu-admin-layout .sa-kpi-card .kpi-title{
+  font-size: 13px;
+  color: rgba(255,255,255,0.72);
+}
+.sigu-admin-layout .sa-kpi-card .kpi-value{
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 6px;
+}
+.sigu-admin-layout .sa-kpi-card .kpi-trend{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.03);
+  padding: 6px 8px;
+  border-radius: 999px;
+}
+.sigu-admin-layout .sa-kpi-card .kpi-trend.positive{
+  color: #1dd1a1;
+  background: rgba(29,209,161,0.08);
+}
+.sigu-admin-layout .sa-kpi-card .kpi-trend.negative{
+  color: #ff6b6b;
+  background: rgba(255,107,107,0.06);
+}
+
+/* small sparkline placeholder inside KPI */
+.sigu-admin-layout .kpi-sparkline{
+  width: 100px;
+  height: 28px;
+  opacity: 0.9;
+}
+
+/* Organizar gráficas en una cuadrícula de 2 columnas */
+.sigu-admin-layout .sa-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+.sigu-admin-layout .sa-charts-grid .sa-chart-card {
+  margin-top: 0;
+}
+@media (max-width: 992px) {
+  .sigu-admin-layout .sa-charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .sigu-admin-layout .sigu-sidebar { position: relative; width: 100%; height: auto; box-shadow:none }
+  .sigu-admin-layout .sigu-main-with-sidebar { margin-left: 0; padding: 1rem }
+  .sigu-admin-layout .sigu-footer { padding-left: 1.5rem; }
+}
+
+/* ===== UTILIDADES (GLOBALES) ===== */
+.fs-xs { font-size: 0.75rem; }
+.ls-1 { letter-spacing: 0.5px; }
+.fw-extrabold { font-weight: 800; }
+.tracking-tighter { letter-spacing: -0.05em; }
+.rounded-4 { border-radius: 1rem !important; }
+.modal-content { border-radius: 1.5rem !important; }
+.table-hover tbody tr:hover { background-color: rgba(94, 84, 142, 0.04) !important; }
+
+/* ===== FONDO SUBTLE PARA BADGES / ALERTAS ===== */
+.bg-primary-subtle { background-color: rgba(94, 84, 142, 0.1) !important; }
+.bg-success-subtle { background-color: #e8f5e9 !important; }
+.bg-danger-subtle { background-color: #fbe9e7 !important; }
+.bg-info-subtle { background-color: #e3f2fd !important; }
+.bg-warning-subtle { background-color: #fff8e1 !important; }
+
+/* ===== ESPEC�FICOS: DOCUMENTOS & REPORTES ===== */
+.sa-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+.sa-content-title h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+.sa-content-title p { margin: 0.25rem 0 0 0; opacity: 0.8; }
+.sa-filters-section {
+    background: var(--card);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 6px 18px rgba(31, 36, 48, 0.04);
+}
+.sa-kpi-section {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+.sa-kpi-card {
+    flex: 1;
+    min-width: 150px;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--p-light), var(--p-mid));
+    border-radius: 8px;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .sa-content-header { flex-direction: column; gap: 1rem; }
+    .sa-filters-section .row { grid-auto-flow: dense; }
+    .sa-kpi-section { grid-template-columns: 1fr; }
+}
+
+/* ===== ESTILOS DE ELEMENTOS (AVATARES, ICONOS) ===== */
+.avatar-sm { width: 40px; height: 40px; object-fit: cover; }
+.avatar-md { width: 80px; height: 80px; object-fit: cover; }
+.object-fit-cover { object-fit: cover !important; }
+
+/* ===== IMAGEN USUARIO ===== */
+.usuario-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Variante para vistas tipo card horizontal */
+.usuario-img-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+/* Contenedor de usuario */
+.usuario-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Evitar im�genes gigantes */
+.usuario-img-banner {
+    max-width: 150px;
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+}

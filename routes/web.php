@@ -40,6 +40,7 @@ require base_path('routes/jefemantenimiento.php');
 // Rutas del Controlador de Tiempo
 require base_path('routes/controlador-tiempo.php');
 require base_path('routes/conductor.php');
+require base_path('routes/empresa.php');
 
 use App\Http\Controllers\LandingController;
 
@@ -104,8 +105,27 @@ Route::middleware('auth:web')->group(function () {
         Route::post('/reportar-falla', [ConductorController::class, 'reportarFalla'])->name('reportarFalla');
     });
 
-    Route::get('/empresa/dashboard', [EmpresaController::class, 'dashboard'])
-        ->name('empresa.dashboard')->middleware('role:5'); // 5 = Auxiliar Empresa
+        /* 
+        Route::middleware(['auth:web', 'role:5'])->prefix('empresa')->name('empresa.')->group(function () {
+            Route::get('/dashboard', [EmpresaController::class, 'dashboard'])->name('dashboard');
+            
+            // Usuarios (Propietarios, Conductores)
+            Route::post('/usuarios', [EmpresaController::class, 'storeUsuario'])->name('usuarios.store');
+            
+            // Buses
+            Route::post('/buses', [EmpresaController::class, 'storeBus'])->name('buses.store');
+            
+            // Documentos
+            Route::post('/documentos/{id}/aprobar', [EmpresaController::class, 'aprobarDocumento'])->name('documentos.aprobar');
+            Route::post('/documentos/{id}/rechazar', [EmpresaController::class, 'rechazarDocumento'])->name('documentos.rechazar');
+            
+            // Asignaciones
+            Route::post('/asignaciones', [EmpresaController::class, 'storeAsignacion'])->name('asignaciones.store');
+            
+            // Reportes
+            Route::get('/reportes/export', [EmpresaController::class, 'descargarReporte'])->name('reportes.export');
+        });
+        */
 
 });
 

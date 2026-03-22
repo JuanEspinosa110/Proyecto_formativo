@@ -157,7 +157,43 @@ class DocumentoController extends Controller
         $tiposDocumento = TipoDocumento::where('id_estado', 1)->get();
         $estados = Estado::all();
 
+        if ($request->ajax()) {
+            return view('admin.documentos.partials.table', compact('documentos'));
+        }
+
         return view('admin.documentos.index', compact('documentos', 'tiposDocumento', 'estados', 'empresa'));
+    }
+
+    /**
+     * Mostrar solicitudes de aprobación de documentos (Pendientes)
+     */
+    public function solicitudes(Request $request)
+    {
+        $empresa = $this->getEmpresaAdmin();
+
+        if (!$empresa) {
+            return redirect()->route('admin.dashboard')->with('error', ' No tiene empresa asignada');
+        }
+
+        $query = Documento::where('NIT', $empresa->NIT)
+            ->with(['tipoDocumento', 'estado', 'bus'])
+            ->whereNotNull('placa'); 
+
+        // Filtrar solicitudes: Excluir Aprobados (24) y Rechazados (25)
+        $query->whereNotIn('id_estado', [24, 25]);
+
+        if ($request->filled('placa')) {
+            $query->where('placa', 'like', '%' . $request->placa . '%');
+        }
+        if ($request->filled('propietario')) {
+            $query->whereHas('bus', function($q) use ($request) {
+                $q->where('nombre_propietario', 'like', '%' . $request->propietario . '%');
+            });
+        }
+
+        $documentos = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        return view('admin.documentos.solicitudes', compact('documentos', 'empresa'));
     }
 
     /**

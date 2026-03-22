@@ -20,7 +20,18 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('admin.dashboard');
+        $user = Auth::guard('web')->user();
+        $nit = $user->NIT ?? null;
+
+        $documentosPendientes = 0;
+        if ($nit) {
+            $documentosPendientes = Documento::where('NIT', $nit)
+                ->whereNotNull('placa')
+                ->whereNotIn('id_estado', [24, 25])
+                ->count();
+        }
+
+        return view('admin.dashboard', compact('documentosPendientes'));
     }
 
     /**

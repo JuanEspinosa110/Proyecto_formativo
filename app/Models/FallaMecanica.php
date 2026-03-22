@@ -28,4 +28,12 @@ class FallaMecanica extends Model
     {
         return $this->belongsTo(Bus::class, 'placa', 'placa');
     }
+
+    /**
+     * Relación con el Estado.
+     */
+    public function estado()
+    {
+        return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
+    }
 }

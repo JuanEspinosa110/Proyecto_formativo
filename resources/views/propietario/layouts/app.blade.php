@@ -22,7 +22,7 @@
     <style>
         /* Ajustes específicos para el layout horizontal del propietario */
         .sigu-body {
-            background: linear-gradient(150deg, #cdc0eaff 0%, #6a51a0ff 100%) !important;
+            background: linear-gradient(150deg, #e5dcf8ff 0%, #8271a6ff 100%) !important;
             background-attachment: fixed !important;
             min-height: 100vh;
         }

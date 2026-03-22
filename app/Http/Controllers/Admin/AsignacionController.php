@@ -79,10 +79,31 @@ class AsignacionController extends Controller
         // Datos para los modales
         $buses = Bus::where('NIT', $nit)->get();
         $rutas = Ruta::orderBy('id_ruta', 'asc')->get();
+        $adminRoleIds = \Illuminate\Support\Facades\DB::table('tipo_usuario')
+            ->where('nombre_tipo', 'like', '%admin%')
+            ->pluck('id_tipo_usuario');
+
+        $licenciasVigentes = \App\Models\Documento::where('id_tipo_documento', 3)
+            ->where('id_estado', 1) // Activo/Vigente
+            ->whereDate('fecha_vencimiento', '>=', now()->format('Y-m-d'))
+            ->pluck('doc_usuario');
+
         $conductores = Usuario::where('NIT', $nit)
-            ->where('id_tipo_usuario', 3)
+            ->where('id_estado', 1) // ACTIVO
+            ->whereIn('doc_usuario', $licenciasVigentes)
+            ->whereNotIn('id_tipo_usuario', $adminRoleIds)
             ->get();
         $estados = Estado::whereIn('nombre_estado', ['ACTIVO', 'INACTIVO'])->get();
+
+        if ($request->ajax()) {
+            return view('admin.asignaciones.partials.table', compact(
+                'asignaciones',
+                'buses',
+                'rutas',
+                'conductores',
+                'estados'
+            ));
+        }
 
         return view('admin.asignaciones.index', compact(
             'asignaciones',

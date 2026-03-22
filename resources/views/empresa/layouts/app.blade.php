@@ -26,7 +26,7 @@
                 <div class="sigu-brand-mark" aria-hidden="true"><span class="material-symbols-rounded">route</span></div>
                 <div class="sigu-brand-text">
                     <span class="sigu-brand-name">SIGU</span>
-                    <span class="sigu-brand-sub">Empresa</span>
+                    <span class="sigu-brand-sub">Auxilar Admin/span>
                 </div>
             </a>
 
@@ -36,7 +36,7 @@
                     <span>Dashboard</span>
                 </a>
                 
-                <!-- Enlaces placeholders o futuros -->
+               
                 <!--
                 <a href="#" class="sigu-sb-link">
                     <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
