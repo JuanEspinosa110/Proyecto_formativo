@@ -91,6 +91,14 @@ class Usuario extends Authenticatable
     }
 
     /**
+     * Obtener el estado del usuario
+     */
+    public function estado()
+    {
+        return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
+    }
+
+    /**
      * Obtener la empresa asociada al usuario 
      */
     public function empresa()

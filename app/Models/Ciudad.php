@@ -32,4 +32,20 @@ class Ciudad extends Model
     {
         return $this->hasMany(Empresa::class, 'id_ciudad', 'id_ciudad');
     }
+
+    /**
+     * Relación con Barrios
+     */
+    public function barrios()
+    {
+        return $this->hasMany(Barrio::class, 'id_ciudad', 'id_ciudad');
+    }
+
+    /**
+     * Relación con Usuarios
+     */
+    public function usuarios()
+    {
+        return $this->hasMany(Usuario::class, 'id_ciudad', 'id_ciudad');
+    }
 }

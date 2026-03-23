@@ -16,4 +16,12 @@ class Gasto extends Model
         'descripcion',
         'valor'
     ];
+
+    /**
+     * Relación con el Bus
+     */
+    public function bus()
+    {
+        return $this->belongsTo(Bus::class, 'placa', 'placa');
+    }
 }

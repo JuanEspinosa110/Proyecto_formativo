@@ -28,7 +28,7 @@ class DespachoController extends Controller
         }
 
         if ($request->filled('doc_usuario')) {
-            $query->where('doc_us', $request->doc_usuario);
+            $query->where('doc_usuario', $request->doc_usuario);
         }
 
         if ($request->filled('estado')) {
