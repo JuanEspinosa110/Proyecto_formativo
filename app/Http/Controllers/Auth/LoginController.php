@@ -63,6 +63,9 @@ class LoginController extends Controller
                 case 8: // CONTROLADOR_TIEMPO
                     return redirect()->route('controlador-tiempo.dashboard');
 
+                case 10: // GESTOR_RECARGAS
+                    return redirect()->route('gestor-recargas.dashboard');
+
                 default:
                     Auth::guard('web')->logout();
                     return back()->withErrors([

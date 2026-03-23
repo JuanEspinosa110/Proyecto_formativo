@@ -41,6 +41,8 @@ require base_path('routes/jefemantenimiento.php');
 require base_path('routes/controlador-tiempo.php');
 require base_path('routes/conductor.php');
 require base_path('routes/empresa.php');
+// Rutas del Gestor Recargas
+require base_path('routes/gestor-recargas.php');
 
 use App\Http\Controllers\LandingController;
 

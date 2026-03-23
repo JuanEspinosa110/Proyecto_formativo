@@ -25,6 +25,7 @@ class Recarga extends Model
         'id_recarga',
         'id_tarjeta',
         'monto',
+        'doc_usuario_gestor',
     ];
 
     /**
@@ -42,6 +43,12 @@ class Recarga extends Model
     public function tarjeta()
     {
         return $this->belongsTo(Tarjeta::class, 'id_tarjeta', 'id_tarjeta');
+    }
+
+    // Relación con el Gestor que hizo la recarga
+    public function gestor()
+    {
+        return $this->belongsTo(Usuario::class, 'doc_usuario_gestor', 'doc_usuario');
     }
 
 }
