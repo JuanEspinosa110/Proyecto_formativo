@@ -9,7 +9,7 @@
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('empresa.reportes.export') }}" method="GET">
+            <form id="formReportesAuxiliar" action="{{ route('empresa.reportes.export') }}" method="GET">
                 <div class="modal-body p-4">
                     <div class="row g-3">
                         <div class="col-12">

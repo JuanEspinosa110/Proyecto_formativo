@@ -44,6 +44,7 @@ class PropietarioController extends Controller
         $gananciasHoy = 0;
         $gananciasSemana = 0;
         $gananciasMes = 0;
+        $ingresosPorBus = collect();
 
         if ($buses->isNotEmpty()) {
             $queryAsignaciones->whereIn('placa', $busIds);
