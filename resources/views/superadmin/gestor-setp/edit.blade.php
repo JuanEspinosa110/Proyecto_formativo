@@ -96,9 +96,9 @@
                         <div class="col-md-6">
                             <label class="form-label">Primer nombre <span class="req">*</span></label>
                             <input type="text" name="primer_nombre"
-                                   class="form-control @error('primer_nombre') is-invalid @enderror"
-                                   value="{{ old('primer_nombre', $gestor->primer_nombre) }}"
-                                   maxlength="50" required>
+                                class="form-control @error('primer_nombre') is-invalid @enderror"
+                                value="{{ old('primer_nombre', $gestor->primer_nombre) }}"
+                                maxlength="30" minlength="3" required pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ]{3,30}$" title="Solo letras, mínimo 3 caracteres, sin espacios" oninput="this.value = this.value.replace(/\s/g, '')">
                             @error('primer_nombre')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -106,9 +106,9 @@
                         <div class="col-md-6">
                             <label class="form-label">Segundo nombre</label>
                             <input type="text" name="segundo_nombre"
-                                   class="form-control @error('segundo_nombre') is-invalid @enderror"
-                                   value="{{ old('segundo_nombre', $gestor->segundo_nombre) }}"
-                                   maxlength="50">
+                                class="form-control @error('segundo_nombre') is-invalid @enderror"
+                                value="{{ old('segundo_nombre', $gestor->segundo_nombre) }}"
+                                maxlength="30" minlength="3" pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ]{3,30}$" title="Solo letras, mínimo 3 caracteres, sin espacios" oninput="this.value = this.value.replace(/\s/g, '')">
                             @error('segundo_nombre')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -116,9 +116,9 @@
                         <div class="col-md-6">
                             <label class="form-label">Primer apellido <span class="req">*</span></label>
                             <input type="text" name="primer_apellido"
-                                   class="form-control @error('primer_apellido') is-invalid @enderror"
-                                   value="{{ old('primer_apellido', $gestor->primer_apellido) }}"
-                                   maxlength="50" required>
+                                class="form-control @error('primer_apellido') is-invalid @enderror"
+                                value="{{ old('primer_apellido', $gestor->primer_apellido) }}"
+                                maxlength="30" minlength="3" required pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ]{3,30}$" title="Solo letras, mínimo 3 caracteres, sin espacios" oninput="this.value = this.value.replace(/\s/g, '')">
                             @error('primer_apellido')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -126,9 +126,9 @@
                         <div class="col-md-6">
                             <label class="form-label">Segundo apellido</label>
                             <input type="text" name="segundo_apellido"
-                                   class="form-control @error('segundo_apellido') is-invalid @enderror"
-                                   value="{{ old('segundo_apellido', $gestor->segundo_apellido) }}"
-                                   maxlength="50">
+                                class="form-control @error('segundo_apellido') is-invalid @enderror"
+                                value="{{ old('segundo_apellido', $gestor->segundo_apellido) }}"
+                                maxlength="30" minlength="3" pattern="^[A-Za-záéíóúÁÉÍÓÚñÑ]{3,30}$" title="Solo letras, mínimo 3 caracteres, sin espacios" oninput="this.value = this.value.replace(/\s/g, '')">
                             @error('segundo_apellido')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -144,9 +144,9 @@
                         <div class="col-md-6">
                             <label class="form-label">Correo electrónico <span class="req">*</span></label>
                             <input type="email" name="correo"
-                                   class="form-control @error('correo') is-invalid @enderror"
-                                   value="{{ old('correo', $gestor->correo) }}"
-                                   maxlength="150" required>
+                                class="form-control @error('correo') is-invalid @enderror"
+                                value="{{ old('correo', $gestor->correo) }}"
+                                maxlength="150" required pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" title="Debe ser un correo válido, sin espacios">
                             @error('correo')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -154,9 +154,9 @@
                         <div class="col-md-6">
                             <label class="form-label">Teléfono</label>
                             <input type="text" name="telefono"
-                                   class="form-control @error('telefono') is-invalid @enderror"
-                                   value="{{ old('telefono', $gestor->telefono) }}"
-                                   maxlength="20">
+                                class="form-control @error('telefono') is-invalid @enderror"
+                                value="{{ old('telefono', $gestor->telefono) }}"
+                                size="10" pattern="^[0-9]{10}$" title="Solo números 10 dígitos">
                             @error('telefono')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

@@ -66,4 +66,8 @@ Route::middleware(['auth:web', 'role:pasajero', 'CheckTarjeta'])
         Route::post('perfil/foto',   [PerfilController::class, 'foto'])  ->name('perfil.foto');
         Route::put ('perfil/password',[PerfilController::class, 'password'])->name('perfil.password');
 
+        // Recarga con Stripe
+        Route::get('tarjeta/recargar', [TarjetaController::class, 'recargar'])->name('tarjeta.recargar');
+        Route::post('tarjeta/recargar', [TarjetaController::class, 'procesarRecarga'])->name('tarjeta.procesarRecarga');
+
 });

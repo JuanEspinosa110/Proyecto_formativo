@@ -32,6 +32,9 @@ class GestorSetpController extends Controller
             $query->where(function ($sq) use ($q) {
                 $sq->where('primer_nombre',    'like', "%{$q}%")
                    ->orWhere('primer_apellido','like', "%{$q}%")
+                   ->orWhere('segundo_nombre', 'like', "%{$q}%")
+                   ->orWhere('primer_apellido', 'like', "%{$q}%")
+                   ->orWhere('segundo_apellido', 'like', "%{$q}%")
                    ->orWhere('doc_usuario',     $q);
             });
         }
@@ -59,25 +62,37 @@ class GestorSetpController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'doc_usuario'      => 'required|integer|min:1000000|unique:usuario,doc_usuario',
-            'NIT'              => 'required|exists:empresa,NIT',
-            'primer_nombre'    => 'required|string|max:50',
-            'segundo_nombre'   => 'nullable|string|max:50',
-            'primer_apellido'  => 'required|string|max:50',
-            'segundo_apellido' => 'nullable|string|max:50',
-            'correo'           => 'required|email|max:150|unique:usuario,correo',
-            'telefono'         => 'nullable|string|max:20',
-            'id_ciudad'        => 'required|exists:ciudad,id_ciudad',
-            'password'         => 'required|string|min:8|confirmed',
+            'doc_usuario'      => ['required', 'integer', 'min:1000000', 'max:9999999999', 'unique:usuario,doc_usuario'],
+            'NIT'              => ['required', 'exists:empresa,NIT'],
+            'primer_nombre'    => ['required', 'string', 'min:3', 'max:30', 'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑ]{3,30}$/'],
+            'segundo_nombre'   => ['nullable', 'string', 'min:3', 'max:30', 'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑ]{3,30}$/'],
+            'primer_apellido'  => ['required', 'string', 'min:3', 'max:30', 'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑ]{3,30}$/'],
+            'segundo_apellido' => ['nullable', 'string', 'min:3', 'max:30', 'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑ]{3,30}$/'],
+            'correo'           => ['required', 'email', 'max:150', 'unique:usuario,correo', 'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/'],
+            'telefono'         => ['nullable', 'string', 'min:7', 'max:20', 'regex:/^[0-9]{7,20}$/'],
+            'id_ciudad'        => ['required', 'exists:ciudad,id_ciudad'],
+            'password'         => ['required', 'string', 'min:8', 'confirmed'],
         ], [
             'doc_usuario.required'   => 'El número de documento es obligatorio.',
             'doc_usuario.unique'     => 'Ya existe un usuario con ese documento.',
+            'doc_usuario.min'        => 'El documento debe tener mínimo 7 dígitos.',
+            'doc_usuario.max'        => 'El documento debe tener máximo 10 dígitos.',
             'NIT.required'           => 'Debe seleccionar una empresa SETP.',
             'NIT.exists'             => 'La empresa seleccionada no existe.',
             'primer_nombre.required' => 'El primer nombre es obligatorio.',
+            'primer_nombre.regex'    => 'El primer nombre solo puede contener letras, sin espacios.',
+            'primer_nombre.min'      => 'El primer nombre debe tener mínimo 3 caracteres.',
+            'primer_nombre.max'      => 'El primer nombre debe tener máximo 30 caracteres.',
+            'segundo_nombre.regex'   => 'El segundo nombre solo puede contener letras, sin espacios.',
             'primer_apellido.required' => 'El primer apellido es obligatorio.',
+            'primer_apellido.regex'    => 'El primer apellido solo puede contener letras, sin espacios.',
+            'primer_apellido.min'      => 'El primer apellido debe tener mínimo 3 caracteres.',
+            'primer_apellido.max'      => 'El primer apellido debe tener máximo 30 caracteres.',
+            'segundo_apellido.regex'   => 'El segundo apellido solo puede contener letras, sin espacios.',
             'correo.required'        => 'El correo electrónico es obligatorio.',
             'correo.unique'          => 'Ya existe un usuario con ese correo.',
+            'correo.regex'           => 'El correo no puede contener espacios y debe ser válido.',
+            'telefono.regex'         => 'El teléfono solo puede contener números, entre 7 y 20 dígitos.',
             'id_ciudad.required'     => 'Debe seleccionar una ciudad.',
             'password.required'      => 'La contraseña es obligatoria.',
             'password.min'           => 'La contraseña debe tener al menos 8 caracteres.',
@@ -131,26 +146,36 @@ class GestorSetpController extends Controller
                          ->firstOrFail();
 
         $rules = [
-            'NIT'              => 'required|exists:empresa,NIT',
-            'primer_nombre'    => 'required|string|max:50',
-            'segundo_nombre'   => 'nullable|string|max:50',
-            'primer_apellido'  => 'required|string|max:50',
-            'segundo_apellido' => 'nullable|string|max:50',
-            'correo'           => "required|email|max:150|unique:usuario,correo,{$doc},doc_usuario",
-            'telefono'         => 'nullable|string|max:20',
-            'id_ciudad'        => 'required|exists:ciudad,id_ciudad',
-            'id_estado'        => 'required|in:1,2',
+            'NIT'              => ['required', 'exists:empresa,NIT'],
+            'primer_nombre'    => ['required', 'string', 'min:3', 'max:30', 'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑ]{3,30}$/'],
+            'segundo_nombre'   => ['nullable', 'string', 'min:3', 'max:30', 'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑ]{3,30}$/'],
+            'primer_apellido'  => ['required', 'string', 'min:3', 'max:30', 'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑ]{3,30}$/'],
+            'segundo_apellido' => ['nullable', 'string', 'min:3', 'max:30', 'regex:/^[A-Za-záéíóúÁÉÍÓÚñÑ]{3,30}$/'],
+            'correo'           => ["required", "email", "max:150", "unique:usuario,correo,{$doc},doc_usuario", 'regex:/^[^\s@]+@[^\s@]+\.[^\s@]+$/'],
+            'telefono'         => ['nullable', 'string', 'min:7', 'max:20', 'regex:/^[0-9]{7,20}$/'],
+            'id_ciudad'        => ['required', 'exists:ciudad,id_ciudad'],
+            'id_estado'        => ['required', 'in:1,2'],
         ];
 
         if ($request->filled('password')) {
-            $rules['password'] = 'string|min:8|confirmed';
+            $rules['password'] = ['string', 'min:8', 'confirmed'];
         }
 
         $messages = [
             'NIT.required'           => 'Debe seleccionar una empresa SETP.',
             'primer_nombre.required' => 'El primer nombre es obligatorio.',
+            'primer_nombre.regex'    => 'El primer nombre solo puede contener letras, sin espacios.',
+            'primer_nombre.min'      => 'El primer nombre debe tener mínimo 3 caracteres.',
+            'primer_nombre.max'      => 'El primer nombre debe tener máximo 30 caracteres.',
+            'segundo_nombre.regex'   => 'El segundo nombre solo puede contener letras, sin espacios.',
             'primer_apellido.required' => 'El primer apellido es obligatorio.',
+            'primer_apellido.regex'    => 'El primer apellido solo puede contener letras, sin espacios.',
+            'primer_apellido.min'      => 'El primer apellido debe tener mínimo 3 caracteres.',
+            'primer_apellido.max'      => 'El primer apellido debe tener máximo 30 caracteres.',
+            'segundo_apellido.regex'   => 'El segundo apellido solo puede contener letras, sin espacios.',
             'correo.unique'          => 'Ya existe otro usuario con ese correo.',
+            'correo.regex'           => 'El correo no puede contener espacios y debe ser válido.',
+            'telefono.regex'         => 'El teléfono solo puede contener números, entre 7 y 20 dígitos.',
             'id_ciudad.required'     => 'Debe seleccionar una ciudad.',
             'password.min'           => 'La contraseña debe tener al menos 8 caracteres.',
             'password.confirmed'     => 'Las contraseñas no coinciden.',

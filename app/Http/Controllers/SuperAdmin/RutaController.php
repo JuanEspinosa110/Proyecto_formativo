@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ruta;
 // use App\Models\Empresa;
 use App\Services\RutaService;
+use App\Http\Requests\Admin\RutaRequest as AdminRutaRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -70,7 +71,7 @@ class RutaController extends Controller
     /**
      * Actualizar ruta existente
      */
-    public function update(RutaRequest $request, Ruta $ruta)
+    public function update(AdminRutaRequest $request, Ruta $ruta)
     {
         $this->rutaService->updateRuta($ruta, $request->validated());
 

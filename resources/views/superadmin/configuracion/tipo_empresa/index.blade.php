@@ -132,7 +132,9 @@
                 <div class="modal-body py-4">
                     <div class="mb-0">
                         <label class="form-label fw-semibold">Nombre del Tipo <span class="text-danger">*</span></label>
+
                         <input type="text" name="nombre_tipo" id="nombre_tipo" class="form-control @error('nombre_tipo') is-invalid @enderror" placeholder="Ej: Pública" required value="{{ old('nombre_tipo') }}">
+
                         @error('nombre_tipo')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -196,17 +198,6 @@
                 sessionStorage.setItem('last_edit_id_tipo_empresa', id);
             });
         }
-        const camposTexto = ['nombre_tipo', 'editNombre'];
-
-        camposTexto.forEach(id => {
-            const input = document.getElementById(id);
-            if (input) {
-                input.addEventListener('input', function(e) {
-                // Reemplaza lo que NO sea: letras (a-z), letras con tilde, ñ o espacios
-                this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
-                });
-            }
-        });
 
         // Redirect error to correct modal
         @if($errors->any())
