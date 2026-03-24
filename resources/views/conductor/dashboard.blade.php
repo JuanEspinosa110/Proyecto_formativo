@@ -167,11 +167,27 @@
                                         {{ $recorridoActivo->sentido }}
                                     </h2>
                                 </div>
-                                <p class="mb-4 d-flex justify-content-center align-items-center gap-2 text-muted fs-route-title">
+                                <p class="mb-3 d-flex justify-content-center align-items-center gap-2 text-muted fs-route-title">
                                     <span class="material-symbols-rounded">schedule</span>
                                     Hora de salida: <strong class="text-dark">{{ \Carbon\Carbon::parse($recorridoActivo->hora_salida)->format('h:i A') }}</strong>
                                 </p>
                                 
+                                <div class="row g-2 justify-content-center max-width-stats mx-auto mb-4">
+                                    <div class="col-6">
+                                        <div class="bg-light p-2 rounded-3">
+                                            <span class="small text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Pasajeros Hoy</span>
+                                            <h4 class="fw-bold mb-0 text-primary">{{ $pasajerosTotalesHoy }}</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="bg-light p-2 rounded-3">
+                                            <span class="small text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Ingresos Hoy</span>
+                                            <h4 class="fw-bold mb-0 text-success">${{ number_format($ingresosTotalesHoy) }}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+
                                 <form action="{{ route('conductor.finalizarRecorrido', $recorridoActivo->id_recorrido) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-warning py-3 fw-bold text-dark rounded-pill shadow-sm d-inline-flex border-0 justify-content-center align-items-center gap-2 transition-all w-100 btn-route-action">
@@ -204,8 +220,9 @@
                 <p class="text-success fw-bold flex-grow-1">Su jornada ha terminado por hoy. Excelente trabajo.</p>
                 <div class="w-100 d-flex justify-content-center flex-wrap gap-4 mt-4 bg-white p-3 rounded-4 shadow-sm">
                     <div><span class="small text-muted d-block text-uppercase fw-bold">Recorridos</span> <h4 class="fw-bold mb-0 text-dark">{{ $recorridosHoy->count() }}</h4></div>
-                    <div><span class="small text-muted d-block text-uppercase fw-bold">Pasajeros Totales</span> <h4 class="fw-bold mb-0 text-primary">{{ $recorridosHoy->sum('cantidad_pasajeros') }}</h4></div>
-                    <div><span class="small text-muted d-block text-uppercase fw-bold">Tiempo Trabajado</span> <h4 class="fw-bold mb-0 text-success">{{ $tiempoTrabajadoFormato ?? '0h 0m' }}</h4></div>
+                    <div><span class="small text-muted d-block text-uppercase fw-bold">Pasajeros Totales</span> <h4 class="fw-bold mb-0 text-primary">{{ $pasajerosTotalesHoy }}</h4></div>
+                    <div><span class="small text-muted d-block text-uppercase fw-bold">Ingresos Generados</span> <h4 class="fw-bold mb-0 text-success">${{ number_format($ingresosTotalesHoy) }}</h4></div>
+                    <div><span class="small text-muted d-block text-uppercase fw-bold">Tiempo Trabajado</span> <h4 class="fw-bold mb-0 text-dark">{{ $tiempoTrabajadoFormato ?? '0h 0m' }}</h4></div>
                 </div>
             </div>
         </div>
@@ -389,101 +406,8 @@
 
 <!-- END OF VIEWS -->
 
-<!-- MODAL REPORTE FALLA -->
-<div class="modal fade" id="fallaModal" tabindex="-1" aria-labelledby="fallaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <form class="modal-content border-0 shadow rounded-4" action="{{ route('conductor.reportarFalla') }}" method="POST">
-            @csrf
-            <div class="modal-header border-0 pb-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="fallaModalLabel">
-                    <span class="material-symbols-rounded text-warning">warning</span> Reportar Falla Mecánica
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body px-4 py-3">
-                <p class="text-muted small mb-4">Evidencie todo problema mecánico u operativo a los líderes. Esto permitirá asignar mantenimientos rápidamente.</p>
-                
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-dark small text-uppercase">Vehículo Implicado</label>
-                    @if($asignacionActiva)
-                        <input type="text" name="placa" class="form-control bg-light rounded-3 font-monospace fw-bold" value="{{ $asignacionActiva->placa }}" readonly required>
-                    @else
-                        <!-- Listamos todos los buses del sistema unicos de asignaciones para permitir el input -->
-                        <select name="placa" class="form-select rounded-3" required>
-                            <option value="" disabled selected>Seleccione placa del vehículo...</option>
-                            @foreach($asignaciones->unique('placa') as $asig)
-                                <option value="{{ $asig->placa }}">{{ $asig->placa }}</option>
-                            @endforeach
-                        </select>
-                    @endif
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-dark small text-uppercase">Nivel de Urgencia</label>
-                    <select name="nivel_urgencia" class="form-select rounded-3" required>
-                        @foreach($nivelesUrgencia as $nivel)
-                            <option value="{{ $nivel }}" {{ $nivel == 'Bajo' ? 'selected' : '' }}>{{ $nivel }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-bold text-dark small text-uppercase">Descripción Detallada y Contexto</label>
-                    <textarea name="descripcion" class="form-control rounded-3 bg-light border-0 py-3 px-3" rows="4" placeholder="Explique la situación experimentada con detalle, qué sonido hace, la frecuencia, afectaciones al manejo, etc." required></textarea>
-                </div>
-            </div>
-            <div class="modal-footer border-0 pb-4 px-4 pt-2">
-                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Restablecer</button>
-                <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold text-dark shadow-sm">Registrar Envío</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- MODAL INICIAR RUTA (SENTIDO) -->
-@if(isset($asignacionActiva) && !$recorridoActivo)
-<div class="modal fade" id="modalIniciarRuta" tabindex="-1" aria-labelledby="modalIniciarRutaLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <form class="modal-content border-0 shadow-lg rounded-4" action="{{ route('conductor.iniciarRecorrido', $asignacionActiva->id_viaje) }}" method="POST">
-            @csrf
-            <div class="modal-header border-0 pb-0 pt-4 px-4 bg-primary text-white rounded-top-4 pb-3">
-                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
-                    <span class="material-symbols-rounded">route</span> Configurar Trayecto
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body px-4 py-4">
-                <div class="text-center mb-4">
-                    <h5 class="fw-bold text-dark mb-1">Ruta: {{ $asignacionActiva->ruta->nombre_ruta ?? 'N/A' }}</h5>
-                    <p class="text-muted small">Seleccione el sentido del recorrido a realizar. Cada sentido se guardará como un viaje/recorrido individual e independiente de la meta fiscal para su cierre total.</p>
-                </div>
-                
-                <div class="row g-3">
-                    <div class="col-6">
-                        <input type="radio" class="btn-check" name="sentido" id="sentidoIda" value="IDA" required>
-                        <label class="btn btn-outline-primary w-100 p-3 rounded-4 d-flex flex-column align-items-center" for="sentidoIda">
-                            <span class="material-symbols-rounded fs-1 mb-2">trending_flat</span>
-                            <span class="fw-bold">Viaje de IDA</span>
-                            <small class="opacity-75 d-block mt-1">Origen &rarr; Destino</small>
-                        </label>
-                    </div>
-                    <div class="col-6">
-                        <input type="radio" class="btn-check" name="sentido" id="sentidoVuelta" value="VUELTA" required>
-                        <label class="btn btn-outline-primary w-100 p-3 rounded-4 d-flex flex-column align-items-center" for="sentidoVuelta">
-                            <span class="material-symbols-rounded fs-1 mb-2">sync_alt</span>
-                            <span class="fw-bold">Viaje VUELTA</span>
-                            <small class="opacity-75 d-block mt-1">Destino &rarr; Origen</small>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer border-0 pb-4 px-4 pt-1">
-                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold fs-5 shadow-sm w-100 py-3">Comenzar y Marcar Salida</button>
-            </div>
-        </form>
-    </div>
-</div>
-@endif
+@include('conductor.modals.falla_mecanica')
+@include('conductor.modals.iniciar_ruta')
 
 <!-- WIDGET FLOTANTE DE PASAJEROS -->
 @if(isset($recorridoActivo) && $recorridoActivo)

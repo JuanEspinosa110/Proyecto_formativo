@@ -11,6 +11,8 @@ class Tarjeta extends Model
     protected $table = 'tarjeta';
 
     protected $primaryKey = 'id_tarjeta';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     public $timestamps = false; // si tu tabla no tiene timestamps
 

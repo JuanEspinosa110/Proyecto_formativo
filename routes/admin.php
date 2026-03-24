@@ -29,6 +29,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('asignaciones', AsignacionController::class)
             ->only(['index', 'store', 'update', 'destroy']);
 
+
         // Otros módulos
         Route::get('/usuarios', [UsuarioController::class, 'index'])->name('usuarios.index');
 

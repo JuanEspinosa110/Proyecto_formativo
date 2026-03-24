@@ -25,11 +25,20 @@ class ConductorController extends Controller
             ->where('doc_us', $conductor->doc_usuario)
             ->orderBy('fecha', 'desc')
             ->get();
+            
+        $ahora = Carbon::now();
 
         // 2. Estado de la jornada actual
-        // Buscar si tiene un turno activo (1 = Activo) o en curso (12 = En curso) programado para HOY
-        $asignacionActiva = $asignaciones->filter(function($asig) use ($hoy) {
-            return in_array($asig->id_estado, [1, 12, 8]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
+        // Buscar si tiene un turno activo o en curso programado para HOY dentro del rango horario
+        $asignacionActiva = $asignaciones->filter(function($asig) use ($hoy, $ahora) {
+            $esHoy = Carbon::parse($asig->fecha)->isSameDay($hoy);
+            if (!$esHoy) return false;
+
+            $fecha = Carbon::parse($asig->fecha);
+            $inicio = $fecha->copy()->subMinutes(30);
+            $fin = $fecha->copy()->addHours(8); // Duración asumida de jornada
+
+            return in_array($asig->id_estado, [1, 12, 8]) && $ahora->between($inicio, $fin);
         })->first();
 
         // **Auto-vencer turno si pasan más de 4 horas sin iniciar**
@@ -82,6 +91,15 @@ class ConductorController extends Controller
         }
 
         // 6. Historial de Recorridos (Trazabilidad dia actual y generales)
+        // Calcular Totales de Hoy desde VentaViaje (Ventas Reales)
+        $viajesHoyIds = Viaje::where('doc_us', $conductor->doc_usuario)
+            ->whereDate('fecha', $hoy)
+            ->pluck('id_viaje')
+            ->toArray();
+
+        $pasajerosTotalesHoy = VentaViaje::whereIn('id_viaje', $viajesHoyIds)->count();
+        $ingresosTotalesHoy = VentaViaje::whereIn('id_viaje', $viajesHoyIds)->sum('valor');
+
         // Primero obtener TODOS los recorridos de hoy para los contadores totales
         $recorridosHoy = Recorrido::where('doc_us', $conductor->doc_usuario)
             ->whereDate('hora_salida', $hoy)
@@ -136,7 +154,9 @@ class ConductorController extends Controller
             'tiempoTrabajadoFormato',
             'historialFallas',
             'hoy',
-            'nivelesUrgencia'
+            'nivelesUrgencia',
+            'pasajerosTotalesHoy',
+            'ingresosTotalesHoy'
         ));
     }
 
@@ -279,7 +299,7 @@ class ConductorController extends Controller
     public function registrarPasajero(Request $request, $id_recorrido)
     {
         $request->validate([
-            'codigo_tarjeta' => 'required|string'
+            'codigo_tarjeta' => 'required|numeric'
         ]);
 
         $recorrido = Recorrido::findOrFail($id_recorrido);
@@ -332,8 +352,9 @@ class ConductorController extends Controller
             'id_estado' => 18 // PAGADO
         ]);
 
-        // Aumentar pasajeros en recorrido
+        // Aumentar pasajeros e ingresos en recorrido
         $recorrido->cantidad_pasajeros += 1;
+        $recorrido->ingresos += 3300;
         $recorrido->save();
 
         if ($request->wantsJson()) {

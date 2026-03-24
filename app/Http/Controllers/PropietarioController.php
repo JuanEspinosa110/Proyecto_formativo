@@ -32,6 +32,7 @@ class PropietarioController extends Controller
         // 1. Información de los buses (Filtrados por doc_propietario)
         $buses = Bus::with('estado')->where('doc_propietario', $user->doc_usuario)->get();
         $busIds = $buses->pluck('placa')->toArray();
+        $viajesOwnerIds = Viaje::whereIn('placa', $busIds)->pluck('id_viaje')->toArray();
 
         // 2. Asignaciones, Ingresos y Gastos
         $queryAsignaciones = Viaje::query()->with(['ruta', 'conductor', 'estado', 'ventas']);
@@ -58,29 +59,30 @@ class PropietarioController extends Controller
             $conteoAsignaciones = \App\Models\Recorrido::whereIn('placa', $busIds)->count();
             $conteoDocumentos = Documento::whereIn('placa', $busIds)->count();
             
-            // Ingresos y pasajeros desde la tabla recorridos
-            $conteoPasajeros = \App\Models\Recorrido::whereIn('placa', $busIds)->sum('cantidad_pasajeros');
+            // Ingresos y pasajeros desde VentaViaje (Ventas Reales)
+            $conteoPasajeros = VentaViaje::whereIn('id_viaje', $viajesOwnerIds)->count();
             
-            // Filtro por Mes para Ganancias (Nuevo)
-            $mesFiltro = $request->query('mes_seleccionado'); // YYYY-MM
+            // Filtro por Mes para Ganancias
+            $mesFiltro = $request->query('mes_seleccionado'); 
             if ($mesFiltro) {
-                $ingresosTotales = \App\Models\Recorrido::whereIn('placa', $busIds)->where('hora_salida', 'like', $mesFiltro . '%')->sum('ingresos');
+                $ingresosTotales = VentaViaje::whereIn('id_viaje', $viajesOwnerIds)->where('fecha', 'like', $mesFiltro . '%')->sum('valor');
             } else {
-                $ingresosTotales = \App\Models\Recorrido::whereIn('placa', $busIds)->sum('ingresos');
+                $ingresosTotales = VentaViaje::whereIn('id_viaje', $viajesOwnerIds)->sum('valor');
             }
 
             $hoy = \Carbon\Carbon::today();
             $semana = \Carbon\Carbon::now()->startOfWeek();
             $mes = \Carbon\Carbon::now()->startOfMonth();
 
-            $gananciasHoy = \App\Models\Recorrido::whereIn('placa', $busIds)->whereDate('hora_salida', $hoy)->sum('ingresos');
-            $gananciasSemana = \App\Models\Recorrido::whereIn('placa', $busIds)->where('hora_salida', '>=', $semana)->sum('ingresos');
-            $gananciasMes = \App\Models\Recorrido::whereIn('placa', $busIds)->where('hora_salida', '>=', $mes)->sum('ingresos');
+            $gananciasHoy = VentaViaje::whereIn('id_viaje', $viajesOwnerIds)->whereDate('fecha', $hoy)->sum('valor');
+            $gananciasSemana = VentaViaje::whereIn('id_viaje', $viajesOwnerIds)->where('fecha', '>=', $semana)->sum('valor');
+            $gananciasMes = VentaViaje::whereIn('id_viaje', $viajesOwnerIds)->where('fecha', '>=', $mes)->sum('valor');
 
-            // 3. Ingresos individuales por bus (Nuevo)
-            $ingresosPorBus = \App\Models\Recorrido::whereIn('placa', $busIds)
-                ->select('placa', \Illuminate\Support\Facades\DB::raw('SUM(ingresos) as total_ingresos'), \Illuminate\Support\Facades\DB::raw('SUM(cantidad_pasajeros) as total_pasajeros'))
-                ->groupBy('placa')
+            // 3. Ingresos individuales por bus (Ventas Reales)
+            $ingresosPorBus = VentaViaje::whereIn('venta_viaje.id_viaje', $viajesOwnerIds)
+                ->join('viaje', 'venta_viaje.id_viaje', '=', 'viaje.id_viaje')
+                ->select('viaje.placa', \Illuminate\Support\Facades\DB::raw('SUM(venta_viaje.valor) as total_ingresos'), \Illuminate\Support\Facades\DB::raw('COUNT(venta_viaje.id_venta) as total_pasajeros'))
+                ->groupBy('viaje.placa')
                 ->get();
 
             // 1. Filtros Independientes

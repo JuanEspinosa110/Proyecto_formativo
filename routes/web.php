@@ -80,6 +80,11 @@ Route::post(
 
 
 
+// Simulador Autónomo
+use App\Http\Controllers\SimulacionController;
+Route::get('/simulacion', [SimulacionController::class, 'index'])->name('simulacion.index');
+Route::post('/simulacion/validar', [SimulacionController::class, 'validar'])->name('simulacion.validar');
+
 Route::middleware('auth:web')->group(function () {
 
     Route::get('/pasajero/dashboard', fn() => view('pasajeros.index'))
