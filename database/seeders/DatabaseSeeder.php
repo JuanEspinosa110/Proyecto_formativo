@@ -15,16 +15,32 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(InitialDataSeeder::class);
+        $this->call([
+            TipoEmpresaSeeder::class ,
+            TipoUsuarioSeeder::class ,
+            TipoDocumentoSeeder::class ,
+            InitialDataSeeder::class ,
+            DepartamentoSeeder::class ,
+            CiudadSeeder::class ,
+            BarrioSeeder::class ,
 
-        // User::create([
-        //     'doc_usuario' => 1000000000,
-        //     'primer_nombre' => 'Test',
-        //     'primer_apellido' => 'User',
-        //     'correo' => 'test@example.com',
-        //     'password' => \Illuminate\Support\Facades\Hash::make('password'),
-        //     'id_tipo_usuario' => 1,
-        //     'id_estado' => 1
-        // ]);
+            EmpresaSeeder::class ,
+            UsuarioEmpresaSeeder::class ,
+            LicenciaEmpresaSeeder::class ,
+            BusSeeder::class ,
+            SuperAdministradorSeeder::class ,
+            GestorSetpSeeder::class ,
+            RutaSeeder::class ,
+        ]);
+
+    // User::create([
+    //     'doc_usuario' => 1000000000,
+    //     'primer_nombre' => 'Test',
+    //     'primer_apellido' => 'User',
+    //     'correo' => 'test@example.com',
+    //     'password' => \Illuminate\Support\Facades\Hash::make('password'),
+    //     'id_tipo_usuario' => 1,
+    //     'id_estado' => 1
+    // ]);
     }
 }

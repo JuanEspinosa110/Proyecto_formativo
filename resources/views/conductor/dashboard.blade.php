@@ -80,8 +80,8 @@
 <div class="row g-4 mb-5">
     @if($asignacionActiva)
         @php
-            $enCurso = $asignacionActiva->id_estado == 12; // En Servicio
-            $vencido = $asignacionActiva->id_estado == 8; // Vencido/No ejecutado
+            $enCurso = $asignacionActiva->id_estado == 4; // En Curso
+            $vencido = $asignacionActiva->id_estado == 6; // Vencido/No ejecutado
         @endphp
         <div class="col-md-8 col-xl-9">
             <div class="row g-3 h-100">
@@ -379,9 +379,9 @@
                                     <span class="badge bg-light text-dark border mt-1">{{ $falla->nivel_urgencia }}</span>
                                 </td>
                                 <td class="text-end pe-3">
-                                    @if($falla->id_estado == 19) <!-- PENDIENTE -->
+                                    @if($falla->id_estado == 5) <!-- PENDIENTE (Nuevo ID) -->
                                         <span class="badge bg-danger rounded-pill">PENDIENTE</span>
-                                    @elseif($falla->id_estado == 6 || $falla->id_estado == 7) <!-- EN_PROCESO o MANTENIMIENTO -->
+                                    @elseif($falla->id_estado == 4) <!-- EN_PROCESO o MANTENIMIENTO (Nuevo ID) -->
                                         <span class="badge bg-warning rounded-pill text-dark">EN PROCESO</span>
                                     @else
                                         <span class="badge bg-success rounded-pill">SOLUCIONADO</span>
@@ -665,7 +665,7 @@
                     title: '{{ $asig->placa }} - {{ $asig->ruta->nombre_ruta ?? "Ruta" }}',
                     start: '{{ \Carbon\Carbon::parse($asig->fecha)->format("Y-m-d\TH:i:s") }}',
                     end: '{{ \Carbon\Carbon::parse($asig->fecha)->addHours(8)->format("Y-m-d\TH:i:s") }}',
-                    color: '{{ in_array($asig->id_estado, [12, 13]) ? "#10b981" : "#94a3b8" }}',
+                    color: '{{ in_array($asig->id_estado, [4, 7]) ? "#10b981" : "#94a3b8" }}',
                     extendedProps: {
                         ruta: '{{ $asig->ruta->nombre_ruta ?? "" }}',
                         estado: '{{ optional($asig->estado)->nombre_estado }}'

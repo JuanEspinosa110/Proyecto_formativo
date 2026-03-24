@@ -114,7 +114,7 @@ class BusController extends Controller
                   ->firstOrFail();
 
         $request->validate([
-            'nuevo_estado' => 'required|in:1,2,3,7,8',
+            'nuevo_estado' => 'required|in:1,2,3,4,9',
         ], [
             'nuevo_estado.required' => 'Debe indicar el nuevo estado.',
             'nuevo_estado.in'       => 'El estado indicado no es válido para un bus.',
@@ -127,8 +127,8 @@ class BusController extends Controller
             1 => 'Bus activado correctamente.',
             2 => 'Bus inactivado correctamente.',
             3 => 'Bus suspendido correctamente.',
-            7 => 'Bus marcado en mantenimiento.',
-            8 => 'Bus marcado fuera de servicio.',
+            4 => 'Bus marcado en mantenimiento.',
+            9 => 'Bus bloqueado.',
         ];
 
         return back()->with('success', $mensajes[$request->nuevo_estado] ?? 'Estado actualizado.');

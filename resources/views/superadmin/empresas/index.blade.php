@@ -132,7 +132,7 @@
                 <span class="material-symbols-outlined"><i class="fa fa-spinner" aria-hidden="true"></i></span>
             </div>
             <div class="stat-info">
-                <h3>{{ \App\Models\Empresa::where('id_estado', 6)->count() }}</h3>
+                <h3>{{ \App\Models\Empresa::where('id_estado', 4)->count() }}</h3>
                 <p>En Proceso</p>
             </div>
         </div>

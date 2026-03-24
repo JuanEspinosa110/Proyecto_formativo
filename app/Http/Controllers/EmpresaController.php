@@ -78,7 +78,7 @@ class EmpresaController extends Controller
             $data['stats'] = [
                 'usuarios' => Usuario::where('NIT', $nit)->whereIn('id_tipo_usuario', [3, 6])->count(),
                 'buses' => Bus::where('NIT', $nit)->count(),
-                'documentos_pendientes' => Documento::where('NIT', $nit)->where('id_estado', 19)->count(),
+                'documentos_pendientes' => Documento::where('NIT', $nit)->where('id_estado', 5)->count(),
                 'asignaciones_hoy' => Viaje::whereHas('bus', function($q) use ($nit) { $q->where('NIT', $nit); })->whereDate('fecha', now()->toDateString())->count(),
             ];
         }
@@ -138,7 +138,7 @@ class EmpresaController extends Controller
     public function aprobarDocumento($id)
     {
         $documento = Documento::findOrFail($id);
-        $documento->id_estado = 24; // APROBADO
+        $documento->id_estado = 1; // APROBADO (ACTIVO)
         $documento->save();
 
         if ($documento->placa) {
@@ -158,7 +158,7 @@ class EmpresaController extends Controller
     public function rechazarDocumento($id)
     {
         $documento = Documento::findOrFail($id);
-        $documento->id_estado = 25; // RECHAZADO
+        $documento->id_estado = 8; // RECHAZADO
         $documento->save();
 
         if ($documento->placa) {

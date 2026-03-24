@@ -2,129 +2,16 @@
 
 @section('title', 'Crear Gestor SETP')
 
-@push('styles')
-<style>
-.gs-form-wrap {
-    max-width: 780px;
-    margin: 0 auto;
-}
-.gs-form-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r-md);
-    box-shadow: var(--sh-sm);
-    overflow: hidden;
-}
-.gs-form-header {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    background: var(--p-xlight);
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-}
-.gs-form-header .icon-wrap {
-    width: 42px; height: 42px;
-    background: linear-gradient(135deg, var(--p), var(--p-mid));
-    border-radius: var(--r);
-    display: flex; align-items: center; justify-content: center;
-}
-.gs-form-header .icon-wrap .material-symbols-rounded {
-    color: #fff; font-size: 1.3rem;
-    font-variation-settings: var(--ms-on);
-}
-.gs-form-header h2 {
-    font-family: var(--ff-d);
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text);
-    margin: 0;
-}
-.gs-form-header p {
-    font-size: .8rem;
-    color: var(--text-2);
-    margin: 0;
-}
-.gs-form-body { padding: 1.75rem 1.5rem; }
-.gs-form-footer {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: flex-end;
-    gap: .75rem;
-    background: var(--p-xlight);
-}
 
-/* Secciones del formulario */
-.gs-section-title {
-    font-size: .75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: var(--p);
-    margin: 0 0 1rem;
-    padding-bottom: .45rem;
-    border-bottom: 2px solid var(--p-light);
-    display: flex;
-    align-items: center;
-    gap: .4rem;
-}
-.gs-section-title .material-symbols-rounded { font-size: .95rem; }
-
-/* Labels y controles */
-.form-label {
-    font-size: .825rem;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: .3rem;
-}
-.form-label .req { color: var(--err); }
-.form-control, .form-select {
-    border-color: var(--border);
-    border-radius: var(--r-sm);
-    font-size: .875rem;
-    color: var(--text);
-    transition: border-color .15s, box-shadow .15s;
-}
-.form-control:focus, .form-select:focus {
-    border-color: var(--p);
-    box-shadow: 0 0 0 3px rgba(94,84,142,.12);
-}
-.form-control.is-invalid, .form-select.is-invalid { border-color: var(--err); }
-.invalid-feedback {
-    font-size: .78rem;
-    color: var(--err);
-}
-.form-hint {
-    font-size: .76rem;
-    color: var(--text-2);
-    margin-top: .25rem;
-}
-
-/* Aviso empresa SETP */
-.gs-setp-notice {
-    background: var(--info-bg);
-    border: 1px solid var(--info);
-    border-radius: var(--r);
-    padding: .75rem 1rem;
-    font-size: .84rem;
-    color: var(--info);
-    display: flex;
-    align-items: flex-start;
-    gap: .5rem;
-    margin-bottom: 1.5rem;
-}
-</style>
-@endpush
 
 @section('content')
 <div class="container-fluid py-4 px-4">
 
     {{-- Breadcrumb --}}
     <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb" style="font-size:.83rem;">
+        <ol class="breadcrumb">
             <li class="breadcrumb-item">
-                <a href="{{ route('superadmin.gestores-setp.index') }}" style="color:var(--p)">Gestores SETP</a>
+                <a href="{{ route('superadmin.gestores-setp.index') }}">Gestores SETP</a>
             </li>
             <li class="breadcrumb-item active">Nuevo gestor</li>
         </ol>
@@ -134,7 +21,7 @@
 
         {{-- Aviso informativo --}}
         <div class="gs-setp-notice mb-4">
-            <span class="material-symbols-rounded" style="flex-shrink:0">info</span>
+            <span class="material-symbols-rounded">info</span>
             <span>
                 Solo se pueden asignar gestores a empresas de tipo <strong>SETP</strong>.
                 El rol <strong>Gestor SETP</strong> se asignará automáticamente al crear el usuario.
@@ -317,7 +204,7 @@
                        style="border-radius:var(--r-sm)">Cancelar</a>
                     <button type="submit" class="btn d-flex align-items-center gap-2"
                             style="background:var(--p);color:#fff;border-radius:var(--r-sm)">
-                        <span class="material-symbols-rounded" style="font-size:1.1rem">save</span>
+                        <span class="material-symbols-rounded">save</span>
                         Crear Gestor SETP
                     </button>
                 </div>

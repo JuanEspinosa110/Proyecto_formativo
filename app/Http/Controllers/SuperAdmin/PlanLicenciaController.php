@@ -30,7 +30,7 @@ class PlanLicenciaController extends Controller
             
             $plan->licencias_activas = DB::table('licencias')
                 ->where('id_plan', $plan->id_plan)
-                ->whereIn('id_estado', [1, 22]) // VIGENTE o RENOVADA
+                ->whereIn('id_estado', [1]) // VIGENTE/RENOVADA (Normalizado a 1)
                 ->count();
         }
 

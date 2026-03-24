@@ -28,7 +28,7 @@ class DashboardController extends Controller
         if ($nit) {
             $documentosPendientes = Documento::where('NIT', $nit)
                 ->whereNotNull('placa')
-                ->whereNotIn('id_estado', [24, 25])
+                ->where('id_estado', 5) // PENDIENTE
                 ->count();
         }
 

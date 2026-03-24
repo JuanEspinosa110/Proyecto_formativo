@@ -36,35 +36,32 @@ class LoginController extends Controller
             $user = Auth::guard('web')->user();
 
             switch ($user->id_tipo_usuario) {
-                case 1:
+                case 1: // ADMINISTRADOR
                     return redirect()->route('admin.dashboard');
 
-                case 2:
+                case 2: // PASAJERO
                     return redirect()->route('pasajero.saldo');
 
-                case 3:
+                case 3: // CONDUCTOR
                     return redirect()->route('conductor.dashboard');
 
-                case 4:
+                case 4: // AUXILIAR EMPRESA
                     return redirect()->route('empresa.dashboard');
-                
-                case 5:
-                    return redirect()->route('empresa.dashboard'); // Auxiliar
 
-                case 9:
-                    return redirect()->route('propietario.dashboard'); // Propietario
+                case 5: // PROPIETARIO
+                    return redirect()->route('propietario.dashboard');
 
                 case 6: // SETP
                     return redirect()->route('gestor-setp.dashboard');
 
-                case 7: // JEFE_MANTENIMIENTO
-                    return redirect()->route('jefemantenimiento.dashboard');
-
-                case 8: // CONTROLADOR_TIEMPO
+                case 7: // COORDINADOR BUS
                     return redirect()->route('controlador-tiempo.dashboard');
 
-                case 10: // GESTOR_RECARGAS
+                case 8: // GESTOR DE RECARGAS
                     return redirect()->route('gestor-recargas.dashboard');
+
+                case 9: // JEFE DE MANTENIMIENTO
+                    return redirect()->route('jefemantenimiento.dashboard');
 
                 default:
                     Auth::guard('web')->logout();

@@ -70,7 +70,7 @@ class Bus extends Model
         // 2. Contar documentos aprobados y vigentes para este bus (por tipo de documento)
         $approvedCount = Documento::where('placa', $this->placa)
             ->whereIn('id_tipo_documento', $requiredTypes)
-            ->where('id_estado', 24) // 24 = APROBADO
+            ->where('id_estado', 1) // 1 = ACTIVO/APROBADO
             ->where('fecha_vencimiento', '>', now())
             ->distinct('id_tipo_documento')
             ->count('id_tipo_documento');

@@ -26,8 +26,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
         DB::table('tipo_usuario')
             ->whereIn('id_tipo_usuario', [1, 2, 3, 4, 5, 6, 7])
             ->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }
 };

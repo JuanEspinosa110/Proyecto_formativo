@@ -225,7 +225,7 @@
                         <td class="small fw-bold">{{ $doc->fecha_vencimiento->format('d/m/Y') }}</td>
                         <td>
                             @php
-                                $statusColors = [19 => 'warning', 24 => 'success', 25 => 'danger', 1 => 'success', 2 => 'danger'];
+                                $statusColors = [5 => 'warning', 1 => 'success', 8 => 'danger', 2 => 'danger'];
                                 $valText = optional($doc->estado)->nombre_estado ?? 'Desconocido';
                                 $valColor = $statusColors[$doc->id_estado] ?? 'secondary';
                             @endphp
@@ -234,7 +234,7 @@
                             </span>
                         </td>
                         <td class="text-center">
-                            @if($doc->id_estado == 19)
+                            @if($doc->id_estado == 5)
                             <button class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" 
                                     data-bs-toggle="modal" 
                                     data-bs-target="#modalGestionarDocumento"

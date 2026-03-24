@@ -99,10 +99,13 @@
                 </div>
                 <div>
                     <label class="small text-muted d-block">Estado</label>
-                    @if((int)$mantenimiento->id_estado === 7)
+                    <label class="small text-muted d-block">Estado</label>
+                    @if((int)$mantenimiento->id_estado === 4)
                         <span class="badge bg-warning text-dark">En Taller</span>
-                    @else
+                    @elseif((int)$mantenimiento->id_estado === 7)
                         <span class="badge bg-success">Finalizado</span>
+                    @else
+                        <span class="badge bg-secondary">{{ $mantenimiento->estado->nombre_estado ?? 'Desconocido' }}</span>
                     @endif
                 </div>
             </div>
@@ -168,7 +171,7 @@
             </tr>
             <tr>
                 <td style="padding:6px 0; font-weight:bold; color:#555; font-size:9pt;">ESTADO</td>
-                <td style="padding:6px 8px;">@if((int)$mantenimiento->id_estado === 7) En Taller @else Finalizado @endif</td>
+                <td style="padding:6px 8px;">@if((int)$mantenimiento->id_estado === 4) En Taller @else Finalizado @endif</td>
                 <td style="padding:6px 0; font-weight:bold; color:#555; font-size:9pt;">COSTO TOTAL</td>
                 <td style="padding:6px 8px; font-weight:bold; font-size:12pt;">${{ number_format($mantenimiento->costo_total, 0, ',', '.') }}</td>
             </tr>

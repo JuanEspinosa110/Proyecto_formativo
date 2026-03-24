@@ -78,7 +78,7 @@ class Documento extends Model
             return 'VIGENTE';
         }
 
-        if ($this->id_estado == 2 || $this->id_estado == 22) {
+        if ($this->id_estado == 2) {
             return 'ARCHIVADO';
         }
 

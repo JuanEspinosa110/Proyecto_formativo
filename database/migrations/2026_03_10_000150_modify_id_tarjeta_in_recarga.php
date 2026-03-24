@@ -21,8 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('recarga', function (Blueprint $table) {
-            $table->bigInteger('id_tarjeta')->change();
-        });
+        // No-op: la columna id_tarjeta contiene datos VARCHAR (Ej: 'TARJ-INT-10001')
+        // que no son compatibles con bigInteger. No se puede revertir sin perder datos.
     }
 };

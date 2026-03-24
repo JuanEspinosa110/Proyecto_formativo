@@ -47,7 +47,7 @@ class EmpresaController extends Controller
         }
 
         $empresas = $query->orderBy('fecha_creacion', 'desc')->paginate(5);
-        $estados = Estado::whereIn('id_estado', [1, 2, 3, 6])->get();
+        $estados = Estado::whereIn('id_estado', [1, 2, 3, 4, 5, 9])->get();
         $ciudades = Ciudad::orderBy('nombre_city')->get();
 
         return view('superadmin.empresas.index', compact('empresas', 'estados', 'ciudades'));
@@ -60,7 +60,7 @@ class EmpresaController extends Controller
     {
         $tipos = \App\Models\TipoEmpresa::all();
         $departamentos = Departamento::orderBy('nombre_departamento')->get();
-        $estados = Estado::whereIn('id_estado', [1, 2, 3, 6])->get();
+        $estados = Estado::whereIn('id_estado', [1, 2, 3, 4, 5, 9])->get();
 
         return view('superadmin.empresas.create', compact('departamentos', 'estados', 'tipos'));
     }
@@ -141,7 +141,7 @@ class EmpresaController extends Controller
     {
         $empresa = Empresa::with('ciudad')->findOrFail($nit);
         $departamentos = Departamento::orderBy('nombre_departamento')->get();
-        $estados = Estado::whereIn('id_estado', [1, 2, 3, 6])->get();
+        $estados = Estado::whereIn('id_estado', [1, 2, 3, 4, 5, 9])->get();
         $tipos = \App\Models\TipoEmpresa::all();
 
         $ciudades = Ciudad::where(

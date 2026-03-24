@@ -51,8 +51,8 @@ $routePrefix = Auth::user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
                         @php
                         $badgeClass = match($documento->id_estado) {
                             1 => 'bg-success',
-                            20 => 'bg-success',
-                            21 => 'bg-danger',
+                            8 => 'bg-danger',
+                            5 => 'bg-warning text-dark',
                             default => 'bg-secondary'
                         };
                         @endphp
@@ -69,7 +69,7 @@ $routePrefix = Auth::user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
                                 <span class="material-symbols-rounded fs-5">visibility</span>
                             </button>
 
-                            @if($documento->id_estado == 19) <!-- PENDIENTE -->
+                            @if($documento->id_estado == 5) <!-- PENDIENTE (Nuevo ID) -->
                                 <form action="{{ route($routePrefix . '.documentos.aprobar', $documento->id_documento) }}" method="POST" class="d-inline">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-success rounded-pill px-2 fw-bold" title="Aprobar">

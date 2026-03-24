@@ -68,7 +68,7 @@ class DashboardController extends Controller
             ->where('NIT', $nit)
             ->where(function($q) {
                 $q->where('fecha_vencimiento', '<', Carbon::now())
-                  ->orWhere('id_estado', 3); // 3 = Rechazado (Asumiendo)
+                  ->orWhere('id_estado', 8); // 8 = RECHAZADO
             })
             ->get();
 
@@ -82,7 +82,7 @@ class DashboardController extends Controller
         $documentosPendientes = DB::table('documento')
             ->where('NIT', $nit)
             ->whereNotNull('placa')
-            ->whereNotIn('id_estado', [24, 25])
+            ->where('id_estado', 5) // PENDIENTE
             ->count();
 
         return view('auxiliar.dashboard', compact(

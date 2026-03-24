@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('recarga', function (Blueprint $table) {
-            $table->unsignedBigInteger('id_recarga');
+            $table->bigIncrements('id_recarga');
             $table->bigInteger('id_tarjeta')->index('id_tarjeta');
             $table->decimal('monto', 10);
             $table->timestamp('created_at')->useCurrent();

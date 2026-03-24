@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\DB;
 
 // IDs de estado del bus
 define('ESTADO_BUS_ACTIVO', 1);
-define('ESTADO_BUS_EN_MANTENIMIENTO', 7);
+define('ESTADO_BUS_EN_MANTENIMIENTO', 4);
 // IDs de estado del registro de mantenimiento
-define('ESTADO_MANT_EN_TALLER', 7);
-define('ESTADO_MANT_FINALIZADO', 1);
+define('ESTADO_MANT_EN_TALLER', 4);
+define('ESTADO_MANT_FINALIZADO', 7);
 
 class MantenimientoController extends Controller
 {
@@ -52,7 +52,7 @@ class MantenimientoController extends Controller
             WHERE m.id_mantenimiento = (
                 SELECT sub.id_mantenimiento
                 FROM mantenimiento sub
-                WHERE sub.placa = b.placa AND sub.id_estado = 1
+                WHERE sub.placa = b.placa AND sub.id_estado = 7 -- 7 = FINALIZADO (Mantenimiento completado)
                 ORDER BY sub.fecha_mantenimiento DESC
                 LIMIT 1
             )
@@ -61,7 +61,7 @@ class MantenimientoController extends Controller
                 OR
                 (m.km_proximo IS NOT NULL AND m.km_proximo <= b.kilometraje + 500)
             )
-            AND b.id_estado != 7
+            AND b.id_estado NOT IN (4, 9) -- Excluir buses en taller o bloqueados
         ");
 
         return view('jefemantenimiento.dashboard', compact(
@@ -197,9 +197,9 @@ class MantenimientoController extends Controller
             // *** Cambiar bus a "En Mantenimiento" (id=7) ***
             $bus->update(['id_estado' => ESTADO_BUS_EN_MANTENIMIENTO]);
 
-            // Si viene de un reporte, marcarlo como atendido
+            // Si viene de un reporte, marcarlo como atendido (4 = En Curso/Taller)
             if ($request->reporte_id) {
-                ReporteFalla::find($request->reporte_id)?->update(['id_estado' => 7]);
+                ReporteFalla::find($request->reporte_id)?->update(['id_estado' => 4]);
             }
 
             DB::commit();

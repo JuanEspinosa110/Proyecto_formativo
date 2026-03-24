@@ -69,7 +69,7 @@ class UsuarioController extends Controller
 
         $docs_licencia = \App\Models\Documento::whereIn('doc_usuario', collect($usuarios->items())->pluck('doc_usuario'))
             ->where('id_tipo_documento', 3)
-            ->whereIn('id_estado', [1, 21])
+            ->whereIn('id_estado', [1, 6])
             ->get()->keyBy('doc_usuario');
 
         // Alertas globales de licencias para el Admin
@@ -172,7 +172,7 @@ class UsuarioController extends Controller
                     'id_tipo_documento' => 3, // ID de la licencia
                     'doc_usuario' => $request->doc_usuario,
                     'NIT' => Auth::user()->NIT,
-                    'id_estado' => $fecha_venc->isPast() ? 21 : 1
+                    'id_estado' => $fecha_venc->isPast() ? 6 : 1
                 ]);
             }
 

@@ -298,7 +298,7 @@ class PropietarioController extends Controller
                         'placa' => $bus->placa,
                         'doc_usuario' => $user->doc_usuario,
                         'NIT' => $bus->NIT,
-                        'id_estado' => 19, // 19 = PENDIENTE de aprobación
+                        'id_estado' => 5, // 5 = PENDIENTE de aprobación
                     ]);
 
                     // Inactivar el bus preventivamente ya que el documento requiere aprobación
@@ -350,7 +350,7 @@ class PropietarioController extends Controller
                 'doc_usuario' => $user->doc_usuario,
                 'fecha_expedicion' => $request->fecha_expedicion,
                 'fecha_vencimiento' => $request->fecha_vencimiento,
-                'id_estado' => 19, // 19 = PENDIENTE de aprobación
+                'id_estado' => 5, // 5 = PENDIENTE de aprobación
             ];
 
             // Inactivar el bus preventivamente ya que el documento requiere aprobación

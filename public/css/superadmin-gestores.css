@@ -265,3 +265,5 @@
     font-size: .875rem;
     font-weight: 600;
 }
+/* ── Clases Helper ─────────────────────────────────────────── */
+.gs-icon-primary { color: var(--p) !important; }

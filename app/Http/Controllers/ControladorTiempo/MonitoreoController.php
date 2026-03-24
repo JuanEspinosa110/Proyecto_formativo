@@ -19,16 +19,15 @@ class MonitoreoController extends Controller
         $estadisticas = [
             'en_ruta' => $todosLosBuses->where('id_estado', 1)->count(),
             'inactivos' => $todosLosBuses->where('id_estado', 2)->count(),
-            'en_taller' => $todosLosBuses->where('id_estado', 7)->count(),
+            'en_taller' => $todosLosBuses->where('id_estado', 4)->count(),
             'total' => $todosLosBuses->count(),
         ];
 
         // 2. Obtener solo los buses con operación activa para el monitoreo
-        // Buses con asignación activa (EN_CURSO = 12)
         $buses = Bus::with([
             'estado',
             'asignaciones' => function ($q) {
-            $q->where('id_estado', 12); // Solo viajes activos
+            $q->where('id_estado', 4); // Solo viajes activos (EN CURSO)
         },
             'asignaciones.usuario',
             'asignaciones.ruta.barrioOrigen',
@@ -39,7 +38,7 @@ class MonitoreoController extends Controller
         ])
             ->where('NIT', $user->NIT)
             ->whereHas('asignaciones', function ($q) {
-            $q->where('id_estado', 12);
+            $q->where('id_estado', 4);
         })
             ->orderBy('placa')
             ->get();

@@ -85,3 +85,23 @@ Route::middleware(['auth:superadmin'])
         Route::patch('/{doc}/estado',[GestorSetpController::class, 'toggleEstado'])->name('toggle-estado');
         Route::delete('/{doc}',      [GestorSetpController::class, 'destroy'])->name('destroy');
     });
+
+/*
+|--------------------------------------------------------------------------
+| Rutas SuperAdmin → gestión de Gestores de Recargas
+|--------------------------------------------------------------------------
+*/
+use App\Http\Controllers\SuperAdmin\GestorRecargasController;
+
+Route::middleware(['auth:superadmin'])
+    ->prefix('superadmin/gestores-recargas')
+    ->name('superadmin.gestores-recargas.')
+    ->group(function () {
+        Route::get('/',              [GestorRecargasController::class, 'index'])       ->name('index');
+        Route::get('/crear',         [GestorRecargasController::class, 'create'])      ->name('create');
+        Route::post('/',             [GestorRecargasController::class, 'store'])       ->name('store');
+        Route::get('/{doc}/editar',  [GestorRecargasController::class, 'edit'])        ->name('edit');
+        Route::put('/{doc}',         [GestorRecargasController::class, 'update'])      ->name('update');
+        Route::patch('/{doc}/estado',[GestorRecargasController::class, 'toggleEstado'])->name('toggle-estado');
+        Route::delete('/{doc}',      [GestorRecargasController::class, 'destroy'])     ->name('destroy');
+    });

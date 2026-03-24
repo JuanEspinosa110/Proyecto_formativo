@@ -27,23 +27,23 @@ class ConductorController extends Controller
             ->get();
 
         // 2. Estado de la jornada actual
-        // Buscar si tiene un turno activo (1 = Activo) o en curso (12 = En curso) programado para HOY
+        // Buscar si tiene un turno activo (1 = Activo) o en curso (4 = En curso) programado para HOY
         $asignacionActiva = $asignaciones->filter(function($asig) use ($hoy) {
-            return in_array($asig->id_estado, [1, 12, 8]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
+            return in_array($asig->id_estado, [1, 4, 6]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
         })->first();
 
         // **Auto-vencer turno si pasan más de 4 horas sin iniciar**
         if ($asignacionActiva && $asignacionActiva->id_estado == 1) {
             $horaProgramada = Carbon::parse($asignacionActiva->fecha);
             if (Carbon::now()->greaterThan($horaProgramada->copy()->addHours(4))) {
-                $asignacionActiva->id_estado = 8; // Vencida
+                $asignacionActiva->id_estado = 6; // Vencida
                 $asignacionActiva->save();
             }
         }
 
         // Buscar si ya finalizó su turno hoy (8 = FUERA DE SERVICIO)
         $turnoFinalizadoHoy = $asignaciones->filter(function($asig) use ($hoy) {
-            return $asig->id_estado == 8 && Carbon::parse($asig->fecha)->isSameDay($hoy);
+            return $asig->id_estado == 6 && Carbon::parse($asig->fecha)->isSameDay($hoy);
         })->isNotEmpty();
 
         // 3. Documentos y validaciones (Licencia)
@@ -62,7 +62,7 @@ class ConductorController extends Controller
         $fallasBus = collect();
         if ($asignacionActiva) {
             $fallasBus = ReporteFalla::where('placa', $asignacionActiva->placa)
-                ->where('id_estado', 19) // 19 = PENDIENTE
+                ->where('id_estado', 5) // 5 = PENDIENTE
                 ->get();
         }
 
@@ -155,7 +155,7 @@ class ConductorController extends Controller
             'doc_usuario' => Auth::guard('web')->id(),
             'descripcion' => $request->descripcion,
             'nivel_urgencia' => $request->nivel_urgencia ?? 'Bajo',
-            'id_estado' => 19 // PENDIENTE
+            'id_estado' => 5 // PENDIENTE
         ]);
 
         // Cierre automático de turno si hay uno activo
@@ -163,12 +163,12 @@ class ConductorController extends Controller
         $hoy = Carbon::today();
         
         $asignacionActiva = Viaje::where('doc_us', $conductor->doc_usuario)
-            ->whereIn('id_estado', [1, 12]) // EN_CURSO o PROGRAMADO
+            ->whereIn('id_estado', [1, 4]) // EN_CURSO o PROGRAMADO
             ->where('placa', $request->placa)
             ->first();
 
         if ($asignacionActiva) {
-            $asignacionActiva->id_estado = 8; // FUERA_DE_SERVICIO
+            $asignacionActiva->id_estado = 7; // FINALIZADO
             $asignacionActiva->save();
 
             // También finalizar recorrido activo en pista si existe
@@ -211,8 +211,8 @@ class ConductorController extends Controller
             }
         }
 
-        // 12 = EN_CURSO
-        $viaje->id_estado = 12;
+        // 4 = EN_CURSO
+        $viaje->id_estado = 4;
         $viaje->save();
 
         return redirect()->back()->with('success', 'Turno iniciado. Conduzca con precaución.');
@@ -228,8 +228,7 @@ class ConductorController extends Controller
         }
 
         $viaje = Viaje::findOrFail($id_viaje);
-        // 8 = FUERA_DE_SERVICIO
-        $viaje->id_estado = 8;
+        $viaje->id_estado = 7;
         $viaje->save();
 
         return redirect()->back()->with('success', 'Turno finalizado y registrado.');
@@ -240,8 +239,8 @@ class ConductorController extends Controller
     {
         $viaje = Viaje::findOrFail($id_viaje);
 
-        // Validar que el turno esté en curso (12) antes de iniciar recorrido
-        if ($viaje->id_estado != 12) {
+        // Validar que el turno esté en curso (4) antes de iniciar recorrido
+        if ($viaje->id_estado != 4) {
             return redirect()->back()->with('error', 'Debe iniciar su turno antes de comenzar un recorrido.');
         }
         
@@ -299,7 +298,7 @@ class ConductorController extends Controller
 
         $recorrido = Recorrido::findOrFail($id_recorrido);
         $viaje = Viaje::where('doc_us', $recorrido->viaje->doc_us)
-            ->whereIn('id_estado', [12]) // EN_CURSO
+            ->whereIn('id_estado', [4]) // EN_CURSO
             ->where('placa', $recorrido->viaje->placa)
             ->first();
 
@@ -318,7 +317,7 @@ class ConductorController extends Controller
             return redirect()->back()->with('error', 'Tarjeta inválida o no registrada en el sistema.');
         }
 
-        if ($tarjeta->id_estado != 1 && $tarjeta->id_estado != 20) {
+        if ($tarjeta->id_estado != 1) {
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => 'La tarjeta se encuentra inactiva o bloqueada.']);
             }
@@ -344,7 +343,7 @@ class ConductorController extends Controller
             'id_tarjeta' => $tarjeta->id_tarjeta,
             'valor' => $costoPasaje,
             'fecha' => Carbon::now(),
-            'id_estado' => 18 // PAGADO
+            'id_estado' => 1 // PAGADO -> ACTIVO
         ]);
 
         if ($request->wantsJson()) {
@@ -405,7 +404,7 @@ class ConductorController extends Controller
         $asignaciones = Viaje::where('doc_us', $conductor->doc_usuario)->get();
         $hoy = Carbon::today();
         $asignacionActiva = $asignaciones->filter(function($asig) use ($hoy) {
-            return in_array($asig->id_estado, [1, 12]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
+            return in_array($asig->id_estado, [1, 4]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
         })->first();
 
         $type = DB::select('SHOW COLUMNS FROM reportes_fallas WHERE Field = "nivel_urgencia"')[0]->Type;

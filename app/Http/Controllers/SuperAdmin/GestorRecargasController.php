@@ -10,16 +10,16 @@ use App\Models\Empresa;
 use App\Models\Ciudad;
 
 /**
- * Controlador SuperAdmin → Gestores SETP
- * Gestiona la creación y edición de usuarios con rol Gestor SETP (id_tipo_usuario = 11),
- * asignados a empresas de tipo Setp (id_tipo_empresa = 5).
+ * Controlador SuperAdmin → Gestores de Recargas
+ * Gestiona la creación y edición de usuarios con rol Gestor de Recargas (id_tipo_usuario = 8),
+ * asignados a empresas de tipo Recarga (id_tipo_empresa = 3).
  */
-class GestorSetpController extends Controller
+class GestorRecargasController extends Controller
 {
-    // id del tipo de empresa Setp (id_tipo_empresa = 4 en TipoEmpresaSeeder)
-    const ID_TIPO_EMPRESA_SETP  = 4;
-    // id del tipo de usuario Gestor Setp
-    const ID_TIPO_USUARIO_GESTOR = 6;
+    // id del tipo de empresa de Recargas (id_tipo_empresa = 3 en TipoEmpresaSeeder)
+    const ID_TIPO_EMPRESA_RECARGAS = 3;
+    // id del tipo de usuario Gestor de Recargas
+    const ID_TIPO_USUARIO_GESTOR   = 8;
 
     // ── index ─────────────────────────────────────────────────────
     public function index(Request $request)
@@ -31,31 +31,30 @@ class GestorSetpController extends Controller
             $q = $request->q;
             $query->where(function ($sq) use ($q) {
                 $sq->where('primer_nombre',    'like', "%{$q}%")
-                   ->orWhere('primer_apellido','like', "%{$q}%")
-                   ->orWhere('segundo_nombre', 'like', "%{$q}%")
                    ->orWhere('primer_apellido', 'like', "%{$q}%")
-                   ->orWhere('segundo_apellido', 'like', "%{$q}%")
+                   ->orWhere('segundo_nombre',  'like', "%{$q}%")
+                   ->orWhere('segundo_apellido','like', "%{$q}%")
                    ->orWhere('doc_usuario',     $q);
             });
         }
         if ($request->filled('nit'))    $query->where('NIT', $request->nit);
         if ($request->filled('estado')) $query->where('id_estado', $request->estado);
 
-        $gestores      = $query->latest('doc_usuario')->paginate(15);
-        $empresasSetp  = Empresa::where('id_tipo_empresa', self::ID_TIPO_EMPRESA_SETP)
-                                ->where('id_estado', 1)->get();
+        $gestores        = $query->latest('doc_usuario')->paginate(15);
+        $empresasRecarga = Empresa::where('id_tipo_empresa', self::ID_TIPO_EMPRESA_RECARGAS)
+                                  ->where('id_estado', 1)->get();
 
-        return view('superadmin.gestor-setp.index', compact('gestores', 'empresasSetp'));
+        return view('superadmin.gestor-recargas.index', compact('gestores', 'empresasRecarga'));
     }
 
     // ── create ────────────────────────────────────────────────────
     public function create()
     {
-        $empresasSetp = Empresa::where('id_tipo_empresa', self::ID_TIPO_EMPRESA_SETP)
-                               ->where('id_estado', 1)->with('ciudad')->get();
-        $ciudades     = Ciudad::orderBy('nombre_city')->get();
+        $empresasRecarga = Empresa::where('id_tipo_empresa', self::ID_TIPO_EMPRESA_RECARGAS)
+                                  ->where('id_estado', 1)->with('ciudad')->get();
+        $ciudades        = Ciudad::orderBy('nombre_city')->get();
 
-        return view('superadmin.gestor-setp.create', compact('empresasSetp', 'ciudades'));
+        return view('superadmin.gestor-recargas.create', compact('empresasRecarga', 'ciudades'));
     }
 
     // ── store ─────────────────────────────────────────────────────
@@ -73,36 +72,36 @@ class GestorSetpController extends Controller
             'id_ciudad'        => ['required', 'exists:ciudad,id_ciudad'],
             'password'         => ['required', 'string', 'min:8', 'confirmed'],
         ], [
-            'doc_usuario.required'   => 'El número de documento es obligatorio.',
-            'doc_usuario.unique'     => 'Ya existe un usuario con ese documento.',
-            'doc_usuario.min'        => 'El documento debe tener mínimo 7 dígitos.',
-            'doc_usuario.max'        => 'El documento debe tener máximo 10 dígitos.',
-            'NIT.required'           => 'Debe seleccionar una empresa SETP.',
-            'NIT.exists'             => 'La empresa seleccionada no existe.',
-            'primer_nombre.required' => 'El primer nombre es obligatorio.',
-            'primer_nombre.regex'    => 'El primer nombre solo puede contener letras, sin espacios.',
-            'primer_nombre.min'      => 'El primer nombre debe tener mínimo 3 caracteres.',
-            'primer_nombre.max'      => 'El primer nombre debe tener máximo 30 caracteres.',
-            'segundo_nombre.regex'   => 'El segundo nombre solo puede contener letras, sin espacios.',
+            'doc_usuario.required'     => 'El número de documento es obligatorio.',
+            'doc_usuario.unique'       => 'Ya existe un usuario con ese documento.',
+            'doc_usuario.min'          => 'El documento debe tener mínimo 7 dígitos.',
+            'doc_usuario.max'          => 'El documento debe tener máximo 10 dígitos.',
+            'NIT.required'             => 'Debe seleccionar una empresa de recargas.',
+            'NIT.exists'               => 'La empresa seleccionada no existe.',
+            'primer_nombre.required'   => 'El primer nombre es obligatorio.',
+            'primer_nombre.regex'      => 'El primer nombre solo puede contener letras, sin espacios.',
+            'primer_nombre.min'        => 'El primer nombre debe tener mínimo 3 caracteres.',
+            'primer_nombre.max'        => 'El primer nombre debe tener máximo 30 caracteres.',
+            'segundo_nombre.regex'     => 'El segundo nombre solo puede contener letras, sin espacios.',
             'primer_apellido.required' => 'El primer apellido es obligatorio.',
             'primer_apellido.regex'    => 'El primer apellido solo puede contener letras, sin espacios.',
             'primer_apellido.min'      => 'El primer apellido debe tener mínimo 3 caracteres.',
             'primer_apellido.max'      => 'El primer apellido debe tener máximo 30 caracteres.',
             'segundo_apellido.regex'   => 'El segundo apellido solo puede contener letras, sin espacios.',
-            'correo.required'        => 'El correo electrónico es obligatorio.',
-            'correo.unique'          => 'Ya existe un usuario con ese correo.',
-            'correo.regex'           => 'El correo no puede contener espacios y debe ser válido.',
-            'telefono.regex'         => 'El teléfono solo puede contener números, entre 7 y 20 dígitos.',
-            'id_ciudad.required'     => 'Debe seleccionar una ciudad.',
-            'password.required'      => 'La contraseña es obligatoria.',
-            'password.min'           => 'La contraseña debe tener al menos 8 caracteres.',
-            'password.confirmed'     => 'Las contraseñas no coinciden.',
+            'correo.required'          => 'El correo electrónico es obligatorio.',
+            'correo.unique'            => 'Ya existe un usuario con ese correo.',
+            'correo.regex'             => 'El correo no puede contener espacios y debe ser válido.',
+            'telefono.regex'           => 'El teléfono solo puede contener números, entre 7 y 20 dígitos.',
+            'id_ciudad.required'       => 'Debe seleccionar una ciudad.',
+            'password.required'        => 'La contraseña es obligatoria.',
+            'password.min'             => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.confirmed'       => 'Las contraseñas no coinciden.',
         ]);
 
-        // Verificar que la empresa sea de tipo Setp
+        // Verificar que la empresa sea de tipo Recargas
         $empresa = Empresa::findOrFail($data['NIT']);
-        if ($empresa->id_tipo_empresa !== self::ID_TIPO_EMPRESA_SETP) {
-            return back()->withErrors(['NIT' => 'La empresa seleccionada no es de tipo Setp.'])->withInput();
+        if ($empresa->id_tipo_empresa !== self::ID_TIPO_EMPRESA_RECARGAS) {
+            return back()->withErrors(['NIT' => 'La empresa seleccionada no es de tipo Recargas.'])->withInput();
         }
 
         Usuario::create([
@@ -120,8 +119,8 @@ class GestorSetpController extends Controller
             'password'         => Hash::make($data['password']),
         ]);
 
-        return redirect()->route('superadmin.gestores-setp.index')
-                         ->with('success', 'Gestor SETP creado exitosamente.');
+        return redirect()->route('superadmin.gestores-recargas.index')
+                         ->with('success', 'Gestor de Recargas creado exitosamente.');
     }
 
     // ── edit ──────────────────────────────────────────────────────
@@ -131,11 +130,11 @@ class GestorSetpController extends Controller
                          ->where('id_tipo_usuario', self::ID_TIPO_USUARIO_GESTOR)
                          ->firstOrFail();
 
-        $empresasSetp = Empresa::where('id_tipo_empresa', self::ID_TIPO_EMPRESA_SETP)
-                               ->where('id_estado', 1)->with('ciudad')->get();
-        $ciudades     = Ciudad::orderBy('nombre_city')->get();
+        $empresasRecarga = Empresa::where('id_tipo_empresa', self::ID_TIPO_EMPRESA_RECARGAS)
+                                  ->where('id_estado', 1)->with('ciudad')->get();
+        $ciudades        = Ciudad::orderBy('nombre_city')->get();
 
-        return view('superadmin.gestor-setp.edit', compact('gestor', 'empresasSetp', 'ciudades'));
+        return view('superadmin.gestor-recargas.edit', compact('gestor', 'empresasRecarga', 'ciudades'));
     }
 
     // ── update ────────────────────────────────────────────────────
@@ -162,23 +161,17 @@ class GestorSetpController extends Controller
         }
 
         $messages = [
-            'NIT.required'           => 'Debe seleccionar una empresa SETP.',
-            'primer_nombre.required' => 'El primer nombre es obligatorio.',
-            'primer_nombre.regex'    => 'El primer nombre solo puede contener letras, sin espacios.',
-            'primer_nombre.min'      => 'El primer nombre debe tener mínimo 3 caracteres.',
-            'primer_nombre.max'      => 'El primer nombre debe tener máximo 30 caracteres.',
-            'segundo_nombre.regex'   => 'El segundo nombre solo puede contener letras, sin espacios.',
+            'NIT.required'             => 'Debe seleccionar una empresa de recargas.',
+            'primer_nombre.required'   => 'El primer nombre es obligatorio.',
+            'primer_nombre.regex'      => 'El primer nombre solo puede contener letras, sin espacios.',
             'primer_apellido.required' => 'El primer apellido es obligatorio.',
             'primer_apellido.regex'    => 'El primer apellido solo puede contener letras, sin espacios.',
-            'primer_apellido.min'      => 'El primer apellido debe tener mínimo 3 caracteres.',
-            'primer_apellido.max'      => 'El primer apellido debe tener máximo 30 caracteres.',
-            'segundo_apellido.regex'   => 'El segundo apellido solo puede contener letras, sin espacios.',
-            'correo.unique'          => 'Ya existe otro usuario con ese correo.',
-            'correo.regex'           => 'El correo no puede contener espacios y debe ser válido.',
-            'telefono.regex'         => 'El teléfono solo puede contener números, entre 7 y 20 dígitos.',
-            'id_ciudad.required'     => 'Debe seleccionar una ciudad.',
-            'password.min'           => 'La contraseña debe tener al menos 8 caracteres.',
-            'password.confirmed'     => 'Las contraseñas no coinciden.',
+            'correo.unique'            => 'Ya existe otro usuario con ese correo.',
+            'correo.regex'             => 'El correo no puede contener espacios y debe ser válido.',
+            'telefono.regex'           => 'El teléfono solo puede contener números, entre 7 y 20 dígitos.',
+            'id_ciudad.required'       => 'Debe seleccionar una ciudad.',
+            'password.min'             => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.confirmed'       => 'Las contraseñas no coinciden.',
         ];
 
         $data = $request->validate($rules, $messages);
@@ -201,8 +194,8 @@ class GestorSetpController extends Controller
 
         $gestor->update($updateData);
 
-        return redirect()->route('superadmin.gestores-setp.index')
-                         ->with('success', 'Gestor SETP actualizado correctamente.');
+        return redirect()->route('superadmin.gestores-recargas.index')
+                         ->with('success', 'Gestor de Recargas actualizado correctamente.');
     }
 
     // ── toggleEstado ──────────────────────────────────────────────
@@ -217,10 +210,10 @@ class GestorSetpController extends Controller
         ]);
 
         $accion = $gestor->id_estado == 1 ? 'activado' : 'inactivado';
-        return back()->with('success', "Gestor SETP {$accion} exitosamente.");
+        return back()->with('success', "Gestor de Recargas {$accion} exitosamente.");
     }
 
-    // ── destroy (opcional) ────────────────────────────────────────
+    // ── destroy ───────────────────────────────────────────────────
     public function destroy($doc)
     {
         $gestor = Usuario::where('doc_usuario', $doc)
@@ -229,7 +222,7 @@ class GestorSetpController extends Controller
 
         $gestor->delete();
 
-        return redirect()->route('superadmin.gestores-setp.index')
-                         ->with('success', 'Gestor SETP eliminado del sistema.');
+        return redirect()->route('superadmin.gestores-recargas.index')
+                         ->with('success', 'Gestor de Recargas eliminado del sistema.');
     }
 }

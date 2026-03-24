@@ -45,8 +45,8 @@
                             <td>{{ number_format($mant->kilometraje) }} KM</td>
                             <td>${{ number_format($mant->costo_total, 0, ',', '.') }}</td>
                             <td>
-                                <span class="badge @if($mant->id_estado == 1) bg-success @else bg-secondary @endif">
-                                    {{ $mant->estado ? $mant->estado->nombre_estado : 'Finalizado' }}
+                                <span class="badge @if($mant->id_estado == 7) bg-success @elseif($mant->id_estado == 4) bg-warning text-dark @else bg-secondary @endif">
+                                    {{ $mant->estado ? $mant->estado->nombre_estado : 'Desconocido' }}
                                 </span>
                             </td>
                             <td>

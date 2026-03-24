@@ -135,7 +135,7 @@ Route::middleware('auth:web')->group(function () {
 // ==========================================
 // RAMP: PANEL PROPIETARIO (Independiente)
 // ==========================================
-Route::middleware(['auth:web', 'role:9'])->prefix('propietario')->name('propietario.')->group(function () {
+Route::middleware(['auth:web', 'role:5'])->prefix('propietario')->name('propietario.')->group(function () {
     Route::get('/dashboard', [PropietarioController::class, 'dashboard'])->name('dashboard');
     Route::post('/documento', [PropietarioController::class, 'subirDocumento'])->name('subirDocumento');
     Route::post('/gasto', [PropietarioController::class, 'registrarGasto'])->name('registrarGasto');

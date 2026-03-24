@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/empresas.css') }}">
     <link rel="stylesheet" href="{{ asset('css/perfil-seguridad.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/superadmin-gestores-setp.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/superadmin-gestores.css') }}">
 
     @stack('styles')
 </head>
@@ -82,6 +82,11 @@
                     <span class="material-symbols-rounded">person</span>
                     <span>Gestores SETP</span>
                 </a>
+                <a href="{{ route('superadmin.gestores-recargas.index') }}"
+                    class="sigu-nl {{ request()->routeIs('superadmin.gestores-recargas.*') ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">person_add</span>
+                    <span>Gestores Recargas</span>
+                </a>
             </nav>
             <div class="dropdown">
             <a href="#"
@@ -116,13 +121,7 @@
                         </a>
                     </li>
 
-                {{-- RUTAS --}}
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.rutas.index') }}">
-                        <i class="bi bi-map"></i> Rutas
-                    </a>
-                </li>
+
 
                 {{-- TIPOS DE EMPRESA --}}
                 <li>
@@ -232,8 +231,9 @@
             <a href="{{ route('superadmin.licencias.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.licencias.*') ? 'active' : '' }}"><span class="material-symbols-rounded">verified</span>Licencias</a>
             <a href="{{ route('superadmin.planes.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.planes.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">layers</span>Planes</a>
 
-            <a href="{{ route('superadmin.rutas.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.rutas.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">map</span>Rutas</a>
 
+
+            <a href="{{ route('superadmin.gestores-recargas.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.gestores-recargas.*') ? 'active' : '' }}"><span class="material-symbols-rounded">person_add</span>Gestores Recargas</a>
             <a href="{{ route('superadmin.configuracion.barrios.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.barrios.*') ? 'active' : '' }}"><span class="material-symbols-rounded">location_city</span>Barrios</a>
             <a href="{{ route('superadmin.perfil.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.perfil.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">badge</span>Perfil</a>
             <div class="sigu-drawer-footer">

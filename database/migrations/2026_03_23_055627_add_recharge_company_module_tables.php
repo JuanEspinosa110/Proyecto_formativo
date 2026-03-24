@@ -12,17 +12,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Añadir el nuevo tipo de empresa
-        DB::table('tipo_empresa')->insertOrIgnore([
-            'id_tipo_empresa' => 6,
-            'nombre_tipo' => 'EMPRESA DE RECARGAS'
-        ]);
-
-        // Añadir el nuevo tipo de usuario (10: GESTOR RECARGAS)
-        DB::table('tipo_usuario')->insertOrIgnore([
-            'id_tipo_usuario' => 10,
-            'nombre_tipo' => 'GESTOR RECARGAS'
-        ]);
 
         // Añadir columna doc_usuario_gestor a la tabla recarga
         Schema::table('recarga', function (Blueprint $table) {
@@ -44,8 +33,5 @@ return new class extends Migration
                 $table->dropColumn('doc_usuario_gestor');
             }
         });
-
-        DB::table('tipo_usuario')->where('id_tipo_usuario', 10)->delete();
-        DB::table('tipo_empresa')->where('id_tipo_empresa', 6)->delete();
     }
 };

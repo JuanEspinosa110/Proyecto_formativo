@@ -34,7 +34,7 @@ class DocumentoController extends Controller
             'id_tipo_documento' => 'required|exists:tipo_documento,id_tipo_documento|integer',
             'fecha_expedicion' => 'required|date|before_or_equal:today',
             'fecha_vencimiento' => 'required|date|after:fecha_expedicion|after:' . now()->addDays(30),
-            'id_estado' => 'required|exists:estado,id_estado|integer|in:1,20,21',
+            'id_estado' => 'required|exists:estado,id_estado|integer|in:1,6',
         ];
 
         // Validaciones CONDICIONALES según el tipo de documento
@@ -179,8 +179,8 @@ class DocumentoController extends Controller
             ->with(['tipoDocumento', 'estado', 'bus'])
             ->whereNotNull('placa'); 
 
-        // Filtrar solicitudes: Excluir Aprobados (24) y Rechazados (25)
-        $query->whereNotIn('id_estado', [24, 25]);
+        // Filtrar solicitudes: Excluir Aprobados (1) y Rechazados (8)
+        $query->whereNotIn('id_estado', [1, 8]);
 
         if ($request->filled('placa')) {
             $query->where('placa', 'like', '%' . $request->placa . '%');
@@ -208,7 +208,7 @@ class DocumentoController extends Controller
         }
 
         $tiposDocumento = TipoDocumento::where('id_estado', 1)->get();
-        $estados = Estado::whereIn('id_estado', [1, 20, 21])->get();
+        $estados = Estado::whereIn('id_estado', [1, 6])->get();
 
         return view('admin.documentos.create', compact('tiposDocumento', 'estados', 'empresa'));
     }
@@ -285,7 +285,7 @@ class DocumentoController extends Controller
             ->firstOrFail();
 
         $tiposDocumento = TipoDocumento::where('id_estado', 1)->get();
-        $estados = Estado::whereIn('id_estado', [1, 20, 21])->get();
+        $estados = Estado::whereIn('id_estado', [1, 6])->get();
 
         return view('admin.documentos.edit', compact('documento', 'tiposDocumento', 'estados', 'empresa'));
     }
@@ -630,7 +630,7 @@ class DocumentoController extends Controller
     public function aprobar($id)
     {
         $documento = Documento::findOrFail($id);
-        $documento->id_estado = 24; // APROBADO
+        $documento->id_estado = 1; // APROBADO -> ACTIVO
         $documento->save();
 
         if ($documento->placa) {
@@ -650,7 +650,7 @@ class DocumentoController extends Controller
     public function rechazar($id)
     {
         $documento = Documento::findOrFail($id);
-        $documento->id_estado = 25; // RECHAZADO
+        $documento->id_estado = 8; // RECHAZADO
         $documento->save();
 
         if ($documento->placa) {
