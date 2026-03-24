@@ -12,6 +12,34 @@
         </div>
     </div>
 
+    <!-- KPIs -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="sa-kpi-card">
+                <div class="kpi-label">Empresa</div>
+                <div class="kpi-value" id="kpiEmpresa">—</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="sa-kpi-card">
+                <div class="kpi-label">Usuarios</div>
+                <div class="kpi-value" id="kpiUsuarios">—</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="sa-kpi-card">
+                <div class="kpi-label">Documentos</div>
+                <div class="kpi-value" id="kpiDocumentos">—</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="sa-kpi-card">
+                <div class="kpi-label">Buses</div>
+                <div class="kpi-value" id="kpiBuses">—</div>
+            </div>
+        </div>
+    </div>
+
     <section class="sa-charts-grid">
         <div class="sa-chart-card" style="max-width:600px;">
             <h4>

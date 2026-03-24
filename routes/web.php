@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\RecuperarPasswordController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\PropietarioController;
 use App\Http\Controllers\ConductorController;
+use  App\Http\Controllers\Admin\ReporteController;
 
 use App\Http\Controllers\SuperAdmin\{
     DashboardController,
@@ -17,7 +18,6 @@ use App\Http\Controllers\SuperAdmin\{
     DocumentoController,
     TarjetaController,
     LicenciaController,
-    ReporteController,
     AlertaController,
     ConfiguracionController,
     PerfilSeguridadController,
@@ -31,8 +31,15 @@ use App\Http\Controllers\EmpresaController;
 require base_path('routes/superadmin.php');
 // Rutas Administrativas (Panel Empresas)
 require base_path('routes/admin.php');
+// Rutas del Gestor SETP
+require base_path('routes/gestor-setp.php');
+// Rutas del Pasajero
+require base_path('routes/pasajero.php');
+// Rutas del Jefe de Mantenimiento
+require base_path('routes/jefemantenimiento.php');
 
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\StripeWebhookController;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
@@ -46,7 +53,7 @@ Route::view('/register', 'auth.register')->name('register');
 Route::post('/register', [RegistroController::class, 'store'])
     ->name('register.store');
 
-Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar'); 
+Route::get('/recuperar', [RecuperarPasswordController::class, 'index'])->name('recuperar');
 
 Route::post(
     '/recuperar/enviar-codigo',
@@ -112,6 +119,8 @@ Route::middleware(['auth:web', 'role:6'])->prefix('propietario')->name('propieta
     Route::get('/bus/{placa}/detalles', [PropietarioController::class, 'verVehiculo'])->name('verVehiculo');
     Route::get('/bus/{placa}/historial-documental', [PropietarioController::class, 'historialDocumental'])->name('historialDocumental');
     Route::get('/asignacion/{id}/detalle', [PropietarioController::class, 'getDetalleAsignacion'])->name('detalleAsignacion');
+    Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
+        ->name('empresa.dashboard');
 });
 
 
@@ -127,7 +136,7 @@ Route::middleware('auth:superadmin')->group(function () {
 Route::prefix('superadmin')
     ->name('superadmin.')
     ->middleware(['auth:superadmin'])
-    ->group(function () 
+    ->group(function ()
     {
 
 
@@ -182,7 +191,7 @@ Route::prefix('superadmin')
         // Ruta para obtener ciudades por departamento (AJAX)
         Route::get('/empresas/ciudades/{id_departamento}', [SuperAdminEmpresaController::class, 'getCiudadesByDepartamento'])
         ->name('superadmin.empresas.ciudades');
-    
+
         // Rutas CRUD de Empresas
         Route::resource('empresas', SuperAdminEmpresaController::class);
         Route::get('empresas/export/csv', [SuperAdminEmpresaController::class, 'exportCsv'])->name('empresas.export.csv');
@@ -204,11 +213,12 @@ Route::prefix('superadmin')
 
 
 
-        //Reportes 
-        Route::get('reportes', [ReporteController::class, 'index'])
+        //Reportes
+        // Reportes (ahora en Admin)
+        Route::get('reportes', [\App\Http\Controllers\Admin\ReporteController::class, 'index'])
             ->name('reportes.index');
 
-        Route::get('/reportes/pdf', [ReporteController::class, 'exportPdf'])
+        Route::get('/reportes/pdf', [\App\Http\Controllers\Admin\ReporteController::class, 'exportPdf'])
             ->name('reportes.pdf');
 
         // Tarjetas
@@ -229,3 +239,11 @@ Route::prefix('superadmin')
 
     });
 
+    Route::patch(
+    'usuarios/{doc}/inactivar',
+    [UsuarioController::class, 'inactivar'])->name('admin.usuarios.inactivar');
+
+    Route::put('admin/usuarios/{doc_usuario}', [\App\Http\Controllers\Admin\UsuarioController::class, 'update'])->name('admin.usuarios.update');
+
+// Webhook de Stripe
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle']);

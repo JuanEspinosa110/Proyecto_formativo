@@ -1,0 +1,100 @@
+/* ================================================================
+   jefemantenimiento.css
+   Paleta y estilos del panel Jefe de Mantenimiento
+   ================================================================ */
+
+/* ── Variables ────────────────────────────────────────────────── */
+:root {
+    --jm-bg:          #f0f4f8;        /* Sidebar: gris azulado claro */
+    --jm-bg-hover:    #dce5ef;        /* Hover link */
+    --jm-accent:      #f6820c;        /* Naranja industrial */
+    --jm-accent-glow: rgba(246,130,12,0.14);
+    --jm-text:        #4a5568;        /* Texto normal */
+    --jm-text-active: #1a202c;        /* Texto activo */
+    --jm-border:      #d1dbe8;        /* Divisores */
+    --p: #f6820c;                     /* Override del --p global */
+}
+
+/* ── Sidebar base ─────────────────────────────────────────────── */
+.sigu-sidebar {
+    background: var(--jm-bg) !important;
+    border-right: 1px solid var(--jm-border);
+}
+
+/* ── Brand / logo ─────────────────────────────────────────────── */
+.sigu-sidebar .sigu-brand-mark {
+    background: var(--jm-accent) !important;
+    color: #fff;
+}
+
+.sigu-sidebar .sigu-brand-name {
+    color: #1a202c;
+    font-weight: 700;
+}
+
+.sigu-sidebar .sigu-brand-sub {
+    color: var(--jm-accent);
+    font-size: 0.67rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+/* ── Links de navegación ──────────────────────────────────────── */
+.sigu-sidebar .sigu-sb-link {
+    color: var(--jm-text);
+    border-radius: 8px;
+    margin: 2px 8px;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: background 0.16s, color 0.16s;
+}
+
+.sigu-sidebar .sigu-sb-link:hover {
+    background: var(--jm-bg-hover);
+    color: var(--jm-text-active);
+}
+
+.sigu-sidebar .sigu-sb-link.active {
+    background: var(--jm-accent-glow);
+    color: var(--jm-accent);
+    font-weight: 600;
+}
+
+.sigu-sidebar .sigu-sb-link .sb-ico {
+    color: inherit;
+    display: flex;
+    align-items: center;
+    min-width: 22px;
+}
+
+/* ── Etiquetas de sección ─────────────────────────────────────── */
+.sigu-sb-section {
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #a0aec0;
+    padding: 0 20px;
+    margin: 4px 0;
+}
+
+/* ── Divisor ──────────────────────────────────────────────────── */
+.sigu-sidebar .sigu-sb-divider {
+    background: var(--jm-border) !important;
+    height: 1px;
+    margin: 1rem 0;
+}
+
+/* ── Botón logout ─────────────────────────────────────────────── */
+.sigu-sidebar .sigu-btn-ghost {
+    color: var(--jm-text) !important;
+    transition: color 0.15s;
+}
+
+.sigu-sidebar .sigu-btn-ghost:hover {
+    color: var(--jm-text-active) !important;
+}

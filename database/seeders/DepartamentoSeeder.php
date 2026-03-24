@@ -48,8 +48,5 @@ class DepartamentoSeeder extends Seeder
             ['id_departamento' => '97', 'nombre_departamento' => 'VAUPES'],
             ['id_departamento' => '99', 'nombre_departamento' => 'VICHADA']
         ];
-
-        // Optimización: Insertar o ignorar si ya existe
-        \Illuminate\Support\Facades\DB::table('departamento')->insertOrIgnore($departamentos);
     }
 }

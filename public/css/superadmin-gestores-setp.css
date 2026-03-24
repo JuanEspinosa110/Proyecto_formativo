@@ -1,0 +1,267 @@
+/* ════════════════════════════════════════════════════════════════
+   SIGU — superadmin-gestores-setp.css
+   Estilos del panel SuperAdmin para gestionar usuarios Gestor SETP
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── Encabezado de sección ──────────────────────────────────── */
+.gs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+}
+.gs-header-left h1 {
+    font-family: var(--ff-d);
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 .2rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+.gs-header-left p {
+    color: var(--text-2);
+    font-size: .875rem;
+    margin: 0;
+}
+
+/* ── Filtros ────────────────────────────────────────────────── */
+.gs-filters {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 1rem 1.25rem;
+    display: flex;
+    gap: .75rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--sh-xs);
+}
+.gs-filters .form-control,
+.gs-filters .form-select {
+    border-color: var(--border);
+    border-radius: var(--r-sm);
+    font-size: .875rem;
+    color: var(--text);
+}
+.gs-filters .form-control:focus,
+.gs-filters .form-select:focus {
+    border-color: var(--p);
+    box-shadow: 0 0 0 3px rgba(94, 84, 142, .12);
+}
+
+/* ── Tarjeta contenedora de tabla ───────────────────────────── */
+.gs-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    box-shadow: var(--sh-sm);
+    overflow: hidden;
+}
+
+/* ── Tabla ──────────────────────────────────────────────────── */
+.gs-table { width: 100%; border-collapse: collapse; }
+
+.gs-table thead tr {
+    background: var(--p-xlight);
+    border-bottom: 2px solid var(--border);
+}
+.gs-table th {
+    padding: .8rem 1rem;
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--text-2);
+    white-space: nowrap;
+}
+.gs-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .15s ease;
+}
+.gs-table tbody tr:last-child { border-bottom: none; }
+.gs-table tbody tr:hover      { background: var(--p-xlight); }
+.gs-table td {
+    padding: .85rem 1rem;
+    font-size: .875rem;
+    color: var(--text);
+    vertical-align: middle;
+}
+
+/* ── Avatar ─────────────────────────────────────────────────── */
+.gs-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--p), var(--p-mid));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: .95rem;
+    font-weight: 700;
+    font-family: var(--ff-d);
+    flex-shrink: 0;
+}
+
+/* ── Badges de estado ───────────────────────────────────────── */
+.gs-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .25rem .65rem;
+    border-radius: var(--r-xl);
+    font-size: .75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.gs-badge-active   { background: var(--ok-bg);  color: var(--ok); }
+.gs-badge-inactive { background: var(--err-bg); color: var(--err); }
+
+/* ── Botones de acción (iconos en tabla) ────────────────────── */
+.gs-actions { display: flex; gap: .35rem; align-items: center; }
+.gs-btn-icon {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: var(--r-sm);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all .15s ease;
+    text-decoration: none;
+    color: var(--text-2);
+}
+.gs-btn-icon:hover {
+    border-color: var(--p);
+    color: var(--p);
+    background: var(--p-light);
+}
+.gs-btn-icon.danger:hover {
+    border-color: var(--err);
+    color: var(--err);
+    background: var(--err-bg);
+}
+.gs-btn-icon .material-symbols-rounded { font-size: 1rem; }
+
+/* ── Estado vacío ───────────────────────────────────────────── */
+.gs-empty {
+    text-align: center;
+    padding: 3.5rem 1rem;
+}
+.gs-empty .material-symbols-rounded {
+    font-size: 3rem;
+    color: var(--text-3);
+    margin-bottom: .75rem;
+    display: block;
+}
+.gs-empty p { color: var(--text-2); font-size: .9rem; margin: 0; }
+
+/* ── Paginación ─────────────────────────────────────────────── */
+.gs-pagination {
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid var(--border);
+}
+
+/* ── Formulario (create / edit) ─────────────────────────────── */
+.gs-form-wrap  { max-width: 780px; margin: 0 auto; }
+.gs-form-card  {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    box-shadow: var(--sh-sm);
+    overflow: hidden;
+}
+.gs-form-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--p-xlight);
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+.gs-form-header .icon-wrap {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, var(--p), var(--p-mid));
+    border-radius: var(--r);
+    display: flex; align-items: center; justify-content: center;
+}
+.gs-form-header .icon-wrap .material-symbols-rounded {
+    color: #fff;
+    font-size: 1.3rem;
+    font-variation-settings: var(--ms-on);
+}
+.gs-form-header h2 {
+    font-family: var(--ff-d);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+}
+.gs-form-header p { font-size: .8rem; color: var(--text-2); margin: 0; }
+
+.gs-form-body { padding: 1.75rem 1.5rem; }
+.gs-form-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: .75rem;
+    background: var(--p-xlight);
+}
+
+/* ── Secciones internas del formulario ──────────────────────── */
+.gs-section-title {
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--p);
+    margin: 0 0 1rem;
+    padding-bottom: .45rem;
+    border-bottom: 2px solid var(--p-light);
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+}
+.gs-section-title .material-symbols-rounded { font-size: .95rem; }
+
+/* ── Controles de formulario ────────────────────────────────── */
+.gs-form-body .form-label       { font-size: .825rem; font-weight: 600; color: var(--text); margin-bottom: .3rem; }
+.gs-form-body .form-label .req  { color: var(--err); }
+.gs-form-body .form-control,
+.gs-form-body .form-select      { border-color: var(--border); border-radius: var(--r-sm); font-size: .875rem; color: var(--text); transition: border-color .15s, box-shadow .15s; }
+.gs-form-body .form-control:focus,
+.gs-form-body .form-select:focus { border-color: var(--p); box-shadow: 0 0 0 3px rgba(94, 84, 142, .12); }
+.gs-form-body .form-control.is-invalid,
+.gs-form-body .form-select.is-invalid { border-color: var(--err); }
+.gs-form-body .invalid-feedback { font-size: .78rem; color: var(--err); }
+.gs-form-body .form-hint        { font-size: .76rem; color: var(--text-2); margin-top: .25rem; }
+
+/* ── Aviso empresa SETP ─────────────────────────────────────── */
+.gs-setp-notice {
+    background: var(--info-bg);
+    border: 1px solid var(--info);
+    border-radius: var(--r);
+    padding: .75rem 1rem;
+    font-size: .84rem;
+    color: var(--info);
+    display: flex;
+    align-items: flex-start;
+    gap: .5rem;
+}
+
+/* ── Badge de documento (vista edit) ────────────────────────── */
+.gs-doc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: var(--p-light);
+    color: var(--p);
+    border-radius: var(--r);
+    padding: .35rem .85rem;
+    font-size: .875rem;
+    font-weight: 600;
+}

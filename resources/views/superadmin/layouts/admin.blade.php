@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/empresas.css') }}">
     <link rel="stylesheet" href="{{ asset('css/perfil-seguridad.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/superadmin-gestores-setp.css') }}">
 
     @stack('styles')
 </head>
@@ -76,10 +77,15 @@
                     <span class="material-symbols-rounded">layers</span>
                     <span>Planes</span>
                 </a>
+                <a href="{{ route('superadmin.gestores-setp.index') }}"
+                    class="sigu-nl {{ request()->routeIs('superadmin.gestores-setp.*') ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">person</span>
+                    <span>Gestores SETP</span>
+                </a>
             </nav>
             <div class="dropdown">
             <a href="#"
-            class="sigu-nl dropdown-toggle 
+            class="sigu-nl dropdown-toggle
             {{ request()->routeIs('superadmin.ciudades.*') ||
                 request()->routeIs('superadmin.tipo-empresa.*') ||
                 request()->routeIs('superadmin.tipo_usuario.*') ||
@@ -88,28 +94,39 @@
             data-bs-toggle="dropdown"
             aria-expanded="false">
 
-                <span class="material-symbols-rounded">settings</span>
-                <span>Configuración</span>
-            </a>
+                    <span class="material-symbols-rounded">settings</span>
+                    <span>Configuración</span>
+                </a>
 
-            <ul class="dropdown-menu">
+                <ul class="dropdown-menu">
 
-                {{-- CIUDADES --}}
+                    {{-- CIUDADES --}}
+                    <li>
+                        <a class="dropdown-item"
+                            href="{{ route('superadmin.configuracion.ciudades.index') }}">
+                            <i class="bi bi-geo-alt"></i> Ciudades
+                        </a>
+                    </li>
+
+                    {{-- BARRIOS --}}
+                    <li>
+                        <a class="dropdown-item"
+                            href="{{ route('superadmin.configuracion.barrios.index') }}">
+                            <i class="bi bi-geo-fill"></i> Barrios
+                        </a>
+                    </li>
+
+<<<<<<< HEAD
+=======
+                {{-- RUTAS --}}
                 <li>
                     <a class="dropdown-item"
-                    href="{{ route('superadmin.configuracion.ciudades.index') }}">
-                        <i class="bi bi-geo-alt"></i> Ciudades
+                    href="{{ route('superadmin.rutas.index') }}">
+                        <i class="bi bi-map"></i> Rutas
                     </a>
                 </li>
 
-                {{-- BARRIOS --}}
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.configuracion.barrios.index') }}">
-                        <i class="bi bi-geo-fill"></i> Barrios
-                    </a>
-                </li>
-
+>>>>>>> origin
                 {{-- TIPOS DE EMPRESA --}}
                 <li>
                     <a class="dropdown-item"
@@ -125,6 +142,7 @@
                         <i class="bi bi-people"></i> Tipos de Usuario
                     </a>
                 </li>
+
                 {{-- ESTADOS --}}
                 <li>
                     <a class="dropdown-item"
@@ -138,12 +156,15 @@
                         <i class="bi bi-tools"></i> Tipo de Mantenimiento
                     </a>
                 </li>
+<<<<<<< HEAD
                 <li>
                     <a class="dropdown-item"
                     href="{{ route('superadmin.configuracion.tipo-documento.index') }}">
                         <i class="bi bi-file-earmark-text"></i> Tipo de Documento
                     </a>
                 </li>
+=======
+>>>>>>> origin
                 {{-- TIPO DE DOCUMENTOS --}}
                 <li>
                     <a class="dropdown-item"
@@ -164,56 +185,56 @@
 
             {{-- FOOTER --}}
             <div class="sa-dash-sidebar-footer">
-            <!-- ▸ ACCIONES DERECHA -->
-            <div class="sigu-nb-end">
+                <!-- ▸ ACCIONES DERECHA -->
+                <div class="sigu-nb-end">
 
-                <!-- Dropdown usuario -->
-                <div class="dropdown">
-                    <button class="sigu-user-pill dropdown-toggle"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <div class="sigu-user-ava">
-                            <span class="material-symbols-rounded">person</span>
-                        </div>
-                        <div class="sigu-user-info d-none d-md-flex">
-                            <span class="sigu-user-name">Super Admin</span>
-                            <span class="sigu-user-role">Administrador</span>
-                        </div>
-                        <span class="material-symbols-rounded sigu-caret d-none d-md-inline">expand_more</span>
+                    <!-- Dropdown usuario -->
+                    <div class="dropdown">
+                        <button class="sigu-user-pill dropdown-toggle"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <div class="sigu-user-ava">
+                                <span class="material-symbols-rounded">person</span>
+                            </div>
+                            <div class="sigu-user-info d-none d-md-flex">
+                                <span class="sigu-user-name">Super Admin</span>
+                                <span class="sigu-user-role">Administrador</span>
+                            </div>
+                            <span class="material-symbols-rounded sigu-caret d-none d-md-inline">expand_more</span>
+                        </button>
+
+                        <ul class="dropdown-menu dropdown-menu-end sigu-drop">
+                            <li class="sigu-drop-head">
+                                <span class="material-symbols-rounded">manage_accounts</span>
+                                Mi cuenta
+                            </li>
+                            <li>
+                                <a class="dropdown-item sigu-di" href="{{ route('superadmin.perfil.index') }}">
+                                    <span class="material-symbols-rounded">badge</span>
+                                    Perfil y Seguridad
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider sigu-drop-sep">
+                            </li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item sigu-di sigu-di-danger">
+                                        <span class="material-symbols-rounded">logout</span>
+                                        Cerrar sesión
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Hamburger mobile -->
+                    <button class="sigu-burger d-lg-none" id="sigu-burger" aria-expanded="false" aria-label="Menú">
+                        <span></span><span></span><span></span>
                     </button>
-
-                    <ul class="dropdown-menu dropdown-menu-end sigu-drop">
-                        <li class="sigu-drop-head">
-                            <span class="material-symbols-rounded">manage_accounts</span>
-                            Mi cuenta
-                        </li>
-                        <li>
-                            <a class="dropdown-item sigu-di" href="{{ route('superadmin.perfil.index') }}">
-                                <span class="material-symbols-rounded">badge</span>
-                                Perfil y Seguridad
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider sigu-drop-sep">
-                        </li>
-                        <li>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="dropdown-item sigu-di sigu-di-danger">
-                                    <span class="material-symbols-rounded">logout</span>
-                                    Cerrar sesión
-                                </button>
-                            </form>
-                        </li>
-                    </ul>
                 </div>
-
-                <!-- Hamburger mobile -->
-                <button class="sigu-burger d-lg-none" id="sigu-burger" aria-expanded="false" aria-label="Menú">
-                    <span></span><span></span><span></span>
-                </button>
             </div>
-        </div>
 
         <!-- Mobile drawer -->
         <div class="sigu-drawer" id="sigu-drawer">
@@ -221,6 +242,12 @@
             <a href="{{ route('superadmin.empresas.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.empresas.*') ? 'active' : '' }}"><span class="material-symbols-rounded">business</span>Empresas</a>
             <a href="{{ route('superadmin.licencias.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.licencias.*') ? 'active' : '' }}"><span class="material-symbols-rounded">verified</span>Licencias</a>
             <a href="{{ route('superadmin.planes.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.planes.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">layers</span>Planes</a>
+<<<<<<< HEAD
+=======
+
+            <a href="{{ route('superadmin.rutas.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.rutas.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">map</span>Rutas</a>
+
+>>>>>>> origin
             <a href="{{ route('superadmin.configuracion.barrios.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.barrios.*') ? 'active' : '' }}"><span class="material-symbols-rounded">location_city</span>Barrios</a>
             <a href="{{ route('superadmin.perfil.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.perfil.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">badge</span>Perfil</a>
             <div class="sigu-drawer-footer">
@@ -231,7 +258,6 @@
                     </button>
                 </form>
             </div>
-        </div>
     </header>
 
     <!-- ╔══════════════════════════════════════════════════════╗
