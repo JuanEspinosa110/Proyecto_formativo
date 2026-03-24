@@ -27,6 +27,8 @@ class DatabaseSeeder extends Seeder
             UsuarioEmpresaSeeder::class,
             LicenciaEmpresaSeeder::class,
             SuperAdministradorSeeder::class,
+            BusSeeder::class,
+            GestorSetpSeeder::class,
         ]);
 
         // User::create([

@@ -10,14 +10,16 @@ class TipoUsuarioSeeder extends Seeder
     public function run()
     {
         DB::table('tipo_usuario')->insertOrIgnore([
-            ['nombre_tipo' => 'Admin'],
-            ['nombre_tipo' => 'Pasajero'],
-            ['nombre_tipo' => 'CONDUCTOR'],
-            ['nombre_tipo' => 'AUXILIAR EMPRESA'],
-            ['nombre_tipo' => 'PROPIETARIO'],
-            ['nombre_tipo' => 'SETP'],
-            ['nombre_tipo' => 'COORDINADOR BUS'],
-            ['nombre_tipo' => 'GANAGANA'],
+            ['id_tipo_usuario' => 1, 'nombre_tipo' => 'ADMINISTRADOR'],
+            ['id_tipo_usuario' => 2, 'nombre_tipo' => 'Pasajero'],
+            ['id_tipo_usuario' => 3, 'nombre_tipo' => 'CONDUCTOR'],
+            ['id_tipo_usuario' => 4, 'nombre_tipo' => 'AUXILIAR EMPRESA'],
+            ['id_tipo_usuario' => 5, 'nombre_tipo' => 'PROPIETARIO'],
+            ['id_tipo_usuario' => 6, 'nombre_tipo' => 'SETP'],
+            ['id_tipo_usuario' => 7, 'nombre_tipo' => 'COORDINADOR BUS'],
+            ['id_tipo_usuario' => 8, 'nombre_tipo' => 'GANAGANA'],
+            ['id_tipo_usuario' => 9, 'nombre_tipo' => 'JEFE DE MANTENIMIENTO'],
+
         ]);
     }
 }
