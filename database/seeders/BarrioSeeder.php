@@ -12,7 +12,8 @@ class BarrioSeeder extends Seeder
      */
     public function run(): void
     {
-                $barrios = [
+        $barrios = [
+
             ['id_barrio' => 1, 'nombre' => 'AUGUSTO E MEDINA', 'id_ciudad' => '730001', 'latitud' => 4.45380950, 'longitud' => -75.24649900],
             ['id_barrio' => 2, 'nombre' => 'BALTAZAR', 'id_ciudad' => '730001', 'latitud' => 4.44264030, 'longitud' => -75.24459210],
             ['id_barrio' => 3, 'nombre' => 'CENTRO', 'id_ciudad' => '730001', 'latitud' => 4.44199350, 'longitud' => -75.23664160],
@@ -457,6 +458,5 @@ class BarrioSeeder extends Seeder
             ['id_barrio' => 442, 'nombre' => 'TERRAZAS DE BOQUERON', 'id_ciudad' => '730001', 'latitud' => 4.43890000, 'longitud' => -75.23220000],
             ['id_barrio' => 443, 'nombre' => 'VILLA MERY', 'id_ciudad' => '730001', 'latitud' => 4.41377190, 'longitud' => -75.26441650],
         ];
-        \Illuminate\Support\Facades\DB::table('barrio')->upsert($barrios, ['id_barrio'], ['nombre', 'id_ciudad', 'latitud', 'longitud']);
     }
 }

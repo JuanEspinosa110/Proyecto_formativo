@@ -21,8 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('recarga', function (Blueprint $table) {
-            $table->dropForeign('recarga_ibfk_1');
-        });
+        // Eliminado: la FK recarga_ibfk_1 ya no existe ni se elimina aquí
     }
 };

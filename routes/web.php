@@ -113,23 +113,23 @@ Route::middleware('auth:web')->group(function () {
         Route::post('/reportar-falla', [ConductorController::class, 'reportarFalla'])->name('reportarFalla');
     });
 
-        /* 
+        /*
         Route::middleware(['auth:web', 'role:5'])->prefix('empresa')->name('empresa.')->group(function () {
             Route::get('/dashboard', [EmpresaController::class, 'dashboard'])->name('dashboard');
-            
+
             // Usuarios (Propietarios, Conductores)
             Route::post('/usuarios', [EmpresaController::class, 'storeUsuario'])->name('usuarios.store');
-            
+
             // Buses
             Route::post('/buses', [EmpresaController::class, 'storeBus'])->name('buses.store');
-            
+
             // Documentos
             Route::post('/documentos/{id}/aprobar', [EmpresaController::class, 'aprobarDocumento'])->name('documentos.aprobar');
             Route::post('/documentos/{id}/rechazar', [EmpresaController::class, 'rechazarDocumento'])->name('documentos.rechazar');
-            
+
             // Asignaciones
             Route::post('/asignaciones', [EmpresaController::class, 'storeAsignacion'])->name('asignaciones.store');
-            
+
             // Reportes
             Route::get('/reportes/export', [EmpresaController::class, 'descargarReporte'])->name('reportes.export');
         });
@@ -148,6 +148,8 @@ Route::middleware(['auth:web', 'role:5'])->prefix('propietario')->name('propieta
     Route::get('/bus/{placa}/detalles', [PropietarioController::class, 'verVehiculo'])->name('verVehiculo');
     Route::get('/bus/{placa}/historial-documental', [PropietarioController::class, 'historialDocumental'])->name('historialDocumental');
     Route::get('/asignacion/{id}/detalle', [PropietarioController::class, 'getDetalleAsignacion'])->name('detalleAsignacion');
+    Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
+        ->name('empresa.dashboard');
 });
 
 
@@ -266,11 +268,10 @@ Route::prefix('superadmin')
     });
 
     Route::patch(
-        'usuarios/{doc}/inactivar',
-        [UsuarioController::class, 'inactivar']
-    )->name('admin.usuarios.inactivar');
+    'usuarios/{doc}/inactivar',
+    [UsuarioController::class, 'inactivar'])->name('admin.usuarios.inactivar');
 
     Route::put('admin/usuarios/{doc_usuario}', [\App\Http\Controllers\Admin\UsuarioController::class, 'update'])->name('admin.usuarios.update');
 
-    // Webhook de Stripe
-    Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle']);
+// Webhook de Stripe
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle']);

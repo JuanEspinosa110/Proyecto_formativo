@@ -17,7 +17,11 @@ class LicenciaEmpresaSeeder extends Seeder
                 'fecha_inicio' => now()->toDateString(),
                 'fecha_vencimiento' => now()->addMonths(12)->toDateString(),
                 'id_estado' => 1,
+<<<<<<< HEAD
                 'doc_super_admin' => 1105463369,
+=======
+                'doc_super_admin' => 1000000001,
+>>>>>>> develop
                 'fecha_creacion' => now(),
             ]
         ]);

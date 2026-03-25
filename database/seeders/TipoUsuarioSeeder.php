@@ -17,7 +17,11 @@ class TipoUsuarioSeeder extends Seeder
             ['id_tipo_usuario' => 5, 'nombre_tipo' => 'PROPIETARIO'],
             ['id_tipo_usuario' => 6, 'nombre_tipo' => 'SETP'],
             ['id_tipo_usuario' => 7, 'nombre_tipo' => 'COORDINADOR BUS'],
+<<<<<<< HEAD
             ['id_tipo_usuario' => 8, 'nombre_tipo' => 'GESTOR DE RECARGAS'],
+=======
+            ['id_tipo_usuario' => 8, 'nombre_tipo' => 'GANAGANA'],
+>>>>>>> develop
             ['id_tipo_usuario' => 9, 'nombre_tipo' => 'JEFE DE MANTENIMIENTO'],
 
         ]);
