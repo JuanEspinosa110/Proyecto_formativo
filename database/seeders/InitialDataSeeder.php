@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class InitialDataSeeder extends Seeder
 {
     public function run(): void
-    {
+
         // Estados completos
         $estados = [
             ['id_estado' => 1, 'nombre_estado' => 'ACTIVO'],
@@ -29,4 +29,4 @@ class InitialDataSeeder extends Seeder
             );
         }
     }
-}
+
