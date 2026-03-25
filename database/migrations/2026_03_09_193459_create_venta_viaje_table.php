@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('venta_viaje', function (Blueprint $table) {
             $table->integer('id_venta', true);
             $table->integer('id_viaje')->nullable()->index('id_viaje');
-            $table->bigInteger('id_tarjeta')->nullable()->index('id_tarjeta');
+            $table->string('id_tarjeta', 20)->nullable();
             $table->decimal('valor', 10)->nullable();
             $table->dateTime('fecha')->nullable();
             $table->unsignedTinyInteger('id_estado')->nullable()->index('id_estado');

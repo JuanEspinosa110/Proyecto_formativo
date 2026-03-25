@@ -221,11 +221,11 @@ class UsuarioController extends Controller
 
         // Los campos de nombre y apellidos no deben ser modificables
         $data = $request->except([
-            '_token', '_method', 'foto_usuario', 'form_type', 
+            '_token', '_method', 'foto_usuario', 'form_type',
             'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido',
             'fecha_expedicion', 'fecha_vencimiento', 'archivo_licencia'
         ]);
-        
+
         $userToUpdate = Usuario::find($doc_usuario);
 
         if ($request->hasFile('foto_usuario')) {

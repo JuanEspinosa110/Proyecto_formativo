@@ -1134,6 +1134,5 @@ class CiudadSeeder extends Seeder
             ['id_ciudad' => '990624', 'nombre_city' => 'SANTA ROSALIA', 'id_departamento' => '99'],
             ['id_ciudad' => '990773', 'nombre_city' => 'CUMARIBO', 'id_departamento' => '99'],
         ];
-        \Illuminate\Support\Facades\DB::table('ciudad')->insertOrIgnore($ciudades);
     }
 }

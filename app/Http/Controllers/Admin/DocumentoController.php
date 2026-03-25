@@ -463,7 +463,7 @@ class DocumentoController extends Controller
         }
 
         $filename = 'Reporte_Documentos_' . date('Ymd_His') . '.xlsx';
-        
+
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment;filename="' . $filename . '"');
         header('Cache-Control: max-age=0');
@@ -636,7 +636,7 @@ class DocumentoController extends Controller
         if ($documento->placa) {
             $bus = $documento->bus;
             if ($bus) {
-                $bus->id_estado = $bus->isOperable() ? 1 : 2; 
+                $bus->id_estado = $bus->isOperable() ? 1 : 2;
                 $bus->save();
             }
         }

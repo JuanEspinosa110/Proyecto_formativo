@@ -13,16 +13,16 @@ return new class extends Migration
     {
         Schema::create('novedad_recorridos', function (Blueprint $table) {
             $table->id('id_novedad');
-            
+
             $table->unsignedBigInteger('id_recorrido');
             $table->foreign('id_recorrido')->references('id_recorrido')->on('recorridos')->onDelete('cascade');
-            
+
             $table->unsignedBigInteger('doc_controlador');
             $table->foreign('doc_controlador')->references('doc_usuario')->on('usuario');
-            
+
             $table->enum('tipo', ['CHECKPOINT', 'INCIDENCIA'])->default('CHECKPOINT');
             $table->text('descripcion')->nullable();
-            
+
             $table->timestamps();
         });
     }

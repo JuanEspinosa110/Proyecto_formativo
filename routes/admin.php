@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\RutaController;
 use App\Http\Controllers\JefeMantenimiento\MantenimientoController;
 use App\Http\Controllers\JefeMantenimiento\ReporteFallaController;
 
+
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth:web', 'role:1'])->group(function () {
         // Dashboard
@@ -54,6 +55,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('documentos/{id}', [DocumentoController::class, 'destroy'])->name('documentos.destroy');
         Route::get('documentos/{id}/download', [DocumentoController::class, 'download'])->name('documentos.download');
         Route::get('documentos/export', [DocumentoController::class, 'export'])->name('documentos.export');
+        Route::post('documentos/{id}/aprobar', [DocumentoController::class, 'aprobar'])->name('documentos.aprobar');
+        Route::post('documentos/{id}/rechazar', [DocumentoController::class, 'rechazar'])->name('documentos.rechazar');
+
         // ─── Módulo de Mantenimiento (Admin) ──────────────────────────────────
         // Bandeja de reportes de fallas
         Route::get('mantenimiento/reportes', [ReporteFallaController::class, 'indexAdmin'])->name('mantenimiento.reportes');
@@ -69,8 +73,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Historial por bus
         Route::get('buses/{placa}/historial', [MantenimientoController::class, 'historialBus'])->name('buses.historial');
-
-        Route::post('documentos/{id}/aprobar', [DocumentoController::class, 'aprobar'])->name('documentos.aprobar');
-        Route::post('documentos/{id}/rechazar', [DocumentoController::class, 'rechazar'])->name('documentos.rechazar');
     });
 });

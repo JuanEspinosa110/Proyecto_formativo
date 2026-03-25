@@ -108,21 +108,18 @@ class Documento extends Model
 
     public function isVigente()
     {
-        return $this->estado_expiracion === 'VIGENTE';
+        return $this->fecha_vencimiento >= now()->toDateString() && $this->id_estado == 1;
     }
 
     public function isVencido()
     {
-        return $this->estado_expiracion === 'VENCIDO';
-    }
-
-    public function isProximoAVencer()
-    {
-        return $this->estado_expiracion === 'PRÓXIMO A VENCER';
+        return $this->fecha_vencimiento < now()->toDateString();
     }
 
     public function diasParaVencimiento()
     {
-        return now()->diffInDays($this->fecha_vencimiento, false);
+        return now()->toDateString() < $this->fecha_vencimiento
+            ? now()->diffInDays($this->fecha_vencimiento)
+            : 0;
     }
 }
