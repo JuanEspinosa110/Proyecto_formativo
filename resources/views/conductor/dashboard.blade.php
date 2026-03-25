@@ -195,6 +195,21 @@
                                     Hora de salida: <strong class="text-dark">{{ \Carbon\Carbon::parse($recorridoActivo->hora_salida)->format('h:i A') }}</strong>
                                 </p>
                                 
+                                <div class="row g-2 justify-content-center max-width-stats mx-auto mb-4">
+                                    <div class="col-6">
+                                        <div class="bg-light p-3 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-center">
+                                            <span class="small text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.75rem;"><span class="material-symbols-rounded align-middle fs-6" style="margin-top:-2px;">groups</span> Pasajeros Hoy</span>
+                                            <h3 class="fw-black mb-0 text-primary">{{ $pasajerosTotalesHoy }}</h3>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="bg-light p-3 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-center">
+                                            <span class="small text-muted d-block text-uppercase fw-bold mb-1" style="font-size: 0.75rem;"><span class="material-symbols-rounded align-middle fs-6" style="margin-top:-2px;">payments</span> Ingresos Hoy</span>
+                                            <h3 class="fw-black mb-0 text-success">${{ number_format($ingresosTotalesHoy) }}</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <button type="button" data-bs-toggle="modal" data-bs-target="#modalFinalizarRuta" class="btn btn-warning py-3 fw-bold text-dark rounded-pill shadow-sm d-inline-flex border-0 justify-content-center align-items-center gap-2 transition-all w-100" style="font-size: 1.25rem; max-width: 450px;">
                                     <span class="material-symbols-rounded fs-3">sports_score</span> Llegada a Destino Final
                                 </button>
@@ -224,6 +239,8 @@
                 <p class="text-success fw-bold flex-grow-1">Su jornada ha terminado por hoy. Excelente trabajo.</p>
                 <div class="w-100 d-flex justify-content-center flex-wrap gap-4 mt-4 bg-white p-3 rounded-4 shadow-sm">
                     <div><span class="small text-muted d-block text-uppercase fw-bold">Recorridos</span> <h4 class="fw-bold mb-0 text-dark">{{ $recorridosHoy->count() }}</h4></div>
+                    <div><span class="small text-muted d-block text-uppercase fw-bold">Pasajeros Totales</span> <h4 class="fw-bold mb-0 text-primary">{{ $pasajerosTotalesHoy }}</h4></div>
+                    <div><span class="small text-muted d-block text-uppercase fw-bold">Ingresos Generados</span> <h4 class="fw-bold mb-0 text-success">${{ number_format($ingresosTotalesHoy) }}</h4></div>
                     <div><span class="small text-muted d-block text-uppercase fw-bold">Tiempo Trabajado</span> <h4 class="fw-bold mb-0 text-success">{{ $tiempoTrabajadoFormato ?? '0h 0m' }}</h4></div>
                 </div>
             </div>
@@ -449,7 +466,18 @@
 @include('conductor.modals.falla_mecanica')
 @include('conductor.modals.iniciar_ruta')
 
-<!-- WIDGET FLOTANTE DE PASAJEROS REMOVIDO -->
+<!-- WIDGET FLOTANTE DE PASAJEROS RESTAURADO -->
+@if(isset($recorridoActivo) && $recorridoActivo)
+<div class="position-fixed bottom-0 end-0 m-3 m-md-4 p-3 bg-white shadow-lg d-flex align-items-center gap-3 widget-passengers border border-primary border-opacity-10 rounded-pill" style="z-index: 1050; padding-right: 1.5rem !important;">
+    <div class="bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px;">
+        <span class="material-symbols-rounded" style="font-size: 24px;">group</span>
+    </div>
+    <div class="pe-2">
+        <span class="d-block text-muted text-uppercase fw-bold flex-column justify-content-center align-items-start" style="font-size: 0.7rem; line-height: 1;">Pasajeros</span>
+        <span class="d-block text-dark fw-black flex-column justify-content-center align-items-start" style="font-size: 1.5rem; line-height: 1.1;" id="pasajeros-count">{{ $pasajerosTotalesHoy }}</span>
+    </div>
+</div>
+@endif
 
 <!-- MODAL QR DE VIAJE -->
 @if(isset($recorridoActivo) && $recorridoActivo)
@@ -470,8 +498,8 @@
                 </div>
 
                 <div class="mt-2">
-                    <h4 class="fw-black text-dark mb-0">{{ $recorridoActivo->viaje->placa ?? '...' }}</h4>
-                    <p class="text-primary small fw-bold text-uppercase">Ruta: {{ $recorridoActivo->viaje->ruta->nombre_ruta ?? '...' }}</p>
+                    <h4 class="fw-black text-dark mb-0">{{ $recorridoActivo->placa ?? '...' }}</h4>
+                    <p class="text-primary small fw-bold text-uppercase">Ruta: {{ $recorridoActivo->ruta->nombre_ruta ?? '...' }}</p>
                 </div>
 
                 <div class="alert alert-dark bg-dark border-0 rounded-4 mt-4 text-start p-3">

@@ -1,6 +1,6 @@
 @extends('controlador-tiempo.layouts.app')
 
-@section('title', 'Ficha de Verificación — ' . ($recorrido->viaje->placa ?? 'Recorrido'))
+@section('title', 'Ficha de Verificación — ' . ($recorrido->placa ?? 'Recorrido'))
 
 @section('content')
 <div class="sigu-fade">
@@ -20,7 +20,7 @@
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="bg-dark p-4 text-center text-white">
                     <span class="material-symbols-rounded fs-1 mb-2">directions_bus</span>
-                    <h2 class="fw-black mb-0" style="letter-spacing: 2px;">{{ $recorrido->viaje->placa }}</h2>
+                    <h2 class="fw-black mb-0" style="letter-spacing: 2px;">{{ $recorrido->placa }}</h2>
                     <span class="badge bg-primary rounded-pill mt-2">EN RUTA</span>
                 </div>
                 <div class="card-body p-4">
@@ -30,15 +30,15 @@
                         </div>
                         <div>
                             <span class="text-muted small d-block">Conductor</span>
-                            <span class="fw-bold">{{ $recorrido->viaje->conductor->primer_nombre ?? 'N/A' }} {{ $recorrido->viaje->conductor->primer_apellido ?? '' }}</span>
+                            <span class="fw-bold">{{ $recorrido->conductor->primer_nombre ?? 'N/A' }} {{ $recorrido->conductor->primer_apellido ?? '' }}</span>
                         </div>
                     </div>
 
                     <div class="mb-4">
                         <span class="text-muted small d-block mb-1 fw-bold text-uppercase">Ruta Actual</span>
                         <div class="p-3 bg-light rounded-3">
-                            <div class="fw-bold text-dark">{{ $recorrido->viaje->ruta->nombre_ruta }}</div>
-                            <div class="small text-muted">{{ $recorrido->viaje->ruta->barrioOrigen->nombre }} → {{ $recorrido->viaje->ruta->barrioDestino->nombre }}</div>
+                            <div class="fw-bold text-dark">{{ $recorrido->ruta->nombre_ruta }}</div>
+                            <div class="small text-muted">{{ $recorrido->ruta->barrioOrigen->nombre }} → {{ $recorrido->ruta->barrioDestino->nombre }}</div>
                         </div>
                     </div>
 

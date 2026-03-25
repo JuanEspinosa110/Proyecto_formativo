@@ -36,17 +36,14 @@ class DashboardController extends Controller
             ->get();
 
         foreach ($rutasDetalle as $ruta) {
-            $ultimoRecorrido = \App\Models\Recorrido::with('viaje')
-                ->whereHas('viaje', function($q) use ($ruta) {
-                    $q->where('id_ruta', $ruta->id_ruta);
-                })
+            $ultimoRecorrido = \App\Models\Recorrido::where('id_ruta', $ruta->id_ruta)
                 ->whereDate('hora_salida', \Carbon\Carbon::today())
                 ->orderBy('hora_salida', 'desc')
                 ->first();
 
             if ($ultimoRecorrido) {
                 $ruta->minutos_desde_salida = \Carbon\Carbon::parse($ultimoRecorrido->hora_salida)->diffInMinutes(\Carbon\Carbon::now());
-                $ruta->ultimo_bus = $ultimoRecorrido->viaje?->placa;
+                $ruta->ultimo_bus = $ultimoRecorrido->placa;
             } else {
                 $ruta->minutos_desde_salida = null;
                 $ruta->ultimo_bus = null;

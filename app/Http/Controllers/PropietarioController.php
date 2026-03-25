@@ -496,9 +496,8 @@ class PropietarioController extends Controller
         // Un detalle importante: los recorridos deben ser del mismo bus, conductor y ruta? 
         // El requerimiento dice "viajes realizados durante ese turno".
         // Generalmente un turno está asociado a un bus y un conductor.
-        $recorridos = \App\Models\Recorrido::whereHas('viaje', function($q) use ($asignacion) {
-                $q->where('placa', $asignacion->placa)->where('doc_us', $asignacion->doc_us);
-            })
+        $recorridos = \App\Models\Recorrido::where('placa', $asignacion->placa)
+            ->where('doc_us', $asignacion->doc_us)
             ->where('hora_salida', '>=', $horaInicio)
             ->where('hora_llegada', '<=', $horaFin)
             ->orderBy('hora_salida', 'asc')

@@ -69,9 +69,9 @@ class ConductorController extends Controller
         }
 
         // 5. Seguimiento del Recorrido Actual
-        $recorridoActivo = Recorrido::whereHas('viaje', function($q) use ($conductor) {
-            $q->where('doc_us', $conductor->doc_usuario);
-        })->whereNull('hora_llegada')->first();
+        $recorridoActivo = Recorrido::where('doc_us', $conductor->doc_usuario)
+            ->whereNull('hora_llegada')
+            ->first();
 
         // **Auto-finalizar recorrido si lleva más de 30 minutos**
         if ($recorridoActivo) {
@@ -94,9 +94,9 @@ class ConductorController extends Controller
         $ingresosTotalesHoy = VentaViaje::whereIn('id_viaje', $viajesHoyIds)->sum('valor');
 
         // Primero obtener TODOS los recorridos de hoy para los contadores totales
-        $recorridosHoy = Recorrido::whereHas('viaje', function($q) use ($conductor) {
-            $q->where('doc_us', $conductor->doc_usuario);
-        })->whereDate('hora_salida', $hoy)->get();
+        $recorridosHoy = Recorrido::where('doc_us', $conductor->doc_usuario)
+            ->whereDate('hora_salida', $hoy)
+            ->get();
 
         // Calcular Tiempo Trabajado
         $minutosTrabajados = 0;
@@ -112,10 +112,8 @@ class ConductorController extends Controller
         $tiempoTrabajadoFormato = "{$horasTrabajadas}h {$minutosRestantes}m";
 
         // Resumen para el Dashboard (máximo 5 registros)
-        $historialRecorridos = Recorrido::with(['viaje.bus', 'viaje.ruta'])
-            ->whereHas('viaje', function($q) use ($conductor) {
-                $q->where('doc_us', $conductor->doc_usuario);
-            })
+        $historialRecorridos = Recorrido::with(['bus', 'ruta'])
+            ->where('doc_us', $conductor->doc_usuario)
             ->orderBy('hora_salida', 'desc')
             ->limit(5)
             ->get();
@@ -185,9 +183,9 @@ class ConductorController extends Controller
             $asignacionActiva->save();
 
             // También finalizar recorrido activo en pista si existe
-            $recorridoActivo = Recorrido::whereHas('viaje', function($q) use ($conductor) {
-                $q->where('doc_us', $conductor->doc_usuario);
-            })->whereNull('hora_llegada')->first();
+            $recorridoActivo = Recorrido::where('doc_us', $conductor->doc_usuario)
+                ->whereNull('hora_llegada')
+                ->first();
             if ($recorridoActivo) {
                 $recorridoActivo->hora_llegada = Carbon::now();
                 $recorridoActivo->save();
@@ -233,9 +231,9 @@ class ConductorController extends Controller
 
     public function finalizarTurno($id_viaje)
     {
-        $recorridoA = Recorrido::whereHas('viaje', function($q) {
-            $q->where('doc_us', Auth::guard('web')->id());
-        })->whereNull('hora_llegada')->first();
+        $recorridoA = Recorrido::where('doc_us', Auth::guard('web')->id())
+            ->whereNull('hora_llegada')
+            ->first();
         if ($recorridoA) {
             return redirect()->back()->with('error', 'Debe finalizar el recorrido activo en pista antes de terminar el turno.');
         }
@@ -262,18 +260,22 @@ class ConductorController extends Controller
         ]);
 
         // Evitar duplicidades de inicio
-        $activo = Recorrido::whereHas('viaje', function($q) {
-            $q->where('doc_us', Auth::guard('web')->id());
-        })->whereNull('hora_llegada')->first();
+        $activo = Recorrido::where('doc_us', Auth::guard('web')->id())
+            ->whereNull('hora_llegada')
+            ->first();
         if ($activo) {
             return redirect()->back();
         }
 
         Recorrido::create([
-            'id_viaje' => $viaje->id_viaje,
+            'placa' => $viaje->placa,
+            'id_ruta' => $viaje->id_ruta,
+            'doc_us' => $viaje->doc_us,
             'sentido' => $request->sentido,
             'hora_salida' => Carbon::now(),
             'hora_llegada' => null,
+            'cantidad_pasajeros' => 0,
+            'ingresos' => 0,
             'foto_torniquete' => null
         ]);
 
@@ -310,9 +312,9 @@ class ConductorController extends Controller
         ]);
 
         $recorrido = Recorrido::findOrFail($id_recorrido);
-        $viaje = Viaje::where('doc_us', $recorrido->viaje->doc_us)
+        $viaje = Viaje::where('doc_us', $recorrido->doc_us)
             ->whereIn('id_estado', [4]) // EN_CURSO
-            ->where('placa', $recorrido->viaje->placa)
+            ->where('placa', $recorrido->placa)
             ->first();
 
         if (!$viaje) {
@@ -359,6 +361,11 @@ class ConductorController extends Controller
             'id_estado' => 1 // PAGADO -> ACTIVO
         ]);
 
+        // Aumentar pasajeros e ingresos en recorrido
+        $recorrido->cantidad_pasajeros += 1;
+        $recorrido->ingresos += $costoPasaje;
+        $recorrido->save();
+
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true, 
@@ -373,10 +380,8 @@ class ConductorController extends Controller
         $conductor = Auth::guard('web')->user();
         $filtro = $request->get('filtro', 'todos');
         
-        $query = Recorrido::with(['viaje.bus', 'viaje.ruta'])
-            ->whereHas('viaje', function($q) use ($conductor) {
-                $q->where('doc_us', $conductor->doc_usuario);
-            })
+        $query = Recorrido::with(['bus', 'ruta'])
+            ->where('doc_us', $conductor->doc_usuario)
             ->orderBy('hora_salida', 'desc');
 
         if ($filtro == 'hoy') {

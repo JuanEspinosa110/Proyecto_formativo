@@ -15,7 +15,10 @@ class SimulacionController extends Controller
         // Obtener viajes de HOY para simular
         $viajes = Viaje::with(['bus', 'ruta', 'conductor', 'estado'])
             ->whereDate('fecha', Carbon::today())
-            ->whereIn('id_estado', [1, 12]) // Solo Programado o En Curso
+            ->whereIn('id_estado', [1, 4]) // Solo Programado (1) o En Curso (4)
+            ->whereHas('ruta', function ($q) {
+                $q->where('id_estado', 1); // 1 = ACTIVO en la tabla estado para Rutas
+            })
             ->orderBy('fecha', 'asc')
             ->get()
             ->map(function($viaje) {
@@ -70,8 +73,22 @@ class SimulacionController extends Controller
             'id_tarjeta' => $tarjeta->id_tarjeta,
             'valor' => $costoPasaje,
             'fecha' => Carbon::now(),
-            'id_estado' => 18 // PAGADO
+            'id_estado' => 1 // PAGADO -> ACTIVO
         ]);
+
+        $viaje = Viaje::find($request->id_viaje);
+        if ($viaje) {
+            $recorridoActivo = \App\Models\Recorrido::where('doc_us', $viaje->doc_us)
+                ->where('placa', $viaje->placa)
+                ->whereNull('hora_llegada')
+                ->first();
+
+            if ($recorridoActivo) {
+                $recorridoActivo->cantidad_pasajeros += 1;
+                $recorridoActivo->ingresos += $costoPasaje;
+                $recorridoActivo->save();
+            }
+        }
 
         return response()->json([
             'success' => true, 
