@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\Admin\DocumentoController;
 use App\Http\Controllers\Admin\AsignacionController;
 use App\Http\Controllers\Admin\RutaController;
+use App\Http\Controllers\JefeMantenimiento\MantenimientoController;
+use App\Http\Controllers\JefeMantenimiento\ReporteFallaController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth:web', 'role:1'])->group(function () {
@@ -52,6 +54,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('documentos/{id}', [DocumentoController::class, 'destroy'])->name('documentos.destroy');
         Route::get('documentos/{id}/download', [DocumentoController::class, 'download'])->name('documentos.download');
         Route::get('documentos/export', [DocumentoController::class, 'export'])->name('documentos.export');
+        // ─── Módulo de Mantenimiento (Admin) ──────────────────────────────────
+        // Bandeja de reportes de fallas
+        Route::get('mantenimiento/reportes', [ReporteFallaController::class, 'indexAdmin'])->name('mantenimiento.reportes');
+        Route::get('mantenimiento/reportes/{id}/atender', [ReporteFallaController::class, 'attendAdmin'])->name('mantenimiento.reportes.attend');
+        // Gestión de mantenimientos
+        Route::get('mantenimiento', [MantenimientoController::class, 'indexAdmin'])->name('mantenimiento.index');
+        Route::get('mantenimiento/create', [MantenimientoController::class, 'create'])->name('mantenimiento.create');
+        Route::post('mantenimiento', [MantenimientoController::class, 'store'])->name('mantenimiento.store');
+        Route::get('mantenimiento/{id}', [MantenimientoController::class, 'show'])->name('mantenimiento.show');
+
+        // Finalizar mantenimiento (libera el bus)
+        Route::post('mantenimiento/{id}/finalizar', [MantenimientoController::class, 'finalizar'])->name('mantenimiento.finalizar');
+
+        // Historial por bus
+        Route::get('buses/{placa}/historial', [MantenimientoController::class, 'historialBus'])->name('buses.historial');
+
         Route::post('documentos/{id}/aprobar', [DocumentoController::class, 'aprobar'])->name('documentos.aprobar');
         Route::post('documentos/{id}/rechazar', [DocumentoController::class, 'rechazar'])->name('documentos.rechazar');
     });

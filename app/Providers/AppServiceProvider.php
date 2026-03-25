@@ -3,7 +3,11 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Pagination\Paginator; // archivo agregado para usar Bootstrap en la paginación
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Events\MigrationsStarted;
+use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Support\Facades\Event;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +24,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Paginator::useBootstrapFive(); // O useBootstrapFour() según tu versión
+        Paginator::useBootstrapFive();
+
+        // Deshabilitar FK checks durante migraciones (evita errores en migrate:refresh con FKs cruzadas)
+        Event::listen(MigrationsStarted::class, function () {
+            Schema::disableForeignKeyConstraints();
+        });
+
+        Event::listen(MigrationsEnded::class, function () {
+            Schema::enableForeignKeyConstraints();
+        });
     }
 }

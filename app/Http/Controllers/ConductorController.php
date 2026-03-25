@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Viaje;
 use App\Models\Recorrido;
 use App\Models\Documento;
-use App\Models\FallaMecanica;
+use App\Models\ReporteFalla;
 use App\Models\Tarjeta;
 use App\Models\VentaViaje;
 use Illuminate\Support\Facades\Auth;
@@ -29,30 +29,23 @@ class ConductorController extends Controller
         $ahora = Carbon::now();
 
         // 2. Estado de la jornada actual
-        // Buscar si tiene un turno activo o en curso programado para HOY dentro del rango horario
-        $asignacionActiva = $asignaciones->filter(function($asig) use ($hoy, $ahora) {
-            $esHoy = Carbon::parse($asig->fecha)->isSameDay($hoy);
-            if (!$esHoy) return false;
-
-            $fecha = Carbon::parse($asig->fecha);
-            $inicio = $fecha->copy()->subMinutes(30);
-            $fin = $fecha->copy()->addHours(8); // Duración asumida de jornada
-
-            return in_array($asig->id_estado, [1, 12, 8]) && $ahora->between($inicio, $fin);
+        // Buscar si tiene un turno activo (1 = Activo) o en curso (4 = En curso) programado para HOY
+        $asignacionActiva = $asignaciones->filter(function($asig) use ($hoy) {
+            return in_array($asig->id_estado, [1, 4, 6]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
         })->first();
 
         // **Auto-vencer turno si pasan más de 4 horas sin iniciar**
         if ($asignacionActiva && $asignacionActiva->id_estado == 1) {
             $horaProgramada = Carbon::parse($asignacionActiva->fecha);
             if (Carbon::now()->greaterThan($horaProgramada->copy()->addHours(4))) {
-                $asignacionActiva->id_estado = 8; // Vencida
+                $asignacionActiva->id_estado = 6; // Vencida
                 $asignacionActiva->save();
             }
         }
 
         // Buscar si ya finalizó su turno hoy (8 = FUERA DE SERVICIO)
         $turnoFinalizadoHoy = $asignaciones->filter(function($asig) use ($hoy) {
-            return $asig->id_estado == 8 && Carbon::parse($asig->fecha)->isSameDay($hoy);
+            return $asig->id_estado == 6 && Carbon::parse($asig->fecha)->isSameDay($hoy);
         })->isNotEmpty();
 
         // 3. Documentos y validaciones (Licencia)
@@ -70,15 +63,15 @@ class ConductorController extends Controller
         // 4. Estado del vehículo (Fallas activas)
         $fallasBus = collect();
         if ($asignacionActiva) {
-            $fallasBus = FallaMecanica::where('placa', $asignacionActiva->placa)
-                ->where('id_estado', 19) // 19 = PENDIENTE
+            $fallasBus = ReporteFalla::where('placa', $asignacionActiva->placa)
+                ->where('id_estado', 5) // 5 = PENDIENTE
                 ->get();
         }
 
         // 5. Seguimiento del Recorrido Actual
-        $recorridoActivo = Recorrido::where('doc_us', $conductor->doc_usuario)
-            ->whereNull('hora_llegada')
-            ->first();
+        $recorridoActivo = Recorrido::whereHas('viaje', function($q) use ($conductor) {
+            $q->where('doc_us', $conductor->doc_usuario);
+        })->whereNull('hora_llegada')->first();
 
         // **Auto-finalizar recorrido si lleva más de 30 minutos**
         if ($recorridoActivo) {
@@ -101,9 +94,9 @@ class ConductorController extends Controller
         $ingresosTotalesHoy = VentaViaje::whereIn('id_viaje', $viajesHoyIds)->sum('valor');
 
         // Primero obtener TODOS los recorridos de hoy para los contadores totales
-        $recorridosHoy = Recorrido::where('doc_us', $conductor->doc_usuario)
-            ->whereDate('hora_salida', $hoy)
-            ->get();
+        $recorridosHoy = Recorrido::whereHas('viaje', function($q) use ($conductor) {
+            $q->where('doc_us', $conductor->doc_usuario);
+        })->whereDate('hora_salida', $hoy)->get();
 
         // Calcular Tiempo Trabajado
         $minutosTrabajados = 0;
@@ -119,14 +112,16 @@ class ConductorController extends Controller
         $tiempoTrabajadoFormato = "{$horasTrabajadas}h {$minutosRestantes}m";
 
         // Resumen para el Dashboard (máximo 5 registros)
-        $historialRecorridos = Recorrido::with(['bus', 'ruta'])
-            ->where('doc_us', $conductor->doc_usuario)
+        $historialRecorridos = Recorrido::with(['viaje.bus', 'viaje.ruta'])
+            ->whereHas('viaje', function($q) use ($conductor) {
+                $q->where('doc_us', $conductor->doc_usuario);
+            })
             ->orderBy('hora_salida', 'desc')
             ->limit(5)
             ->get();
 
         // 7. Historial de Fallas (Resumen para el Dashboard)
-        $historialFallas = FallaMecanica::with('bus')
+        $historialFallas = ReporteFalla::with('bus')
             ->where('doc_usuario', $conductor->doc_usuario)
             ->orderBy('created_at', 'desc')
             ->limit(5)
@@ -168,12 +163,12 @@ class ConductorController extends Controller
             'nivel_urgencia' => 'nullable|in:Bajo,Medio,Alto'
         ]);
 
-        FallaMecanica::create([
+        ReporteFalla::create([
             'placa' => $request->placa,
             'doc_usuario' => Auth::guard('web')->id(),
             'descripcion' => $request->descripcion,
             'nivel_urgencia' => $request->nivel_urgencia ?? 'Bajo',
-            'id_estado' => 19 // PENDIENTE
+            'id_estado' => 5 // PENDIENTE
         ]);
 
         // Cierre automático de turno si hay uno activo
@@ -181,18 +176,18 @@ class ConductorController extends Controller
         $hoy = Carbon::today();
         
         $asignacionActiva = Viaje::where('doc_us', $conductor->doc_usuario)
-            ->whereIn('id_estado', [1, 12]) // EN_CURSO o PROGRAMADO
+            ->whereIn('id_estado', [1, 4]) // EN_CURSO o PROGRAMADO
             ->where('placa', $request->placa)
             ->first();
 
         if ($asignacionActiva) {
-            $asignacionActiva->id_estado = 8; // FUERA_DE_SERVICIO
+            $asignacionActiva->id_estado = 7; // FINALIZADO
             $asignacionActiva->save();
 
             // También finalizar recorrido activo en pista si existe
-            $recorridoActivo = Recorrido::where('doc_us', $conductor->doc_usuario)
-                ->whereNull('hora_llegada')
-                ->first();
+            $recorridoActivo = Recorrido::whereHas('viaje', function($q) use ($conductor) {
+                $q->where('doc_us', $conductor->doc_usuario);
+            })->whereNull('hora_llegada')->first();
             if ($recorridoActivo) {
                 $recorridoActivo->hora_llegada = Carbon::now();
                 $recorridoActivo->save();
@@ -229,8 +224,8 @@ class ConductorController extends Controller
             }
         }
 
-        // 12 = EN_CURSO
-        $viaje->id_estado = 12;
+        // 4 = EN_CURSO
+        $viaje->id_estado = 4;
         $viaje->save();
 
         return redirect()->back()->with('success', 'Turno iniciado. Conduzca con precaución.');
@@ -238,14 +233,15 @@ class ConductorController extends Controller
 
     public function finalizarTurno($id_viaje)
     {
-        $recorridoA = Recorrido::where('doc_us', Auth::guard('web')->id())->whereNull('hora_llegada')->first();
+        $recorridoA = Recorrido::whereHas('viaje', function($q) {
+            $q->where('doc_us', Auth::guard('web')->id());
+        })->whereNull('hora_llegada')->first();
         if ($recorridoA) {
             return redirect()->back()->with('error', 'Debe finalizar el recorrido activo en pista antes de terminar el turno.');
         }
 
         $viaje = Viaje::findOrFail($id_viaje);
-        // 8 = FUERA_DE_SERVICIO
-        $viaje->id_estado = 8;
+        $viaje->id_estado = 7;
         $viaje->save();
 
         return redirect()->back()->with('success', 'Turno finalizado y registrado.');
@@ -256,8 +252,8 @@ class ConductorController extends Controller
     {
         $viaje = Viaje::findOrFail($id_viaje);
 
-        // Validar que el turno esté en curso (12) antes de iniciar recorrido
-        if ($viaje->id_estado != 12) {
+        // Validar que el turno esté en curso (4) antes de iniciar recorrido
+        if ($viaje->id_estado != 4) {
             return redirect()->back()->with('error', 'Debe iniciar su turno antes de comenzar un recorrido.');
         }
         
@@ -266,20 +262,19 @@ class ConductorController extends Controller
         ]);
 
         // Evitar duplicidades de inicio
-        $activo = Recorrido::where('doc_us', Auth::guard('web')->id())->whereNull('hora_llegada')->first();
+        $activo = Recorrido::whereHas('viaje', function($q) {
+            $q->where('doc_us', Auth::guard('web')->id());
+        })->whereNull('hora_llegada')->first();
         if ($activo) {
             return redirect()->back();
         }
 
         Recorrido::create([
-            'placa' => $viaje->placa,
-            'id_ruta' => $viaje->id_ruta,
+            'id_viaje' => $viaje->id_viaje,
             'sentido' => $request->sentido,
-            'doc_us' => $viaje->doc_us,
             'hora_salida' => Carbon::now(),
             'hora_llegada' => null,
-            'cantidad_pasajeros' => 0,
-            'ingresos' => 0
+            'foto_torniquete' => null
         ]);
 
         return redirect()->back()->with('success', 'Ruta iniciada en sentido ' . $request->sentido . '.');
@@ -287,12 +282,24 @@ class ConductorController extends Controller
 
     public function finalizarRecorrido(Request $request, $id_recorrido)
     {
-        $recorrido = Recorrido::findOrFail($id_recorrido);
+        $request->validate([
+            'foto_torniquete' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120'
+        ], [
+            'foto_torniquete.mimes' => 'El formato de la imagen debe ser JPEG, PNG, JPG o WEBP.',
+            'foto_torniquete.max' => 'La imagen no puede pesar más de 5MB.',
+        ]);
 
+        $recorrido = Recorrido::findOrFail($id_recorrido);
         $recorrido->hora_llegada = Carbon::now();
+
+        if ($request->hasFile('foto_torniquete')) {
+            $path = $request->file('foto_torniquete')->store('evidencias_torniquetes', 'public');
+            $recorrido->foto_torniquete = $path;
+        }
+
         $recorrido->save();
 
-        return redirect()->back()->with('success', 'Recorrido (Sentido ' . $recorrido->sentido . ') finalizado exitosamente.');
+        return redirect()->back()->with('success', 'Recorrido (Sentido ' . ($recorrido->sentido ?? '') . ') finalizado con éxito.');
     }
 
     // REGISTRO TARJETAS (Soporte AJAX para Scanner)
@@ -303,9 +310,9 @@ class ConductorController extends Controller
         ]);
 
         $recorrido = Recorrido::findOrFail($id_recorrido);
-        $viaje = Viaje::where('doc_us', $recorrido->doc_us)
-            ->whereIn('id_estado', [12]) // EN_CURSO
-            ->where('placa', $recorrido->placa)
+        $viaje = Viaje::where('doc_us', $recorrido->viaje->doc_us)
+            ->whereIn('id_estado', [4]) // EN_CURSO
+            ->where('placa', $recorrido->viaje->placa)
             ->first();
 
         if (!$viaje) {
@@ -323,7 +330,7 @@ class ConductorController extends Controller
             return redirect()->back()->with('error', 'Tarjeta inválida o no registrada en el sistema.');
         }
 
-        if ($tarjeta->id_estado != 1 && $tarjeta->id_estado != 20) {
+        if ($tarjeta->id_estado != 1) {
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => 'La tarjeta se encuentra inactiva o bloqueada.']);
             }
@@ -349,22 +356,16 @@ class ConductorController extends Controller
             'id_tarjeta' => $tarjeta->id_tarjeta,
             'valor' => $costoPasaje,
             'fecha' => Carbon::now(),
-            'id_estado' => 18 // PAGADO
+            'id_estado' => 1 // PAGADO -> ACTIVO
         ]);
-
-        // Aumentar pasajeros e ingresos en recorrido
-        $recorrido->cantidad_pasajeros += 1;
-        $recorrido->ingresos += 3300;
-        $recorrido->save();
 
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true, 
-                'message' => 'Pasaje cobrado con éxito. Pasajeros: ' . $recorrido->cantidad_pasajeros,
-                'cantidad_pasajeros' => $recorrido->cantidad_pasajeros
+                'message' => 'Pasaje cobrado con éxito.'
             ]);
         }
-        return redirect()->back()->with('success', 'Pasaje cobrado con éxito. Pasajeros: ' . $recorrido->cantidad_pasajeros);
+        return redirect()->back()->with('success', 'Pasaje cobrado con éxito.');
     }
 
     public function historialRecorridos(Request $request)
@@ -372,8 +373,10 @@ class ConductorController extends Controller
         $conductor = Auth::guard('web')->user();
         $filtro = $request->get('filtro', 'todos');
         
-        $query = Recorrido::with(['bus', 'ruta'])
-            ->where('doc_us', $conductor->doc_usuario)
+        $query = Recorrido::with(['viaje.bus', 'viaje.ruta'])
+            ->whereHas('viaje', function($q) use ($conductor) {
+                $q->where('doc_us', $conductor->doc_usuario);
+            })
             ->orderBy('hora_salida', 'desc');
 
         if ($filtro == 'hoy') {
@@ -395,7 +398,7 @@ class ConductorController extends Controller
         $conductor = Auth::guard('web')->user();
         $filtro = $request->get('filtro', 'todos');
         
-        $query = FallaMecanica::with('bus')
+        $query = ReporteFalla::with('bus')
             ->where('doc_usuario', $conductor->doc_usuario)
             ->orderBy('created_at', 'desc');
 
@@ -414,7 +417,7 @@ class ConductorController extends Controller
         $asignaciones = Viaje::where('doc_us', $conductor->doc_usuario)->get();
         $hoy = Carbon::today();
         $asignacionActiva = $asignaciones->filter(function($asig) use ($hoy) {
-            return in_array($asig->id_estado, [1, 12]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
+            return in_array($asig->id_estado, [1, 4]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
         })->first();
 
         $type = DB::select('SHOW COLUMNS FROM reportes_fallas WHERE Field = "nivel_urgencia"')[0]->Type;

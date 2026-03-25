@@ -70,7 +70,6 @@
     @endif
 
     @include('admin.buses.partials.table')
-
 </div>
 
 @include('admin.buses.partials.create_modal')

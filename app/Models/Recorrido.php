@@ -10,36 +10,20 @@ class Recorrido extends Model
     protected $primaryKey = 'id_recorrido';
 
     protected $fillable = [
-        'placa',
-        'id_ruta',
-        'doc_us',
+        'id_viaje',
+        'sentido',
         'hora_salida',
         'hora_llegada',
-        'cantidad_pasajeros',
-        'ingresos'
+        'foto_torniquete'
     ];
 
-    protected static function booted()
+    public function viaje()
     {
-        static::saving(function ($recorrido) {
-            if ($recorrido->cantidad_pasajeros) {
-                $recorrido->ingresos = $recorrido->cantidad_pasajeros * 3300;
-            }
-        });
+        return $this->belongsTo(Viaje::class, 'id_viaje', 'id_viaje');
     }
 
-    public function bus()
+    public function novedades()
     {
-        return $this->belongsTo(Bus::class, 'placa', 'placa');
-    }
-
-    public function ruta()
-    {
-        return $this->belongsTo(Ruta::class, 'id_ruta', 'id_ruta');
-    }
-
-    public function conductor()
-    {
-        return $this->belongsTo(Usuario::class, 'doc_us', 'doc_usuario');
+        return $this->hasMany(NovedadRecorrido::class, 'id_recorrido', 'id_recorrido');
     }
 }

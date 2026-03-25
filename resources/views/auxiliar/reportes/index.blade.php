@@ -23,8 +23,7 @@
                 <h5 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
                     <span class="material-symbols-rounded text-primary">analytics</span> Configurar Reporte
                 </h5>
-
-                <form method="GET" action="{{ route('empresa.reportes.export') }}">
+                <form id="formGenerarReporte" method="GET" action="{{ route('empresa.reportes.export') }}">
                     
                     <div class="row g-3">
                         <!-- Tipo de Reporte -->
@@ -125,8 +124,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    const form = document.querySelector('form');
-    form.addEventListener('submit', function(e) {
+    const form = document.getElementById('formGenerarReporte');
+    if (form) {
+        form.addEventListener('submit', function(e) {
         e.preventDefault();
         
         const btn = form.querySelector('button[type="submit"]');
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             });
-    });
+    }
 });
 </script>
 @endpush

@@ -26,6 +26,7 @@ class UsuarioController extends Controller
         }
 
         $roles = DB::table('tipo_usuario')
+            ->whereIn('id_tipo_usuario', [1, 3, 4, 5, 7, 8]) // Solo roles de empresa
             ->orderBy('id_tipo_usuario')
             ->when($user->id_tipo_usuario != 1, function ($q) {
                 $q->where(function($sub) {
@@ -33,7 +34,7 @@ class UsuarioController extends Controller
                         ->orWhere('nombre_tipo', 'like', '%propietario%');
                 });
             })->get();
-        $estados = DB::table('estado')->whereIn('id_estado', [1,2,3])->get();
+        $estados = DB::table('estado')->whereIn('id_estado', [1, 2, 3])->get();
 
         $query = DB::table('usuario')
             ->leftJoin('estado', 'usuario.id_estado', '=', 'estado.id_estado')
@@ -64,11 +65,11 @@ class UsuarioController extends Controller
             $query->where('usuario.id_tipo_usuario', $selectedRole);
         }
 
-        $usuarios = $query->orderBy('usuario.doc_usuario', 'ASC')->paginate(5)->withQueryString();
+        $usuarios = $query->orderBy('usuario.doc_usuario', 'ASC')->paginate(10)->withQueryString();
 
         $docs_licencia = \App\Models\Documento::whereIn('doc_usuario', collect($usuarios->items())->pluck('doc_usuario'))
             ->where('id_tipo_documento', 3)
-            ->whereIn('id_estado', [1, 21])
+            ->whereIn('id_estado', [1, 6])
             ->get()->keyBy('doc_usuario');
 
         // Alertas globales de licencias para el Admin
@@ -121,17 +122,17 @@ class UsuarioController extends Controller
 
             // Usamos los nombres de campos que vienen del formulario
             $data = [
-                'primer_nombre'   => $request->primer_nombre,
-                'segundo_nombre'  => $request->segundo_nombre,
+                'primer_nombre' => $request->primer_nombre,
+                'segundo_nombre' => $request->segundo_nombre,
                 'primer_apellido' => $request->primer_apellido,
-                'segundo_apellido'=> $request->segundo_apellido,
-                'doc_usuario'     => $request->doc_usuario,
-                'correo'          => $request->correo,
-                'telefono'        => $request->telefono,
+                'segundo_apellido' => $request->segundo_apellido,
+                'doc_usuario' => $request->doc_usuario,
+                'correo' => $request->correo,
+                'telefono' => $request->telefono,
                 'id_tipo_usuario' => $request->id_tipo_usuario,
-                'id_estado'       => 1,
-                'password'        => Hash::make($passwordGenerada),
-                'NIT'             => Auth::user()->NIT
+                'id_estado' => 1,
+                'password' => Hash::make($passwordGenerada),
+                'NIT' => Auth::user()->NIT
             ];
 
             if ($request->filled('fecha_nacimiento')) {
@@ -171,7 +172,7 @@ class UsuarioController extends Controller
                     'id_tipo_documento' => 3, // ID de la licencia
                     'doc_usuario' => $request->doc_usuario,
                     'NIT' => Auth::user()->NIT,
-                    'id_estado' => $fecha_venc->isPast() ? 21 : 1
+                    'id_estado' => $fecha_venc->isPast() ? 6 : 1
                 ]);
             }
 
@@ -179,7 +180,8 @@ class UsuarioController extends Controller
                 ->back()
                 ->with('success', 'Registro creado correctamente. Contraseña: ' . $passwordGenerada);
 
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             return back()->withInput()->with('error', 'Error al crear: ' . $e->getMessage());
         }
     }
@@ -231,7 +233,7 @@ class UsuarioController extends Controller
             if ($userToUpdate && $userToUpdate->foto_usuario) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($userToUpdate->foto_usuario);
             }
-            
+
             $path = $request->file('foto_usuario')->store('usuarios', 'public');
             $data['foto_usuario'] = $path;
         }
@@ -279,7 +281,7 @@ class UsuarioController extends Controller
 
         // Si el usuario editado es el que está en sesión y se inactiva o bloquea, cerrar sesión
         $usuarioEditado = Auth::user();
-        if ($usuarioEditado && $usuarioEditado->doc_usuario == $doc_usuario && in_array($request->id_estado, [2,3])) {
+        if ($usuarioEditado && $usuarioEditado->doc_usuario == $doc_usuario && in_array($request->id_estado, [2, 3])) {
             Auth::logout();
             return redirect('/login')->with('error', 'Tu cuenta ha sido inactivada o bloqueada.');
         }

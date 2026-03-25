@@ -59,7 +59,7 @@ public function superAdminStats()
 
     // Vencidas (21)
     $licenciasVencidas = DB::table('licencias')
-        ->where('id_estado', 21)
+        ->where('id_estado', 6)
         ->count();
 
     // Por vencer (vigentes que vencen en próximos 15 días)

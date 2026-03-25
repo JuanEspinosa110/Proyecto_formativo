@@ -9,6 +9,22 @@
 
 @section('content')
 
+@if($errors->any())
+<div class="alert alert-danger border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center gap-4">
+    <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-circle">
+        <span class="material-symbols-rounded fs-1">error</span>
+    </div>
+    <div class="flex-grow-1">
+        <h5 class="fw-bold mb-1">Error al procesar la solicitud</h5>
+        <ul class="mb-0 text-danger" style="padding-left: 20px;">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+</div>
+@endif
+
 @if($licenciaVencida || $licenciaProxima)
 <div class="alert {{ $licenciaVencida ? 'alert-danger' : 'alert-warning' }} border-0 shadow-sm rounded-4 p-4 mb-4 d-flex align-items-center gap-4">
     <div class="bg-{{ $licenciaVencida ? 'danger' : 'warning' }} bg-opacity-10 text-{{ $licenciaVencida ? 'danger' : 'warning' }} p-3 rounded-circle">
@@ -64,8 +80,8 @@
 <div class="row g-4 mb-5">
     @if($asignacionActiva)
         @php
-            $enCurso = $asignacionActiva->id_estado == 12; // En Servicio
-            $vencido = $asignacionActiva->id_estado == 8; // Vencido/No ejecutado
+            $enCurso = $asignacionActiva->id_estado == 4; // En Curso
+            $vencido = $asignacionActiva->id_estado == 6; // Vencido/No ejecutado
         @endphp
         <div class="col-md-8 col-xl-9">
             <div class="row g-3 h-100">
@@ -156,11 +172,18 @@
                             <p class="text-muted small mt-3 mb-0">Presione el botón justo al salir del punto de partida</p>
                         @else
                             <div class="text-center py-2">
-                                <h5 class="fw-bold mb-3 text-primary d-inline-flex align-items-center gap-2 title-large">
-                                    <span class="spinner-grow text-success spinner-small" role="status"></span>
-                                    Recorrido en Progreso
-                                </h5>
-                                <div class="bg-light p-4 rounded-4 my-3 mx-auto box-route-dashed">
+                                <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+                                    <h5 class="fw-bold mb-0 text-primary d-inline-flex align-items-center gap-2 title-large">
+                                        <span class="spinner-grow text-success spinner-small" role="status"></span>
+                                        Recorrido en Progreso
+                                    </h5>
+                                    <button class="btn btn-dark rounded-pill px-3 py-2 d-flex align-items-center gap-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalQRViaje">
+                                        <span class="material-symbols-rounded">qr_code_2</span> 
+                                        <span class="small fw-bold">Ver QR de Viaje</span>
+                                    </button>
+                                </div>
+
+                                <div class="bg-light p-4 rounded-4 my-3 mx-auto box-route-dashed" style="max-width: 450px;">
                                     <p class="mb-2 text-muted fw-bold text-uppercase small letter-spacing-1">Dirigiéndose en sentido</p>
                                     <h2 class="fw-black text-dark mb-0 d-flex align-items-center justify-content-center gap-2">
                                         <span class="material-symbols-rounded fs-2 text-primary">{{ $recorridoActivo->sentido == 'IDA' ? 'trending_flat' : 'sync_alt' }}</span>
@@ -172,28 +195,9 @@
                                     Hora de salida: <strong class="text-dark">{{ \Carbon\Carbon::parse($recorridoActivo->hora_salida)->format('h:i A') }}</strong>
                                 </p>
                                 
-                                <div class="row g-2 justify-content-center max-width-stats mx-auto mb-4">
-                                    <div class="col-6">
-                                        <div class="bg-light p-2 rounded-3">
-                                            <span class="small text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Pasajeros Hoy</span>
-                                            <h4 class="fw-bold mb-0 text-primary">{{ $pasajerosTotalesHoy }}</h4>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="bg-light p-2 rounded-3">
-                                            <span class="small text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Ingresos Hoy</span>
-                                            <h4 class="fw-bold mb-0 text-success">${{ number_format($ingresosTotalesHoy) }}</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-
-                                <form action="{{ route('conductor.finalizarRecorrido', $recorridoActivo->id_recorrido) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-warning py-3 fw-bold text-dark rounded-pill shadow-sm d-inline-flex border-0 justify-content-center align-items-center gap-2 transition-all w-100 btn-route-action">
-                                        <span class="material-symbols-rounded fs-3">sports_score</span> Llegada a Destino Final
-                                    </button>
-                                </form>
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#modalFinalizarRuta" class="btn btn-warning py-3 fw-bold text-dark rounded-pill shadow-sm d-inline-flex border-0 justify-content-center align-items-center gap-2 transition-all w-100" style="font-size: 1.25rem; max-width: 450px;">
+                                    <span class="material-symbols-rounded fs-3">sports_score</span> Llegada a Destino Final
+                                </button>
                             </div>
                         @endif
                     </div>
@@ -220,9 +224,7 @@
                 <p class="text-success fw-bold flex-grow-1">Su jornada ha terminado por hoy. Excelente trabajo.</p>
                 <div class="w-100 d-flex justify-content-center flex-wrap gap-4 mt-4 bg-white p-3 rounded-4 shadow-sm">
                     <div><span class="small text-muted d-block text-uppercase fw-bold">Recorridos</span> <h4 class="fw-bold mb-0 text-dark">{{ $recorridosHoy->count() }}</h4></div>
-                    <div><span class="small text-muted d-block text-uppercase fw-bold">Pasajeros Totales</span> <h4 class="fw-bold mb-0 text-primary">{{ $pasajerosTotalesHoy }}</h4></div>
-                    <div><span class="small text-muted d-block text-uppercase fw-bold">Ingresos Generados</span> <h4 class="fw-bold mb-0 text-success">${{ number_format($ingresosTotalesHoy) }}</h4></div>
-                    <div><span class="small text-muted d-block text-uppercase fw-bold">Tiempo Trabajado</span> <h4 class="fw-bold mb-0 text-dark">{{ $tiempoTrabajadoFormato ?? '0h 0m' }}</h4></div>
+                    <div><span class="small text-muted d-block text-uppercase fw-bold">Tiempo Trabajado</span> <h4 class="fw-bold mb-0 text-success">{{ $tiempoTrabajadoFormato ?? '0h 0m' }}</h4></div>
                 </div>
             </div>
         </div>
@@ -323,7 +325,7 @@
                         <tr>
                             <th class="ps-3 border-0">FECHA / SENTIDO</th>
                             <th class="border-0">TIEMPOS</th>
-                            <th class="border-0 text-center">PASAJEROS</th>
+                            <th class="border-0 text-center">EVIDENCIA</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -336,7 +338,13 @@
                                 <td>
                                     <div class="fw-bold text-dark small">{{ \Carbon\Carbon::parse($rec->hora_salida)->format('H:i') }} - @if($rec->hora_llegada) <span class="text-success">{{ \Carbon\Carbon::parse($rec->hora_llegada)->format('H:i') }}</span> @else <span class="badge bg-warning text-dark spinner-grow spinner-grow-sm" role="status"></span> @endif</div>
                                 </td>
-                                <td class="text-center fw-bold text-primary">{{ $rec->cantidad_pasajeros }}</td>
+                                <td class="text-center">
+                                    @if($rec->foto_torniquete)
+                                        <a href="{{ asset('storage/' . $rec->foto_torniquete) }}" target="_blank" class="text-decoration-none">Ver Foto</a>
+                                    @else
+                                        <span class="text-muted small">N/A</span>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr><td colspan="3" class="text-center py-4 text-muted small">No hay registros de recorridos.</td></tr>
@@ -371,9 +379,9 @@
                                     <span class="badge bg-light text-dark border mt-1">{{ $falla->nivel_urgencia }}</span>
                                 </td>
                                 <td class="text-end pe-3">
-                                    @if($falla->id_estado == 19) <!-- PENDIENTE -->
+                                    @if($falla->id_estado == 5) <!-- PENDIENTE (Nuevo ID) -->
                                         <span class="badge bg-danger rounded-pill">PENDIENTE</span>
-                                    @elseif($falla->id_estado == 6 || $falla->id_estado == 7) <!-- EN_PROCESO o MANTENIMIENTO -->
+                                    @elseif($falla->id_estado == 4) <!-- EN_PROCESO o MANTENIMIENTO (Nuevo ID) -->
                                         <span class="badge bg-warning rounded-pill text-dark">EN PROCESO</span>
                                     @else
                                         <span class="badge bg-success rounded-pill">SOLUCIONADO</span>
@@ -405,19 +413,110 @@
 
 
 <!-- END OF VIEWS -->
+<!-- Modal de Validación de Final de Ruta -->
+<div class="modal fade" id="modalFinalizarRuta" tabindex="-1" aria-labelledby="modalFinalizarRutaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="modalFinalizarRutaLabel">
+                    <span class="material-symbols-rounded text-warning">photo_camera</span> Evidencia de Finalización
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center px-4 py-3">
+                <p class="text-muted small mb-4">Por favor, toma o selecciona una foto clara del torniquete para confirmar la visual del recorrido.</p>
+                
+                <form action="{{ $recorridoActivo ? route('conductor.finalizarRecorrido', $recorridoActivo->id_recorrido) : '#' }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-4 text-start">
+                        <label for="foto_torniquete" class="form-label fw-bold text-dark small text-uppercase">Adjuntar Fotografía</label>
+                        <input class="form-control bg-light rounded-3 py-2 px-3" type="file" id="foto_torniquete" name="foto_torniquete" accept="image/*" required>
+                        <div class="form-text small mt-2">Asegúrate de que los números sean legibles.</div>
+                    </div>
+                    
+                    <div class="modal-footer border-0 pb-4 px-0 pt-2 gap-2 w-100 d-flex justify-content-between">
+                        <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" style="width: 48%" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold text-dark shadow-sm" style="width: 48%">
+                            Enviar Evidencia
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 @include('conductor.modals.falla_mecanica')
 @include('conductor.modals.iniciar_ruta')
 
-<!-- WIDGET FLOTANTE DE PASAJEROS -->
+<!-- WIDGET FLOTANTE DE PASAJEROS REMOVIDO -->
+
+<!-- MODAL QR DE VIAJE -->
 @if(isset($recorridoActivo) && $recorridoActivo)
-<div class="position-fixed bottom-0 end-0 m-3 m-md-4 p-3 bg-white shadow-lg d-flex align-items-center gap-3 widget-passengers">
-    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center widget-icon-box">
-        <span class="material-symbols-rounded widget-icon-fs">group</span>
+<div class="modal fade" id="modalQRViaje" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-dark text-white border-0 py-3">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded text-primary">qr_code_scanner</span> <span class="text-white-50">Código de Validación</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-toggle="modal" data-bs-target="#modalQRViaje"></button>
+            </div>
+            <div class="modal-body p-5 text-center bg-white">
+                <p class="text-secondary fw-bold text-uppercase small mb-4">Muestre este código al controlador de tiempo</p>
+                
+                <div class="d-inline-block p-3 bg-white border rounded-4 shadow-sm mb-4">
+                    <div id="qrcode-container"></div>
+                </div>
+
+                <div class="mt-2">
+                    <h4 class="fw-black text-dark mb-0">{{ $recorridoActivo->viaje->placa ?? '...' }}</h4>
+                    <p class="text-primary small fw-bold text-uppercase">Ruta: {{ $recorridoActivo->viaje->ruta->nombre_ruta ?? '...' }}</p>
+                </div>
+
+                <div class="alert alert-dark bg-dark border-0 rounded-4 mt-4 text-start p-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="material-symbols-rounded fs-5 text-primary">info</span>
+                        <span class="fw-bold text-white small">Información del Código</span>
+                    </div>
+                    <p class="small text-white opacity-75 mb-0">
+                        Este código contiene su ID de recorrido actual. El controlador podrá verificar sus tiempos y pasajeros escaneándolo.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pb-4">
+                <button type="button" class="btn btn-dark w-100 py-3 rounded-pill fw-bold" data-bs-dismiss="modal">Listo, Entendido</button>
+            </div>
+        </div>
     </div>
-    <div class="pe-2">
-        <span class="d-block text-muted text-uppercase fw-bold pb-1 widget-text-small">Pasajeros</span>
-        <span class="d-block text-dark fw-black widget-text-large" id="pasajeros-count">{{ $recorridoActivo->cantidad_pasajeros }}</span>
+</div>
+@endif
+
+<!-- MODAL FINALIZAR RECORRIDO Y FOTO TORNIQUETE -->
+@if(isset($recorridoActivo) && $recorridoActivo)
+<div class="modal fade" id="modalFinalizarRecorrido" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content border-0 shadow-lg rounded-4" action="{{ route('conductor.finalizarRecorrido', $recorridoActivo->id_recorrido) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-header border-0 pb-0 pt-4 px-4 bg-warning text-dark rounded-top-4 pb-3">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded">photo_camera</span> Fin de Recorrido: Cargar Evidencia
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-4 py-4 text-center">
+                <p class="text-muted fw-bold mb-4">¿Estás seguro de que deseas enviar esta foto y finalizar el recorrido en sentido <strong>{{ $recorridoActivo->sentido }}</strong>?</p>
+                <div class="mb-3 text-start">
+                    <label class="form-label fw-bold small text-uppercase">Foto del Torniquete</label>
+                    <input type="file" class="form-control form-control-lg bg-light" name="foto_torniquete" accept="image/*" capture="environment" required>
+                    <small class="text-muted d-block mt-2">Tome o suba una foto clara del contador del torniquete al finalizar el viaje.</small>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pb-4 px-4 pt-1">
+                <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm">Confirmar y Finalizar</button>
+            </div>
+        </form>
     </div>
 </div>
 @endif
@@ -426,6 +525,26 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+@if(isset($recorridoActivo) && $recorridoActivo)
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const qrContainer = document.getElementById("qrcode-container");
+        if (qrContainer) {
+            // Generamos el QR con el ID del recorrido
+            new QRCode(qrContainer, {
+                text: "{{ $recorridoActivo->id_recorrido }}",
+                width: 250,
+                height: 250,
+                colorDark: "#212529",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+    });
+</script>
+@endif
 @if(request('view') == 'calendario')
 <!-- SOLO Renderizar calendario si estamos en la vista calendario para ahorrar memoria -->
 <script>
@@ -453,7 +572,7 @@
                     title: '{{ $asig->placa }} - {{ $asig->ruta->nombre_ruta ?? "Ruta" }}',
                     start: '{{ \Carbon\Carbon::parse($asig->fecha)->format("Y-m-d\TH:i:s") }}',
                     end: '{{ \Carbon\Carbon::parse($asig->fecha)->addHours(8)->format("Y-m-d\TH:i:s") }}',
-                    color: '{{ in_array($asig->id_estado, [12, 13]) ? "#10b981" : "#94a3b8" }}',
+                    color: '{{ in_array($asig->id_estado, [4, 7]) ? "#10b981" : "#94a3b8" }}',
                     extendedProps: {
                         ruta: '{{ $asig->ruta->nombre_ruta ?? "" }}',
                         estado: '{{ optional($asig->estado)->nombre_estado }}'

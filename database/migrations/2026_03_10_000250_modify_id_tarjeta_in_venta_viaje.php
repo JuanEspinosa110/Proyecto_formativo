@@ -11,20 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('venta_viaje', function (Blueprint $table) {
-        // Elimina la FK antes de modificar la columna
-        $table->dropForeign(['id_tarjeta']);
-    });
-
-    Schema::table('venta_viaje', function (Blueprint $table) {
-        // Ahora puedes modificar la columna
-        $table->bigInteger('id_tarjeta')->change();
-    });
-
-    // Si necesitas, vuelve a crear la FK después de modificar la columna
-    Schema::table('venta_viaje', function (Blueprint $table) {
-        $table->foreign('id_tarjeta')->references('id_tarjeta')->on('tarjeta');
-    });
+        // No-op: La FK id_tarjeta ya fue eliminada por 2026_03_10_000002
+        // y la columna ya es bigInteger por 2026_03_10_000100.
+        // Esta migración quedó redundante.
     }
 
     /**
@@ -32,18 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('venta_viaje', function (Blueprint $table) {
-        $table->dropForeign(['id_tarjeta']);
-    });
-
-    Schema::table('venta_viaje', function (Blueprint $table) {
-        // Revertir el tipo de columna según lo que era antes
-        $table->integer('id_tarjeta')->change();
-    });
-
-    // Vuelve a crear la FK si era necesaria
-    Schema::table('venta_viaje', function (Blueprint $table) {
-        $table->foreign('id_tarjeta')->references('id_tarjeta')->on('tarjeta');
-    });
+        // No-op: no es posible revertir bigint→int con datos VARCHAR (Ej: 'SIGU-777') en la columna.
+        // La estructura actual es la correcta y no debe revertirse.
     }
 };

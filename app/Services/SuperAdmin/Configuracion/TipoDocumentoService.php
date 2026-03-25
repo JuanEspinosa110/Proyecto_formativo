@@ -18,8 +18,8 @@ class TipoDocumentoService
     public function paginate($perPage = 5, $buscar = null)
     {
         return TipoDocumento::when($buscar, function ($query, $buscar) {
-                return $query->where('nombre', 'like', "%{$buscar}%");
-            })
+            return $query->where('nombre', 'like', "%{$buscar}%");
+        })
             ->orderBy('id_tipo_documento', 'asc')
             ->paginate($perPage)
             ->withQueryString();
@@ -37,7 +37,9 @@ class TipoDocumentoService
         return TipoDocumento::create([
             'nombre' => $data['nombre'],
             'descripcion' => $data['descripcion'] ?? null,
-            'id_estado' => $data['id_estado'] ?? 1 // Asumiendo 1 como activo
+            'id_estado' => $data['id_estado'] ?? 1, // Asumiendo 1 como activo
+            'requiere_doc_usuario' => $data['requiere_doc_usuario'] ?? 0,
+            'requiere_placa' => $data['requiere_placa'] ?? 0,
         ]);
     }
 
@@ -57,7 +59,9 @@ class TipoDocumentoService
         $tipo->update([
             'nombre' => $data['nombre'],
             'descripcion' => $data['descripcion'] ?? $tipo->descripcion,
-            'id_estado' => $data['id_estado'] ?? $tipo->id_estado
+            'id_estado' => $data['id_estado'] ?? $tipo->id_estado,
+            'requiere_doc_usuario'  => $data['requiere_doc_usuario'] ?? 0,
+            'requiere_placa'        => $data['requiere_placa'] ?? 0,
         ]);
 
         return $tipo;
@@ -66,8 +70,8 @@ class TipoDocumentoService
     public function exportExcel($buscar = null)
     {
         $registros = TipoDocumento::when($buscar, function ($query, $buscar) {
-                return $query->where('nombre', 'like', "%{$buscar}%");
-            })
+            return $query->where('nombre', 'like', "%{$buscar}%");
+        })
             ->orderBy('id_tipo_documento', 'asc')
             ->get();
 
@@ -80,7 +84,7 @@ class TipoDocumentoService
 
         // Estilos para encabezados
         $sheet->getStyle('A1:B1')->getFont()->setBold(true);
-        
+
         $row = 2;
         foreach ($registros as $reg) {
             $sheet->setCellValue('A' . $row, $reg->id_tipo_documento);

@@ -70,6 +70,18 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">map</span></span>
                     <span>Rutas</span>
                 </a>
+                <div class="sigu-sb-divider" style="height:1px; background:rgba(255,255,255,0.1); margin:1rem 0;"></div>
+                <p class="small text-uppercase px-4 mb-2" style="font-size:10px; opacity:0.6; letter-spacing:1px;">Mantenimiento</p>
+
+                <a href="{{ route('admin.mantenimiento.reportes') }}" class="sigu-sb-link {{ request()->routeIs('admin.mantenimiento.reportes') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">notification_important</span></span>
+                    <span>Reportes de Fallas</span>
+                </a>
+
+                <a href="{{ route('admin.mantenimiento.index') }}" class="sigu-sb-link {{ request()->routeIs('admin.mantenimiento.*') && !request()->routeIs('admin.mantenimiento.reportes') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">build</span></span>
+                    <span>Mantenimiento</span>
+                </a>
                 @endif
 
             </nav>
@@ -144,6 +156,50 @@
         @if(session('error'))
         document.addEventListener('DOMContentLoaded', () => showToast("{{ session('error') }}", 'error'));
         @endif
+    </script>
+
+
+    <!-- ─── Modal de confirmación personalizado ─────────────────────── -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:380px;">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-body text-center p-4">
+                    <span class="material-symbols-rounded mb-3 d-block" id="confirmIcon"
+                          style="font-size:3rem; color:#f6820c;">help</span>
+                    <h6 class="fw-bold mb-1" id="confirmTitle">¿Estás seguro?</h6>
+                    <p class="text-muted mb-0 small" id="confirmMessage">Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer border-0 justify-content-center gap-2 pb-4 pt-0">
+                    <button type="button" class="btn btn-sm"
+                            style="border:1.5px solid #cbd5e0; color:#4a5568; border-radius:0.5rem; padding:0.35rem 1.2rem;"
+                            data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="confirmOkBtn" class="btn btn-sm"
+                            style="background:var(--p); color:#fff; border:none; border-radius:0.5rem; padding:0.35rem 1.2rem;">
+                        Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Delegación global para botones con data-confirm-form
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('[data-confirm-form]');
+            if (!btn) return;
+            e.preventDefault();
+            const formId = btn.dataset.confirmForm;
+            const title   = btn.dataset.confirmTitle  || '¿Estás seguro?';
+            const msg     = btn.dataset.confirmMsg    || 'Esta acción no se puede deshacer.';
+            document.getElementById('confirmTitle').textContent   = title;
+            document.getElementById('confirmMessage').textContent = msg;
+            const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            document.getElementById('confirmOkBtn').onclick = function() {
+                modal.hide();
+                document.getElementById(formId).submit();
+            };
+            modal.show();
+        });
     </script>
 
     @stack('scripts')

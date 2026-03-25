@@ -103,7 +103,7 @@
 
             <div class="col-md-3">
                 <label class="sa-status-option-label w-100">
-                    <input type="radio" name="id_estado" value="21" class="d-none" @if(old('id_estado', $licencia->id_estado) == 21) checked @endif>
+                    <input type="radio" name="id_estado" value="6" class="d-none" @if(old('id_estado', $licencia->id_estado) == 6) checked @endif>
                     <div class="card sa-status-option-card h-100 border-info">
                         <div class="card-body text-center">
                             <i class="fas fa-hourglass-half text-info fs-3 mb-2"></i>
@@ -116,7 +116,7 @@
 
             <div class="col-md-3">
                 <label class="sa-status-option-label w-100">
-                    <input type="radio" name="id_estado" value="14" class="d-none" @if(old('id_estado', $licencia->id_estado) == 14) checked @endif>
+                    <input type="radio" name="id_estado" value="9" class="d-none" @if(old('id_estado', $licencia->id_estado) == 9) checked @endif>
                     <div class="card sa-status-option-card h-100 border-danger">
                         <div class="card-body text-center">
                             <i class="fas fa-times-circle text-danger fs-3 mb-2"></i>

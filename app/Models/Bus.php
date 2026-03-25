@@ -38,6 +38,21 @@ class Bus extends Model
         return $this->belongsTo(Empresa::class, 'NIT', 'NIT');
     }
 
+    public function asignaciones()
+    {
+        return $this->hasMany(Asignacion::class, 'placa', 'placa');
+    }
+
+    public function documentos()
+    {
+        return $this->hasMany(Documento::class, 'placa', 'placa');
+    }
+
+    public function recorridos()
+    {
+        return $this->hasManyThrough(Recorrido::class, Viaje::class, 'placa', 'id_viaje', 'placa', 'id_viaje');
+    }
+
     /**
      * Verifica si el bus tiene todos los documentos requeridos aprobados y vigentes.
      */
@@ -55,7 +70,7 @@ class Bus extends Model
         // 2. Contar documentos aprobados y vigentes para este bus (por tipo de documento)
         $approvedCount = Documento::where('placa', $this->placa)
             ->whereIn('id_tipo_documento', $requiredTypes)
-            ->where('id_estado', 24) // 24 = APROBADO
+            ->where('id_estado', 1) // 1 = ACTIVO/APROBADO
             ->where('fecha_vencimiento', '>', now())
             ->distinct('id_tipo_documento')
             ->count('id_tipo_documento');

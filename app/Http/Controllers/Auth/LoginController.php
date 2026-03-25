@@ -16,19 +16,19 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'doc_us'   => 'required|integer',
+            'doc_us' => 'required|integer',
             'password' => 'required',
         ]);
 
         /*
-        |----------------------------------
-        |  INTENTO USUARIOS (web)
-        |----------------------------------
-        */
+         |----------------------------------
+         |  INTENTO USUARIOS (web)
+         |----------------------------------
+         */
         if (Auth::guard('web')->attempt([
-            'doc_usuario' => $request->doc_us,
-            'password'   => $request->password,
-            'id_estado'  => 1,
+        'doc_usuario' => $request->doc_us,
+        'password' => $request->password,
+        'id_estado' => 1,
         ])) {
 
             $request->session()->regenerate();
@@ -36,23 +36,32 @@ class LoginController extends Controller
             $user = Auth::guard('web')->user();
 
             switch ($user->id_tipo_usuario) {
-                case 1:
+                case 1: // ADMINISTRADOR
                     return redirect()->route('admin.dashboard');
 
-                case 2:
-                    return redirect()->route('pasajero.dashboard');
+                case 2: // PASAJERO
+                    return redirect()->route('pasajero.saldo');
 
-                case 3:
+                case 3: // CONDUCTOR
                     return redirect()->route('conductor.dashboard');
 
-                case 4:
+                case 4: // AUXILIAR EMPRESA
                     return redirect()->route('empresa.dashboard');
-                
-                case 5:
-                    return redirect()->route('empresa.dashboard'); // Auxiliar
 
-                case 6:
-                    return redirect()->route('propietario.dashboard'); // Propietario
+                case 5: // PROPIETARIO
+                    return redirect()->route('propietario.dashboard');
+
+                case 6: // SETP
+                    return redirect()->route('gestor-setp.dashboard');
+
+                case 7: // COORDINADOR BUS
+                    return redirect()->route('controlador-tiempo.dashboard');
+
+                case 8: // GESTOR DE RECARGAS
+                    return redirect()->route('gestor-recargas.dashboard');
+
+                case 9: // JEFE DE MANTENIMIENTO
+                    return redirect()->route('jefemantenimiento.dashboard');
 
                 default:
                     Auth::guard('web')->logout();
@@ -63,21 +72,21 @@ class LoginController extends Controller
         }
 
         /*
-        |----------------------------------
-        | 2️⃣ INTENTO SUPERADMIN
-        |----------------------------------
-        */
+         |----------------------------------
+         | INTENTO SUPERADMIN
+         |----------------------------------
+         */
         if (Auth::guard('superadmin')->attempt([
-            'doc_super_admin' => $request->doc_us,
-            'password'  => $request->password,
-            'id_estado' => 1,
+        'doc_super_admin' => $request->doc_us,
+        'password' => $request->password,
+        'id_estado' => 1,
         ])) {
 
             $request->session()->regenerate();
             return redirect()->route('superadmin.dashboard');
         }
 
-        
+
         return back()->with([
             'error' => 'Documento o contraseña incorrectos']);
     }

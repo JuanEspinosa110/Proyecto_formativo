@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('venta_viaje', function (Blueprint $table) {
-            $table->foreign('id_tarjeta')
-                  ->references('id_tarjeta')->on('tarjeta')
-                  ->onDelete('restrict');
-        });
+        // No-op: tarjeta.id_tarjeta perdió su PRIMARY KEY al hacer change() a VARCHAR en 000100.
+        // No se puede añadir FK sin índice en la tabla referenciada.
+        // La integridad venta_viaje → tarjeta se gestiona a nivel de aplicación.
     }
 
     /**
@@ -24,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('venta_viaje', function (Blueprint $table) {
-            $table->dropForeign('venta_viaje_ibfk_2');
+            $table->dropForeign('venta_viaje_id_tarjeta_foreign');
         });
     }
 };

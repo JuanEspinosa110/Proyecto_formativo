@@ -187,7 +187,7 @@
                                 <span class="text-white fw-bold d-block">{{ $b->placa }}</span>
                                 <span class="x-small">{{ $b->modelo }}</span>
                             </div>
-                            <span class="badge bg-{{ $b->id_estado == 1 ? 'success' : 'danger' }} rounded-pill" style="font-size: 0.6rem;">{{ $b->estado->nombre_estado }}</span>
+                            <span class="badge bg-{{ $b->id_estado == 1 ? 'success' : ($b->id_estado == 4 ? 'warning text-dark' : 'danger') }} rounded-pill" style="font-size: 0.6rem;">{{ $b->estado->nombre_estado }}</span>
                         </div>
                         @empty
                         <span class="text-white-50">Sin vehículos asociados</span>
@@ -271,7 +271,7 @@
                                 </div>
                                 <div class="col-sm-6 col-md-3">
                                     <label class="text-muted small fw-bold text-uppercase d-block mb-1">Estado</label>
-                                    <span class="badge bg-{{ $b->id_estado == 1 ? 'success' : 'danger' }}-subtle text-{{ $b->id_estado == 1 ? 'success' : 'danger' }} rounded-pill d-inline-block">
+                                    <span class="badge bg-{{ $b->id_estado == 1 ? 'success' : ($b->id_estado == 4 ? 'warning' : 'danger') }}-subtle text-{{ $b->id_estado == 1 ? 'success' : ($b->id_estado == 4 ? 'warning' : 'danger') }} rounded-pill d-inline-block">
                                         {{ optional($b->estado)->nombre_estado ?? 'Activo' }}
                                     </span>
                                 </div>
@@ -449,9 +449,11 @@
                             </td>
                             <td>
                                 @php
-                                    $valColor = 'warning'; $valText = 'Pendiente';
-                                    if ($doc->id_estado == 24 || $doc->id_estado == 1) { $valColor = 'success'; $valText = 'Aprobado'; }
-                                    elseif ($doc->id_estado == 25 || $doc->id_estado == 2) { $valColor = 'danger'; $valText = 'Rechazado'; }
+                                    $valColor = 'secondary'; $valText = 'Desconocido';
+                                    if ($doc->id_estado == 1) { $valColor = 'success'; $valText = 'Aprobado'; }
+                                    elseif ($doc->id_estado == 8) { $valColor = 'danger'; $valText = 'Rechazado'; }
+                                    elseif ($doc->id_estado == 5) { $valColor = 'warning'; $valText = 'Pendiente'; }
+                                    elseif ($doc->id_estado == 2) { $valColor = 'info'; $valText = 'Archivado'; }
                                 @endphp
                                 <span class="badge bg-{{ $valColor }}-subtle text-{{ $valColor }} border border-{{ $valColor }} rounded-pill px-3 py-1 x-small fw-bold">
                                     {{ $valText }}
@@ -1288,7 +1290,11 @@
                     
                     const elEstado = document.getElementById('ver_estado');
                     elEstado.innerText = data.bus.estado.nombre_estado;
-                    elEstado.className = 'badge rounded-pill px-3 py-2 bg-' + (data.bus.id_estado == 1 ? 'success' : 'danger') + '-subtle text-' + (data.bus.id_estado == 1 ? 'success' : 'danger');
+                    let statusClass = 'danger';
+                    if (data.bus.id_estado == 1) statusClass = 'success';
+                    else if (data.bus.id_estado == 4) statusClass = 'warning';
+                    
+                    elEstado.className = 'badge rounded-pill px-3 py-2 bg-' + statusClass + '-subtle text-' + statusClass;
 
                     // Llenar Conductor
                     if (data.conductor) {

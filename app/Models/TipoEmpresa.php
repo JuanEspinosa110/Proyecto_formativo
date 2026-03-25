@@ -11,11 +11,20 @@ class TipoEmpresa extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'nombre_tipo'
+        'nombre_tipo',
+        'id_estado'
     ];
 
     public function empresa()
     {
         return $this->hasMany(Empresa::class, 'id_tipo_empresa', 'id_tipo_empresa');
+    }
+
+    /**
+     * Relación con el Estado
+     */
+    public function estado()
+    {
+        return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
     }
 }

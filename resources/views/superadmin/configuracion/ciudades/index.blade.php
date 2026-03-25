@@ -84,7 +84,7 @@
                                     <td class="py-2">{{ $ciudad->departamento->nombre_departamento ?? 'Sin Departamento' }}</td>
                                     <td class="text-end px-4 py-2">
                                         <div class="d-flex justify-content-end gap-3">
-                                            <a href="#" 
+                                            <a href="#"
                                                class="text-primary text-decoration-none d-flex align-items-center"
                                                data-bs-toggle="modal"
                                                data-bs-target="#editarModal"
@@ -137,16 +137,9 @@
                 <div class="modal-body py-4">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Código ID (2 dígitos) <span class="text-danger">*</span></label>
-                        <input type="text" name="id_departamento" class="form-control @error('id_departamento') is-invalid @enderror"
+                        <input type="text" name="id_departamento" id="id_departamento" inputmode="numeric" class="form-control @error('id_departamento') is-invalid @enderror"
                             placeholder="Ej: 05" maxlength="2" required value="{{ old('id_departamento') }}">
                         @error('id_departamento')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="mb-0">
-                        <label class="form-label fw-semibold">Nombre del Departamento <span class="text-danger">*</span></label>
-                        <input type="text" name="nombre_departamento" class="form-control @error('nombre_departamento') is-invalid @enderror" placeholder="Ej: Antioquia" required value="{{ old('nombre_departamento') }}">
-                        @error('nombre_departamento')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -315,7 +308,7 @@
         document.querySelectorAll('.text-input-validate').forEach(container => {
             const input = container.querySelector('input');
             const type = container.getAttribute('data-type');
-            
+
             if (input) {
                 input.addEventListener('input', function(e) {
                     if (type === 'number') {

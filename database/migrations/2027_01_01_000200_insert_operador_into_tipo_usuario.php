@@ -17,6 +17,7 @@ return new class extends Migration
             ['id_tipo_usuario' => 4, 'nombre_tipo' => 'AUXILIAR EMPRESA'],
             ['id_tipo_usuario' => 5, 'nombre_tipo' => 'PROPIETARIO'],
             ['id_tipo_usuario' => 6, 'nombre_tipo' => 'SETP'],
+            ['id_tipo_usuario' => 7, 'nombre_tipo' => 'JEFE_MANTENIMIENTO'],
         ], ['id_tipo_usuario'], ['nombre_tipo']);
     }
 
@@ -25,8 +26,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
         DB::table('tipo_usuario')
-            ->whereIn('id_tipo_usuario', [1, 2, 3, 4, 5, 6])
+            ->whereIn('id_tipo_usuario', [1, 2, 3, 4, 5, 6, 7])
             ->delete();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }
 };

@@ -6,6 +6,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 use App\Models\TipoUsuario;
+use App\Models\Empresa;
+use App\Models\Ciudad;
+use App\Models\TitularidadTarjeta;
 
 class Usuario extends Authenticatable
 {
@@ -55,11 +58,12 @@ class Usuario extends Authenticatable
 
             // Mapeo de Rol (string de validación a ID real de base de datos)
             if (isset($usuario->rol)) {
-                $usuario->id_tipo_usuario = match($usuario->rol) {
-                    'admin'    => 1, // ID para Admin
-                    'operador' => 4, // ID para Operador (según tabla tipo_usuario)
-                    'usuario'  => 3, // ID para Conductor/Usuario según lista permitida en vista
-                    default    => 1
+                $usuario->id_tipo_usuario = match ($usuario->rol) {
+                    'admin'              => 1,
+                    'operador'           => 4,
+                    'usuario'            => 3,
+                    'controlador_tiempo' => 8,
+                    default              => 1
                 };
             }
 
@@ -86,12 +90,40 @@ class Usuario extends Authenticatable
         return $this->belongsTo(TipoUsuario::class, 'id_tipo_usuario', 'id_tipo_usuario');
     }
 
+    /**
+     * Obtener el estado del usuario
+     */
+    public function estado()
+    {
+        return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
+    }
+
+    /**
+     * Obtener la empresa asociada al usuario 
+     */
+    public function empresa()
+    {
+        // Relación: Un usuario pertenece a una empresa a través del NIT
+        return $this->belongsTo(Empresa::class, 'NIT', 'NIT');
+    }
+
+    /**
+     * Obtener la ciudad asociada al usuario
+     */
+    public function ciudad()
+    {
+        // Relación: Un usuario pertenece a una ciudad a través de id_ciudad
+        return $this->belongsTo(Ciudad::class, 'id_ciudad', 'id_ciudad');
+    }
+
     public function titularidadesTarjeta(): HasMany
     {
         return $this->hasMany(TitularidadTarjeta::class, 'doc_usuario', 'doc_usuario');
     }
 
-
+    public function getActiveNit()
+    {
+        // Retorna el valor de la columna NIT de la tabla usuario
+        return $this->NIT;
+    }
 }
-
-

@@ -266,7 +266,7 @@
                 const form = document.getElementById('formEditRuta'); // Nota: el form tiene ID raro en el controller del user? no, arreglemoslo
                 const formActual = document.getElementById('formEditTipo');
 
-                formActual.action = `/superadmin/tipo-documento/${data.id_tipo_documento}`;
+                formActual.action = `/superadmin/configuracion/tipo-documento/${data.id_tipo_documento}`;
                 formActual.querySelector('[name="nombre"]').value = data.nombre;
                 formActual.querySelector('[name="descripcion"]').value = data.descripcion || '';
                 formActual.querySelector('[name="requiere_doc_usuario"]').checked = data.requiere_doc_usuario == 1;

@@ -17,5 +17,21 @@ class VentaViaje extends Model
         'fecha',
         'id_estado'
     ];
+
+    /**
+     * Relación con el Viaje.
+     */
+    public function viaje()
+    {
+        return $this->belongsTo(Viaje::class, 'id_viaje', 'id_viaje');
+    }
+
+    /**
+     * Relación con la Tarjeta.
+     */
+    public function tarjeta()
+    {
+        return $this->belongsTo(Tarjeta::class, 'id_tarjeta', 'id_tarjeta');
+    }
 }
 

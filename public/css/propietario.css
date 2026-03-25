@@ -1,0 +1,134 @@
+/* Ajustes específicos para el layout horizontal del propietario */
+.sigu-body {
+    background: linear-gradient(150deg, #e5dcf8ff 0%, #8271a6ff 100%) !important;
+    background-attachment: fixed !important;
+    min-height: 100vh;
+}
+
+.sigu-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: white;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 0.75rem 1.5rem;
+}
+.sigu-navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.sigu-brand-section {
+    width: 300px;
+}
+.sigu-brand-mark {
+    background: #5d548e;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sigu-brand-name {
+    line-height: 1;
+}
+
+.sigu-nav {
+    display: flex;
+    gap: 1.5rem;
+    margin-left: 2rem;
+}
+.sigu-nl {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: #64748b;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+.sigu-nl:hover {
+    color: #5d548e;
+    background: rgba(93, 84, 142, 0.05);
+}
+.sigu-nl.active {
+    color: #5d548e;
+    background: rgba(93, 84, 142, 0.1);
+}
+.sigu-nl .material-symbols-rounded {
+    font-size: 1.25rem;
+}
+
+.sigu-main {
+    padding: 2rem 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: calc(100vh - 140px);
+}
+
+.sigu-nb-end {
+    width: 300px;
+}
+.sigu-user-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0.2rem 0.75rem;
+    height: 38px;
+    box-sizing: border-box;
+}
+.sigu-user-pill:hover {
+    background: #f1f5f9;
+}
+.sigu-user-ava {
+    background: #5d548e;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+}
+.sigu-user-ava .material-symbols-rounded {
+    font-size: 1.1rem;
+}
+.sigu-user-info {
+    line-height: 1.1;
+}
+.sigu-user-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+.sigu-user-role {
+    font-size: 0.65rem;
+    color: #64748b;
+    display: block;
+}
+.sigu-user-pill .expand-icon {
+    font-size: 1.1rem;
+}
+
+.sigu-toast-container {
+    z-index: 1085;
+}
+.sigu-toast-icon-wrap {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.2);
+}

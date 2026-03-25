@@ -45,6 +45,7 @@ class PropietarioController extends Controller
         $gananciasHoy = 0;
         $gananciasSemana = 0;
         $gananciasMes = 0;
+        $ingresosPorBus = collect();
 
         if ($buses->isNotEmpty()) {
             $queryAsignaciones->whereIn('placa', $busIds);
@@ -56,34 +57,54 @@ class PropietarioController extends Controller
                 ->first();
 
             // Conteos consolidados basados en Recorridos Reales
-            $conteoAsignaciones = \App\Models\Recorrido::whereIn('placa', $busIds)->count();
+            // Conteos consolidados basados en Recorridos Reales
+            $conteoAsignaciones = \App\Models\Viaje::whereIn('placa', $busIds)->count();
             $conteoDocumentos = Documento::whereIn('placa', $busIds)->count();
             
-            // Ingresos y pasajeros desde VentaViaje (Ventas Reales)
-            $conteoPasajeros = VentaViaje::whereIn('id_viaje', $viajesOwnerIds)->count();
+            // Ingresos y pasajeros desde la tabla recorridos
+            $conteoPasajeros = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                $q->whereIn('placa', $busIds);
+            })->count();
             
             // Filtro por Mes para Ganancias
             $mesFiltro = $request->query('mes_seleccionado'); 
             if ($mesFiltro) {
-                $ingresosTotales = VentaViaje::whereIn('id_viaje', $viajesOwnerIds)->where('fecha', 'like', $mesFiltro . '%')->sum('valor');
+                $ingresosTotales = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                    $q->whereIn('placa', $busIds);
+                })->where('fecha', 'like', $mesFiltro . '%')->sum('valor');
             } else {
-                $ingresosTotales = VentaViaje::whereIn('id_viaje', $viajesOwnerIds)->sum('valor');
+                $ingresosTotales = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                    $q->whereIn('placa', $busIds);
+                })->sum('valor');
             }
 
             $hoy = \Carbon\Carbon::today();
             $semana = \Carbon\Carbon::now()->startOfWeek();
             $mes = \Carbon\Carbon::now()->startOfMonth();
 
-            $gananciasHoy = VentaViaje::whereIn('id_viaje', $viajesOwnerIds)->whereDate('fecha', $hoy)->sum('valor');
-            $gananciasSemana = VentaViaje::whereIn('id_viaje', $viajesOwnerIds)->where('fecha', '>=', $semana)->sum('valor');
-            $gananciasMes = VentaViaje::whereIn('id_viaje', $viajesOwnerIds)->where('fecha', '>=', $mes)->sum('valor');
+            $gananciasHoy = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                $q->whereIn('placa', $busIds);
+            })->whereDate('fecha', $hoy)->sum('valor');
+            $gananciasSemana = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                $q->whereIn('placa', $busIds);
+            })->where('fecha', '>=', $semana)->sum('valor');
+            $gananciasMes = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                $q->whereIn('placa', $busIds);
+            })->where('fecha', '>=', $mes)->sum('valor');
 
-            // 3. Ingresos individuales por bus (Ventas Reales)
-            $ingresosPorBus = VentaViaje::whereIn('venta_viaje.id_viaje', $viajesOwnerIds)
-                ->join('viaje', 'venta_viaje.id_viaje', '=', 'viaje.id_viaje')
-                ->select('viaje.placa', \Illuminate\Support\Facades\DB::raw('SUM(venta_viaje.valor) as total_ingresos'), \Illuminate\Support\Facades\DB::raw('COUNT(venta_viaje.id_venta) as total_pasajeros'))
-                ->groupBy('viaje.placa')
+            // 3. Ingresos individuales por bus (Nuevo)
+            $viajesTotalesBus = \App\Models\Viaje::whereIn('placa', $busIds)
+                ->withCount('ventas as total_pasajeros')
+                ->withSum('ventas as total_ingresos', 'valor')
                 ->get();
+                
+            $ingresosPorBus = $viajesTotalesBus->groupBy('placa')->map(function ($viajes, $placa) {
+                return (object)[
+                    'placa' => $placa,
+                    'total_ingresos' => $viajes->sum('total_ingresos') ?? 0,
+                    'total_pasajeros' => $viajes->sum('total_pasajeros') ?? 0
+                ];
+            })->values();
 
             // 1. Filtros Independientes
             if ($request->filled('fecha')) {
@@ -278,7 +299,7 @@ class PropietarioController extends Controller
                         'placa' => $bus->placa,
                         'doc_usuario' => $user->doc_usuario,
                         'NIT' => $bus->NIT,
-                        'id_estado' => 19, // 19 = PENDIENTE de aprobación
+                        'id_estado' => 5, // 5 = PENDIENTE de aprobación
                     ]);
 
                     // Inactivar el bus preventivamente ya que el documento requiere aprobación
@@ -330,7 +351,7 @@ class PropietarioController extends Controller
                 'doc_usuario' => $user->doc_usuario,
                 'fecha_expedicion' => $request->fecha_expedicion,
                 'fecha_vencimiento' => $request->fecha_vencimiento,
-                'id_estado' => 19, // 19 = PENDIENTE de aprobación
+                'id_estado' => 5, // 5 = PENDIENTE de aprobación
             ];
 
             // Inactivar el bus preventivamente ya que el documento requiere aprobación
@@ -475,16 +496,17 @@ class PropietarioController extends Controller
         // Un detalle importante: los recorridos deben ser del mismo bus, conductor y ruta? 
         // El requerimiento dice "viajes realizados durante ese turno".
         // Generalmente un turno está asociado a un bus y un conductor.
-        $recorridos = \App\Models\Recorrido::where('placa', $asignacion->placa)
-            ->where('doc_us', $asignacion->doc_us)
+        $recorridos = \App\Models\Recorrido::whereHas('viaje', function($q) use ($asignacion) {
+                $q->where('placa', $asignacion->placa)->where('doc_us', $asignacion->doc_us);
+            })
             ->where('hora_salida', '>=', $horaInicio)
             ->where('hora_llegada', '<=', $horaFin)
             ->orderBy('hora_salida', 'asc')
             ->get();
 
-        // Totales
-        $totalPasajeros = $recorridos->sum('cantidad_pasajeros');
-        $totalIngresos = $recorridos->sum('ingresos');
+        // Totales referenciando tarjetas/ventas directamente a LA ASIGNACIÓN (Viaje), NO por recorrido
+        $totalPasajeros = \App\Models\VentaViaje::where('id_viaje', $asignacion->id_viaje)->count();
+        $totalIngresos = \App\Models\VentaViaje::where('id_viaje', $asignacion->id_viaje)->sum('valor');
         
         // Contar trayectos
         // Trayecto Origen -> Destino vs Destino -> Origen
@@ -518,15 +540,16 @@ class PropietarioController extends Controller
                 'fecha' => $horaInicio->format('d/m/Y')
             ],
             'recorridos' => $recorridos->map(function($r, $index) use ($ruta) {
-                $esRegreso = ($index % 2 != 0);
+                $esRegreso = ($r->sentido == 'VUELTA');
                 return [
                     'trayecto' => $esRegreso 
                         ? ($ruta->barrioDestino->nombre ?? 'Destino') . ' → ' . ($ruta->barrioOrigen->nombre ?? 'Origen')
                         : ($ruta->barrioOrigen->nombre ?? 'Origen') . ' → ' . ($ruta->barrioDestino->nombre ?? 'Destino'),
                     'hora_salida' => \Carbon\Carbon::parse($r->hora_salida)->format('H:i'),
-                    'hora_llegada' => \Carbon\Carbon::parse($r->hora_llegada)->format('H:i'),
-                    'cantidad_pasajeros' => $r->cantidad_pasajeros,
-                    'ingresos' => $r->ingresos,
+                    'hora_llegada' => $r->hora_llegada ? \Carbon\Carbon::parse($r->hora_llegada)->format('H:i') : 'En curso',
+                    'cantidad_pasajeros' => 'Reflejado en Turno',
+                    'ingresos' => 'Reflejado en Turno',
+                    'evidencia' => $r->foto_torniquete ? asset('storage/' . $r->foto_torniquete) : null,
                     'es_regreso' => $esRegreso
                 ];
             }),

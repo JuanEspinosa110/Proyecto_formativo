@@ -33,7 +33,9 @@ class Barrio extends Model
      */
     protected $fillable = [
         'nombre',
-        'id_ciudad'
+        'id_ciudad',
+        'latitud',
+        'longitud'
     ];
 
     /**

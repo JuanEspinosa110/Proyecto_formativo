@@ -26,7 +26,7 @@
                 <div class="sigu-brand-mark" aria-hidden="true"><span class="material-symbols-rounded">route</span></div>
                 <div class="sigu-brand-text">
                     <span class="sigu-brand-name">SIGU</span>
-                    <span class="sigu-brand-sub">Auxilar Admin/span>
+                    <span class="sigu-brand-sub">Auxilar Admin</span>
                 </div>
             </a>
 
@@ -46,7 +46,7 @@
             </nav>
 
             <div class="sigu-sidebar-footer">
-                <form method="POST" action="{{ route('logout') }}">
+                <form id="empresa-logout-form-sidebar" method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="sigu-btn sigu-btn-ghost">
                         <span class="material-symbols-rounded">logout</span>

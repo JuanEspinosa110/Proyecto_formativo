@@ -18,100 +18,7 @@
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     <link rel="stylesheet" href="{{ asset('css/validacion.css') }}">
-
-    <style>
-        /* Ajustes específicos para el layout horizontal del propietario */
-        .sigu-body {
-            background: linear-gradient(150deg, #e5dcf8ff 0%, #8271a6ff 100%) !important;
-            background-attachment: fixed !important;
-            min-height: 100vh;
-        }
-
-        .sigu-navbar {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            background: white;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding: 0.75rem 1.5rem;
-        }
-        .sigu-navbar-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        .sigu-nav {
-            display: flex;
-            gap: 1.5rem;
-            margin-left: 2rem;
-        }
-        .sigu-nl {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            color: #64748b;
-            font-weight: 500;
-            font-size: 0.9rem;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            transition: all 0.2s ease;
-        }
-        .sigu-nl:hover {
-            color: #5d548e;
-            background: rgba(93, 84, 142, 0.05);
-        }
-        .sigu-nl.active {
-            color: #5d548e;
-            background: rgba(93, 84, 142, 0.1);
-        }
-        .sigu-nl .material-symbols-rounded {
-            font-size: 1.25rem;
-        }
-        .sigu-main {
-            padding: 2rem 1.5rem;
-            max-width: 1400px;
-            margin: 0 auto;
-            min-height: calc(100vh - 140px);
-        }
-        .sigu-user-pill {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 0.4rem 1rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .sigu-user-pill:hover {
-            background: #f1f5f9;
-        }
-        .sigu-user-ava {
-            width: 32px;
-            height: 32px;
-            background: #5d548e;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .sigu-user-name {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .sigu-user-role {
-            font-size: 0.7rem;
-            color: #64748b;
-            display: block;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/propietario.css') }}">
 
     @stack('styles')
 </head>
@@ -120,56 +27,60 @@
 
     <header class="sigu-navbar">
         <div class="sigu-navbar-inner">
-            <div class="d-flex align-items-center">
+            
+            <!-- Izquierda: Logo -->
+            <div class="d-flex align-items-center sigu-brand-section">
                 <a href="{{ route('propietario.dashboard') }}" class="sigu-brand text-decoration-none d-flex align-items-center gap-2">
-                    <div class="sigu-brand-mark" style="background: #5d548e; color: white; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <div class="sigu-brand-mark">
                         <span class="material-symbols-rounded">person_pin</span>
                     </div>
                     <div class="sigu-brand-text">
-                        <span class="sigu-brand-name fw-bold text-dark fs-5 mb-0 d-block" style="line-height: 1;">SIGU</span>
+                        <span class="sigu-brand-name fw-bold text-dark fs-5 mb-0 d-block">SIGU</span>
                         <span class="sigu-brand-sub text-muted small">Propietario</span>
                     </div>
                 </a>
-
-                <nav class="sigu-nav d-none d-lg-flex">
-                    <a href="{{ route('propietario.dashboard') }}" class="sigu-nl {{ request()->routeIs('propietario.dashboard') && !request()->has('section') ? 'active' : '' }}">
-                        <span class="material-symbols-rounded">dashboard</span>
-                        <span>Dashboard</span>
-                    </a>
-                    <a href="{{ route('propietario.dashboard', ['section' => 'vehiculo']) }}" class="sigu-nl {{ request()->get('section') == 'vehiculo' ? 'active' : '' }}">
-                        <span class="material-symbols-rounded">directions_bus</span>
-                        <span>Mi Vehículo</span>
-                    </a>
-                    <a href="{{ route('propietario.dashboard', ['section' => 'asignaciones']) }}" class="sigu-nl {{ request()->get('section') == 'asignaciones' ? 'active' : '' }}">
-                        <span class="material-symbols-rounded">assignment</span>
-                        <span>Asignaciones</span>
-                    </a>
-                    <a href="{{ route('propietario.dashboard', ['section' => 'documentos']) }}" class="sigu-nl {{ request()->get('section') == 'documentos' ? 'active' : '' }}">
-                        <span class="material-symbols-rounded">description</span>
-                        <span>Documentos</span>
-                    </a>
-                    <a href="{{ route('propietario.dashboard', ['section' => 'historial']) }}" class="sigu-nl {{ request()->get('section') == 'historial' ? 'active' : '' }}">
-                        <span class="material-symbols-rounded">history</span>
-                        <span>Historial</span>
-                    </a>
-                    <a href="{{ route('propietario.dashboard', ['section' => 'ganancias']) }}" class="sigu-nl {{ request()->get('section') == 'ganancias' ? 'active' : '' }}">
-                        <span class="material-symbols-rounded">payments</span>
-                        <span>Ganancias</span>
-                    </a>
-                </nav>
             </div>
 
-            <div class="sigu-nb-end d-flex align-items-center gap-3">
+            <!-- Centro: Menú de Navegación -->
+            <nav class="sigu-nav d-none d-lg-flex m-0 justify-content-center flex-grow-1">
+                <a href="{{ route('propietario.dashboard') }}" class="sigu-nl {{ request()->routeIs('propietario.dashboard') && !request()->has('section') ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ route('propietario.dashboard', ['section' => 'vehiculo']) }}" class="sigu-nl {{ request()->get('section') == 'vehiculo' ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">directions_bus</span>
+                    <span>Mi Vehículo</span>
+                </a>
+                <a href="{{ route('propietario.dashboard', ['section' => 'asignaciones']) }}" class="sigu-nl {{ request()->get('section') == 'asignaciones' ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">assignment</span>
+                    <span>Asignaciones</span>
+                </a>
+                <a href="{{ route('propietario.dashboard', ['section' => 'documentos']) }}" class="sigu-nl {{ request()->get('section') == 'documentos' ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">description</span>
+                    <span>Documentos</span>
+                </a>
+                <a href="{{ route('propietario.dashboard', ['section' => 'historial']) }}" class="sigu-nl {{ request()->get('section') == 'historial' ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">history</span>
+                    <span>Historial</span>
+                </a>
+                <a href="{{ route('propietario.dashboard', ['section' => 'ganancias']) }}" class="sigu-nl {{ request()->get('section') == 'ganancias' ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">payments</span>
+                    <span>Ganancias</span>
+                </a>
+            </nav>
+
+            <!-- Derecha: Perfil Usuario -->
+            <div class="sigu-nb-end d-flex align-items-center justify-content-end gap-3">
                 <div class="dropdown">
                     <div class="sigu-user-pill dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="sigu-user-ava">
                             <span class="material-symbols-rounded">person</span>
                         </div>
-                        <div class="sigu-user-info d-none d-md-block">
-                            <span class="sigu-user-name">{{ auth()->user()->primer_nombre }} {{ auth()->user()->primer_apellido }}</span>
-                            <span class="sigu-user-role">Documento: {{ auth()->user()->doc_usuario }}</span>
+                        <div class="sigu-user-info d-none d-md-block text-start">
+                            <span class="sigu-user-name d-block m-0 pb-1">{{ auth()->user()->primer_nombre }} {{ auth()->user()->primer_apellido }}</span>
+                            <span class="sigu-user-role d-block m-0">Documento: {{ auth()->user()->doc_usuario }}</span>
                         </div>
-                        <span class="material-symbols-rounded fs-5 text-muted">expand_more</span>
+                        <span class="material-symbols-rounded text-muted expand-icon">expand_more</span>
                     </div>
                     <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2">
                         <li>
@@ -184,6 +95,7 @@
                     </ul>
                 </div>
             </div>
+            
         </div>
     </header>
 
@@ -206,11 +118,11 @@
     </footer>
 
     <!-- Toast UI -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1085;">
+    <div class="toast-container position-fixed bottom-0 end-0 p-4 sigu-toast-container">
         <div id="siguToast" class="toast align-items-center text-white border-0 shadow-lg rounded-4" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="8000">
             <div class="d-flex">
                 <div class="toast-body d-flex align-items-center gap-3 py-3 px-4">
-                    <div id="toastIconWrap" class="rounded-circle d-flex align-items-center justify-content-center" style="width:32px; height:32px; background: rgba(255,255,255,0.2)">
+                    <div id="toastIconWrap" class="rounded-circle d-flex align-items-center justify-content-center sigu-toast-icon-wrap">
                         <span id="toastIcon" class="material-symbols-rounded fs-5"></span>
                     </div>
                     <div id="toastMessage" class="fw-medium"></div>
