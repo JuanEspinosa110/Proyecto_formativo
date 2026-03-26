@@ -32,5 +32,5 @@ class InitialDataSeeder extends Seeder
     }
 }
 
-}
+
 
