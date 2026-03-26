@@ -20,7 +20,7 @@ Route::prefix('empresa')->name('empresa.')->group(function () {
 
             // Módulo de Asignaciones (Restringir Delete en Controlador para Auxiliar)
             Route::resource('asignaciones', AsignacionController::class)
-                ->only(['index', 'store', 'update', 'destroy']);
+                ->only(['index', 'create', 'store', 'update', 'destroy']);
             // Módulo de Usuarios (Compartido)
             Route::get('/usuarios', [UsuarioController::class , 'index'])->name('usuarios.index');
             Route::post('/usuarios', [UsuarioController::class , 'store'])->name('usuarios.store');

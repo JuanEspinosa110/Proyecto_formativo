@@ -115,6 +115,37 @@ class AsignacionController extends Controller
     }
 
     /**
+     * Muestra el formulario para crear una nueva asignación.
+     */
+    public function create()
+    {
+        $user = Auth::guard('web')->user();
+        $nit = $user->getActiveNit();
+
+        $buses = Bus::where('NIT', $nit)->get();
+        $rutas = Ruta::orderBy('id_ruta', 'asc')->get();
+        
+        $adminRoleIds = \Illuminate\Support\Facades\DB::table('tipo_usuario')
+            ->where('nombre_tipo', 'like', '%admin%')
+            ->pluck('id_tipo_usuario');
+
+        $licenciasVigentes = \App\Models\Documento::where('id_tipo_documento', 3)
+            ->where('id_estado', 1)
+            ->whereDate('fecha_vencimiento', '>=', now()->format('Y-m-d'))
+            ->pluck('doc_usuario');
+
+        $conductores = Usuario::where('NIT', $nit)
+            ->where('id_estado', 1)
+            ->whereIn('doc_usuario', $licenciasVigentes)
+            ->whereNotIn('id_tipo_usuario', $adminRoleIds)
+            ->get();
+
+        $estados = Estado::whereIn('nombre_estado', ['ACTIVO', 'INACTIVO'])->get();
+
+        return view('admin.asignaciones.create', compact('buses', 'rutas', 'conductores', 'estados'));
+    }
+
+    /**
      * Guardar una nueva asignación con ID generado manualmente.
      */
     public function store(AsignacionRequest $request)

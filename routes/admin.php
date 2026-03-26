@@ -30,7 +30,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Módulo de Asignaciones
         Route::resource('asignaciones', AsignacionController::class)
-            ->only(['index', 'store', 'update', 'destroy']);
+            ->only(['index', 'create', 'store', 'update', 'destroy']);
 
 
         // Otros módulos

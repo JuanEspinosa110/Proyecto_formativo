@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             BusSeeder::class,
             GestorSetpSeeder::class,
             RutaSeeder::class,
+            DocumentoSeeder::class,
             PasajeroSeeder::class,
         ]);
 
