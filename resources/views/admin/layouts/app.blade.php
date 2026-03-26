@@ -70,7 +70,6 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">map</span></span>
                     <span>Rutas</span>
                 </a>
-
                 <div class="sigu-sb-divider" style="height:1px; background:rgba(255,255,255,0.1); margin:1rem 0;"></div>
                 <p class="small text-uppercase px-4 mb-2" style="font-size:10px; opacity:0.6; letter-spacing:1px;">Mantenimiento</p>
 
@@ -83,6 +82,7 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">build</span></span>
                     <span>Mantenimiento</span>
                 </a>
+                @endif
 
             </nav>
 

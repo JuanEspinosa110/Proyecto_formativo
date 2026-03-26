@@ -5,13 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>@yield('title', 'Super Admin')</title>
-    <title>@yield('title', 'SIGU') — Sistema Integral de Seguimiento Urbano</title>
-
-    <!-- Tipografías: Sora (display) + Inter Tight (body) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
-
     <title>@yield('title', 'SIGU') — Sistema Integral de Seguimiento Urbano</title>
 
     <!-- Tipografías: Sora (display) + Inter Tight (body) -->
@@ -121,22 +114,13 @@
                         </a>
                     </li>
 
-<<<<<<< HEAD
-
-
-=======
-<<<<<<< HEAD
-=======
-                {{-- RUTAS --}}
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.rutas.index') }}">
-                        <i class="bi bi-map"></i> Rutas
-                    </a>
-                </li>
-
->>>>>>> origin
->>>>>>> develop
+                    {{-- RUTAS --}}
+                    <li>
+                        <a class="dropdown-item"
+                           href="{{ route('superadmin.rutas.index') }}">
+                            <i class="bi bi-map"></i> Rutas
+                        </a>
+                    </li>
                 {{-- TIPOS DE EMPRESA --}}
                 <li>
                     <a class="dropdown-item"
@@ -153,7 +137,6 @@
                         </a>
                     </li>
 
-<<<<<<< HEAD
                     {{-- ESTADOS --}}
                     <li>
                         <a class="dropdown-item"
@@ -161,44 +144,14 @@
                             <i class="bi bi-toggle-on"></i> Estados
                         </a>
                     </li>
+
+                    {{-- TIPO MANTENIMIENTO --}}
                     <li>
                         <a class="dropdown-item"
                         href="{{ route('superadmin.configuracion.tipo-mantenimiento.index') }}">
                             <i class="bi bi-tools"></i> Tipo de Mantenimiento
                         </a>
                     </li>
-=======
-                {{-- ESTADOS --}}
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.configuracion.estados.index') }}">
-                        <i class="bi bi-toggle-on"></i> Estados
-                    </a>
-                </li>
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.configuracion.tipo-mantenimiento.index') }}">
-                        <i class="bi bi-tools"></i> Tipo de Mantenimiento
-                    </a>
-                </li>
-<<<<<<< HEAD
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.configuracion.tipo-documento.index') }}">
-                        <i class="bi bi-file-earmark-text"></i> Tipo de Documento
-                    </a>
-                </li>
-=======
->>>>>>> origin
-                {{-- TIPO DE DOCUMENTOS --}}
-                <li>
-                    <a class="dropdown-item"
-                    href="{{ route('superadmin.configuracion.tipo-documento.index') }}">
-                        <i class="bi bi-file-earmark-text"></i> Tipos de Documento
-                    </a>
-                </li>
-                {{-- TIPO DE ASIGNACIÓN --}}
->>>>>>> develop
 
                     {{-- TIPOS DE DOCUMENTO --}}
                     <li>
@@ -277,19 +230,7 @@
             <a href="{{ route('superadmin.empresas.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.empresas.*') ? 'active' : '' }}"><span class="material-symbols-rounded">business</span>Empresas</a>
             <a href="{{ route('superadmin.licencias.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.licencias.*') ? 'active' : '' }}"><span class="material-symbols-rounded">verified</span>Licencias</a>
             <a href="{{ route('superadmin.planes.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.planes.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">layers</span>Planes</a>
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> develop
-
-
-<<<<<<< HEAD
-
             <a href="{{ route('superadmin.gestores-recargas.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.gestores-recargas.*') ? 'active' : '' }}"><span class="material-symbols-rounded">person_add</span>Gestores Recargas</a>
-=======
->>>>>>> origin
->>>>>>> develop
             <a href="{{ route('superadmin.configuracion.barrios.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.barrios.*') ? 'active' : '' }}"><span class="material-symbols-rounded">location_city</span>Barrios</a>
             <a href="{{ route('superadmin.perfil.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.perfil.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">badge</span>Perfil</a>
             <div class="sigu-drawer-footer">
