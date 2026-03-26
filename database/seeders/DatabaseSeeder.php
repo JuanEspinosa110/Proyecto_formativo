@@ -32,6 +32,15 @@ class DatabaseSeeder extends Seeder
             RutaSeeder::class,
             DocumentoSeeder::class,
             PasajeroSeeder::class,
+            AfiliacionSeeder::class,
+            RecargaSeeder::class,
+            AsignacionSeeder::class,
+            RecorridoSeeder::class,
+            ViajeSeeder::class,
+            NovedadRecorridoSeeder::class,
+            MantenimientoSeeder::class,
+            ReporteFallasSeeder::class,
+            GastosSeeder::class,
         ]);
 
     }
