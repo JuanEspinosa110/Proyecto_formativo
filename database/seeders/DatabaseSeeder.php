@@ -29,7 +29,8 @@ class DatabaseSeeder extends Seeder
             SuperAdministradorSeeder::class,
             BusSeeder::class,
             GestorSetpSeeder::class,
-            RutaSeeder::class ,
+            RutaSeeder::class,
+            PasajeroSeeder::class,
         ]);
 
     }
