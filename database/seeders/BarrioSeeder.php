@@ -458,5 +458,16 @@ class BarrioSeeder extends Seeder
             ['id_barrio' => 442, 'nombre' => 'TERRAZAS DE BOQUERON', 'id_ciudad' => '730001', 'latitud' => 4.43890000, 'longitud' => -75.23220000],
             ['id_barrio' => 443, 'nombre' => 'VILLA MERY', 'id_ciudad' => '730001', 'latitud' => 4.41377190, 'longitud' => -75.26441650],
         ];
+        foreach ($barrios as $barrio) {
+            \Illuminate\Support\Facades\DB::table('barrio')->updateOrInsert(
+                ['id_barrio' => $barrio['id_barrio']],
+                [
+                    'nombre' => $barrio['nombre'],
+                    'id_ciudad' => $barrio['id_ciudad'],
+                    'latitud' => $barrio['latitud'],
+                    'longitud' => $barrio['longitud']
+                ]
+            );
+        }
     }
 }

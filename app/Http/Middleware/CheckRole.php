@@ -19,14 +19,13 @@ class CheckRole
         'propietario' => 5,
         'gestor_setp' => 6,
         'coordinador_bus' => 7,
-        'ganagana'           => 8, // Alias heredado — ahora es GESTOR DE RECARGAS
-        'gestor_recargas'    => 8,
+        'ganagana' => 8, // Alias heredado — ahora es GESTOR DE RECARGAS
+        'gestor_recargas' => 8,
         'jefe_mantenimiento' => 9,
     ];
 
     /**
      * Handle an incoming request.
-     * Permite usar tanto ids como nombres de rol en el middleware: role:admin o role:1
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
@@ -35,11 +34,11 @@ class CheckRole
                 ->with('error', 'Debe iniciar sesión para continuar.');
         }
 
-        $user = Auth::user();
-        $userRoleId = (int) $user->id_tipo_usuario;
+        $user = auth()->user();
+        $userRoleId = (int)$user->id_tipo_usuario;
 
         // Convertir nombres de rol a id
-        $roleIds = array_map(function($role) {
+        $roleIds = array_map(function ($role) {
             if (is_numeric($role)) {
                 return (int)$role;
             }

@@ -49,5 +49,11 @@ class DepartamentoSeeder extends Seeder
             ['id_departamento' => '97', 'nombre_departamento' => 'VAUPES'],
             ['id_departamento' => '99', 'nombre_departamento' => 'VICHADA']
         ];
+        foreach ($departamentos as $departamento) {
+            \Illuminate\Support\Facades\DB::table('departamento')->updateOrInsert(
+                ['id_departamento' => $departamento['id_departamento']],
+                ['nombre_departamento' => $departamento['nombre_departamento']]
+            );
+        }
     }
 }
