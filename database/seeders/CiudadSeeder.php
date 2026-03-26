@@ -1,7 +1,6 @@
 <?php
 
 namespace Database\Seeders;
-
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,6 +11,7 @@ class CiudadSeeder extends Seeder
      */
     public function run(): void
     {
+
         $ciudades = [
             ['id_ciudad' => '050001', 'nombre_city' => 'MEDELLIN', 'id_departamento' => '05'],
             ['id_ciudad' => '050002', 'nombre_city' => 'ABEJORRAL', 'id_departamento' => '05'],

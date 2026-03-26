@@ -81,7 +81,7 @@ class DashboardController extends Controller
                 ]
             ]);
         } catch (\Throwable $e) {
-            \Log::error('Error en DashboardController@stats: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Error en DashboardController@stats: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['error' => 'Error interno: '.$e->getMessage()], 500);
         }
     }
