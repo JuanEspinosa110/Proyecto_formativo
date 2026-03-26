@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class Tarjeta extends Model
 {
@@ -44,7 +45,7 @@ class Tarjeta extends Model
 
             // Estado por defecto: buscar el id del estado 'ACTIVO'
             if (empty($tarjeta->id_estado)) {
-                $estadoActivo = \DB::table('estado')->where('nombre_estado', 'ACTIVO')->value('id_estado');
+                $estadoActivo = DB::table('estado')->where('nombre_estado', 'ACTIVO')->value('id_estado');
                 $tarjeta->id_estado = $estadoActivo;
             }
         });
@@ -68,7 +69,7 @@ class Tarjeta extends Model
     // Métodos para cambiar estado usando el nombre del estado
     public function cambiarEstadoPorNombre($nombreEstado)
     {
-        $nuevoEstado = \DB::table('estado')->where('nombre', $nombreEstado)->value('id_estado');
+        $nuevoEstado = DB::table('estado')->where('nombre', $nombreEstado)->value('id_estado');
         if ($nuevoEstado) {
             $this->id_estado = $nuevoEstado;
             $this->save();

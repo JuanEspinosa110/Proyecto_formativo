@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class InitialDataSeeder extends Seeder
 {
-    public function run(): void
+    public function run(): void {
 
         // Estados completos
         $estados = [
@@ -29,4 +29,6 @@ class InitialDataSeeder extends Seeder
             );
         }
     }
+
+}
 

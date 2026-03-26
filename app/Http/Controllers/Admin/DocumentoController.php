@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class DocumentoController extends Controller
 {
@@ -177,7 +178,7 @@ class DocumentoController extends Controller
 
         $query = Documento::where('NIT', $empresa->NIT)
             ->with(['tipoDocumento', 'estado', 'bus'])
-            ->whereNotNull('placa'); 
+            ->whereNotNull('placa');
 
         // Filtrar solicitudes: Excluir Aprobados (1) y Rechazados (8)
         $query->whereNotIn('id_estado', [1, 8]);

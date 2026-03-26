@@ -26,8 +26,6 @@ use App\Http\Controllers\SuperAdmin\{
     CiudadController,
 };
 
-use App\Http\Controllers\EmpresaController;
-
 require base_path('routes/superadmin.php');
 // Rutas Administrativas (Panel Empresas)
 require base_path('routes/admin.php');

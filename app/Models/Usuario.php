@@ -99,7 +99,7 @@ class Usuario extends Authenticatable
     }
 
     /**
-     * Obtener la empresa asociada al usuario 
+     * Obtener la empresa asociada al usuario
      */
     public function empresa()
     {
