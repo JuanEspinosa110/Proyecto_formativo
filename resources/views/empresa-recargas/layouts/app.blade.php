@@ -47,6 +47,12 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
                     <span>Usuarios</span>
                 </a>
+
+                <div class="sigu-sb-divider" style="height:1px; background:rgba(255,255,255,0.1); margin:1rem 0;"></div>
+                <a href="{{ route('pasajero.dashboard') }}" class="sigu-sb-link {{ request()->routeIs('pasajero.*') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">credit_card</span></span>
+                    <span>Mi Tarjeta</span>
+                </a>
             </nav>
 
             <div class="sigu-sidebar-footer">

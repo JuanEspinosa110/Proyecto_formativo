@@ -126,4 +126,54 @@ class Usuario extends Authenticatable
         // Retorna el valor de la columna NIT de la tabla usuario
         return $this->NIT;
     }
+
+    /**
+     * Determina si el usuario tiene un rol específico o acceso por jerarquía.
+     */
+    public function hasRole($role): bool
+    {
+        $roleMap = [
+            'admin'              => 1,
+            'pasajero'           => 2,
+            'conductor'          => 3,
+            'auxiliar'           => 4,
+            'propietario'        => 5,
+            'gestor_setp'        => 6,
+            'coordinador_bus'    => 7,
+            'gestor_recargas'    => 8,
+            'jefe_mantenimiento' => 9,
+        ];
+
+        $targetId = is_numeric($role) ? (int)$role : ($roleMap[$role] ?? null);
+
+        if (!$targetId) return false;
+
+        // El usuario tiene el rol exacto
+        if ((int)$this->id_tipo_usuario === $targetId) {
+            return true;
+        }
+
+        // Lógica de herencia: Cualquier usuario autenticado tiene acceso a "pasajero" (ID 2)
+        if ($targetId === 2) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Obtiene el nombre de la ruta del dashboard principal según el rol.
+     */
+    public function getDashboardRoute(): string
+    {
+        return match ((int)$this->id_tipo_usuario) {
+            1       => 'admin.dashboard',
+            3       => 'conductor.dashboard',
+            4       => 'empresa.dashboard',
+            5       => 'propietario.dashboard',
+            8       => 'ganagana.dashboard', // O gestor_recargas
+            9       => 'jefemantenimiento.dashboard',
+            default => 'pasajero.dashboard',
+        };
+    }
 }

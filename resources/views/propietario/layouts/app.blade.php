@@ -82,7 +82,14 @@
                         </div>
                         <span class="material-symbols-rounded text-muted expand-icon">expand_more</span>
                     </div>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2">
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2 px-2">
+                        <li>
+                            <a href="{{ route('pasajero.dashboard') }}" class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2 mb-1 fw-medium">
+                                <span class="material-symbols-rounded fs-5">credit_card</span>
+                                Mi Tarjeta
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider opacity-10"></li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf

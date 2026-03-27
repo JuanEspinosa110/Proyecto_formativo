@@ -66,6 +66,11 @@
                     <span class="material-symbols-rounded">folder_open</span>
                     <span>Documentos</span>
                 </a>
+                <a href="{{ route('pasajero.dashboard') }}"
+                   class="sigu-nl {{ request()->routeIs('pasajero.*') ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">credit_card</span>
+                    <span>Mi Tarjeta</span>
+                </a>
             </nav>
 
             <!-- Acciones derecha -->
@@ -89,6 +94,12 @@
                         <li class="sigu-drop-head">
                             <span class="material-symbols-rounded">manage_accounts</span>
                             Mi cuenta
+                        </li>
+                        <li>
+                            <a class="dropdown-item sigu-di" href="{{ route('pasajero.dashboard') }}">
+                                <span class="material-symbols-rounded">credit_card</span>
+                                Mi Tarjeta
+                            </a>
                         </li>
                         <li><hr class="dropdown-divider sigu-drop-sep"></li>
                         <li>
@@ -117,6 +128,7 @@
             <a href="{{ route('gestor-setp.empresas.index') }}" class="sigu-dl {{ request()->routeIs('gestor-setp.empresas.*') ? 'active' : '' }}"><span class="material-symbols-rounded">business</span>Empresas</a>
             <a href="{{ route('gestor-setp.buses.index') }}"  class="sigu-dl {{ request()->routeIs('gestor-setp.buses.*')    ? 'active' : '' }}"><span class="material-symbols-rounded">directions_bus</span>Buses</a>
             <a href="{{ route('gestor-setp.documentos.index') }}" class="sigu-dl {{ request()->routeIs('gestor-setp.documentos.*') ? 'active' : '' }}"><span class="material-symbols-rounded">folder_open</span>Documentos</a>
+            <a href="{{ route('pasajero.dashboard') }}" class="sigu-dl {{ request()->routeIs('pasajero.*') ? 'active' : '' }}"><span class="material-symbols-rounded">credit_card</span>Mi Tarjeta</a>
             <div class="sigu-drawer-footer">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

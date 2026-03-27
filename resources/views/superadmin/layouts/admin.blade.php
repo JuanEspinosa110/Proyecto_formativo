@@ -203,6 +203,12 @@
                                 </a>
                             </li>
                             <li>
+                                <a class="dropdown-item sigu-di" href="{{ route('pasajero.dashboard') }}">
+                                    <span class="material-symbols-rounded">credit_card</span>
+                                    Mi Tarjeta
+                                </a>
+                            </li>
+                            <li>
                                 <hr class="dropdown-divider sigu-drop-sep">
                             </li>
                             <li>
@@ -233,6 +239,7 @@
             <a href="{{ route('superadmin.gestores-recargas.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.gestores-recargas.*') ? 'active' : '' }}"><span class="material-symbols-rounded">person_add</span>Gestores Recargas</a>
             <a href="{{ route('superadmin.configuracion.barrios.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.barrios.*') ? 'active' : '' }}"><span class="material-symbols-rounded">location_city</span>Barrios</a>
             <a href="{{ route('superadmin.perfil.index') }}" class="sigu-dl {{ request()->routeIs('superadmin.perfil.*')   ? 'active' : '' }}"><span class="material-symbols-rounded">badge</span>Perfil</a>
+            <a href="{{ route('pasajero.dashboard') }}" class="sigu-dl {{ request()->routeIs('pasajero.*') ? 'active' : '' }}"><span class="material-symbols-rounded">credit_card</span>Mi Tarjeta</a>
             <div class="sigu-drawer-footer">
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

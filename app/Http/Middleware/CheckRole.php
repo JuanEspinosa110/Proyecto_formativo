@@ -35,24 +35,12 @@ class CheckRole
         }
 
         $user = auth()->user();
-        $userRoleId = (int)$user->id_tipo_usuario;
 
-        // Convertir nombres de rol a id
-        $roleIds = array_map(function ($role) {
-            if (is_numeric($role)) {
-                return (int)$role;
+        // Verificar si el usuario tiene al menos uno de los roles permitidos (incluyendo herencia)
+        foreach ($roles as $role) {
+            if ($user->hasRole($role)) {
+                return $next($request);
             }
-            return self::ROLES[$role] ?? null;
-        }, $roles);
-
-        // Convertimos los nombres de roles (si vienen como strings) a sus IDs correspondientes
-        $roleIds = array_map(function ($role) {
-            return is_numeric($role) ? (int)$role : (self::ROLES[$role] ?? $role);
-        }, $roles);
-
-        // Si el rol del usuario está en los permitidos, continuar
-        if (in_array($user->id_tipo_usuario, $roleIds)) {
-            return $next($request);
         }
 
         // Redirección por seguridad si intenta entrar a donde no debe

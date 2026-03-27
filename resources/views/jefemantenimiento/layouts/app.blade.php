@@ -54,6 +54,12 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">engineering</span></span>
                     <span>Historial / Taller</span>
                 </a>
+                <div class="sigu-sb-divider"></div>
+                <a href="{{ route('pasajero.dashboard') }}"
+                   class="sigu-sb-link {{ request()->routeIs('pasajero.*') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">credit_card</span></span>
+                    <span>Mi Tarjeta</span>
+                </a>
 
             </nav>
 
