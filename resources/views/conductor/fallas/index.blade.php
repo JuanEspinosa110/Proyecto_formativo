@@ -57,12 +57,14 @@
                             <span class="badge bg-light text-dark border">{{ $falla->nivel_urgencia }}</span>
                         </td>
                         <td class="text-end pe-3">
-                            @if($falla->id_estado == 19) 
+                            @if($falla->id_estado == 6) 
                                 <span class="badge bg-danger rounded-pill">PENDIENTE</span>
-                            @elseif($falla->id_estado == 6 || $falla->id_estado == 7) 
+                            @elseif($falla->id_estado == 1) 
                                 <span class="badge bg-warning rounded-pill text-dark">EN PROCESO</span>
-                            @else
+                            @elseif($falla->id_estado == 5)
                                 <span class="badge bg-success rounded-pill">SOLUCIONADO</span>
+                            @else
+                                <span class="badge bg-secondary rounded-pill">OTROS</span>
                             @endif
                         </td>
                     </tr>

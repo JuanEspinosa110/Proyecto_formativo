@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Limpiamos los registros existentes que quedarían huérfanos sin id_viaje para evitar incosistencias de integridad
-        // Alternativamente, se dejan como nulos. Los hacemos nulos con nullable().
         Schema::table('recorridos', function (Blueprint $table) {
-            $table->dropColumn(['placa', 'id_ruta', 'doc_us', 'cantidad_pasajeros', 'ingresos']);
+            $columnsToDrop = ['placa', 'id_ruta', 'doc_us', 'cantidad_pasajeros', 'ingresos'];
+            foreach ($columnsToDrop as $column) {
+                if (Schema::hasColumn('recorridos', $column)) {
+                    $table->dropColumn($column);
+                }
+            }
             $table->unsignedBigInteger('id_viaje')->nullable()->after('id_recorrido');
             $table->enum('sentido', ['IDA', 'VUELTA'])->nullable()->after('id_viaje');
             $table->string('foto_torniquete')->nullable()->after('hora_llegada');

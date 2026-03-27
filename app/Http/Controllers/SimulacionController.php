@@ -78,15 +78,13 @@ class SimulacionController extends Controller
 
         $viaje = Viaje::find($request->id_viaje);
         if ($viaje) {
-            $recorridoActivo = \App\Models\Recorrido::where('doc_us', $viaje->doc_us)
-                ->where('placa', $viaje->placa)
+            $recorridoActivo = \App\Models\Recorrido::where('id_viaje', $viaje->id_viaje)
                 ->whereNull('hora_llegada')
                 ->first();
 
             if ($recorridoActivo) {
-                $recorridoActivo->cantidad_pasajeros += 1;
-                $recorridoActivo->ingresos += $costoPasaje;
-                $recorridoActivo->save();
+                // Nota: Los pasajeros e ingresos se trackean vía VentaViaje vinculado al id_viaje.
+                // Ya no existen columnas en la tabla recorridos.
             }
         }
 

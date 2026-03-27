@@ -268,7 +268,7 @@
                             <td>
                                 @if($licencia->id_estado == 1)
                                 <span class="badge bg-success">{{ $licencia->nombre_estado }}</span>
-                                @elseif($licencia->id_estado == 6)
+                                @elseif($licencia->id_estado == 8)
                                 <span class="badge bg-danger">{{ $licencia->nombre_estado }}</span>
                                 @elseif($licencia->id_estado == 3)
                                 <span class="badge bg-warning">{{ $licencia->nombre_estado }}</span>

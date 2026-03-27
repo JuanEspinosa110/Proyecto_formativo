@@ -51,7 +51,9 @@ class MonitoreoController extends Controller
                 $idRuta = $bus->asignaciones->first()->id_ruta;
 
                 // Buscar el bus que salió inmediatamente antes por la misma ruta
-                $recorridoAnterior = \App\Models\Recorrido::where('id_ruta', $idRuta)
+                $recorridoAnterior = \App\Models\Recorrido::whereHas('viaje', function($q) use ($idRuta) {
+                                $q->where('id_ruta', $idRuta);
+                            })
                             ->where('id_recorrido', '!=', $ultimaSalida->id_recorrido)
                             ->where('hora_salida', '<', $ultimaSalida->hora_salida)
                             ->orderBy('hora_salida', 'desc')

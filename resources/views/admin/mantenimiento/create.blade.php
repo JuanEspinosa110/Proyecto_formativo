@@ -48,9 +48,9 @@
                         @foreach($buses as $bus)
                             <option value="{{ $bus->placa }}"
                                 @if(isset($placa_predefinida) && $placa_predefinida == $bus->placa) selected @endif
-                                @if($bus->id_estado == 7) disabled @endif>
+                                @if($bus->id_estado == 4) disabled @endif>
                                 {{ $bus->placa }} — {{ $bus->modelo }}
-                                @if($bus->id_estado == 7) (Ya en taller) @endif
+                                @if($bus->id_estado == 4) (Ya en taller) @endif
                             </option>
                         @endforeach
                     </select>

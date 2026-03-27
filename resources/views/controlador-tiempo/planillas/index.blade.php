@@ -34,7 +34,7 @@
                             <td>{{ $bus->modelo ?? 'N/A' }}</td>
                             <td>
                                 @php $nomEstado = $bus->estado->nombre_estado ?? 'Desconocido'; @endphp
-                                @if(str_contains(strtoupper($nomEstado), 'TALLER') || $bus->id_estado == 7)
+                                @if(str_contains(strtoupper($nomEstado), 'TALLER') || $bus->id_estado == 4)
                                     <span class="badge bg-warning text-dark rounded-pill">En Taller</span>
                                 @else
                                     <span class="badge bg-danger rounded-pill">{{ $nomEstado }}</span>

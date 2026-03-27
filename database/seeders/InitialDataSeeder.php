@@ -21,6 +21,8 @@ class InitialDataSeeder extends Seeder
             ['id_estado' => 7, 'nombre_estado' => 'BLOQUEADA'],
             ['id_estado' => 8, 'nombre_estado' => 'VENCIDA'],
             ['id_estado' => 9, 'nombre_estado' => 'RENOVADA'],
+            ['id_estado' => 10, 'nombre_estado' => 'RECHAZADO'],
+            ['id_estado' => 11, 'nombre_estado' => 'ARCHIVADO'],
         ];
 
         foreach ($estados as $estado) {

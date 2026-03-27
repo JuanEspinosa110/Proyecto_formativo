@@ -451,9 +451,9 @@
                                 @php
                                     $valColor = 'secondary'; $valText = 'Desconocido';
                                     if ($doc->id_estado == 1) { $valColor = 'success'; $valText = 'Aprobado'; }
-                                    elseif ($doc->id_estado == 8) { $valColor = 'danger'; $valText = 'Rechazado'; }
-                                    elseif ($doc->id_estado == 5) { $valColor = 'warning'; $valText = 'Pendiente'; }
-                                    elseif ($doc->id_estado == 2) { $valColor = 'info'; $valText = 'Archivado'; }
+                                    elseif ($doc->id_estado == 10) { $valColor = 'danger'; $valText = 'Rechazado'; }
+                                    elseif ($doc->id_estado == 6) { $valColor = 'warning'; $valText = 'Pendiente'; }
+                                    elseif ($doc->id_estado == 11) { $valColor = 'info'; $valText = 'Archivado'; }
                                 @endphp
                                 <span class="badge bg-{{ $valColor }}-subtle text-{{ $valColor }} border border-{{ $valColor }} rounded-pill px-3 py-1 x-small fw-bold">
                                     {{ $valText }}

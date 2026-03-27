@@ -10,27 +10,24 @@ class RecorridoSeeder extends Seeder
 {
     public function run(): void
     {
-        $asignaciones = DB::table('asignacion')->get();
-        if ($asignaciones->isEmpty()) return;
+        // 1. Obtener viajes finalizados
+        $viajes = DB::table('viaje')->where('id_estado', 5)->get();
 
-        foreach ($asignaciones as $asig) {
-            // Obtener un viaje para esta asignación (o crear uno si es necesario para el seeder)
-            $viaje = DB::table('viaje')
-                ->where('placa', $asig->placa)
-                ->where('doc_us', $asig->doc_usuario)
-                ->first();
+        if ($viajes->isEmpty()) {
+            return;
+        }
 
-            if ($viaje) {
-                // Generar 1 recorrido hoy para cada asignación
-                DB::table('recorridos')->insert([
-                    'id_viaje' => $viaje->id_viaje,
-                    'sentido' => 'IDA',
-                    'hora_salida' => now()->subHours(2),
-                    'hora_llegada' => now(),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+        foreach ($viajes as $v) {
+            // Generar 1 recorrido físico para cada registro de viaje header
+            DB::table('recorridos')->insert([
+                'id_viaje' => $v->id_viaje,
+                'sentido' => (rand(0, 1) == 0 ? 'IDA' : 'VUELTA'),
+                'hora_salida' => Carbon::parse($v->fecha),
+                'hora_llegada' => Carbon::parse($v->fecha)->addMinutes(rand(45, 90)),
+                'foto_torniquete' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
     }
 }

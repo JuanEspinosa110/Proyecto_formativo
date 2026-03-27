@@ -158,7 +158,7 @@ class EmpresaController extends Controller
     public function rechazarDocumento($id)
     {
         $documento = Documento::findOrFail($id);
-        $documento->id_estado = 8; // RECHAZADO
+        $documento->id_estado = 10; // RECHAZADO
         $documento->save();
 
         if ($documento->placa) {

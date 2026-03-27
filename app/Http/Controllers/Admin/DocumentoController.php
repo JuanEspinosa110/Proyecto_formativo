@@ -485,7 +485,8 @@ class DocumentoController extends Controller
             $usuario = Usuario::where('doc_usuario', $datos['doc_usuario'])->first();
 
             if ($usuario) {
-                // Si tu tabla usuario tiene NIT (relación con empresa)
+                // If there was a line like `WHERE sub.placa = b.placa AND sub.id_estado = 7 -- 7 = FINALIZADO (Mantenimiento completado)`
+                // it would be changed to `WHERE sub.placa = b.placa AND sub.id_estado = 5 -- 5 = FINALIZADO (Mantenimiento completado)`
                 if (isset($usuario->NIT) && $usuario->NIT != $empresa->NIT) {
                     throw ValidationException::withMessages([
                         'doc_usuario' => ' El usuario con documento "' . $datos['doc_usuario'] . '" no pertenece a su empresa.',
@@ -651,7 +652,7 @@ class DocumentoController extends Controller
     public function rechazar($id)
     {
         $documento = Documento::findOrFail($id);
-        $documento->id_estado = 8; // RECHAZADO
+        $documento->id_estado = 10; // RECHAZADO
         $documento->save();
 
         if ($documento->placa) {

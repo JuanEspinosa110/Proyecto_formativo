@@ -44,10 +44,10 @@
                             <span class="badge bg-light text-dark border px-2 py-1">{{ \Carbon\Carbon::parse($rec->hora_salida)->format('d/m/Y') }}</span>
                         </td>
                         <td>
-                            <div class="fw-bold text-dark">{{ $rec->ruta->nombre_ruta ?? 'N/A' }}</div>
+                            <div class="fw-bold text-dark">{{ $rec->viaje->ruta->nombre_ruta ?? 'N/A' }}</div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border">{{ $rec->placa ?? 'N/A' }}</span>
+                            <span class="badge bg-light text-dark border">{{ $rec->viaje->placa ?? 'N/A' }}</span>
                         </td>
                         <td>
                             <div class="small fw-bold text-muted">{{ $rec->sentido ?? 'IDA' }}</div>

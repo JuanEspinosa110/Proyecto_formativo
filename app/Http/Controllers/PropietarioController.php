@@ -281,7 +281,7 @@ class PropietarioController extends Controller
                 Documento::where('placa', $request->placa)
                         ->where('id_tipo_documento', $request->id_tipo_documento)
                         ->where('id_estado', 1)
-                        ->update(['id_estado' => 2]); // 2 = Inactivo/Archivado
+                        ->update(['id_estado' => 11]); // 11 = Archivado
 
                 // Almacenar el archivo en storage/app/public/documentos
                 $path = $request->file('archivo')->store('documentos', 'public');
@@ -299,7 +299,7 @@ class PropietarioController extends Controller
                         'placa' => $bus->placa,
                         'doc_usuario' => $user->doc_usuario,
                         'NIT' => $bus->NIT,
-                        'id_estado' => 5, // 5 = PENDIENTE de aprobación
+                        'id_estado' => 6, // 6 = PENDIENTE de aprobación
                     ]);
 
                     // Inactivar el bus preventivamente ya que el documento requiere aprobación
@@ -351,7 +351,7 @@ class PropietarioController extends Controller
                 'doc_usuario' => $user->doc_usuario,
                 'fecha_expedicion' => $request->fecha_expedicion,
                 'fecha_vencimiento' => $request->fecha_vencimiento,
-                'id_estado' => 5, // 5 = PENDIENTE de aprobación
+                'id_estado' => 6, // 6 = PENDIENTE de aprobación
             ];
 
             // Inactivar el bus preventivamente ya que el documento requiere aprobación
@@ -456,7 +456,7 @@ class PropietarioController extends Controller
                     'fecha_vencimiento' => $doc->fecha_vencimiento->format('d/m/Y'),
                     'status_vigencia' => $doc->estado_expiracion,
                     'status_color' => $doc->status_color,
-                    'es_archivado' => $doc->id_estado == 2,
+                    'es_archivado' => $doc->id_estado == 11,
                     'url_archivo' => $doc->archivo ? asset('storage/' . $doc->archivo) : null
                 ];
             });
@@ -496,10 +496,7 @@ class PropietarioController extends Controller
         // Un detalle importante: los recorridos deben ser del mismo bus, conductor y ruta? 
         // El requerimiento dice "viajes realizados durante ese turno".
         // Generalmente un turno está asociado a un bus y un conductor.
-        $recorridos = \App\Models\Recorrido::where('placa', $asignacion->placa)
-            ->where('doc_us', $asignacion->doc_us)
-            ->where('hora_salida', '>=', $horaInicio)
-            ->where('hora_llegada', '<=', $horaFin)
+        $recorridos = \App\Models\Recorrido::where('id_viaje', $asignacion->id_viaje)
             ->orderBy('hora_salida', 'asc')
             ->get();
 
@@ -546,8 +543,8 @@ class PropietarioController extends Controller
                         : ($ruta->barrioOrigen->nombre ?? 'Origen') . ' → ' . ($ruta->barrioDestino->nombre ?? 'Destino'),
                     'hora_salida' => \Carbon\Carbon::parse($r->hora_salida)->format('H:i'),
                     'hora_llegada' => $r->hora_llegada ? \Carbon\Carbon::parse($r->hora_llegada)->format('H:i') : 'En curso',
-                    'cantidad_pasajeros' => 'Reflejado en Turno',
-                    'ingresos' => 'Reflejado en Turno',
+                    'cantidad_pasajeros' => 'N/A (Ver Turno)',
+                    'ingresos' => 0,
                     'evidencia' => $r->foto_torniquete ? asset('storage/' . $r->foto_torniquete) : null,
                     'es_regreso' => $esRegreso
                 ];

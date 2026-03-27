@@ -42,7 +42,7 @@ class ReporteFallasSeeder extends Seeder
                 'created_at' => $faker->dateTimeBetween('-1 month', 'now'),
                 'descripcion' => $faker->randomElement($descripciones),
                 'nivel_urgencia' => $faker->randomElement(['Bajo', 'Medio', 'Alto']),
-                'id_estado' => $faker->randomElement([6, 1]), // PENDIENTE o ACTIVO (atendido)
+                'id_estado' => $faker->randomElement([6, 1, 5]), // 6=PENDIENTE, 1=ACTIVO(En proceso), 5=FINALIZADO(Atendido)
             ]);
         }
     }

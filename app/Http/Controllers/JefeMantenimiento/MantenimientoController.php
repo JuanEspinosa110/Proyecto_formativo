@@ -52,7 +52,7 @@ class MantenimientoController extends Controller
             WHERE m.id_mantenimiento = (
                 SELECT sub.id_mantenimiento
                 FROM mantenimiento sub
-                WHERE sub.placa = b.placa AND sub.id_estado = 7 -- 7 = FINALIZADO (Mantenimiento completado)
+                WHERE sub.placa = b.placa AND sub.id_estado = 5 -- 5 = FINALIZADO (Mantenimiento completado)
                 ORDER BY sub.fecha_mantenimiento DESC
                 LIMIT 1
             )

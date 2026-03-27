@@ -56,7 +56,7 @@
             @php
                 $estadoBus = $bus->estado->nombre_estado ?? 'Desconocido';
                 $esActivo  = $bus->id_estado == 1;
-                $esTaller  = $bus->id_estado == 7;
+                $esTaller  = $bus->id_estado == 4;
                 $badgeClass = $esActivo  ? 'bg-success-subtle text-success border-success-subtle'
                             : ($esTaller ? 'bg-warning-subtle text-warning border-warning-subtle'
                                          : 'bg-danger-subtle text-danger border-danger-subtle');

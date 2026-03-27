@@ -84,7 +84,7 @@
                         <select name="id_estado" class="form-select sa-licencia-status-select mb-3">
                             <option value="1" @if($licencia->id_estado == 1) selected @endif>● ACTIVA</option>
                             <option value="3" @if($licencia->id_estado == 3) selected @endif>● SUSPENDIDA</option>
-                            <option value="6" @if($licencia->id_estado == 6) selected @endif>● VENCIDA</option>
+                            <option value="8" @if($licencia->id_estado == 8) selected @endif>● VENCIDA</option>
                         </select>
                         <button type="button" class="btn btn-light w-100 btn-sm text-muted">
                             <i class="fas fa-history me-1"></i> Gestionar Estado

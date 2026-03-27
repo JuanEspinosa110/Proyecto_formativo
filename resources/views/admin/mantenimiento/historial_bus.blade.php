@@ -9,7 +9,7 @@
             <a href="{{ route('admin.buses.index') }}" class="text-muted small" style="text-decoration:none;">← Volver a Buses</a>
             <h1 class="sigu-page-title mt-1">Historial del Bus: {{ $bus->placa }}</h1>
             <p class="sigu-page-sub">{{ $bus->modelo }} — Estado actual:
-                <span class="badge @if($bus->id_estado == 7) bg-warning text-dark @elseif($bus->id_estado == 1) bg-success @else bg-secondary @endif">
+                <span class="badge @if($bus->id_estado == 4) bg-warning text-dark @elseif($bus->id_estado == 1) bg-success @else bg-secondary @endif">
                     {{ $bus->estado->nombre_estado ?? 'Sin estado' }}
                 </span>
             </p>

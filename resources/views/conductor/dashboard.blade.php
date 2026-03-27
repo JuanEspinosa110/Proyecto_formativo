@@ -81,7 +81,7 @@
     @if($asignacionActiva)
         @php
             $enCurso = $asignacionActiva->id_estado == 4; // En Curso
-            $vencido = $asignacionActiva->id_estado == 6; // Vencido/No ejecutado
+            $vencido = $asignacionActiva->id_estado == 8; // Vencido/No ejecutado
         @endphp
         <div class="col-md-8 col-xl-9">
             <div class="row g-3 h-100">
@@ -498,8 +498,8 @@
                 </div>
 
                 <div class="mt-2">
-                    <h4 class="fw-black text-dark mb-0">{{ $recorridoActivo->placa ?? '...' }}</h4>
-                    <p class="text-primary small fw-bold text-uppercase">Ruta: {{ $recorridoActivo->ruta->nombre_ruta ?? '...' }}</p>
+                    <h4 class="fw-black text-dark mb-0">{{ $recorridoActivo->viaje->placa ?? '...' }}</h4>
+                    <p class="text-primary small fw-bold text-uppercase">Ruta: {{ $recorridoActivo->viaje->ruta->nombre_ruta ?? '...' }}</p>
                 </div>
 
                 <div class="alert alert-dark bg-dark border-0 rounded-4 mt-4 text-start p-3">
