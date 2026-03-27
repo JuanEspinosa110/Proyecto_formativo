@@ -29,11 +29,12 @@ class NovedadRecorridoSeeder extends Seeder
         ];
 
         foreach ($recorridos->shuffle()->take(10) as $rec) {
+            $tipo = $faker->randomElement(['CHECKPOINT', 'INCIDENCIA']);
             DB::table('novedad_recorridos')->insert([
                 'id_recorrido' => $rec->id_recorrido,
                 'doc_controlador' => $controlador->doc_usuario,
-                'tipo' => $faker->randomElement(['CHECKPOINT', 'INCIDENCIA']),
-                'descripcion' => $faker->randomElement($novedades),
+                'tipo' => $tipo,
+                'descripcion' => ($tipo === 'INCIDENCIA') ? $faker->randomElement($novedades) : null,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

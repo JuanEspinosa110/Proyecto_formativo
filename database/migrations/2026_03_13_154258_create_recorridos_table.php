@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('doc_us')->nullable()->index();
             $table->dateTime('hora_salida')->nullable();
             $table->dateTime('hora_llegada')->nullable();
+            $table->integer('cantidad_pasajeros')->default(0);
             $table->decimal('ingresos', 12, 2)->default(0);
             $table->timestamps();
         });
