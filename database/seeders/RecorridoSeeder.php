@@ -14,17 +14,23 @@ class RecorridoSeeder extends Seeder
         if ($asignaciones->isEmpty()) return;
 
         foreach ($asignaciones as $asig) {
-            // Generar 1 recorrido hoy para cada asignación
-            DB::table('recorridos')->insert([
-                'placa' => $asig->placa,
-                'id_ruta' => $asig->id_ruta,
-                'doc_us' => $asig->doc_usuario,
-                'hora_salida' => now()->subHours(2),
-                'hora_llegada' => now(),
-                'ingresos' => rand(15000, 50000),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // Obtener un viaje para esta asignación (o crear uno si es necesario para el seeder)
+            $viaje = DB::table('viaje')
+                ->where('placa', $asig->placa)
+                ->where('doc_us', $asig->doc_usuario)
+                ->first();
+
+            if ($viaje) {
+                // Generar 1 recorrido hoy para cada asignación
+                DB::table('recorridos')->insert([
+                    'id_viaje' => $viaje->id_viaje,
+                    'sentido' => 'IDA',
+                    'hora_salida' => now()->subHours(2),
+                    'hora_llegada' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
     }
 }
