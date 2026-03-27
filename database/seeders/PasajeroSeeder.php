@@ -39,7 +39,7 @@ class PasajeroSeeder extends Seeder
             DB::table('tarjeta')->insert([
                 'id_tarjeta' => $id_tarjeta,
                 'doc_usuario' => $doc_usuario,
-                'saldo' => $faker->randomFloat(2, 2000, 50000),
+                'saldo' => 0, // El saldo real se calcula al final con recargas y pasajes
                 'codigo_tarjeta' => 'UID-' . strtoupper($faker->bothify('??##??##')),
                 'id_estado' => 1, // Activo
             ]);
