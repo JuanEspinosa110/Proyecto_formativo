@@ -5,7 +5,7 @@ use App\Http\Controllers\JefeMantenimiento\MantenimientoController;
 use App\Http\Controllers\JefeMantenimiento\ReporteFallaController;
 
 Route::prefix('jefemantenimiento')->name('jefemantenimiento.')->group(function () {
-    Route::middleware(['auth:web', 'role:9'])->group(function () {
+    Route::middleware(['auth:web', 'role:9', 'CheckNit'])->group(function () {
         Route::get('/', [MantenimientoController::class, 'dashboard'])->name('dashboard');
 
 

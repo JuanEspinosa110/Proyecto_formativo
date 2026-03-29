@@ -82,6 +82,7 @@ class RegistroController extends Controller
             'telefono' => $request->telefono,
             'password' => Hash::make($request->password),
             'id_tipo_usuario' => 2,
+            'id_ciudad' => 730001,
             'id_estado' => 1
         ]);
 

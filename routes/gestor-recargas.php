@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GestorRecargas\GestorRecargaController;
 
 // Rol ID 8 = GESTOR DE RECARGAS
-Route::middleware(['auth:web', 'role:8'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
+Route::middleware(['auth:web', 'role:8', 'CheckNit'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
     Route::get('/dashboard', [GestorRecargaController::class, 'dashboard'])->name('dashboard');
     
     // Recargas

@@ -299,6 +299,14 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-1 justify-content-center">
+                                    @if($diasRestantes <= 30)
+                                    <a href="{{ route('superadmin.licencias.create', ['nit' => $licencia->NIT]) }}" 
+                                       class="btn btn-sm btn-warning" 
+                                       data-bs-toggle="tooltip" 
+                                       title="Renovar Licencia">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </a>
+                                    @endif
                                     <button class="btn btn-sm btn-outline-info"
                                         data-bs-toggle="tooltip"
                                         title="Ver Detalles"

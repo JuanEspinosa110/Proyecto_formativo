@@ -12,7 +12,7 @@ use App\Http\Controllers\Auxiliar\ReporteController;
 Route::prefix('empresa')->name('empresa.')->group(function () {
 
     // 🟢 Grupo GENERAL (Administrador [1] y Auxiliar [4, 8])
-    Route::middleware(['auth:web', 'role:1,4,8'])->group(function () {
+    Route::middleware(['auth:web', 'role:1,4,8', 'CheckNit'])->group(function () {
 
             // Dashboard
             Route::get('/', [DashboardController::class , 'index'])->name('dashboard');
@@ -75,7 +75,7 @@ Route::prefix('empresa')->name('empresa.')->group(function () {
 
 // 🔵 Grupo Exclusivo AUXILIAR (Rol 4)
 Route::prefix('auxiliar')->name('auxiliar.')
-    ->middleware(['auth:web', 'role:4'])
+    ->middleware(['auth:web', 'role:4', 'CheckNit'])
     ->group(function () {
 
         // Dashboard

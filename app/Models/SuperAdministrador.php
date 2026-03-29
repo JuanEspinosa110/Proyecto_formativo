@@ -109,4 +109,47 @@ class SuperAdministrador extends Authenticatable
         }
         return strtoupper(substr($this->nombre, 0, 2));
     }
+
+    /**
+     * Accessor para doc_usuario (alias de doc_super_admin)
+     * para compatibilidad con el sistema de tarjetas.
+     */
+    public function getDocUsuarioAttribute()
+    {
+        return $this->doc_super_admin;
+    }
+
+    /**
+     * Accessor para id_tipo_usuario (virtual)
+     * para compatibilidad con vistas compartidas.
+     * El SuperAdmin no tiene un ID real en la tabla tipo_usuario
+     * por lo que retornamos 0 o un valor que no sea el de pasajero (2).
+     */
+    public function getIdTipoUsuarioAttribute()
+    {
+        return 0; // O cualquier valor != 2 para que se muestre el botón "Volver a mi Panel"
+    }
+
+    /**
+     * Obtener la ruta del dashboard principal del SuperAdmin.
+     */
+    public function getDashboardRoute(): string
+    {
+        return 'superadmin.dashboard';
+    }
+
+    /**
+     * Accessors de compatibilidad con el modelo Usuario
+     * para que las vistas compartidas funcionen correctamente.
+     */
+    public function getPrimerNombreAttribute()
+    {
+        return explode(' ', $this->nombre)[0] ?? $this->nombre;
+    }
+
+    public function getPrimerApellidoAttribute()
+    {
+        $partes = explode(' ', $this->nombre);
+        return $partes[count($partes) - 1] ?? '';
+    }
 }

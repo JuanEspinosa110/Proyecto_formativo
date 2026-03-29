@@ -8,7 +8,7 @@ use App\Http\Controllers\ControladorTiempo\PlanillaController;
 
 Route::prefix('controlador-tiempo')
     ->name('controlador-tiempo.')
-    ->middleware(['auth:web', 'role:7'])
+    ->middleware(['auth:web', 'role:7', 'CheckNit'])
     ->group(function () {
 
         // Dashboard principal

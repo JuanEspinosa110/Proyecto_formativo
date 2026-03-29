@@ -59,11 +59,11 @@ class Usuario extends Authenticatable
             // Mapeo de Rol (string de validación a ID real de base de datos)
             if (isset($usuario->rol)) {
                 $usuario->id_tipo_usuario = match ($usuario->rol) {
-                    'admin'              => 1,
-                    'operador'           => 4,
-                    'usuario'            => 3,
+                    'admin' => 1,
+                    'operador' => 4,
+                    'usuario' => 3,
                     'controlador_tiempo' => 8,
-                    default              => 1
+                    default => 1
                 };
             }
 
@@ -133,23 +133,24 @@ class Usuario extends Authenticatable
     public function hasRole($role): bool
     {
         $roleMap = [
-            'admin'              => 1,
-            'pasajero'           => 2,
-            'conductor'          => 3,
-            'auxiliar'           => 4,
-            'propietario'        => 5,
-            'gestor_setp'        => 6,
-            'coordinador_bus'    => 7,
-            'gestor_recargas'    => 8,
+            'admin' => 1,
+            'pasajero' => 2,
+            'conductor' => 3,
+            'auxiliar' => 4,
+            'propietario' => 5,
+            'gestor_setp' => 6,
+            'coordinador_bus' => 7,
+            'gestor_recargas' => 8,
             'jefe_mantenimiento' => 9,
         ];
 
-        $targetId = is_numeric($role) ? (int)$role : ($roleMap[$role] ?? null);
+        $targetId = is_numeric($role) ? (int) $role : ($roleMap[$role] ?? null);
 
-        if (!$targetId) return false;
+        if (!$targetId)
+            return false;
 
         // El usuario tiene el rol exacto
-        if ((int)$this->id_tipo_usuario === $targetId) {
+        if ((int) $this->id_tipo_usuario === $targetId) {
             return true;
         }
 
@@ -166,13 +167,15 @@ class Usuario extends Authenticatable
      */
     public function getDashboardRoute(): string
     {
-        return match ((int)$this->id_tipo_usuario) {
-            1       => 'admin.dashboard',
-            3       => 'conductor.dashboard',
-            4       => 'empresa.dashboard',
-            5       => 'propietario.dashboard',
-            8       => 'ganagana.dashboard', // O gestor_recargas
-            9       => 'jefemantenimiento.dashboard',
+        return match ((int) $this->id_tipo_usuario) {
+            1 => 'admin.dashboard',
+            3 => 'conductor.dashboard',
+            4 => 'empresa.dashboard',
+            5 => 'propietario.dashboard',
+            6 => 'gestor_setp.dashboard',
+            7 => 'coordinador_bus.dashboard',
+            8 => 'gestor_recargas.dashboard', // O gestor_recargas
+            9 => 'jefemantenimiento.dashboard',
             default => 'pasajero.dashboard',
         };
     }
