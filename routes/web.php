@@ -45,7 +45,7 @@ require base_path('routes/gestor-recargas.php');
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\StripeWebhookController;
 
-Route::get('/cliclkpasajes', [LandingController::class, 'index'])->name('home');
+Route::get('/', [LandingController::class, 'index'])->name('home');
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
