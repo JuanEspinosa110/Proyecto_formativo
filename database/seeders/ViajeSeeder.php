@@ -58,6 +58,34 @@ class ViajeSeeder extends Seeder
             }
         }
 
+        // 3. Generar viajes programados para el 5, 6 y 7 de abril (Estado 1: ACTIVO)
+        $diasAbril = [5, 6, 7];
+        foreach ($diasAbril as $dia) {
+            // Asumiendo el año 2026 basado en la fecha actual del sistema
+            $fechaAbril = Carbon::create(2026, 4, $dia, 0, 0, 0);
+
+            foreach ($asignaciones as $asig) {
+                $horaInicio = rand(6, 18);
+                $minutoInicio = [0, 15, 30, 45][array_rand([0, 15, 30, 45])];
+                $tiempoViaje = $fechaAbril->copy()->addHours($horaInicio)->addMinutes($minutoInicio);
+
+                $viajes[] = [
+                    'id_viaje' => $id_viaje++,
+                    'placa' => $asig->placa,
+                    'id_ruta' => $asig->id_ruta,
+                    'doc_us' => $asig->doc_usuario,
+                    'fecha' => $tiempoViaje->format('Y-m-d H:i:s'),
+                    'fecha_asignacion' => $tiempoViaje->format('Y-m-d H:i:s'),
+                    'id_estado' => 1, // ACTIVO
+                ];
+
+                if (count($viajes) >= 500) {
+                    DB::table('viaje')->insert($viajes);
+                    $viajes = [];
+                }
+            }
+        }
+
         // Insertar restantes
         if (count($viajes) > 0) {
             DB::table('viaje')->insert($viajes);

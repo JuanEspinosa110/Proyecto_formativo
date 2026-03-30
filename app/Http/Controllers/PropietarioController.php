@@ -515,14 +515,13 @@ class PropietarioController extends Controller
             ->get();
 
         // Totales referenciando tarjetas/ventas directamente a LA ASIGNACIÓN (Viaje), NO por recorrido
-        $totalPasajeros = \App\Models\VentaViaje::where('id_viaje', $asignacion->id_viaje)->count();
-        $totalIngresos = \App\Models\VentaViaje::where('id_viaje', $asignacion->id_viaje)->sum('valor');
+        // Totales referenciando tarjetas/ventas directamente a LA ASIGNACIÓN (Viaje)
+        $ventasViaje = \App\Models\VentaViaje::where('id_viaje', $asignacion->id_viaje)->get();
+        $totalPasajeros = $ventasViaje->count();
+        $totalIngresos = $ventasViaje->sum('valor');
         
         // Contar trayectos
         // Trayecto Origen -> Destino vs Destino -> Origen
-        // Asumimos que el trayecto se puede identificar por la ruta o algún campo.
-        // Como no hay un campo explícito de "sentido" en Recorrido, vamos a simularlo 
-        // o ver si hay algo en la ruta.
         $ruta = $asignacion->ruta;
         $totalOrigenDestino = 0;
         $totalDestinoOrigen = 0;
@@ -549,18 +548,40 @@ class PropietarioController extends Controller
                 'fin' => $horaFin->format('H:i'),
                 'fecha' => $horaInicio->format('d/m/Y')
             ],
-            'recorridos' => $recorridos->map(function($r, $index) use ($ruta) {
-                $esRegreso = ($r->sentido == 'VUELTA');
+            'recorridos' => $recorridos->map(function($r, $index) use ($ruta, $recorridos, $ventasViaje) {
+                // Sentido del recorrido (ida o vuelta)
+                $esIda = ($index % 2 == 0);
+                
+                $horaSalida = \Carbon\Carbon::parse($r->hora_salida);
+                
+                // Si no tiene hora_llegada, el torniquete asume los pasajes hasta el inicio del siguiente recorrido, o hasta el final del turno
+                $horaLlegada = $r->hora_llegada ? \Carbon\Carbon::parse($r->hora_llegada) : null;
+                if (!$horaLlegada && isset($recorridos[$index + 1])) {
+                    $horaLlegada = \Carbon\Carbon::parse($recorridos[$index + 1]->hora_salida);
+                }
+                
+                // Filtrar ventas por el rango de tiempo de este recorrido
+                $ventasRecorrido = $ventasViaje->filter(function($venta) use ($horaSalida, $horaLlegada) {
+                    $fechaVenta = \Carbon\Carbon::parse($venta->fecha);
+                    if ($horaLlegada) {
+                        return $fechaVenta->between($horaSalida, $horaLlegada);
+                    }
+                    return $fechaVenta->greaterThanOrEqualTo($horaSalida);
+                });
+                
+                $pasajerosRec = $ventasRecorrido->count();
+                $ingresosRec = $ventasRecorrido->sum('valor');
+
                 return [
-                    'trayecto' => $esRegreso 
+                    'trayecto' => !$esIda 
                         ? ($ruta->barrioDestino->nombre ?? 'Destino') . ' → ' . ($ruta->barrioOrigen->nombre ?? 'Origen')
                         : ($ruta->barrioOrigen->nombre ?? 'Origen') . ' → ' . ($ruta->barrioDestino->nombre ?? 'Destino'),
-                    'hora_salida' => \Carbon\Carbon::parse($r->hora_salida)->format('H:i'),
+                    'hora_salida' => $horaSalida->format('H:i'),
                     'hora_llegada' => $r->hora_llegada ? \Carbon\Carbon::parse($r->hora_llegada)->format('H:i') : 'En curso',
-                    'cantidad_pasajeros' => 'N/A (Ver Turno)',
-                    'ingresos' => 0,
+                    'cantidad_pasajeros' => $pasajerosRec,
+                    'ingresos' => $ingresosRec,
                     'evidencia' => $r->foto_torniquete ? asset('storage/' . $r->foto_torniquete) : null,
-                    'es_regreso' => $esRegreso
+                    'es_regreso' => !$esIda
                 ];
             }),
             'resumen' => [

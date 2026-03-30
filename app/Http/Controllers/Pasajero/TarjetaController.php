@@ -79,15 +79,32 @@ class TarjetaController extends Controller
                 ->withInput();
         }
 
+        if ($tarjeta->id_estado == 3) {
+            return back()
+                ->withErrors(['codigo_tarjeta' => 'Esta tarjeta ya no está operativa.'])
+                ->withInput();
+        }
+
+        if (!empty($tarjeta->doc_usuario)) {
+            return back()
+                ->withErrors(['codigo_tarjeta' => 'Esta tarjeta ya está asociada a un pasajero.'])
+                ->withInput();
+        }
+
+        if ($tarjeta->id_estado != 2) {
+            return back()
+                ->withErrors(['codigo_tarjeta' => 'La tarjeta no está disponible para ser vinculada.'])
+                ->withInput();
+        }
+
         // Verificar que no esté ya asignada a otro usuario activo
         $yaAsignada = TitularidadTarjeta::where('id_tarjeta', $tarjeta->id_tarjeta)
             ->where('id_estado', 1)
-            ->where('doc_usuario', '!=', $user->doc_usuario)
             ->exists();
 
         if ($yaAsignada) {
             return back()
-                ->withErrors(['codigo_tarjeta' => 'Esta tarjeta ya está vinculada a otro usuario activo.'])
+                ->withErrors(['codigo_tarjeta' => 'Esta tarjeta ya está vinculada a un usuario.'])
                 ->withInput();
         }
 
@@ -99,6 +116,12 @@ class TarjetaController extends Controller
             'fecha_fin' => null,
             'id_estado' => 1,
             'motivo_cambio' => 'Registro inicial por el pasajero',
+        ]);
+
+        // Aseguramos de que el plástico quede asignado y activo
+        $tarjeta->update([
+            'doc_usuario' => $user->doc_usuario,
+            'id_estado' => 1
         ]);
 
         return redirect()->route('pasajero.dashboard')
@@ -205,14 +228,18 @@ class TarjetaController extends Controller
             return back()->withErrors(['codigo_tarjeta_nueva' => 'No encontramos una tarjeta con ese código.'])->withInput();
         }
 
-        // Verificar que la tarjeta nueva esté activa (id_estado == 1)
-        if ($nuevaTarjeta->id_estado != 1) {
-            return back()->withErrors(['codigo_tarjeta_nueva' => 'Esta tarjeta no se encuentra activa.'])->withInput();
+        if ($nuevaTarjeta->id_estado == 3) {
+            return back()->withErrors(['codigo_tarjeta_nueva' => 'Esta tarjeta ya no está operativa.'])->withInput();
         }
 
         // Verificar que no esté asignada a ningún usuario en la tabla Tarjeta
         if (!empty($nuevaTarjeta->doc_usuario)) {
-            return back()->withErrors(['codigo_tarjeta_nueva' => 'Esta tarjeta ya está asignada a un usuario.'])->withInput();
+            return back()->withErrors(['codigo_tarjeta_nueva' => 'Esta tarjeta ya está asociada a un pasajero.'])->withInput();
+        }
+
+        // Verificar que la tarjeta nueva esté activa (id_estado == 1)
+        if ($nuevaTarjeta->id_estado != 2) {
+            return back()->withErrors(['codigo_tarjeta_nueva' => 'Esta tarjeta no se encuentra disponible para asignación.'])->withInput();
         }
 
         // Verificar que no esté ya asignada a otro usuario activo en TitularidadTarjeta
@@ -268,8 +295,7 @@ class TarjetaController extends Controller
             DB::commit();
 
             return redirect()->route('pasajero.dashboard')->with('success', '¡Tarjeta cambiada exitosamente! Tu tarjeta anterior ha sido inactivada.');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Ocurrió un error al procesar el cambio: ' . $e->getMessage());
         }
@@ -354,8 +380,7 @@ class TarjetaController extends Controller
 
             DB::commit();
             return redirect()->route('pasajero.dashboard')->with('success', '¡Traspaso autorizado y tarjeta cambiada exitosamente!');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Ocurrió un error al procesar el traspaso: ' . $e->getMessage());
         }
@@ -375,8 +400,8 @@ class TarjetaController extends Controller
             'id_estado' => 2 // Inactiva
         ]);
 
-        // 2. Inactivar plástico tarjeta antigua
-        $tarjetaAntigua->update(['id_estado' => 2]);
+        // 2. Inactivar plástico tarjeta antigua (Pasa a estado 3 - Suspendida)
+        $tarjetaAntigua->update(['id_estado' => 3]);
 
         // 3. Crear nueva titularidad
         TitularidadTarjeta::create([
@@ -400,8 +425,8 @@ class TarjetaController extends Controller
 
             // Generar un ID de recarga específico para traspasos (iniciando con 99 para identificar traspaso)
             $baseId = '99' . time();
-            $idRecargaNegativa = (int)($baseId . '1');
-            $idRecargaPositiva = (int)($baseId . '2');
+            $idRecargaNegativa = (int) ($baseId . '1');
+            $idRecargaPositiva = (int) ($baseId . '2');
 
             // Restar en tarjeta vieja (Historial negativo)
             Recarga::create([
@@ -454,16 +479,18 @@ class TarjetaController extends Controller
 
         $session = \Stripe\Checkout\Session::create([
             'payment_method_types' => ['card'],
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'cop',
-                    'product_data' => [
-                        'name' => 'Recarga Tarjeta SIGU',
+            'line_items' => [
+                [
+                    'price_data' => [
+                        'currency' => 'cop',
+                        'product_data' => [
+                            'name' => 'Recarga Tarjeta SIGU',
+                        ],
+                        'unit_amount' => $request->monto * 100, // Stripe usa centavos
                     ],
-                    'unit_amount' => $request->monto * 100, // Stripe usa centavos
-                ],
-                'quantity' => 1,
-            ]],
+                    'quantity' => 1,
+                ]
+            ],
             'mode' => 'payment',
             'success_url' => route('pasajero.saldo') . '?success=1',
             'cancel_url' => route('pasajero.saldo') . '?cancel=1',

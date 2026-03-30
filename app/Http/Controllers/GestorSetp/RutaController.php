@@ -23,7 +23,10 @@ class RutaController extends Controller
     {
         $ciudad = auth()->user()->id_ciudad;
 
-        $query = Ruta::with(['barrioOrigen', 'barrioDestino', 'ciudad', 'asignaciones.empresa'])
+        $query = Ruta::with(['barrioOrigen', 'barrioDestino', 'ciudad', 'asignaciones' => function($q) {
+            $q->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)
+              ->where('id_estado', 1);
+        }, 'asignaciones.empresa'])
             ->where('id_ciudad', $ciudad);
 
         if ($request->filled('codigo')) {
@@ -184,7 +187,9 @@ class RutaController extends Controller
     // ── formAsignar ───────────────────────────────────────────────
     public function formAsignar($id)
     {
-        $ruta = Ruta::with(['barrioOrigen', 'barrioDestino', 'asignaciones.empresa'])
+        $ruta = Ruta::with(['barrioOrigen', 'barrioDestino', 'asignaciones' => function($q) {
+                $q->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)->where('id_estado', 1);
+            }, 'asignaciones.empresa'])
             ->where('id_ruta', $id)
             ->where('id_ciudad', auth()->user()->id_ciudad)
             ->firstOrFail();

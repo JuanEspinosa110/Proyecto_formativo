@@ -17,7 +17,39 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow-sm p-4 mt-4">
+    <div class="bg-white rounded-lg shadow-sm p-4 mt-4 mb-4">
+        <form action="{{ route('admin.mantenimiento.reportes') }}" method="GET">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Fecha Desde</label>
+                    <input type="date" name="fecha_desde" class="form-control form-control-sm" value="{{ request('fecha_desde') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Fecha Hasta</label>
+                    <input type="date" name="fecha_hasta" class="form-control form-control-sm" value="{{ request('fecha_hasta') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Placa del Bus</label>
+                    <input type="text" name="placa" class="form-control form-control-sm" placeholder="Ej: ABC-123" value="{{ request('placa') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Estado</label>
+                    <select name="estado" class="form-select form-select-sm">
+                        <option value="">Todos</option>
+                        <option value="1" {{ request('estado') == 1 ? 'selected' : '' }}>No Atendido</option>
+                        <option value="4" {{ request('estado') == 4 ? 'selected' : '' }}>En Taller</option>
+                        <option value="5" {{ request('estado') == 5 ? 'selected' : '' }}>Finalizado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-3 d-flex gap-2 justify-content-end">
+                <a href="{{ route('admin.mantenimiento.reportes') }}" class="btn btn-sm btn-light border">Limpiar</a>
+                <button type="submit" class="btn btn-sm btn-primary">Filtrar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm p-4">
         <div class="table-responsive">
             <table class="table sigu-table w-100 table-hover">
                 <thead>
@@ -79,7 +111,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="mt-4">{{ $reportes->links() }}</div>
+        <div class="mt-4">{{ $reportes->appends(request()->all())->links() }}</div>
     </div>
 </div>
 @endsection

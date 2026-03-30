@@ -16,7 +16,11 @@ class DespachoController extends Controller
         $user = Auth::user();
 
         // Filtros dinámicos
-        $query = Asignacion::with(['bus', 'usuario', 'recorridos', 'ruta.barrioOrigen', 'ruta.barrioDestino'])
+        // Solo asignaciones activas
+        $query = Asignacion::with(['bus', 'usuario', 'viajes' => function($q) {
+                $q->whereDate('fecha', today());
+            }, 'ruta.barrioOrigen', 'ruta.barrioDestino'])
+            ->where('id_estado', 1)
             ->whereHas('bus', fn($q) => $q->where('NIT', $user->NIT));
 
         if ($request->filled('placa')) {
@@ -33,17 +37,18 @@ class DespachoController extends Controller
 
         if ($request->filled('estado')) {
             if ($request->estado == 'iniciado') {
-                $query->whereHas('recorridos');
+                $query->whereHas('viajes', fn($q) => $q->whereDate('fecha', today()));
             } elseif ($request->estado == 'pendiente') {
-                $query->whereDoesntHave('recorridos');
+                $query->whereDoesntHave('viajes', fn($q) => $q->whereDate('fecha', today()));
             }
         }
 
         $asignaciones = $query->orderBy('id_asignacion', 'desc')->paginate(15)->withQueryString();
             
-        // Buses que ya iniciaron su recorrido (tienen al menos un registro en la tabla recorridos)
+        // Buses que ya iniciaron turno hoy
         $busesIniciados = Asignacion::whereHas('bus', fn($q) => $q->where('NIT', $user->NIT))
-            ->whereHas('recorridos')
+            ->where('id_estado', 1)
+            ->whereHas('viajes', fn($q) => $q->whereDate('fecha', today()))
             ->count();
 
         // Buses disponibles (activos, sin asignación activa de conductor)

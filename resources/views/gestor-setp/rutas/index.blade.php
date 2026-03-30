@@ -87,24 +87,40 @@
                     <span class="rt-barrio">{{ $ruta->barrioDestino->nombre ?? 'N/A' }}</span>
                 </div>
 
+                @php
+                    $empresasUnicas = $ruta->asignaciones->pluck('empresa')->unique('NIT')->filter();
+                @endphp
                 <div class="rt-meta">
                     <span><span class="material-symbols-rounded" style="font-size:.9rem">location_city</span>
                         {{ $ruta->ciudad->nombre_city ?? '—' }}
                     </span>
                     <span><span class="material-symbols-rounded" style="font-size:.9rem">corporate_fare</span>
-                        {{ $ruta->asignaciones->count() }} empresa(s) asignada(s)
+                        @if($empresasUnicas->isEmpty())
+                            Todas las empresas (Uso libre)
+                        @else
+                            {{ $empresasUnicas->count() }} empresa(s)
+                        @endif
+                    </span>
+                    <span><span class="material-symbols-rounded" style="font-size:.9rem">directions_bus</span>
+                        {{ $ruta->buses_asignados_count }} buses asig.
                     </span>
                 </div>
 
-                {{-- Empresas asignadas --}}
-                @if($ruta->asignaciones->count())
+                {{-- Empresas autorizadas/asignadas para usar esta ruta --}}
+                @if($empresasUnicas->isNotEmpty())
                 <div class="rt-emp-list">
-                    @foreach($ruta->asignaciones->take(3) as $asig)
-                        <span class="rt-emp-chip">{{ $asig->empresa->nombre_empresa ?? $asig->Nit }}</span>
+                    @foreach($empresasUnicas->take(3) as $empresa)
+                        <span class="rt-emp-chip">{{ $empresa->nombre_empresa ?? $empresa->NIT }}</span>
                     @endforeach
-                    @if($ruta->asignaciones->count() > 3)
-                        <span class="rt-emp-chip">+{{ $ruta->asignaciones->count() - 3 }} más</span>
+                    @if($empresasUnicas->count() > 3)
+                        <span class="rt-emp-chip">+{{ $empresasUnicas->count() - 3 }} más</span>
                     @endif
+                </div>
+                @else
+                <div class="rt-emp-list">
+                    <span class="rt-emp-chip" style="background-color: var(--primary-100); color: var(--primary); border: 1px dotted var(--primary);">
+                        <span class="material-symbols-rounded" style="font-size: .9rem;">lock_open</span> No restringida
+                    </span>
                 </div>
                 @endif
             </div>

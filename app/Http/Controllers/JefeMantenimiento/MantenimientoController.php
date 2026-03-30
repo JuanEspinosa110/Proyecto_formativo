@@ -10,13 +10,16 @@ use App\Models\Bus;
 use App\Models\TipoMantenimiento;
 use App\Models\ReporteFalla;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 // IDs de estado del bus
 define('ESTADO_BUS_ACTIVO', 1);
 define('ESTADO_BUS_EN_MANTENIMIENTO', 4);
 // IDs de estado del registro de mantenimiento
 define('ESTADO_MANT_EN_TALLER', 4);
-define('ESTADO_MANT_FINALIZADO', 7);
+define('ESTADO_MANT_FINALIZADO', 5);
 
 class MantenimientoController extends Controller
 {
@@ -78,22 +81,158 @@ class MantenimientoController extends Controller
     // ─── Listados ─────────────────────────────────────────────────────────────
 
     /** Vista del Jefe de Mantenimiento */
-    public function index()
+    public function index(Request $request)
     {
-        $mantenimientos = Mantenimiento::with(['bus', 'estado'])
-            ->orderBy('fecha_mantenimiento', 'desc')
-            ->paginate(10);
+        $query = Mantenimiento::with(['bus', 'estado']);
 
+        // Aplicar filtros
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('fecha_mantenimiento', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('fecha_mantenimiento', '<=', $request->fecha_hasta);
+        }
+        if ($request->filled('placa')) {
+            $query->where('placa', 'like', '%' . $request->placa . '%');
+        }
+        if ($request->filled('costo_min')) {
+            $query->where('costo_total', '>=', $request->costo_min);
+        }
+        if ($request->filled('costo_max')) {
+            $query->where('costo_total', '<=', $request->costo_max);
+        }
+        if ($request->filled('estado')) {
+            $query->where('id_estado', $request->estado);
+        }
+
+        // Ordenamiento: "En Taller" (estado 4)
+        $query->orderByRaw('CASE WHEN id_estado = 4 THEN 1 ELSE 2 END ASC')
+              ->orderBy('fecha_mantenimiento', 'desc');
+
+        if ($request->has('export')) {
+            $mantenimientos = $query->get();
+
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            
+            // Cabeceras
+            $sheet->setCellValue('A1', 'Fecha');
+            $sheet->setCellValue('B1', 'Placa');
+            $sheet->setCellValue('C1', 'Kilometraje');
+            $sheet->setCellValue('D1', 'Costo Total');
+            $sheet->setCellValue('E1', 'Estado');
+
+            // Formato negrita para cabecera
+            $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+
+            $row = 2;
+            foreach ($mantenimientos as $mant) {
+                $sheet->setCellValue('A' . $row, \Carbon\Carbon::parse($mant->fecha_mantenimiento)->format('d/m/Y'));
+                $sheet->setCellValue('B' . $row, $mant->placa);
+                $sheet->setCellValue('C' . $row, $mant->kilometraje);
+                $sheet->setCellValue('D' . $row, $mant->costo_total);
+                $sheet->setCellValue('E' . $row, $mant->id_estado == 4 ? 'En Taller' : 'Finalizado');
+                $row++;
+            }
+
+            // Auto-size columns
+            foreach (range('A', 'E') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            $writer = new Xlsx($spreadsheet);
+            
+            $response = new StreamedResponse(function() use ($writer) {
+                $writer->save('php://output');
+            });
+
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', 'attachment;filename="Reporte_Mantenimientos.xlsx"');
+            $response->headers->set('Cache-Control', 'max-age=0');
+            
+            return $response;
+        }
+
+        $mantenimientos = $query->paginate(10);
 
         return view('jefemantenimiento.index', compact('mantenimientos'));
     }
 
     /** Vista del Admin de Empresa */
-    public function indexAdmin()
+    public function indexAdmin(Request $request)
     {
-        $mantenimientos = Mantenimiento::with(['bus', 'estado'])
-            ->orderBy('fecha_mantenimiento', 'desc')
-            ->paginate(10);
+        $query = Mantenimiento::with(['bus', 'estado']);
+
+        // Aplicar filtros
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('fecha_mantenimiento', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('fecha_mantenimiento', '<=', $request->fecha_hasta);
+        }
+        if ($request->filled('placa')) {
+            $query->where('placa', 'like', '%' . $request->placa . '%');
+        }
+        if ($request->filled('costo_min')) {
+            $query->where('costo_total', '>=', $request->costo_min);
+        }
+        if ($request->filled('costo_max')) {
+            $query->where('costo_total', '<=', $request->costo_max);
+        }
+        if ($request->filled('estado')) {
+            $query->where('id_estado', $request->estado);
+        }
+
+        // Ordenamiento: "En Taller" (estado 7 o el definido por ESTADO_MANT_EN_TALLER/FINALIZADO) 
+        // Según la base de datos, En Taller es id_estado 4.
+        $query->orderByRaw('CASE WHEN id_estado = 4 THEN 1 ELSE 2 END ASC')
+              ->orderBy('fecha_mantenimiento', 'desc');
+
+        if ($request->has('export')) {
+            $mantenimientos = $query->get();
+
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            
+            // Cabeceras
+            $sheet->setCellValue('A1', 'Fecha');
+            $sheet->setCellValue('B1', 'Placa');
+            $sheet->setCellValue('C1', 'Kilometraje');
+            $sheet->setCellValue('D1', 'Costo Total');
+            $sheet->setCellValue('E1', 'Estado');
+
+            // Formato negrita para cabecera
+            $sheet->getStyle('A1:E1')->getFont()->setBold(true);
+
+            $row = 2;
+            foreach ($mantenimientos as $mant) {
+                $sheet->setCellValue('A' . $row, \Carbon\Carbon::parse($mant->fecha_mantenimiento)->format('d/m/Y'));
+                $sheet->setCellValue('B' . $row, $mant->placa);
+                $sheet->setCellValue('C' . $row, $mant->kilometraje);
+                $sheet->setCellValue('D' . $row, $mant->costo_total);
+                $sheet->setCellValue('E' . $row, $mant->id_estado == 4 ? 'En Taller' : 'Finalizado');
+                $row++;
+            }
+
+            // Auto-size columns
+            foreach (range('A', 'E') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            $writer = new Xlsx($spreadsheet);
+            
+            $response = new StreamedResponse(function() use ($writer) {
+                $writer->save('php://output');
+            });
+
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', 'attachment;filename="Reporte_Mantenimientos.xlsx"');
+            $response->headers->set('Cache-Control', 'max-age=0');
+            
+            return $response;
+        }
+
+        $mantenimientos = $query->paginate(10);
 
         return view('admin.mantenimiento.index', compact('mantenimientos'));
     }

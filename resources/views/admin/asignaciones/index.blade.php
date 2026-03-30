@@ -25,7 +25,7 @@
     <!-- Filtros de Búsqueda -->
     <div class="card border-0 shadow-sm mb-4 rounded-3">
         <div class="card-body p-3">
-            <form method="GET" action="{{ route('admin.asignaciones.index') }}" class="row g-3 align-items-center">
+            <form method="GET" action="{{ url()->current() }}" class="row g-3 align-items-center">
                 <div class="col-md-2">
                     <input type="text" name="id_viaje" class="form-control bg-light" placeholder="ID Asignación" value="{{ request('id_viaje') }}">
                 </div>
@@ -49,12 +49,12 @@
                     <input type="text" name="conductor" class="form-control bg-light" placeholder="Conductor..." value="{{ request('conductor') }}">
                 </div>
                 <div class="col-md-2">
-                    <input type="time" name="hora" class="form-control bg-light" value="{{ request('hora') }}" title="Filtrar por hora exacta">
+                    <input type="date" name="fecha" class="form-control bg-light" value="{{ request('fecha') }}" title="Filtrar por fecha">
                 </div>
                 <div class="col-md-2 ms-auto d-flex gap-2">
                     <button type="submit" class="btn btn-dark fw-semibold px-3 w-100">Filtrar</button>
-                    @if(request()->hasAny(['id_viaje', 'placa', 'id_ruta', 'id_estado', 'conductor', 'hora']))
-                        <a href="{{ route('admin.asignaciones.index') }}" class="btn btn-light text-muted" title="Limpiar">
+                    @if(request()->hasAny(['id_viaje', 'placa', 'id_ruta', 'id_estado', 'conductor', 'fecha']))
+                        <a href="{{ url()->current() }}" class="btn btn-light text-muted" title="Limpiar">
                             <span class="material-symbols-rounded" style="font-size: 1.2rem;">filter_alt_off</span>
                         </a>
                     @endif

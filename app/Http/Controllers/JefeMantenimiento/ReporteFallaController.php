@@ -3,17 +3,31 @@
 namespace App\Http\Controllers\JefeMantenimiento;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\ReporteFalla;
 
 class ReporteFallaController extends Controller
 {
     // ─── Jefe de Mantenimiento ────────────────────────────────────────────────
 
-    public function index()
+    public function index(Request $request)
     {
-        $reportes = ReporteFalla::with(['bus', 'conductor', 'estado'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $query = ReporteFalla::with(['bus', 'conductor', 'estado']);
+
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('fecha_reporte', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('fecha_reporte', '<=', $request->fecha_hasta);
+        }
+        if ($request->filled('placa')) {
+            $query->where('placa', 'like', '%' . $request->placa . '%');
+        }
+        if ($request->filled('estado')) {
+            $query->where('id_estado', $request->estado);
+        }
+
+        $reportes = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('jefemantenimiento.reportes', compact('reportes'));
     }
@@ -31,11 +45,24 @@ class ReporteFallaController extends Controller
 
     // ─── Admin de Empresa ─────────────────────────────────────────────────────
 
-    public function indexAdmin()
+    public function indexAdmin(Request $request)
     {
-        $reportes = ReporteFalla::with(['bus', 'conductor', 'estado'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $query = ReporteFalla::with(['bus', 'conductor', 'estado']);
+
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('fecha_reporte', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('fecha_reporte', '<=', $request->fecha_hasta);
+        }
+        if ($request->filled('placa')) {
+            $query->where('placa', 'like', '%' . $request->placa . '%');
+        }
+        if ($request->filled('estado')) {
+            $query->where('id_estado', $request->estado);
+        }
+
+        $reportes = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return view('admin.mantenimiento.reportes', compact('reportes'));
     }

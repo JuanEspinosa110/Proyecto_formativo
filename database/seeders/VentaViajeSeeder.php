@@ -13,8 +13,11 @@ class VentaViajeSeeder extends Seeder
      */
     public function run(): void
     {
-        // Obtener todos los viajes
-        $viajes = DB::table('viaje')->get();
+        // Obtener solo los IDs de los viajes que tienen recorridos reales registrados
+        $viajesIdsConRecorridos = DB::table('recorridos')->pluck('id_viaje')->unique();
+
+        // Obtener solo los viajes que SÍ tienen recorridos y que el estado sea finalizado o en curso
+        $viajes = DB::table('viaje')->whereIn('id_viaje', $viajesIdsConRecorridos)->get();
         // Obtener todas las tarjetas de los pasajeros
         $tarjetas = DB::table('tarjeta')->get();
 
@@ -26,30 +29,51 @@ class VentaViajeSeeder extends Seeder
         $maxId = DB::table('venta_viaje')->max('id_venta') ?? 0;
         $id_venta = $maxId + 1;
 
+        // Cargar todos los recorridos en memoria (agrupados por viaje) para distribuir ventas
+        $recorridosTodos = DB::table('recorridos')->get()->groupBy('id_viaje');
+
         foreach ($viajes as $viaje) {
-            // Cantidad aleatoria de pasajeros en el viaje (ej: 5 a 15)
-            $numPasajeros = rand(5, 15);
+            $recorridos = $recorridosTodos->get($viaje->id_viaje);
+            
+            if (!$recorridos) continue;
 
-            for ($i = 0; $i < $numPasajeros; $i++) {
-                $tarjeta = $tarjetas->random();
-                
-                // Simular que algunos pasajes se cobran un poco después del inicio del viaje
-                $fechaVenta = Carbon::parse($viaje->fecha)->addMinutes(rand(1, 45));
+            foreach ($recorridos as $recorrido) {
+                // Cantidad aleatoria de pasajeros en ESTE recorrido en específico (ej: 5 a 15)
+                $numPasajeros = rand(5, 15);
 
-                $ventas[] = [
-                    'id_venta' => $id_venta++,
-                    'id_viaje' => $viaje->id_viaje,
-                    'id_tarjeta' => $tarjeta->id_tarjeta,
-                    'valor' => 3300.00, // Precio fijo del pasaje de ejemplo
-                    'fecha' => $fechaVenta->format('Y-m-d H:i:s'),
-                    'id_estado' => 1, // Finalizado/Exitoso
-                ];
-                
-                // Insertar en bloques para no saturar memoria si hay muchos
-                if (count($ventas) > 500) {
-                    DB::table('venta_viaje')->insert($ventas);
-                    $ventas = [];
+                $horaSalida = Carbon::parse($recorrido->hora_salida);
+                $horaLlegada = $recorrido->hora_llegada ? Carbon::parse($recorrido->hora_llegada) : $horaSalida->copy()->addMinutes(45);
+
+                // Calcular la diferencia en minutos entre salida y llegada para distribuir ventas
+                $diffMinutes = $horaLlegada->diffInMinutes($horaSalida);
+                if ($diffMinutes < 1) $diffMinutes = 1;
+
+                for ($i = 0; $i < $numPasajeros; $i++) {
+                    $tarjeta = $tarjetas->random();
+                    
+                    // Simular que el pasaje se cobra en algún momento durante este recorrido exacto
+                    $fechaVenta = $horaSalida->copy()->addMinutes(rand(0, $diffMinutes));
+
+                    $ventas[] = [
+                        'id_venta' => $id_venta++,
+                        'id_viaje' => $viaje->id_viaje,
+                        'id_tarjeta' => $tarjeta->id_tarjeta,
+                        'valor' => 3300.00, // Precio fijo del pasaje
+                        'fecha' => $fechaVenta->format('Y-m-d H:i:s'),
+                        'id_estado' => 1, // Finalizado/Exitoso
+                    ];
+                    
+                    if (count($ventas) > 500) {
+                        DB::table('venta_viaje')->insert($ventas);
+                        $ventas = [];
+                    }
                 }
+            }
+                
+            // Insertar en bloques para no saturar memoria si hay muchos
+            if (count($ventas) > 500) {
+                DB::table('venta_viaje')->insert($ventas);
+                $ventas = [];
             }
         }
 

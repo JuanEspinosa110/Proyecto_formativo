@@ -89,7 +89,8 @@
                                         <span class="material-symbols-rounded" style="font-size: 3rem;">directions_bus</span>
                                     </div>
                                     <div>
-                                        <h1 class="fw-black mb-1 text-dark">{{ $buses->count() }}</h1>
+                                        <h2 class="fw-black mb-1 text-dark text-truncate" title="{{ $buses->count() }}">
+                                            {{ $buses->count() }}</h2>
                                         <p class="text-muted small fw-bold text-uppercase mb-0">Vehículos Registrados</p>
                                     </div>
                                 </div>
@@ -104,9 +105,11 @@
                                     <div class="text-success">
                                         <span class="material-symbols-rounded" style="font-size: 3rem;">monetization_on</span>
                                     </div>
-                                    <div>
-                                        <h1 class="fw-black mb-1 text-dark">${{ number_format($ingresosTotales) }}</h1>
-                                        <p class="text-muted small fw-bold text-uppercase mb-0">Ingresos Totales
+                                    <div class="overflow-hidden">
+                                        <h2 class="fw-black mb-1 text-dark text-truncate"
+                                            title="${{ number_format($ingresosTotales) }}">
+                                            ${{ number_format($ingresosTotales) }}</h2>
+                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Ingresos Totales
                                             ({{ $conteoPasajeros }} Pax)</p>
                                     </div>
                                 </div>
@@ -122,7 +125,8 @@
                                         <span class="material-symbols-rounded" style="font-size: 3rem;">route</span>
                                     </div>
                                     <div>
-                                        <h1 class="fw-black mb-1 text-dark">{{ $conteoAsignaciones }}</h1>
+                                        <h2 class="fw-black mb-1 text-dark text-truncate" title="{{ $conteoAsignaciones }}">
+                                            {{ $conteoAsignaciones }}</h2>
                                         <p class="text-muted small fw-bold text-uppercase mb-0">Viajes Realizados</p>
                                     </div>
                                 </div>
@@ -138,7 +142,8 @@
                                         <span class="material-symbols-rounded" style="font-size: 3rem;">folder_open</span>
                                     </div>
                                     <div>
-                                        <h1 class="fw-black mb-1 text-dark">{{ $conteoDocumentos }}</h1>
+                                        <h2 class="fw-black mb-1 text-dark text-truncate" title="{{ $conteoDocumentos }}">
+                                            {{ $conteoDocumentos }}</h2>
                                         <p class="text-muted small fw-bold text-uppercase mb-0">Documentos Activos</p>
                                     </div>
                                 </div>
@@ -164,7 +169,8 @@
                                             <span class="text-muted small text-uppercase fw-bold d-block mb-1">Ruta
                                                 Actual/Última</span>
                                             <h4 class="fw-bold text-dark mb-0">
-                                                {{ $ultimaAsignacion->ruta->nombre_ruta ?? 'Ruta Express' }}</h4>
+                                                {{ $ultimaAsignacion->ruta->nombre_ruta ?? 'Ruta Express' }}
+                                            </h4>
                                             <div class="d-flex gap-2 align-items-center mt-1">
                                                 <span class="badge bg-primary px-2 rounded-1">{{ $ultimaAsignacion->placa }}</span>
                                                 <span
@@ -398,7 +404,8 @@
                                         </td>
                                         <td class="fw-bold text-dark">{{ $asig->ruta->nombre_ruta ?? 'N/A' }}</td>
                                         <td class="text-muted">{{ $asig->conductor->primer_nombre }}
-                                            {{ $asig->conductor->primer_apellido }}</td>
+                                            {{ $asig->conductor->primer_apellido }}
+                                        </td>
                                         <td>
                                             <div class="d-flex flex-column small">
                                                 <span
@@ -933,7 +940,8 @@
                                         @foreach($buses as $b)
                                             <option value="{{ $b->placa }}"
                                                 data-modelo="{{ preg_replace('/[^0-9]/', '', $b->modelo) }}">{{ $b->placa }} -
-                                                {{ $b->modelo }}</option>
+                                                {{ $b->modelo }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -1304,13 +1312,14 @@
                     <div class="row g-3">
                         <div class="col-md-3">
                             <div class="card border-0 shadow-sm rounded-4 p-3 mb-0 bg-white">
-                                <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Viajes O → D</label>
+                                <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Viajes de Ida</label>
                                 <h3 id="stat_od" class="fw-black text-dark mb-0">0</h3>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="card border-0 shadow-sm rounded-4 p-3 mb-0 bg-white">
-                                <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Viajes D → O</label>
+                                <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Viajes de
+                                    Vuelta</label>
                                 <h3 id="stat_do" class="fw-black text-dark mb-0">0</h3>
                             </div>
                         </div>
@@ -1436,37 +1445,37 @@
                                 const fechaVenc = new Date(doc.fecha_vencimiento).toLocaleDateString();
 
                                 tr.innerHTML = `
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="bg-${doc.status_color} bg-opacity-10 text-${doc.status_color} p-2 rounded-3">
-                                                <span class="material-symbols-rounded">description</span>
-                                            </div>
-                                            <div class="fw-bold text-dark small">${doc.tipo_documento.nombre}</div>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted small">${fechaCarga}</td>
-                                    <td class="fw-bold text-dark small">${fechaVenc}</td>
-                                    <td>
-                                        <span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} rounded-pill px-3 x-small fw-bold border border-${doc.status_color}">${doc.status_vigencia}</span>
-                                    </td>
-                                    <td class="text-end pe-4">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <button class="btn btn-sm btn-light border p-2 rounded-circle btn-visualizar-table" 
-                                                    data-url="${doc.url_archivo}" 
-                                                    data-nombre="${doc.tipo_documento.nombre}"
-                                                    title="Vista Previa">
-                                                <span class="material-symbols-rounded fs-6">visibility</span>
-                                            </button>
-                                            <a href="${doc.url_archivo}" 
-                                               class="btn btn-sm btn-light border p-2 rounded-circle text-primary" 
-                                               download
-                                               title="Descargar">
-                                                <span class="material-symbols-rounded fs-6">download</span>
-                                            </a>
-                                            ${renewBtn}
-                                        </div>
-                                    </td>
-                                `;
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="bg-${doc.status_color} bg-opacity-10 text-${doc.status_color} p-2 rounded-3">
+                                                        <span class="material-symbols-rounded">description</span>
+                                                    </div>
+                                                    <div class="fw-bold text-dark small">${doc.tipo_documento.nombre}</div>
+                                                </div>
+                                            </td>
+                                            <td class="text-muted small">${fechaCarga}</td>
+                                            <td class="fw-bold text-dark small">${fechaVenc}</td>
+                                            <td>
+                                                <span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} rounded-pill px-3 x-small fw-bold border border-${doc.status_color}">${doc.status_vigencia}</span>
+                                            </td>
+                                            <td class="text-end pe-4">
+                                                <div class="d-flex justify-content-end gap-2">
+                                                    <button class="btn btn-sm btn-light border p-2 rounded-circle btn-visualizar-table" 
+                                                            data-url="${doc.url_archivo}" 
+                                                            data-nombre="${doc.tipo_documento.nombre}"
+                                                            title="Vista Previa">
+                                                        <span class="material-symbols-rounded fs-6">visibility</span>
+                                                    </button>
+                                                    <a href="${doc.url_archivo}" 
+                                                       class="btn btn-sm btn-light border p-2 rounded-circle text-primary" 
+                                                       download
+                                                       title="Descargar">
+                                                        <span class="material-symbols-rounded fs-6">download</span>
+                                                    </a>
+                                                    ${renewBtn}
+                                                </div>
+                                            </td>
+                                        `;
                                 docsBody.appendChild(tr);
                             });
 
@@ -1683,19 +1692,19 @@
                             if (data.recorridos.length > 0) {
                                 data.recorridos.forEach(rec => {
                                     const row = `
-                                        <tr>
-                                            <td class="ps-3">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <span class="material-symbols-rounded text-muted small">${rec.es_regreso ? 'keyboard_return' : 'near_me'}</span>
-                                                    <span class="fw-bold text-dark small">${rec.trayecto}</span>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge bg-light text-dark fw-medium">${rec.hora_salida}</span></td>
-                                            <td><span class="badge bg-light text-dark fw-medium">${rec.hora_llegada}</span></td>
-                                            <td class="text-center"><span class="fw-bold">${rec.cantidad_pasajeros}</span></td>
-                                            <td class="text-end pe-3 fw-bold text-success">$${new Intl.NumberFormat().format(rec.ingresos)}</td>
-                                        </tr>
-                                    `;
+                                                <tr>
+                                                    <td class="ps-3">
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <span class="material-symbols-rounded text-muted small">${rec.es_regreso ? 'keyboard_return' : 'near_me'}</span>
+                                                            <span class="fw-bold text-dark small">${rec.trayecto}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td><span class="badge bg-light text-dark fw-medium">${rec.hora_salida}</span></td>
+                                                    <td><span class="badge bg-light text-dark fw-medium">${rec.hora_llegada}</span></td>
+                                                    <td class="text-center"><span class="fw-bold">${rec.cantidad_pasajeros}</span></td>
+                                                    <td class="text-end pe-3 fw-bold text-success">$${new Intl.NumberFormat().format(rec.ingresos)}</td>
+                                                </tr>
+                                            `;
                                     tbody.innerHTML += row;
                                 });
                             } else {
@@ -1743,48 +1752,48 @@
                                         const isArchivado = doc.es_archivado;
                                         const trClass = isArchivado ? 'opacity-75 bg-light' : '';
                                         rows += `
-                                        <tr class="${trClass}">
-                                            <td class="ps-4">
-                                                <div class="fw-bold text-dark small text-truncate" style="max-width: 250px;" title="${doc.nombre}">${doc.nombre}</div>
-                                                ${isArchivado ? '<span class="badge bg-secondary-subtle text-secondary x-small border border-secondary mt-1">Archivado</span>' : (doc.status_vigencia === 'VENCIDO' ? '<span class="badge bg-danger-subtle text-danger x-small border border-danger mt-1">Vencido</span>' : '<span class="badge bg-success-subtle text-success x-small border border-success mt-1">Activo</span>')}
-                                            </td>
-                                            <td class="text-muted small">${doc.fecha_carga}</td>
-                                            <td class="fw-bold text-dark small">${doc.fecha_vencimiento}</td>
-                                            <td><span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} px-3 py-1 x-small border border-${doc.status_color} rounded-pill fw-bold">${doc.status_vigencia}</span></td>
-                                            <td class="text-end pe-4">
-                                                <div class="d-flex justify-content-end gap-2">
-                                                    ${doc.url_archivo ? `
-                                                    <button class="btn btn-sm btn-light border p-2 rounded-circle text-dark" onclick="mostrarVisor('${doc.url_archivo}', '${tipo}')" title="Vista Previa"><span class="material-symbols-rounded fs-6">visibility</span></button>
-                                                    <a href="${doc.url_archivo}" download class="btn btn-sm btn-light border text-primary p-2 rounded-circle" title="Descargar PDF"><span class="material-symbols-rounded fs-6">download</span></a>
-                                                    ` : '<span class="text-muted small">N/A</span>'}
-                                                </div>
-                                            </td>
-                                        </tr>`;
+                                                <tr class="${trClass}">
+                                                    <td class="ps-4">
+                                                        <div class="fw-bold text-dark small text-truncate" style="max-width: 250px;" title="${doc.nombre}">${doc.nombre}</div>
+                                                        ${isArchivado ? '<span class="badge bg-secondary-subtle text-secondary x-small border border-secondary mt-1">Archivado</span>' : (doc.status_vigencia === 'VENCIDO' ? '<span class="badge bg-danger-subtle text-danger x-small border border-danger mt-1">Vencido</span>' : '<span class="badge bg-success-subtle text-success x-small border border-success mt-1">Activo</span>')}
+                                                    </td>
+                                                    <td class="text-muted small">${doc.fecha_carga}</td>
+                                                    <td class="fw-bold text-dark small">${doc.fecha_vencimiento}</td>
+                                                    <td><span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} px-3 py-1 x-small border border-${doc.status_color} rounded-pill fw-bold">${doc.status_vigencia}</span></td>
+                                                    <td class="text-end pe-4">
+                                                        <div class="d-flex justify-content-end gap-2">
+                                                            ${doc.url_archivo ? `
+                                                            <button class="btn btn-sm btn-light border p-2 rounded-circle text-dark" onclick="mostrarVisor('${doc.url_archivo}', '${tipo}')" title="Vista Previa"><span class="material-symbols-rounded fs-6">visibility</span></button>
+                                                            <a href="${doc.url_archivo}" download class="btn btn-sm btn-light border text-primary p-2 rounded-circle" title="Descargar PDF"><span class="material-symbols-rounded fs-6">download</span></a>
+                                                            ` : '<span class="text-muted small">N/A</span>'}
+                                                        </div>
+                                                    </td>
+                                                </tr>`;
                                     });
 
                                     content.innerHTML += `
-                                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-3">
-                                        <div class="card-header bg-white border-0 p-4">
-                                            <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 text-uppercase letter-spacing-1 small">
-                                                <span class="material-symbols-rounded text-primary fs-5">folder_open</span>
-                                                ${tipo}
-                                            </h6>
-                                        </div>
-                                        <div class="table-responsive">
-                                            <table class="table table-hover align-middle mb-0">
-                                                <thead class="bg-light">
-                                                    <tr>
-                                                        <th class="ps-4 py-3 border-0 small text-muted fw-bold">NOMBRES Y ESTADO</th>
-                                                        <th class="py-3 border-0 small text-muted fw-bold">CARGA</th>
-                                                        <th class="py-3 border-0 small text-muted fw-bold">VENCIMIENTO</th>
-                                                        <th class="py-3 border-0 small text-muted fw-bold">VIGENCIA</th>
-                                                        <th class="py-3 border-0 text-end pe-4 small text-muted fw-bold">ACCIONES</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>${rows}</tbody>
-                                            </table>
-                                        </div>
-                                    </div>`;
+                                            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-3">
+                                                <div class="card-header bg-white border-0 p-4">
+                                                    <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 text-uppercase letter-spacing-1 small">
+                                                        <span class="material-symbols-rounded text-primary fs-5">folder_open</span>
+                                                        ${tipo}
+                                                    </h6>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover align-middle mb-0">
+                                                        <thead class="bg-light">
+                                                            <tr>
+                                                                <th class="ps-4 py-3 border-0 small text-muted fw-bold">NOMBRES Y ESTADO</th>
+                                                                <th class="py-3 border-0 small text-muted fw-bold">CARGA</th>
+                                                                <th class="py-3 border-0 small text-muted fw-bold">VENCIMIENTO</th>
+                                                                <th class="py-3 border-0 small text-muted fw-bold">VIGENCIA</th>
+                                                                <th class="py-3 border-0 text-end pe-4 small text-muted fw-bold">ACCIONES</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>${rows}</tbody>
+                                                    </table>
+                                                </div>
+                                            </div>`;
                                 }
                             }
                             modalBoveda.show();
@@ -1815,31 +1824,31 @@
                         if (link) {
                             e.preventDefault();
                             const url = link.href;
-                            
+
                             earningsContainer.style.opacity = '0.5';
                             earningsContainer.style.pointerEvents = 'none';
-                            
+
                             fetch(url, {
                                 headers: {
                                     'X-Requested-With': 'XMLHttpRequest'
                                 }
                             })
-                            .then(response => {
-                                if (!response.ok) throw new Error('Error en la red');
-                                return response.text();
-                            })
-                            .then(html => {
-                                earningsContainer.innerHTML = html;
-                                earningsContainer.style.opacity = '1';
-                                earningsContainer.style.pointerEvents = 'auto';
-                            })
-                            .catch(error => {
-                                console.error('Error en paginación AJAX:', error);
-                                earningsContainer.style.opacity = '1';
-                                earningsContainer.style.pointerEvents = 'auto';
-                                // Fallback: recargar si falla el AJAX
-                                window.location.href = url;
-                            });
+                                .then(response => {
+                                    if (!response.ok) throw new Error('Error en la red');
+                                    return response.text();
+                                })
+                                .then(html => {
+                                    earningsContainer.innerHTML = html;
+                                    earningsContainer.style.opacity = '1';
+                                    earningsContainer.style.pointerEvents = 'auto';
+                                })
+                                .catch(error => {
+                                    console.error('Error en paginación AJAX:', error);
+                                    earningsContainer.style.opacity = '1';
+                                    earningsContainer.style.pointerEvents = 'auto';
+                                    // Fallback: recargar si falla el AJAX
+                                    window.location.href = url;
+                                });
                         }
                     });
                 }

@@ -125,7 +125,7 @@
                             </td>
                             <td class="text-center">
                                 <span class="badge" style="background:var(--ct-accent-light); color:var(--ct-accent); border:1px solid var(--ct-accent-mid); border-radius:999px; padding:0.25em 0.8em; font-size:0.78rem; font-weight:600;">
-                                    {{ $asig->recorridos->isNotEmpty() ? 'EN CURSO' : 'PENDIENTE' }}
+                                    {{ $asig->viajes->isNotEmpty() ? 'EN CURSO' : 'PENDIENTE' }}
                                 </span>
                             </td>
                         </tr>

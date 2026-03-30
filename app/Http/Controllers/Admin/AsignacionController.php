@@ -66,9 +66,9 @@ class AsignacionController extends Controller
             });
         }
         
-        // Filtro por Hora (Ej: '06:00')
-        if ($request->filled('hora')) {
-            $query->whereTime('fecha', '=', $request->hora);
+        // Filtro por Fecha (Ej: '2026-03-30')
+        if ($request->filled('fecha')) {
+            $query->whereDate('fecha', '=', $request->fecha);
         }
 
         // Orden ID ASC y paginación

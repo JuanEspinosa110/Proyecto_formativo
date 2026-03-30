@@ -43,17 +43,27 @@ class EmpresaController extends Controller
         // Conteos en memoria tras paginar para evitar subqueries complejos
         $empresas = $query->orderBy('nombre_empresa')->paginate(12);
 
+        // Calcular rutas de "Uso Libre" (sin ninguna empresa asignada actualmente)
+        $rutasLibresCount = \App\Models\Ruta::where('id_ciudad', $ciudad)
+            ->where('id_estado', 1)
+            ->whereDoesntHave('asignaciones', function ($q) {
+                $q->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)
+                  ->where('id_estado', 1);
+            })->count();
+
         // Añadir conteos y documentos pendientes a cada empresa
-        $empresas->getCollection()->transform(function ($empresa) {
+        $empresas->getCollection()->transform(function ($empresa) use ($rutasLibresCount) {
             $placas = Bus::where('NIT', $empresa->NIT)->pluck('placa');
 
             $empresa->buses_count = $placas->count();
 
-            $empresa->rutas_count = Asignacion::where('Nit', $empresa->NIT)
+            $rutasPropias = Asignacion::where('Nit', $empresa->NIT)
                                               ->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)
                                               ->where('id_estado', 1)
                                               ->distinct('id_ruta')
                                               ->count('id_ruta');
+            
+            $empresa->rutas_count = $rutasPropias + $rutasLibresCount;
 
             $empresa->docs_pendientes = $placas->isNotEmpty()
                 ? Documento::whereIn('placa', $placas)
@@ -88,16 +98,28 @@ class EmpresaController extends Controller
                         return $bus;
                     });
 
-        // Rutas asignadas activas
-        $rutas = Asignacion::with(['ruta.barrioOrigen', 'ruta.barrioDestino'])
+        // Rutas asignadas activas (propias de la empresa)
+        $rutasAsignadas = Asignacion::with(['ruta.barrioOrigen', 'ruta.barrioDestino'])
                             ->where('Nit', $empresa->NIT)
                             ->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)
                             ->where('id_estado', 1)
                             ->get()
                             ->pluck('ruta')
-                            ->filter()
-                            ->unique('id_ruta')
-                            ->values();
+                            ->filter();
+
+        // Rutas de Uso Libre (sin asignación a ninguna empresa)
+        $rutasLibres = \App\Models\Ruta::with(['barrioOrigen', 'barrioDestino'])
+            ->where('id_ciudad', auth()->user()->id_ciudad)
+            ->where('id_estado', 1)
+            ->whereDoesntHave('asignaciones', function ($q) {
+                $q->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)
+                  ->where('id_estado', 1);
+            })->get();
+
+        // Todas las rutas operativas para esta empresa (Propias + Libres)
+        $rutas = $rutasAsignadas->merge($rutasLibres)
+            ->unique('id_ruta')
+            ->values();
 
         // Total de documentos pendientes de todos los buses
         $placas = $buses->pluck('placa');

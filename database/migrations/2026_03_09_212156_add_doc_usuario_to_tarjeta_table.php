@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tarjeta', function (Blueprint $table) {
-            $table->unsignedBigInteger('doc_usuario'); // bigint(20) obligatorio
+            $table->unsignedBigInteger('doc_usuario')->nullable(); // Ahora es opcional (nullable) para manejar tarjetas sin asociar
             $table->foreign('doc_usuario')
                   ->references('doc_usuario')->on('usuario');
         });

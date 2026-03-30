@@ -58,7 +58,7 @@
                 Volver
             </a>
 
-            @if((int)$mantenimiento->id_estado === 7)
+            @if((int)$mantenimiento->id_estado === 4)
             {{-- Aprobar Salida: relleno naranja (acción principal) --}}
             <form id="formAprobar" action="{{ route('jefemantenimiento.aprobar-salida', $mantenimiento->id_mantenimiento) }}" method="POST">
                 @csrf
@@ -102,7 +102,7 @@
                     <label class="small text-muted d-block">Estado</label>
                     @if((int)$mantenimiento->id_estado === 4)
                         <span class="badge bg-warning text-dark">En Taller</span>
-                    @elseif((int)$mantenimiento->id_estado === 7)
+                    @elseif((int)$mantenimiento->id_estado === 5)
                         <span class="badge bg-success">Finalizado</span>
                     @else
                         <span class="badge bg-secondary">{{ $mantenimiento->estado->nombre_estado ?? 'Desconocido' }}</span>

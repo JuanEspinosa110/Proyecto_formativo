@@ -45,10 +45,10 @@ class DashboardController extends Controller
                 ->first();
 
             if ($ultimoRecorrido) {
-                $ruta->minutos_desde_salida = \Carbon\Carbon::parse($ultimoRecorrido->hora_salida)->diffInMinutes(\Carbon\Carbon::now());
+                $ruta->hora_salida = \Carbon\Carbon::parse($ultimoRecorrido->hora_salida);
                 $ruta->ultimo_bus = $ultimoRecorrido->viaje->placa ?? null;
             } else {
-                $ruta->minutos_desde_salida = null;
+                $ruta->hora_salida = null;
                 $ruta->ultimo_bus = null;
             }
         }

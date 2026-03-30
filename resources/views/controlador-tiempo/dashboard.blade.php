@@ -53,24 +53,28 @@
         <div class="col-12">
             <div class="bg-white rounded-3 shadow-sm p-4">
                 <div class="d-flex align-items-center gap-2 mb-4">
-                    <span class="material-symbols-rounded text-primary">timer</span>
-                    <h6 class="fw-bold mb-0">Monitor de Frecuencias (Hoy)</h6>
+                    <span class="material-symbols-rounded text-primary">schedule</span>
+                    <h6 class="fw-bold mb-0">Monitor de Despachos (Hoy)</h6>
                 </div>
                 
                 <div class="row g-3">
                     @forelse($rutasDetalle as $ruta)
                         @php
-                            $min = $ruta->minutos_desde_salida;
-                            $status = ($min === null) ? 'text-muted' : 'text-primary';
+                            $salida = $ruta->hora_salida;
+                            $status = ($salida === null) ? 'text-muted' : 'text-primary';
                         @endphp
                         <div class="col-md-6 col-lg-4">
                             <div class="p-3 border rounded-3 h-100 shadow-none border-light-subtle bg-light bg-opacity-10">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <div class="small fw-extrabold text-uppercase tracking-wider text-muted">{{ $ruta->nombre_ruta ?? ('Ruta #'.$ruta->id_ruta) }}</div>
                                 </div>
-                                <div class="d-flex align-items-baseline gap-2 mt-1">
-                                    <span class="fs-2 fw-bold {{ $status }}">{{ is_numeric($min) ? round($min) : '—' }}</span>
-                                    <span class="text-dark fw-medium" style="opacity: 0.6;">minutos</span>
+                                <div class="mt-2">
+                                    <div class="fs-4 fw-bold {{ $status }}">
+                                        {{ $salida ? $salida->format('h:i A') : 'Sin despachos hoy' }}
+                                    </div>
+                                    <div class="text-dark fw-medium mt-1" style="opacity: 0.6; font-size: 0.85rem;">
+                                        {{ $salida ? $salida->format('d \d\e M Y') : '—' }}
+                                    </div>
                                 </div>
                                 <div class="mt-2 pt-2 border-top border-light d-flex justify-content-between align-items-center">
                                     <div class="small text-muted">

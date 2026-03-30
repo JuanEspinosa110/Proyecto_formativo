@@ -92,7 +92,7 @@
                 <div class="alert alert-danger d-flex align-items-center mb-4 py-2" role="alert">
                     <span class="material-symbols-rounded text-danger fs-4 me-3">report</span>
                     <div style="font-size: .85rem;">
-                        <strong>Atención:</strong> Tan pronto inicies el proceso, tu tarjeta anterior será <b>Inactivada de forma permanente</b> y no servirá para más viajes.
+                        <strong>Atención:</strong> Tan pronto inicies el proceso, tu tarjeta anterior será <b>Suspendida de forma permanente</b> y no servirá para más viajes.
                     </div>
                 </div>
 

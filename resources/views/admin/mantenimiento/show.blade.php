@@ -78,7 +78,7 @@
             </a>
             @endif
 
-            @if((int)$mantenimiento->id_estado === 7)
+            @if((int)$mantenimiento->id_estado === 4)
             {{-- Finalizar: acción principal, verde relleno --}}
             <form id="formFinalizar" action="{{ route('admin.mantenimiento.finalizar', $mantenimiento->id_mantenimiento) }}" method="POST">
                 @csrf
@@ -104,7 +104,7 @@
                 <h6 class="text-uppercase small fw-bold text-muted mb-3">Bus</h6>
                 <h3 class="mb-0">{{ $mantenimiento->placa }}</h3>
                 <p class="text-muted mb-3">{{ $mantenimiento->bus->modelo ?? '—' }}</p>
-                <span class="badge @if((int)$mantenimiento->bus?->id_estado === 7) bg-warning text-dark @else bg-success @endif">
+                <span class="badge @if((int)$mantenimiento->bus?->id_estado === 4) bg-warning text-dark @else bg-success @endif">
                     {{ $mantenimiento->bus?->estado?->nombre_estado ?? 'Sin estado' }}
                 </span>
                 <hr class="my-3">
@@ -122,7 +122,7 @@
                 </div>
                 <div>
                     <label class="small text-muted d-block">Estado del registro</label>
-                    @if((int)$mantenimiento->id_estado === 7)
+                    @if((int)$mantenimiento->id_estado === 4)
                         <span class="badge bg-warning text-dark">En Taller</span>
                     @else
                         <span class="badge bg-success">Finalizado</span>
@@ -191,7 +191,7 @@
             <tr>
                 <td style="padding:6px 0; font-weight:bold; color:#555; font-size:9pt;">ESTADO</td>
                 <td style="padding:6px 8px;">
-                    @if((int)$mantenimiento->id_estado === 7) En Taller @else Finalizado @endif
+                    @if((int)$mantenimiento->id_estado === 4) En Taller @else Finalizado @endif
                 </td>
                 <td style="padding:6px 0; font-weight:bold; color:#555; font-size:9pt;">COSTO TOTAL</td>
                 <td style="padding:6px 8px; font-weight:bold; font-size:12pt;">${{ number_format($mantenimiento->costo_total, 0, ',', '.') }}</td>
