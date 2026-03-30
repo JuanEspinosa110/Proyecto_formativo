@@ -87,6 +87,45 @@ class EmpresaController extends Controller
     }
 
     /**
+     * Devuelve estadísticas en JSON para las gráficas del Dashboard del Auxiliar.
+     */
+    public function stats(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $nit  = $user->NIT ?? null;
+
+            if (!$nit) {
+                return response()->json(['error' => 'Sin empresa asociada'], 400);
+            }
+
+            $empresa    = \App\Models\Empresa::where('NIT', $nit)->first();
+            $usuarios   = Usuario::where('NIT', $nit)->get();
+            $documentos = Documento::where('NIT', $nit)->get();
+            $buses      = Bus::with('estado')->where('NIT', $nit)->get();
+            $viajes     = Viaje::with('ruta')
+                ->whereHas('bus', fn($q) => $q->where('NIT', $nit))
+                ->get();
+
+            return response()->json([
+                'empresa'    => $empresa,
+                'usuarios'   => $usuarios,
+                'documentos' => $documentos,
+                'buses'      => $buses,
+                'viajes'     => $viajes,
+                'totales'    => [
+                    'usuarios'   => $usuarios->count(),
+                    'documentos' => $documentos->count(),
+                    'buses'      => $buses->count(),
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('EmpresaController@stats: ' . $e->getMessage());
+            return response()->json(['error' => 'Error interno'], 500);
+        }
+    }
+
+    /**
      * Crear nuevo usuario (Conductor/Propietario)
      */
     public function storeUsuario(Request $request)

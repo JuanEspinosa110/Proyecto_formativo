@@ -13,6 +13,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}"> <!-- Reusando base css -->
+    <link rel="stylesheet" href="{{ asset('css/validaciones.css') }}">
+
 
     @stack('styles')
 </head>
@@ -80,7 +82,87 @@
         <span>© {{ date('Y') }}</span>
     </footer>
 
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1085;">
+        <div id="siguToast" class="toast align-items-center text-white border-0 shadow-lg rounded-4" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="8000">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-3 py-3 px-4">
+                    <div id="toastIconWrap" class="rounded-circle d-flex align-items-center justify-content-center" style="width:32px; height:32px; background: rgba(255,255,255,0.2)">
+                        <span id="toastIcon" class="material-symbols-rounded fs-5"></span>
+                    </div>
+                    <div id="toastMessage" class="fw-medium"></div>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-3 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal confirmación global -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:380px;">
+            <div class="modal-content rounded-4 border-0 shadow">
+                <div class="modal-body text-center p-4">
+                    <span class="material-symbols-rounded mb-3 d-block" id="confirmIcon" style="font-size:3rem; color:#f6820c;">help</span>
+                    <h6 class="fw-bold mb-1" id="confirmTitle">¿Estás seguro?</h6>
+                    <p class="text-muted mb-0 small" id="confirmMessage">Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer border-0 justify-content-center gap-2 pb-4 pt-0">
+                    <button type="button" class="btn btn-sm" style="border:1.5px solid #cbd5e0; color:#4a5568; border-radius:0.5rem; padding:0.35rem 1.2rem;" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="confirmOkBtn" class="btn btn-sm" style="background:var(--p); color:#fff; border:none; border-radius:0.5rem; padding:0.35rem 1.2rem;">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <script>
+        function showToast(message, type = 'success') {
+            const toastEl = document.getElementById('siguToast');
+            const toastBody = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+            toastEl.classList.remove('bg-success', 'bg-danger', 'bg-warning', 'bg-info');
+            if (type === 'success') {
+                toastEl.classList.add('bg-success');
+                toastIcon.textContent = 'check_circle';
+            } else if (type === 'error') {
+                toastEl.classList.add('bg-danger');
+                toastIcon.textContent = 'error';
+            } else {
+                toastEl.classList.add('bg-info');
+                toastIcon.textContent = 'info';
+            }
+            toastBody.textContent = message;
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }
+
+        @if(session('success'))
+            document.addEventListener('DOMContentLoaded', () => showToast("{{ session('success') }}", 'success'));
+        @endif
+        @if(session('error'))
+            document.addEventListener('DOMContentLoaded', () => showToast("{{ session('error') }}", 'error'));
+        @endif
+
+        // Delegación global para botones confirmar
+        document.addEventListener('click', function (e) {
+            const btn = e.target.closest('[data-confirm-form]');
+            if (!btn) return;
+            e.preventDefault();
+            const formId = btn.dataset.confirmForm;
+            const title = btn.dataset.confirmTitle || '¿Estás seguro?';
+            const msg = btn.dataset.confirmMsg || 'Esta acción no se puede deshacer.';
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = msg;
+            const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+            document.getElementById('confirmOkBtn').onclick = function () {
+                modal.hide();
+                document.getElementById(formId).submit();
+            };
+            modal.show();
+        });
+    </script>
     @stack('scripts')
 
 </body>

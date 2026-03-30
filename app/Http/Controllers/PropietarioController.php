@@ -66,36 +66,42 @@ class PropietarioController extends Controller
                 $q->whereIn('placa', $busIds);
             })->count();
             
-            // Filtro por Mes para Ganancias
+            // Filtro por Mes para Ganancias (Captura inicial)
             $mesFiltro = $request->query('mes_seleccionado'); 
-            if ($mesFiltro) {
-                $ingresosTotales = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
-                    $q->whereIn('placa', $busIds);
-                })->where('fecha', 'like', $mesFiltro . '%')->sum('valor');
-            } else {
-                $ingresosTotales = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
-                    $q->whereIn('placa', $busIds);
-                })->sum('valor');
-            }
+            $mesBase = $mesFiltro ?: \Carbon\Carbon::now()->format('Y-m');
+
+            // 1. Ingresos Totales del Mes Seleccionado
+            $parts = explode('-', $mesBase);
+            $year = $parts[0];
+            $month = $parts[1];
+
+            $ingresosTotales = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                $q->whereIn('placa', $busIds);
+            })->whereYear('fecha', $year)->whereMonth('fecha', $month)->sum('valor');
 
             $hoy = \Carbon\Carbon::today();
             $semana = \Carbon\Carbon::now()->startOfWeek();
-            $mes = \Carbon\Carbon::now()->startOfMonth();
 
+            // 2. Cálculo de tarjetas resumen
             $gananciasHoy = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
                 $q->whereIn('placa', $busIds);
             })->whereDate('fecha', $hoy)->sum('valor');
+            
             $gananciasSemana = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
                 $q->whereIn('placa', $busIds);
             })->where('fecha', '>=', $semana)->sum('valor');
-            $gananciasMes = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
-                $q->whereIn('placa', $busIds);
-            })->where('fecha', '>=', $mes)->sum('valor');
+            
+            // Si hay un mes seleccionado diferente al actual, 'gananciasMes' mostrará ese mes.
+            $gananciasMes = $ingresosTotales;
 
-            // 3. Ingresos individuales por bus (Nuevo)
+            // 3. Ingresos individuales por bus (Filtrados por mes)
             $viajesTotalesBus = \App\Models\Viaje::whereIn('placa', $busIds)
-                ->withCount('ventas as total_pasajeros')
-                ->withSum('ventas as total_ingresos', 'valor')
+                ->withCount(['ventas as total_pasajeros' => function($q) use ($year, $month) {
+                    $q->whereYear('fecha', $year)->whereMonth('fecha', $month);
+                }])
+                ->withSum(['ventas as total_ingresos' => function($q) use ($year, $month) {
+                    $q->whereYear('fecha', $year)->whereMonth('fecha', $month);
+                }], 'valor')
                 ->get();
                 
             $ingresosPorBus = $viajesTotalesBus->groupBy('placa')->map(function ($viajes, $placa) {
@@ -106,7 +112,7 @@ class PropietarioController extends Controller
                 ];
             })->values();
 
-            // 1. Filtros Independientes
+            // 4. Filtros Independientes para Asignaciones
             if ($request->filled('fecha')) {
                 $queryAsignaciones->whereDate('fecha', $request->fecha);
             }
@@ -132,7 +138,7 @@ class PropietarioController extends Controller
                     });
                 });
             }
-            // 2. Lógica de Filtro por Hora (Dentro del turno de 8h)
+            // 5. Lógica de Filtro por Hora (Dentro del turno de 8h)
             if ($request->filled('horario')) {
                 $searchTime = $request->horario;
                 $queryAsignaciones->whereRaw("
@@ -150,18 +156,19 @@ class PropietarioController extends Controller
             $queryAsignaciones->whereRaw('1 = 0');
         }
 
-        // 3. Separación de Asignaciones (Simples) y Historial (Filtrado)
-        // Las asignaciones recientes para el módulo de "Asignaciones"
+        // 6. Separación de Asignaciones (Simples) y Historial (Filtrado)
         $asignacionesRecientes = $queryAsignaciones->orderBy('fecha', 'desc')->paginate(5, ['*'], 'page_rec');
-
-        // El historial filtrado para el módulo de "Historial"
         $historialAsignaciones = $queryAsignaciones->orderBy('fecha', 'desc')->paginate(5, ['*'], 'page_hist');
 
-        // Asignaciones para el módulo de "Ganancias" (mismo filtro base que historial pero tal vez sin los filtros de búsqueda si se prefiere, o siguiendo la lógica de la sección)
-        // El requerimiento pide paginación en Ganancias también.
-        $asignacionesGanancias = Viaje::with(['ruta', 'conductor', 'ventas'])
-            ->whereIn('placa', $busIds)
-            ->orderBy('fecha', 'desc')
+        // Asignaciones para el módulo de "Ganancias" (Filtradas por el mes seleccionado)
+        $queryGanancias = Viaje::with(['ruta', 'conductor', 'ventas'])
+            ->whereIn('placa', $busIds);
+        
+        if ($mesFiltro) {
+             $queryGanancias->whereYear('fecha', $year)->whereMonth('fecha', $month);
+        }
+
+        $asignacionesGanancias = $queryGanancias->orderBy('fecha', 'desc')
             ->paginate(5, ['*'], 'page_gan');
         
         $busesPaginated = Bus::with('estado')->where('doc_propietario', $user->doc_usuario)->paginate(5, ['*'], 'page_bus');
@@ -188,6 +195,13 @@ class PropietarioController extends Controller
         }
         $conteoVencidos = collect($documentosAlerta)->filter(fn($d) => $d->estado_expiracion === 'VENCIDO')->count();
         $conteoProximos = collect($documentosAlerta)->filter(fn($d) => $d->estado_expiracion === 'PRÓXIMO A VENCER')->count();
+
+        // Respuesta para AJAX (Paginación sin recarga)
+        if ($request->ajax()) {
+            if ($request->query('section') === 'ganancias') {
+                return view('propietario.partials.ganancias_table', compact('asignacionesGanancias', 'precioPasaje'))->render();
+            }
+        }
 
         return view('propietario.dashboard', compact(
             'buses', 

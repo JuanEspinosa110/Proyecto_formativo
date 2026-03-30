@@ -70,7 +70,7 @@
                 <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle d-inline-flex mx-auto mb-3" style="width: 60px; height: 60px; align-items: center; justify-content: center;">
                     <span class="material-symbols-rounded fs-2">group</span>
                 </div>
-                <h5 class="fw-bold mb-1">{{ $stats['usuarios'] }}</h5>
+                <h5 class="fw-bold mb-1" id="kpiUsuarios">{{ $stats['usuarios'] }}</h5>
                 <p class="text-muted small mb-0">Usuarios (Personal)</p>
             </div>
         </div>
@@ -79,7 +79,7 @@
                 <div class="bg-success bg-opacity-10 text-success p-3 rounded-circle d-inline-flex mx-auto mb-3" style="width: 60px; height: 60px; align-items: center; justify-content: center;">
                     <span class="material-symbols-rounded fs-2">directions_bus</span>
                 </div>
-                <h5 class="fw-bold mb-1">{{ $stats['buses'] }}</h5>
+                <h5 class="fw-bold mb-1" id="kpiBuses">{{ $stats['buses'] }}</h5>
                 <p class="text-muted small mb-0">Buses Registrados</p>
             </div>
         </div>
@@ -88,7 +88,7 @@
                 <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-circle d-inline-flex mx-auto mb-3" style="width: 60px; height: 60px; align-items: center; justify-content: center;">
                     <span class="material-symbols-rounded fs-2">description</span>
                 </div>
-                <h5 class="fw-bold mb-1">{{ $stats['documentos_pendientes'] }}</h5>
+                <h5 class="fw-bold mb-1" id="kpiDocumentos">{{ $stats['documentos_pendientes'] }}</h5>
                 <p class="text-muted small mb-0">Docs Pendientes</p>
             </div>
         </div>
@@ -99,6 +99,42 @@
                 </div>
                 <h5 class="fw-bold mb-1">{{ $stats['asignaciones_hoy'] }}</h5>
                 <p class="text-muted small mb-0">Asignaciones Hoy</p>
+            </div>
+        </div>
+    </div>
+    <!-- SECCIÓN DE GRÁFICAS (Espejo de Admin) -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h5 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded text-primary">pie_chart</span>
+                    Distribución Usuarios vs Docs
+                </h5>
+                <div style="height: 250px;">
+                    <canvas id="chartUsersDocs"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h5 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded text-success">bar_chart</span>
+                    Buses por Estado
+                </h5>
+                <div style="height: 250px;">
+                    <canvas id="chartBusesEstado"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h5 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded text-info">timeline</span>
+                    Viajes por Ruta
+                </h5>
+                <div style="height: 250px;">
+                    <canvas id="chartViajesRuta"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -316,5 +352,12 @@
 @include('empresa.auxiliar.modals.asignar_conductor')
 @include('empresa.auxiliar.modals.gestionar_documentos')
 @include('empresa.auxiliar.modals.reportes')
+
+@push('scripts')
+<script>
+    window.ADMIN_STATS_URL = "{{ route('empresa.dashboard.stats') }}";
+</script>
+<script src="{{ asset('js/dashboard/admin.js') }}" defer></script>
+@endpush
 
 @endsection

@@ -11,34 +11,46 @@ use Illuminate\Support\Facades\DB;
 
 class PlanillaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
-        // Asignaciones del día con sus respectivos recorridos y novedades
-        $planilla = Asignacion::with([
+        // 1. Obtener listas para los filtros
+        $busesList = Bus::where('NIT', $user->NIT)->orderBy('placa')->get();
+        $conductoresList = \App\Models\Usuario::where('NIT', $user->NIT)
+            ->where('id_tipo_usuario', 3) // Conductores
+            ->orderBy('primer_nombre')
+            ->get();
+        
+        // Rutas que tienen asignaciones en esta empresa
+        $rutasList = \App\Models\Ruta::whereHas('asignaciones', function($q) use ($user) {
+            $q->where('Nit', $user->NIT);
+        })->get();
+
+        // 2. Query con filtros
+        $query = Asignacion::with([
                 'bus', 
                 'usuario', 
                 'ruta.barrioOrigen', 
                 'ruta.barrioDestino',
-                'ruta.barrioDestino',
-                'recorridos.viaje',
                 'recorridos.novedades'
             ])
-            ->whereHas('bus', fn($q) => $q->where('NIT', $user->NIT))
-            ->orderBy('id_asignacion', 'desc')
-            ->paginate(20);
+            ->where('Nit', $user->NIT);
 
-        // Filtrar estrictamente los recorridos en memoria para que solo pertenezcan
-        // al conductor que está asignado, impidiendo que choferes vean turnos ajenos del mismo bus.
-        $planilla->getCollection()->transform(function ($asig) {
-            if ($asig->relationLoaded('recorridos')) {
-                $asig->setRelation('recorridos', $asig->recorridos->filter(function ($rec) use ($asig) {
-                    return $rec->viaje && $rec->viaje->doc_us == $asig->doc_usuario;
-                })->values());
-            }
-            return $asig;
-        });
+        if ($request->filled('placa')) {
+            $query->where('placa', $request->placa);
+        }
+        if ($request->filled('doc_usuario')) {
+            $query->where('doc_usuario', $request->doc_usuario);
+        }
+        if ($request->filled('id_ruta')) {
+            $query->where('id_ruta', $request->id_ruta);
+        }
+        if ($request->filled('fecha')) {
+            $query->whereDate('fecha_inicio', $request->fecha);
+        }
+
+        $planilla = $query->orderBy('id_asignacion', 'desc')->paginate(20)->withQueryString();
 
         // Novedades: buses en taller (mantenimiento) o inactivos como referencia
         $novedades = Bus::with(['estado'])
@@ -46,7 +58,39 @@ class PlanillaController extends Controller
             ->where('id_estado', '!=', 1)
             ->get();
 
-        return view('controlador-tiempo.planillas.index', compact('planilla', 'novedades'));
+        return view('controlador-tiempo.planillas.index', compact(
+            'planilla', 
+            'novedades', 
+            'busesList', 
+            'conductoresList', 
+            'rutasList'
+        ));
+    }
+
+    public function show(Request $request, $id)
+    {
+        $asig = Asignacion::with([
+            'bus', 
+            'usuario', 
+            'ruta.barrioOrigen', 
+            'ruta.barrioDestino'
+        ])->findOrFail($id);
+
+        $query = \App\Models\Recorrido::with('novedades')
+            ->whereHas('viaje', function($q) use ($asig) {
+                $q->where('placa', $asig->placa)
+                  ->where('doc_us', $asig->doc_usuario);
+            });
+
+        if ($request->filled('fecha')) {
+            $query->whereDate('hora_salida', $request->fecha);
+        }
+
+        $recorridos = $query->orderBy('hora_salida', 'desc')
+            ->paginate(3)
+            ->withQueryString();
+
+        return view('controlador-tiempo.planillas.show', compact('asig', 'recorridos'));
     }
 
     public function store(Request $request)

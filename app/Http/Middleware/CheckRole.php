@@ -59,6 +59,12 @@ class CheckRole
                 ->with('error', 'No tienes permisos para esta área.');
         }
 
-        return redirect('/')->with('error', 'Acceso no autorizado.');
+        if ($user->id_tipo_usuario == 4) {
+            return redirect()->route('empresa.dashboard')
+                ->with('error', 'Acceso restringido.');
+        }
+
+        return redirect()->route('cliclkpasajes')->with('error', 'Acceso no autorizado.');
+
     }
 }

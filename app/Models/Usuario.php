@@ -62,7 +62,8 @@ class Usuario extends Authenticatable
                     'admin' => 1,
                     'operador' => 4,
                     'usuario' => 3,
-                    'controlador_tiempo' => 8,
+                    'controlador_tiempo' => 7,
+                    'gestor_recargas' => 8,
                     default => 1
                 };
             }
@@ -172,9 +173,9 @@ class Usuario extends Authenticatable
             3 => 'conductor.dashboard',
             4 => 'empresa.dashboard',
             5 => 'propietario.dashboard',
-            6 => 'gestor_setp.dashboard',
-            7 => 'coordinador_bus.dashboard',
-            8 => 'gestor_recargas.dashboard', // O gestor_recargas
+            6 => 'gestor-setp.dashboard',
+            7 => 'controlador-tiempo.dashboard',
+            8 => 'gestor-recargas.dashboard', 
             9 => 'jefemantenimiento.dashboard',
             default => 'pasajero.dashboard',
         };

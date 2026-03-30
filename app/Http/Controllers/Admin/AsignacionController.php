@@ -184,6 +184,12 @@ class AsignacionController extends Controller
     {
         $viaje = Viaje::findOrFail($id_viaje);
         
+        // No permitir editar si ya está finalizado (ID 5)
+        if ($viaje->id_estado == 5) {
+            return redirect()->route('admin.asignaciones.index')
+                ->with('error', 'No se puede editar una asignación que ya ha sido finalizada.');
+        }
+        
         // Registrar en historial
         $oldConductor = $viaje->getOriginal('doc_us');
         $oldRuta = $viaje->getOriginal('id_ruta');
@@ -226,6 +232,12 @@ class AsignacionController extends Controller
     public function destroy($id_viaje)
     {
         $viaje = Viaje::findOrFail($id_viaje);
+
+        // No permitir eliminar si ya está finalizado (ID 5)
+        if ($viaje->id_estado == 5) {
+            return redirect()->route('admin.asignaciones.index')
+                ->with('error', 'No se puede eliminar una asignación que ya ha sido finalizada.');
+        }
         // Registrar en historial antes de borrar
         HistorialBus::create([
             'placa' => $viaje->placa,

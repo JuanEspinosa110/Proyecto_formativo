@@ -13,7 +13,8 @@
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     <link rel="stylesheet" href="{{ asset('css/jefemantenimiento.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/validacion.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/validaciones.css') }}">
+
 
     @stack('styles')
 </head>

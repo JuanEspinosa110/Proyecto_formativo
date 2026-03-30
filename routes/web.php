@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\Admin\ReporteController;
+use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\PropietarioController;
 use App\Http\Controllers\ConductorController;
 
@@ -123,29 +124,6 @@ Route::middleware('auth:web')->group(function () {
         Route::get('/fallas', [ConductorController::class, 'historialFallas'])->name('fallas');
         Route::post('/reportar-falla', [ConductorController::class, 'reportarFalla'])->name('reportarFalla');
     });
-
-        /*
-        Route::middleware(['auth:web', 'role:5'])->prefix('empresa')->name('empresa.')->group(function () {
-            Route::get('/dashboard', [EmpresaController::class, 'dashboard'])->name('dashboard');
-
-            // Usuarios (Propietarios, Conductores)
-            Route::post('/usuarios', [EmpresaController::class, 'storeUsuario'])->name('usuarios.store');
-
-            // Buses
-            Route::post('/buses', [EmpresaController::class, 'storeBus'])->name('buses.store');
-
-            // Documentos
-            Route::post('/documentos/{id}/aprobar', [EmpresaController::class, 'aprobarDocumento'])->name('documentos.aprobar');
-            Route::post('/documentos/{id}/rechazar', [EmpresaController::class, 'rechazarDocumento'])->name('documentos.rechazar');
-
-            // Asignaciones
-            Route::post('/asignaciones', [EmpresaController::class, 'storeAsignacion'])->name('asignaciones.store');
-
-            // Reportes
-            Route::get('/reportes/export', [EmpresaController::class, 'descargarReporte'])->name('reportes.export');
-        });
-        */
-
 });
 
 // ==========================================
@@ -159,8 +137,30 @@ Route::middleware(['auth:web', 'role:5', 'CheckNit'])->prefix('propietario')->na
     Route::get('/bus/{placa}/detalles', [PropietarioController::class, 'verVehiculo'])->name('verVehiculo');
     Route::get('/bus/{placa}/historial-documental', [PropietarioController::class, 'historialDocumental'])->name('historialDocumental');
     Route::get('/asignacion/{id}/detalle', [PropietarioController::class, 'getDetalleAsignacion'])->name('detalleAsignacion');
-    Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
-        ->name('empresa.dashboard');
+});
+
+// ==========================================
+// PANEL AUXILIAR (Independiente)
+// ==========================================
+Route::middleware(['auth:web', 'role:1,4', 'CheckNit'])->prefix('empresa')->name('empresa.')->group(function () {
+    Route::get('/dashboard', [EmpresaController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard/stats', [EmpresaController::class, 'stats'])->name('dashboard.stats');
+    
+    // Usuarios (Propietarios, Conductores)
+    Route::post('/usuarios', [EmpresaController::class, 'storeUsuario'])->name('usuarios.store');
+
+    // Buses
+    Route::post('/buses', [EmpresaController::class, 'storeBus'])->name('buses.store');
+
+    // Documentos
+    Route::post('/documentos/{id}/aprobar', [EmpresaController::class, 'aprobarDocumento'])->name('documentos.aprobar');
+    Route::post('/documentos/{id}/rechazar', [EmpresaController::class, 'rechazarDocumento'])->name('documentos.rechazar');
+
+    // Asignaciones
+    Route::post('/asignaciones', [EmpresaController::class, 'storeAsignacion'])->name('asignaciones.store');
+
+    // Reportes
+    Route::get('/reportes/export', [EmpresaController::class, 'descargarReporte'])->name('reportes.export');
 });
 
 

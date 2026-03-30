@@ -61,25 +61,12 @@
                     @forelse($rutasDetalle as $ruta)
                         @php
                             $min = $ruta->minutos_desde_salida;
-                            $status = 'text-success';
-                            $bg = 'bg-success';
-                            $msg = 'Frecuencia óptima';
-                            
-                            if($min === null) {
-                                $status = 'text-muted'; $bg = 'bg-secondary'; $msg = 'Sin despachos hoy';
-                            } elseif($min > 15) {
-                                $status = 'text-danger'; $bg = 'bg-danger'; $msg = 'Retraso crítico (>15 min)';
-                            } elseif($min > 10) {
-                                $status = 'text-warning'; $bg = 'bg-warning text-dark'; $msg = 'Alerta de intervalo (>10 min)';
-                            }
+                            $status = ($min === null) ? 'text-muted' : 'text-primary';
                         @endphp
                         <div class="col-md-6 col-lg-4">
                             <div class="p-3 border rounded-3 h-100 shadow-none border-light-subtle bg-light bg-opacity-10">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <div class="small fw-extrabold text-uppercase tracking-wider text-muted">{{ $ruta->nombre_ruta ?? ('Ruta #'.$ruta->id_ruta) }}</div>
-                                    <span class="badge {{ $bg }} rounded-pill ps-2 pe-3 py-1 fw-bold" style="font-size: 0.65rem;">
-                                        <i class="opacity-75 me-1">•</i> {{ $msg }}
-                                    </span>
                                 </div>
                                 <div class="d-flex align-items-baseline gap-2 mt-1">
                                     <span class="fs-2 fw-bold {{ $status }}">{{ is_numeric($min) ? round($min) : '—' }}</span>

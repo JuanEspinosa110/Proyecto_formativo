@@ -17,7 +17,8 @@
     <!-- SIGU — Sistema de estilos unificado -->
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/validacion.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/validaciones.css') }}">
+
     <link rel="stylesheet" href="{{ asset('css/propietario.css') }}">
 
     @stack('styles')

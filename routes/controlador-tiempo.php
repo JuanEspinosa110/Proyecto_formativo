@@ -22,6 +22,7 @@ Route::prefix('controlador-tiempo')
 
         // Módulo de Planillas
         Route::get('planillas', [PlanillaController::class, 'index'])->name('planillas.index');
+        Route::get('planillas/{id}', [PlanillaController::class, 'show'])->name('planillas.show');
         Route::post('planillas', [PlanillaController::class, 'store'])->name('planillas.store');
         Route::post('planillas/{id}/novedad', [PlanillaController::class, 'registrarNovedad'])->name('planillas.novedad');
 

@@ -62,21 +62,28 @@
                                data-estado="{{ optional($asig->estado)->nombre_estado }}">
                                 <span class="material-symbols-rounded fs-5">visibility</span>
                             </a>
-                            <a href="#" 
-                               class="text-primary text-decoration-none d-flex align-items-center edit-asignacion"
-                               title="Editar asignación"
-                               data-bs-toggle="modal"
-                               data-bs-target="#modalEditAsignacion"
-                               data-json="{{ json_encode($asig) }}">
-                                <span class="material-symbols-rounded fs-5">edit</span>
-                            </a>
-                            <form action="{{ route('admin.asignaciones.destroy', $asig->id_viaje) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar esta asignación?')">
-                                @csrf @method('DELETE')
-                                <input type="hidden" name="form_type" value="delete">
-                                <button type="submit" class="p-0 border-0 bg-transparent text-danger d-flex align-items-center" title="Eliminar">
-                                    <span class="material-symbols-rounded fs-5">delete</span>
-                                </button>
-                            </form>
+
+                            @if($asig->id_estado != 5)
+                                <a href="#" 
+                                   class="text-primary text-decoration-none d-flex align-items-center edit-asignacion"
+                                   title="Editar asignación"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#modalEditAsignacion"
+                                   data-json="{{ json_encode($asig) }}">
+                                    <span class="material-symbols-rounded fs-5">edit</span>
+                                </a>
+                                <form action="{{ route('admin.asignaciones.destroy', $asig->id_viaje) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar esta asignación?')">
+                                    @csrf @method('DELETE')
+                                    <input type="hidden" name="form_type" value="delete">
+                                    <button type="submit" class="p-0 border-0 bg-transparent text-danger d-flex align-items-center" title="Eliminar">
+                                        <span class="material-symbols-rounded fs-5">delete</span>
+                                    </button>
+                                </form>
+                            @else
+                                <span class="text-muted opacity-50 d-flex align-items-center" title="Finalizado - No editable">
+                                    <span class="material-symbols-rounded fs-5">lock</span>
+                                </span>
+                            @endif
                         </div>
                     </td>
                 </tr>
