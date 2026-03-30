@@ -778,10 +778,10 @@ class UsuarioEmpresaSeeder extends Seeder
 
         // Empresa 1: TRANSPORTE TEST SAS (900123456)
         DB::table('usuario')->insertOrIgnore([
-            ['doc_usuario' => 3000000001, 'NIT' => 900123456, 'primer_nombre' => 'RICARDO', 'primer_apellido' => 'MORALES', 'correo' => 'rmorales@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 
-            ['doc_usuario' => 3000000002, 'NIT' => 900123456, 'primer_nombre' => 'SANDRA', 'primer_apellido' => 'MILENA', 'correo' => 'smilena@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 
-            ['doc_usuario' => 3000000003, 'NIT' => 900123456, 'primer_nombre' => 'CARLOS', 'primer_apellido' => 'EDUARDO', 'correo' => 'ceduardo@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 
-            ['doc_usuario' => 3000000004, 'NIT' => 900123456, 'primer_nombre' => 'MARTA', 'primer_apellido' => 'CECILIA', 'correo' => 'mcecilia@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 
+            ['doc_usuario' => 3000000001, 'NIT' => 900123456, 'primer_nombre' => 'RICARDO', 'primer_apellido' => 'MORALES', 'correo' => 'rmorales@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO
+            ['doc_usuario' => 3000000002, 'NIT' => 900123456, 'primer_nombre' => 'SANDRA', 'primer_apellido' => 'MILENA', 'correo' => 'smilena@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO
+            ['doc_usuario' => 3000000003, 'NIT' => 900123456, 'primer_nombre' => 'CARLOS', 'primer_apellido' => 'EDUARDO', 'correo' => 'ceduardo@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO
+            ['doc_usuario' => 3000000004, 'NIT' => 900123456, 'primer_nombre' => 'MARTA', 'primer_apellido' => 'CECILIA', 'correo' => 'mcecilia@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO
             ['doc_usuario' => 3000000005, 'NIT' => 900123456, 'primer_nombre' => 'LUIS', 'primer_apellido' => 'ALBERTO', 'correo' => 'lalberto@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
             ['doc_usuario' => 3000000006, 'NIT' => 900123456, 'primer_nombre' => 'ANDREA', 'primer_apellido' => 'PAOLA', 'correo' => 'apaola@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
             ['doc_usuario' => 3000000007, 'NIT' => 900123456, 'primer_nombre' => 'JORGE', 'primer_apellido' => 'ANDRES', 'correo' => 'jandres@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
@@ -1048,6 +1048,27 @@ class UsuarioEmpresaSeeder extends Seeder
         }
         DB::table('usuario')->insertOrIgnore($dataSetp);
 
+
+        // --- ADMIN RECARGAS (nuevo rol 10) ---
+        info('Intentando insertar ADMIN RECARGAS en el seeder');
+        DB::table('usuario')->insert([
+        [
+        'doc_usuario' => 8002223010,
+        'NIT' => 800222333,
+        'primer_nombre' => 'ADMIN',
+        'segundo_nombre' => 'RECARGAS',
+        'primer_apellido' => 'SUPERGIROS',
+        'segundo_apellido' => 'GANA',
+        'correo' => 'adminrecargas@pagatodo.com',
+        'password' => Hash::make('AdminRecargas123*'),
+        'telefono' => '3009999999',
+        'fecha_nacimiento' => '1980-01-01',
+        'foto_usuario' => null,
+        'id_tipo_usuario' => 10, // ADMIN RECARGAS
+        'id_ciudad' => '730001',
+        'id_estado' => 1
+        ]
+            ]);
     }
 
 

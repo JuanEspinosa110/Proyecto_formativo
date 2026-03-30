@@ -63,6 +63,9 @@ class LoginController extends Controller
                 case 9: // JEFE DE MANTENIMIENTO
                     return redirect()->route('jefemantenimiento.dashboard');
 
+                case 10: // ADMIN RECARGAS
+                    return redirect()->route('gestor-recargas.dashboard');
+
                 default:
                     Auth::guard('web')->logout();
                     return back()->withErrors([

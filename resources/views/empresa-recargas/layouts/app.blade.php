@@ -43,10 +43,13 @@
                     <span>Historial</span>
                 </a>
 
+
+                @if(Auth::user() && Auth::user()->id_tipo_usuario == 10)
                 <a href="{{ route('gestor-recargas.usuarios.index') }}" class="sigu-sb-link {{ request()->routeIs('gestor-recargas.usuarios.*') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
                     <span>Usuarios</span>
                 </a>
+                @endif
 
                 <div class="sigu-sb-divider" style="height:1px; background:rgba(255,255,255,0.1); margin:1rem 0;"></div>
                 <a href="{{ route('pasajero.dashboard') }}" class="sigu-sb-link {{ request()->routeIs('pasajero.*') ? 'active' : '' }}">
