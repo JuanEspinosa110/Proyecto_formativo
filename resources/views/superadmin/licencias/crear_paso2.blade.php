@@ -32,6 +32,12 @@
     @endif
 
     <!-- Información de la empresa -->
+    @php
+        $licenciaActual = session('licencia_actual');
+        $hoyStr = date('Y-m-d');
+        $fechaMinima = $licenciaActual ? \Carbon\Carbon::parse($licenciaActual['fecha_vencimiento'])->addDay()->format('Y-m-d') : $hoyStr;
+    @endphp
+
     <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
         <div>
             <strong><i class="fas fa-building me-2"></i>Empresa:</strong> {{ $datos['nombre_empresa'] }}
@@ -40,6 +46,18 @@
             <strong><i class="fas fa-id-card me-2"></i>NIT:</strong> {{ number_format($datos['NIT'], 0, ',', '.') }}
         </div>
     </div>
+
+    @if($licenciaActual)
+    <div class="alert alert-warning mb-4">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2 fs-4"></i>
+            <div>
+                <strong>Aviso de Renovación:</strong> Esta empresa tiene una licencia vigente (ID: {{ $licenciaActual['id_licencia'] }}) que vence el {{ \Carbon\Carbon::parse($licenciaActual['fecha_vencimiento'])->format('d/m/Y') }}.
+                <br>La nueva licencia debe comenzar obligatoriamente el <strong>{{ \Carbon\Carbon::parse($fechaMinima)->format('d/m/Y') }}</strong>.
+            </div>
+        </div>
+    </div>
+    @endif
 
     <form action="{{ route('superadmin.licencias.store') }}" method="POST">
         @csrf
@@ -110,9 +128,12 @@
                             name="fecha_inicio"
                             id="fecha_inicio"
                             class="form-control sa-licencia-input @error('fecha_inicio') is-invalid @enderror"
-                            value="{{ old('fecha_inicio', date('Y-m-d')) }}"
+                            value="{{ old('fecha_inicio', $fechaMinima) }}"
+                            min="{{ $fechaMinima }}"
                             required>
-                        <small class="form-text text-muted d-block mt-2">No puede ser menor a hoy</small>
+                        <small class="form-text text-muted d-block mt-2">
+                            {{ $licenciaActual ? 'Debe ser el día posterior al vencimiento actual' : 'No puede ser menor a hoy' }}
+                        </small>
                         @error('fecha_inicio')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
@@ -165,18 +186,19 @@
         const fechaInicio = document.querySelector('#fecha_inicio');
         const fechaVencimiento = document.querySelector('#fecha_vencimiento');
         const duracionMeses = document.querySelector('#duracion_meses');
-        const hoy = new Date().toISOString().split('T')[0];
+        const hoy = "{{ $hoyStr }}";
+        const fechaMinimaPermitida = "{{ $fechaMinima }}";
 
-        // Establecer el mínimo a hoy
-        fechaInicio.setAttribute('min', hoy);
+        // Establecer el mínimo
+        fechaInicio.setAttribute('min', fechaMinimaPermitida);
 
         /**
-         * Valida que la fecha de inicio no sea menor a hoy
+         * Valida que la fecha de inicio no sea menor a la mínima permitida
          */
         function validarFechaInicio() {
             const fechaSeleccionada = fechaInicio.value;
-            if (fechaSeleccionada < hoy) {
-                fechaInicio.value = hoy;
+            if (fechaSeleccionada < fechaMinimaPermitida) {
+                fechaInicio.value = fechaMinimaPermitida;
             }
         }
 

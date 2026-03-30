@@ -47,6 +47,19 @@ use App\Http\Controllers\StripeWebhookController;
 
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
+// Rutas de Error de Acceso (NIT y Licencia)
+Route::middleware('auth')->group(function () {
+    Route::get('/error/no-asociado', function () {
+        return view('errors.no-nit');
+    })->name('error.no-nit');
+
+    Route::get('/error/licencia-vencida', function () {
+        // Obtener un correo de contacto de SuperAdmin para soporte
+        $contacto = DB::table('super_admin')->value('correo') ?? 'soporte@sigu.com';
+        return view('errors.licencia-vencida', compact('contacto'));
+    })->name('error.licencia-vencida');
+});
+
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -98,7 +111,7 @@ Route::post('/simulacion/validar', [SimulacionController::class, 'validar'])->na
 Route::middleware('auth:web')->group(function () {
 
     Route::get('/pasajero/dashboard', fn() => view('pasajeros.index'))
-        ->name('pasajero.dashboard')->middleware('role:2');
+        ->name('pasajero.dashboard')->middleware('auth:web,superadmin');
     Route::prefix('conductor')->name('conductor.')->middleware('role:3')->group(function () {
         Route::get('/dashboard', [ConductorController::class, 'dashboard'])->name('dashboard');
         Route::post('/iniciar-turno/{id_viaje}', [ConductorController::class, 'iniciarTurno'])->name('iniciarTurno');
@@ -138,7 +151,7 @@ Route::middleware('auth:web')->group(function () {
 // ==========================================
 // RAMP: PANEL PROPIETARIO (Independiente)
 // ==========================================
-Route::middleware(['auth:web', 'role:5'])->prefix('propietario')->name('propietario.')->group(function () {
+Route::middleware(['auth:web', 'role:5', 'CheckNit'])->prefix('propietario')->name('propietario.')->group(function () {
     Route::get('/dashboard', [PropietarioController::class, 'dashboard'])->name('dashboard');
     Route::post('/documento', [PropietarioController::class, 'subirDocumento'])->name('subirDocumento');
     Route::post('/gasto', [PropietarioController::class, 'registrarGasto'])->name('registrarGasto');

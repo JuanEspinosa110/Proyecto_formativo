@@ -10,7 +10,7 @@ use App\Http\Controllers\Pasajero\PerfilController;
 use App\Http\Controllers\Pasajero\MapaController;
 
 // ── Rutas de onboarding (sin check de tarjeta) ─────────────────
-Route::middleware(['auth:web', 'role:pasajero'])
+Route::middleware(['auth:web,superadmin'])
      ->prefix('pasajero')
      ->name('pasajero.')
      ->group(function () {
@@ -41,7 +41,7 @@ Route::middleware(['auth:web', 'role:pasajero'])
 });
 
 // ── Rutas con check de tarjeta ─────────────────────────────────
-Route::middleware(['auth:web', 'role:pasajero', 'CheckTarjeta'])
+Route::middleware(['auth:web,superadmin', 'CheckTarjeta'])
      ->prefix('pasajero')
      ->name('pasajero.')
      ->group(function () {

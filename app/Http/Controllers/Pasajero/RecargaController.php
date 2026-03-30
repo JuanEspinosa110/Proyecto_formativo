@@ -19,7 +19,7 @@ class RecargaController extends Controller
 {
     // Tipos de empresa que actúan como puntos de recarga
     // Ajustar según la configuración real del proyecto.
-    private const TIPOS_RECARGA = [1, 5]; // Transporte Urbano + SETP
+    private const TIPOS_RECARGA = [3]; // Empresa de Recarga (ID 3 en tabla tipo_empresa)
 
     public function index(Request $request)
     {

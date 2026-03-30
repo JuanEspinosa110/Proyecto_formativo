@@ -104,10 +104,11 @@ class LicenciaController extends Controller
     /**
      * PASO 1: Formulario inicial (Empresa + Representante + Admin)
      */
-    public function create()
+    public function create(Request $request)
     {
+        $nit = $request->nit;
         $departamentos = DB::table('departamento')->orderBy('nombre_departamento')->get();
-        return view('superadmin.licencias.crear_paso1', compact('departamentos'));
+        return view('superadmin.licencias.crear_paso1', compact('departamentos', 'nit'));
     }
 
     /**
@@ -138,16 +139,31 @@ class LicenciaController extends Controller
         // Verificar si ya tiene licencia activa
         $licenciaActiva = DB::table('licencias')
             ->where('NIT', $nit)
-            ->whereIn('id_estado', [1]) // VIGENTE/RENOVADA (Normalizado a 1)
+            ->whereIn('id_estado', [1]) // VIGENTE/RENOVADA
+            ->orderBy('fecha_vencimiento', 'desc')
             ->first();
 
         if ($licenciaActiva) {
-            return response()->json([
-                'existe' => true,
-                'tiene_licencia' => true,
-                'error' => true,
-                'mensaje' => 'Esta empresa ya tiene una licencia activa. ID: ' . $licenciaActiva->id_licencia
-            ]);
+            $fechaVencimiento = Carbon::parse($licenciaActiva->fecha_vencimiento);
+            $diasRestantes = (int)Carbon::today()->diffInDays($fechaVencimiento, false);
+
+            if ($diasRestantes > 30) {
+                return response()->json([
+                    'existe' => true,
+                    'tiene_licencia' => true,
+                    'error' => true,
+                    'mensaje' => "Esta empresa ya tiene una licencia activa (ID: {$licenciaActiva->id_licencia}) que vence en {$diasRestantes} días. Solo se permite renovar cuando falten 30 días o menos."
+                ]);
+            }
+            
+            // Guardar info de la licencia actual para validaciones posteriores
+            session(['licencia_actual' => [
+                'id_licencia' => $licenciaActiva->id_licencia,
+                'fecha_vencimiento' => $licenciaActiva->fecha_vencimiento,
+                'dias_restantes' => $diasRestantes
+            ]]);
+        } else {
+            session()->forget('licencia_actual');
         }
 
         // Guardar datos verificados en sesión
@@ -163,10 +179,24 @@ class LicenciaController extends Controller
             ]
         ]);
 
+        // Buscar administrador existente (Rol ID 1) vinculado a la empresa
+        $adminExistente = DB::table('usuario')
+            ->where('NIT', $nit)
+            ->where('id_tipo_usuario', 1)
+            ->where('id_estado', 1)
+            ->select('doc_usuario', 'primer_nombre', 'primer_apellido', 'correo')
+            ->first();
+
+        // Guardar estado en sesión para la validación del paso 1
+        session(['admin_existente' => $adminExistente ? true : false]);
+
         // Empresa existe pero no tiene licencia activa
         return response()->json([
             'existe' => true,
             'tiene_licencia' => false,
+            'admin_existente' => $adminExistente ? true : false,
+            'nombre_admin' => $adminExistente ? ($adminExistente->primer_nombre . ' ' . $adminExistente->primer_apellido) : null,
+            'correo_admin' => $adminExistente ? $adminExistente->correo : null,
             'datos' => [
                 'nombre_empresa' => $empresa->nombre_empresa,
                 'telefono_empresa' => $empresa->telefono_empresa,
@@ -250,8 +280,10 @@ class LicenciaController extends Controller
                 ->withInput();
         }
 
+        $adminExistente = session('admin_existente', false);
+
         // Ahora proceder con las validaciones normales
-        $validated = $request->validate([
+        $rules = [
             // Empresa
             'NIT' => 'required|numeric',
             'nombre_empresa' => 'required|string|max:150',
@@ -259,23 +291,30 @@ class LicenciaController extends Controller
             'id_ciudad' => 'required|exists:ciudad,id_ciudad',
             'telefono_empresa' => 'nullable|digits_between:7,15',
             'correo_corporativo' => 'required|email|max:150',
+            'admin_existente_flag' => 'nullable|string'
+        ];
 
-            // Usuario Administrador
-            'doc_admin' => 'required|digits_between:8,10',
-            'primer_nombre_admin' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
-            'segundo_nombre_admin' => ['nullable', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'primer_apellido_admin' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
-            'segundo_apellido_admin' => ['nullable', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
-            'telefono_admin' => 'nullable|digits_between:7,15',
-            'correo_admin' => ['required', 'email', 'regex:/^.+@.+\..+$/', 'max:150'],
-            'password_admin' => [
-                'required',
-                'min:8',
-                'regex:/[a-z]/',
-                'regex:/[A-Z]/',
-                'regex:/[0-9]/',
-            ],
-        ], [
+        // Validaciones del administrador solo si no existe uno previo
+        if (!$adminExistente) {
+            $rules += [
+                'doc_admin' => 'required|digits_between:8,10',
+                'primer_nombre_admin' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
+                'segundo_nombre_admin' => ['nullable', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+                'primer_apellido_admin' => ['required', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ]+$/'],
+                'segundo_apellido_admin' => ['nullable', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/'],
+                'telefono_admin' => 'nullable|digits_between:7,15',
+                'correo_admin' => ['required', 'email', 'regex:/^.+@.+\..+$/', 'max:150'],
+                'password_admin' => [
+                    'required',
+                    'min:8',
+                    'regex:/[a-z]/',
+                    'regex:/[A-Z]/',
+                    'regex:/[0-9]/',
+                ],
+            ];
+        }
+
+        $validated = $request->validate($rules, [
             // Mensajes para Empresa
             'id_departamento.required' => 'Debe seleccionar un departamento.',
             'id_departamento.exists'   => 'El departamento seleccionado no es válido.',
@@ -308,26 +347,27 @@ class LicenciaController extends Controller
             'password_admin.regex' => 'La contraseña debe contener mayúsculas, minúsculas y números.',
         ]);
 
-        // ✅ Validación adicional: Documento de admin único
-        $docAdminExiste = DB::table('usuario')
-            ->where('doc_usuario', $validated['doc_admin'])
-            ->exists();
+        // ✅ Validaciones adicionales solo si es un administrador nuevo
+        if (!$adminExistente) {
+            $docAdminExiste = DB::table('usuario')
+                ->where('doc_usuario', $validated['doc_admin'])
+                ->exists();
 
-        if ($docAdminExiste) {
-            return redirect()->back()
-                ->withErrors(['doc_admin' => 'Este documento de identidad ya está registrado en el sistema.'])
-                ->withInput();
-        }
+            if ($docAdminExiste) {
+                return redirect()->back()
+                    ->withErrors(['doc_admin' => 'Este documento de identidad ya está registrado en el sistema.'])
+                    ->withInput();
+            }
 
-        // ✅ Validación adicional: Correo de admin único
-        $correoAdminExiste = DB::table('usuario')
-            ->where('correo', $validated['correo_admin'])
-            ->exists();
+            $correoAdminExiste = DB::table('usuario')
+                ->where('correo', $validated['correo_admin'])
+                ->exists();
 
-        if ($correoAdminExiste) {
-            return redirect()->back()
-                ->withErrors(['correo_admin' => 'Este correo electrónico ya está registrado como administrador en el sistema.'])
-                ->withInput();
+            if ($correoAdminExiste) {
+                return redirect()->back()
+                    ->withErrors(['correo_admin' => 'Este correo electrónico ya está registrado como administrador en el sistema.'])
+                    ->withInput();
+            }
         }
         try {
             DB::beginTransaction();
@@ -351,10 +391,8 @@ class LicenciaController extends Controller
                 DB::table('empresa')->insert($datosEmpresa);
             }
 
-            // Usuario Administrador
-            $usuarioExiste = DB::table('usuario')->where('doc_usuario', $validated['doc_admin'])->exists();
-
-            if (!$usuarioExiste) {
+            // Usuario Administrador (solo si no existe uno previo)
+            if (!$adminExistente) {
                 DB::table('usuario')->insert([
                     'doc_usuario' => $validated['doc_admin'],
                     'NIT' => $validated['NIT'],
@@ -434,6 +472,18 @@ class LicenciaController extends Controller
                 'fecha_vencimiento.after' => 'La fecha de vencimiento debe ser posterior a la fecha de inicio',
             ]
         );
+
+        // Validación adicional si existe una licencia previa
+        if (session('licencia_actual')) {
+            $licPrev = session('licencia_actual');
+            $fechaMinimaPermitida = Carbon::parse($licPrev['fecha_vencimiento'])->addDay();
+
+            if (Carbon::parse($validated['fecha_inicio'])->lt($fechaMinimaPermitida)) {
+                return back()->withInput()->withErrors([
+                    'fecha_inicio' => 'La fecha de inicio para la nueva licencia debe ser como mínimo el día siguiente al vencimiento de la actual (' . $fechaMinimaPermitida->format('d/m/Y') . ').'
+                ]);
+            }
+        }
 
         try {
             $datos = session('licencia_paso1');

@@ -18,7 +18,7 @@ use App\Http\Controllers\SuperAdmin\GestorSetpController;
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:web', 'role:gestor_setp'])
+Route::middleware(['auth:web', 'role:gestor_setp', 'CheckNit'])
     ->prefix('gestor-setp')
     ->name('gestor-setp.')
     ->group(function () {

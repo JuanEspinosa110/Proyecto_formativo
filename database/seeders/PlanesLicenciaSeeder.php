@@ -35,16 +35,9 @@ class PlanesLicenciaSeeder extends Seeder
                 'id_estado' => 1,
             ],
             [
-                'nombre_plan' => 'Plan Premium (2.5 Años)',
-                'duracion_meses' => 30,
-                'precio' => 2700000.00,
-                'descripcion' => 'Plan de suscripción de 2 años y medio.',
-                'id_estado' => 1,
-            ],
-            [
-                'nombre_plan' => 'Plan Elite (3 Años)',
+                'nombre_plan' => 'Plan Premium (3 Años)',
                 'duracion_meses' => 36,
-                'precio' => 3200000.00,
+                'precio' => 2700000.00,
                 'descripcion' => 'Plan de suscripción de 3 años.',
                 'id_estado' => 1,
             ],

@@ -113,14 +113,6 @@
                             <i class="bi bi-geo-fill"></i> Barrios
                         </a>
                     </li>
-
-                    {{-- RUTAS --}}
-                    <li>
-                        <a class="dropdown-item"
-                           href="{{ route('superadmin.rutas.index') }}">
-                            <i class="bi bi-map"></i> Rutas
-                        </a>
-                    </li>
                 {{-- TIPOS DE EMPRESA --}}
                 <li>
                     <a class="dropdown-item"
