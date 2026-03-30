@@ -988,6 +988,74 @@ class UsuarioEmpresaSeeder extends Seeder
             DB::table('usuario')->insertOrIgnore($dataCoord);
         }
 
+        // --- ADMIN RECARGAS (id_tipo_usuario = 10) - EMPRESA DE RECARGA (NIT 800222333) ---
+        DB::table('usuario')->insertOrIgnore([
+            [
+                'doc_usuario'     => 8002223011,
+                'NIT'             => 800222333, // SUPERGIROS GANA GANA (EMPRESA DE RECARGA)
+                'primer_nombre'   => 'CARLOS',
+                'segundo_nombre'  => 'ANDRES',
+                'primer_apellido' => 'MENDOZA',
+                'segundo_apellido'=> 'RIOS',
+                'correo'          => 'cmendoza@supergiros.com',
+                'password'        => Hash::make('AdminRecargas123*'),
+                'telefono'        => '3001110001',
+                'fecha_nacimiento'=> '1982-04-15',
+                'foto_usuario'    => null,
+                'id_tipo_usuario' => 10, // ADMIN RECARGAS
+                'id_ciudad'       => '730001',
+                'id_estado'       => 1
+            ],
+            [
+                'doc_usuario'     => 8002223012,
+                'NIT'             => 800222333,
+                'primer_nombre'   => 'LUCIA',
+                'segundo_nombre'  => 'MARCELA',
+                'primer_apellido' => 'TORRES',
+                'segundo_apellido'=> 'VARGAS',
+                'correo'          => 'ltorres@supergiros.com',
+                'password'        => Hash::make('AdminRecargas123*'),
+                'telefono'        => '3001110002',
+                'fecha_nacimiento'=> '1987-09-22',
+                'foto_usuario'    => null,
+                'id_tipo_usuario' => 10, // ADMIN RECARGAS
+                'id_ciudad'       => '730001',
+                'id_estado'       => 1
+            ],
+            [
+                'doc_usuario'     => 8002223013,
+                'NIT'             => 800222333,
+                'primer_nombre'   => 'FELIX',
+                'segundo_nombre'  => 'ERNESTO',
+                'primer_apellido' => 'GUERRERO',
+                'segundo_apellido'=> 'SALCEDO',
+                'correo'          => 'fguerrero@supergiros.com',
+                'password'        => Hash::make('AdminRecargas123*'),
+                'telefono'        => '3001110003',
+                'fecha_nacimiento'=> '1979-12-08',
+                'foto_usuario'    => null,
+                'id_tipo_usuario' => 10, // ADMIN RECARGAS
+                'id_ciudad'       => '730001',
+                'id_estado'       => 1
+            ],
+            [
+                'doc_usuario'     => 8002223014,
+                'NIT'             => 800222333,
+                'primer_nombre'   => 'PAOLA',
+                'segundo_nombre'  => 'VIVIANA',
+                'primer_apellido' => 'CASTILLO',
+                'segundo_apellido'=> 'BEDOYA',
+                'correo'          => 'pcastillo@supergiros.com',
+                'password'        => Hash::make('AdminRecargas123*'),
+                'telefono'        => '3001110004',
+                'fecha_nacimiento'=> '1991-06-30',
+                'foto_usuario'    => null,
+                'id_tipo_usuario' => 10, // ADMIN RECARGAS
+                'id_ciudad'       => '730001',
+                'id_estado'       => 2 // INACTIVO
+            ],
+        ]);
+
         // --- GESTOR DE RECARGAS (doc_usuario inicia en 8) ---
         $dataGestores = [];
         $nombresGestor = [
