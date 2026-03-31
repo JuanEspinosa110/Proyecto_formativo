@@ -18,7 +18,7 @@ return new class extends Migration
                 $table->integer('id_ruta');
                 $table->date('fecha_inicio');
                 $table->date('fecha_fin')->nullable();
-                $table->integer('id_estado')->default(1);
+                $table->unsignedTinyInteger('id_estado')->default(1);
 
                 // Foreign keys
                 $table->foreign('NIT')->references('NIT')->on('empresa')->onDelete('cascade');
