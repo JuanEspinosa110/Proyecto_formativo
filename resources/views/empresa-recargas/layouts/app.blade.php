@@ -11,6 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/btn-sigu.css') }}">
 
     @stack('styles')
 </head>
@@ -28,27 +29,35 @@
             </a>
 
             <nav class="sigu-sidebar-nav" aria-label="Gestor Recargas">
-                <a href="{{ route('gestor-recargas.dashboard') }}" class="sigu-sb-link {{ request()->routeIs('gestor-recargas.dashboard') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">dashboard</span></span>
-                    <span>Dashboard</span>
-                </a>
 
-                <a href="{{ route('gestor-recargas.recargar') }}" class="sigu-sb-link {{ request()->routeIs('gestor-recargas.recargar') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">payments</span></span>
-                    <span>Recargar Tarjeta</span>
-                </a>
+                @php $rol = Auth::user() ? Auth::user()->id_tipo_usuario : null; @endphp
 
-                <a href="{{ route('gestor-recargas.historial') }}" class="sigu-sb-link {{ request()->routeIs('gestor-recargas.historial') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">history</span></span>
-                    <span>Historial</span>
-                </a>
-
-
-                @if(Auth::user() && Auth::user()->id_tipo_usuario == 10)
-                <a href="{{ route('gestor-recargas.usuarios.index') }}" class="sigu-sb-link {{ request()->routeIs('gestor-recargas.usuarios.*') ? 'active' : '' }}">
-                    <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
-                    <span>Usuarios</span>
-                </a>
+                @if($rol == 10)
+                    <a href="{{ route('gestor-recargas.dashboard') }}" class="sigu-sb-link {{ request()->routeIs('gestor-recargas.dashboard') ? 'active' : '' }}">
+                        <span class="sb-ico"><span class="material-symbols-rounded">dashboard</span></span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ route('gestor-recargas.historial') }}" class="sigu-sb-link {{ request()->routeIs('gestor-recargas.historial') ? 'active' : '' }}">
+                        <span class="sb-ico"><span class="material-symbols-rounded">history</span></span>
+                        <span>Historial</span>
+                    </a>
+                    <a href="{{ route('gestor-recargas.usuarios.index') }}" class="sigu-sb-link {{ request()->routeIs('gestor-recargas.usuarios.*') ? 'active' : '' }}">
+                        <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
+                        <span>Usuarios</span>
+                    </a>
+                @elseif($rol == 8)
+                    <a href="{{ route('gestor-recargas.recargar') }}" class="sigu-sb-link {{ request()->routeIs('gestor-recargas.recargar') ? 'active' : '' }}">
+                        <span class="sb-ico"><span class="material-symbols-rounded">payments</span></span>
+                        <span>Recargar Tarjeta</span>
+                    </a>
+                    <a href="{{ route('gestor-recargas.titularidad') }}" class="sigu-sb-link {{ request()->routeIs('gestor-recargas.titularidad') ? 'active' : '' }}">
+                        <span class="sb-ico"><span class="material-symbols-rounded">swap_horiz</span></span>
+                        <span>Titularidad Tarjeta</span>
+                    </a>
+                    <a href="{{ route('gestor-recargas.historial') }}" class="sigu-sb-link {{ request()->routeIs('gestor-recargas.historial') ? 'active' : '' }}">
+                        <span class="sb-ico"><span class="material-symbols-rounded">history</span></span>
+                        <span>Historial</span>
+                    </a>
                 @endif
 
                 <div class="sigu-sb-divider" style="height:1px; background:rgba(255,255,255,0.1); margin:1rem 0;"></div>

@@ -1,0 +1,9 @@
+.btn-sigu {
+    background: #6f42c1;
+    color: #fff;
+    border: none;
+}
+.btn-sigu:hover, .btn-sigu:focus {
+    background: #59359c;
+    color: #fff;
+}

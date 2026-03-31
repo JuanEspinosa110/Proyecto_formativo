@@ -30,31 +30,34 @@ class TarjetasGenerar extends Command
     {
         $cantidadSolicitada = (int) $this->argument('cantidad');
 
-        // Contar usuarios (pasajeros)
-        $totalUsuarios = Usuario::count();
-        // Contar tarjetas activas y sin asignar
-        $stockDisponible = Tarjeta::whereNull('doc_usuario')
-            ->whereHas('estado', function($q) {
-                $q->where('nombre_estado', 'ACTIVO');
-            })->count();
-
-        // Calcular cuántas tarjetas crear para que stock > usuarios
-        $aCrear = max(0, ($totalUsuarios + $cantidadSolicitada) - $stockDisponible);
-        if ($aCrear <= 0) {
-            $this->warn("No se necesitan nuevas tarjetas. Stock disponible: $stockDisponible, Usuarios: $totalUsuarios");
+        // Buscar el id del estado INACTIVO
+        $idEstadoInactivo = DB::table('estado')->where('nombre_estado', 'INACTIVO')->value('id_estado');
+        if (!$idEstadoInactivo) {
+            $this->error('No se encontró el estado INACTIVO en la tabla estado.');
             return;
         }
 
+        // Buscar el último código de tarjeta numérico existente
+        $ultimoCodigo = Tarjeta::max(DB::raw('CAST(codigo_tarjeta AS UNSIGNED)'));
+        $nuevoCodigo = $ultimoCodigo ? ((int)$ultimoCodigo + 1) : 1000001;
+
         $creadas = 0;
-        DB::transaction(function () use ($aCrear, &$creadas) {
-            for ($i = 0; $i < $aCrear; $i++) {
+        DB::transaction(function () use ($cantidadSolicitada, $idEstadoInactivo, &$creadas, &$nuevoCodigo) {
+            for ($i = 0; $i < $cantidadSolicitada; $i++) {
                 $tarjeta = new Tarjeta();
                 $tarjeta->saldo = 0;
+                $tarjeta->id_estado = $idEstadoInactivo;
+                $tarjeta->codigo_tarjeta = (string)$nuevoCodigo;
                 $tarjeta->save();
                 $creadas++;
+                $nuevoCodigo++;
             }
         });
-        $stockFinal = Tarjeta::whereNull('doc_usuario')->whereHas('estado', function($q){$q->where('nombre_estado', 'ACTIVO');})->count();
-        $this->info("Se generaron $creadas tarjetas. Stock final: $stockFinal");
+        $stockFinal = Tarjeta::where('id_estado', $idEstadoInactivo)
+            ->whereDoesntHave('titularidades', function($q) {
+                $q->where('id_estado', 1); // Sin titularidad activa
+            })
+            ->count();
+        $this->info("Se generaron $creadas tarjetas INACTIVAS. Stock final inactivo y sin titularidad activa: $stockFinal");
     }
 }
