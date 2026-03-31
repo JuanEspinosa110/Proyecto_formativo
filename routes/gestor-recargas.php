@@ -20,7 +20,9 @@ Route::middleware(['auth:web', 'role:8', 'CheckNit'])->prefix('gestor-recargas')
     Route::get('/titularidad', [TitularidadTarjetaController::class, 'index'])->name('titularidad');
     Route::post('/titularidad/buscar-usuario', [TitularidadTarjetaController::class, 'buscarUsuario'])->name('titularidad.buscar');
     Route::post('/titularidad/enviar-codigo', [TitularidadTarjetaController::class, 'enviarCodigo'])->name('titularidad.enviar-codigo');
+    Route::post('/titularidad/consultar-cooldown', [TitularidadTarjetaController::class, 'consultarCooldown'])->name('titularidad.consultar-cooldown');
     Route::post('/titularidad/cambiar', [TitularidadTarjetaController::class, 'cambiar'])->name('titularidad.cambiar');
+    Route::post('/titularidad/resetear-cooldown', [TitularidadTarjetaController::class, 'resetearCooldown'])->name('gestor-recargas.titularidad.resetear-cooldown');
 });
 
 // Solo ADMIN de EMPRESA DE RECARGA (id_rol=1, NIT=800222333) puede gestionar usuarios

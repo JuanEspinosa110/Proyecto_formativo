@@ -73,11 +73,17 @@ class TitularidadTarjetaController extends Controller
         if (!$usuario) {
             return response()->json(['success' => false, 'message' => 'Usuario no encontrado.']);
         }
-        // Cooldown: no reenviar código más de 1 vez cada 60 segundos
+        $cooldown = 60; // segundos
         $lastSent = session('codigo_verificacion_last_sent_' . $doc_usuario);
-        if ($lastSent && now()->diffInSeconds($lastSent) < 60) {
-            $wait = 60 - now()->diffInSeconds($lastSent);
-            return response()->json(['success' => false, 'message' => "Debes esperar $wait segundos para reenviar el código."]);
+        if ($lastSent && now()->diffInSeconds($lastSent) < $cooldown) {
+            $wait = $cooldown - now()->diffInSeconds($lastSent);
+            $wait = max(0, min($cooldown, ceil($wait)));
+            return response()->json([
+                'success' => false,
+                'message' => "Debes esperar $wait segundos para reenviar el código.",
+                'wait' => $wait,
+                'cooldown_active' => true
+            ]);
         }
         // Generar código aleatorio de 6 dígitos
         $codigo = random_int(100000, 999999);
@@ -89,14 +95,36 @@ class TitularidadTarjetaController extends Controller
             'codigo_verificacion_expira_' . $doc_usuario => now()->addMinutes(10),
         ]);
         // Enviar correo
-            try {
-                Mail::raw("Su código de verificación para cambio de tarjeta es: $codigo", function($message) use ($usuario) {
-                    $message->to($usuario->correo)->subject('Código de verificación - Cambio de Tarjeta');
-                });
+        try {
+            Mail::raw("Su código de verificación para cambio de tarjeta es: $codigo", function($message) use ($usuario) {
+                $message->to($usuario->correo)->subject('Código de verificación - Cambio de Tarjeta');
+            });
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'No se pudo enviar el correo.']);
         }
-        return response()->json(['success' => true, 'message' => 'Código enviado al correo del usuario.']);
+        return response()->json(['success' => true, 'message' => 'Código enviado al correo del usuario.', 'wait' => $cooldown, 'cooldown_active' => false]);
+    }
+
+    /**
+     * Consultar el tiempo restante del cooldown para un usuario (sin enviar código)
+     */
+    public function consultarCooldown(Request $request)
+    {
+        $doc_usuario = $request->input('doc_usuario');
+        $cooldown = 60; // segundos
+        $lastSent = session('codigo_verificacion_last_sent_' . $doc_usuario);
+        if ($lastSent && now()->diffInSeconds($lastSent) < $cooldown) {
+            $wait = $cooldown - now()->diffInSeconds($lastSent);
+            $wait = max(0, min($cooldown, ceil($wait)));
+            return response()->json([
+                'cooldown_active' => true,
+                'wait' => $wait
+            ]);
+        }
+        return response()->json([
+            'cooldown_active' => false,
+            'wait' => 0
+        ]);
     }
 
     /**
@@ -269,5 +297,20 @@ class TitularidadTarjetaController extends Controller
         session()->forget($sessionKey);
 
         return response()->json(['success' => true, 'message' => 'Cambio de tarjeta realizado correctamente. El saldo ha sido transferido.']);
+    }
+
+    /**
+     * Endpoint temporal para resetear el cooldown del código de verificación (solo pruebas)
+     */
+    public function resetearCooldown(Request $request)
+    {
+        $doc_usuario = $request->input('doc_usuario');
+        session()->forget([
+            'codigo_verificacion_' . $doc_usuario,
+            'codigo_verificacion_last_sent_' . $doc_usuario,
+            'codigo_verificacion_intentos_' . $doc_usuario,
+            'codigo_verificacion_expira_' . $doc_usuario,
+        ]);
+        return response()->json(['success' => true, 'message' => 'Cooldown reseteado para ' . $doc_usuario]);
     }
 }

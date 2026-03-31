@@ -113,59 +113,101 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         // Mostrar tarjetas disponibles para seleccionar
                         let html = `<div class='card p-3'><b>Selecciona una nueva tarjeta para asignar:</b><div class='table-responsive'><table class='table table-sm align-middle'><thead><tr><th>ID</th><th>Código</th><th></th></tr></thead><tbody>`;
-                        tarjetasDisponibles.forEach(function(t) {
-                            // Deshabilitar si es la tarjeta actual
-                            let disabled = (usuarioActual.tarjeta_activa_id && usuarioActual.tarjeta_activa_id == t.id_tarjeta) ? 'disabled' : '';
-                            let btnText = disabled ? 'No disponible (actual)' : 'Seleccionar';
-                            html += `<tr><td>${t.id_tarjeta}</td><td>${t.codigo_tarjeta}</td><td class='text-end'><button class='btn btn-outline-primary btn-sm btn-cambiar-tarjeta-final' data-id='${t.id_tarjeta}' ${disabled}>${btnText}</button></td></tr>`;
-                        });
-                        html += `</tbody></table></div></div>`;
-                        tarjetasCambioDiv.innerHTML = html;
-                        // Asignar eventos a los botones de selección
-                        document.querySelectorAll('.btn-cambiar-tarjeta-final').forEach(function(btn) {
-                            btn.addEventListener('click', function() {
-                                const idTarjeta = this.getAttribute('data-id');
-                                if (cooldown > 0) return;
-                                // Validar en frontend si es la misma tarjeta
-                                if (usuarioActual.tarjeta_activa_id && usuarioActual.tarjeta_activa_id == idTarjeta) {
-                                    tarjetasCambioDiv.innerHTML += `<div class='alert alert-danger mt-2'>Debes seleccionar una tarjeta diferente a la actual.</div>`;
-                                    return;
+                        // PAGINACIÓN TARJETAS DISPONIBLES
+                        let currentPage = 1;
+                        const pageSize = 5;
+                        function renderTarjetasPage(page) {
+                            let html = `<div class='card p-3'><b>Selecciona una nueva tarjeta para asignar:</b><div class='table-responsive'><table class='table table-sm align-middle'><thead><tr><th>ID</th><th>Código</th><th></th></tr></thead><tbody>`;
+                            const start = (page - 1) * pageSize;
+                            const end = start + pageSize;
+                            tarjetasDisponibles.slice(start, end).forEach(function(t) {
+                                let disabled = (usuarioActual.tarjeta_activa_id && usuarioActual.tarjeta_activa_id == t.id_tarjeta) ? 'disabled' : '';
+                                let btnText = disabled ? 'No disponible (actual)' : 'Seleccionar';
+                                html += `<tr><td>${t.id_tarjeta}</td><td>${t.codigo_tarjeta}</td><td class='text-end'><button class='btn btn-outline-primary btn-sm btn-cambiar-tarjeta-final' data-id='${t.id_tarjeta}' ${disabled}>${btnText}</button></td></tr>`;
+                            });
+                            html += `</tbody></table></div>`;
+                            // Controles de paginación
+                            const totalPages = Math.ceil(tarjetasDisponibles.length / pageSize);
+                            html += `<div class='d-flex justify-content-between align-items-center mt-2'>`;
+                            html += `<button class='btn btn-secondary btn-sm' id='btn-prev-page' ${page === 1 ? 'disabled' : ''}>Anterior</button>`;
+                            html += `<span>Página ${page} de ${totalPages}</span>`;
+                            html += `<button class='btn btn-secondary btn-sm' id='btn-next-page' ${page === totalPages ? 'disabled' : ''}>Siguiente</button>`;
+                            html += `</div></div>`;
+                            tarjetasCambioDiv.innerHTML = html;
+                            // Eventos de paginación
+                            document.getElementById('btn-prev-page').onclick = function() {
+                                if (currentPage > 1) {
+                                    currentPage--;
+                                    renderTarjetasPage(currentPage);
                                 }
-                                // Enviar código al correo
-                                fetch("{{ route('gestor-recargas.titularidad.cambiar') }}", {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value
-                                    },
-                                    body: JSON.stringify({ doc_usuario: usuarioActual.doc_usuario, id_tarjeta: idTarjeta })
-                                })
-                                .then(res => res.json())
-                                .then(data => {
-                                    let msg = '';
-                                    if(data.success) {
-                                        msg = `<div class='alert alert-success'>${data.message}</div>`;
-                                        cooldown = 60;
-                                        updateCooldownBtn();
-                                        cooldownInterval = setInterval(() => {
-                                            cooldown--;
-                                            updateCooldownBtn();
-                                            if (cooldown <= 0) {
-                                                clearInterval(cooldownInterval);
-                                                updateCooldownBtn();
-                                            }
-                                        }, 1000);
-                                    } else {
-                                        msg = `<div class='alert alert-danger'>${data.message}</div>`;
+                            };
+                            document.getElementById('btn-next-page').onclick = function() {
+                                if (currentPage < totalPages) {
+                                    currentPage++;
+                                    renderTarjetasPage(currentPage);
+                                }
+                            };
+                            // Reasignar eventos a los botones de selección
+                            document.querySelectorAll('.btn-cambiar-tarjeta-final').forEach(function(btn) {
+                                btn.addEventListener('click', function() {
+                                    const idTarjeta = this.getAttribute('data-id');
+                                    if (usuarioActual.tarjeta_activa_id && usuarioActual.tarjeta_activa_id == idTarjeta) {
+                                        tarjetasCambioDiv.innerHTML += `<div class='alert alert-danger mt-2'>Debes seleccionar una tarjeta diferente a la actual.</div>`;
+                                        return;
                                     }
-                                    document.getElementById('modal-doc-usuario').value = usuarioActual.doc_usuario;
-                                    document.getElementById('modal-id-tarjeta').value = idTarjeta;
-                                    document.getElementById('modal-cambio-mensaje').innerHTML = msg;
-                                    var modal = new bootstrap.Modal(document.getElementById('modalCambioTitularidad'));
-                                    modal.show();
+                                    // Consultar cooldown antes de intentar enviar código
+                                    fetch("{{ route('gestor-recargas.titularidad.consultar-cooldown') }}", {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value
+                                        },
+                                        body: JSON.stringify({ doc_usuario: usuarioActual.doc_usuario })
+                                    })
+                                    .then(res => res.json())
+                                    .then(cooldownData => {
+                                        if (cooldownData.cooldown_active) {
+                                            cooldown = cooldownData.wait;
+                                            document.getElementById('modal-doc-usuario').value = usuarioActual.doc_usuario;
+                                            document.getElementById('modal-id-tarjeta').value = idTarjeta;
+                                            var modal = new bootstrap.Modal(document.getElementById('modalCambioTitularidad'));
+                                            modal.show();
+                                            startCooldown(`<div class='alert alert-warning mt-2'>Ya se envió un código recientemente. Espera para reenviar.</div>`);
+                                        } else {
+                                            // No hay cooldown, ahora sí enviar código
+                                            fetch("{{ route('gestor-recargas.titularidad.enviar-codigo') }}", {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value
+                                                },
+                                                body: JSON.stringify({ doc_usuario: usuarioActual.doc_usuario, id_tarjeta: idTarjeta })
+                                            })
+                                            .then(res => res.json())
+                                            .then(data => {
+                                                let msg = '';
+                                                if(data.success) {
+                                                    msg = `<div class='alert alert-success'>${data.message}</div>`;
+                                                    cooldown = 60;
+                                                    startCooldown(msg);
+                                                } else if(data.wait) {
+                                                    cooldown = data.wait;
+                                                    startCooldown(`<div class='alert alert-danger'>${data.message}</div>`);
+                                                } else {
+                                                    msg = `<div class='alert alert-danger'>${data.message}</div>`;
+                                                    document.getElementById('modal-cambio-mensaje').innerHTML = msg;
+                                                }
+                                                document.getElementById('modal-doc-usuario').value = usuarioActual.doc_usuario;
+                                                document.getElementById('modal-id-tarjeta').value = idTarjeta;
+                                                var modal = new bootstrap.Modal(document.getElementById('modalCambioTitularidad'));
+                                                modal.show();
+                                            });
+                                        }
+                                    });
                                 });
                             });
-                        });
+                        }
+                        renderTarjetasPage(currentPage);
                     });
                 }
 
@@ -188,21 +230,13 @@ document.addEventListener('DOMContentLoaded', function() {
                             if(data.success) {
                                 msg = `<div class='alert alert-success'>${data.message}</div>`;
                                 cooldown = 60;
-                                updateCooldownBtn();
-                                cooldownInterval = setInterval(() => {
-                                    cooldown--;
-                                    updateCooldownBtn();
-                                    if (cooldown <= 0) {
-                                        clearInterval(cooldownInterval);
-                                        updateCooldownBtn();
-                                    }
-                                }, 1000);
+                                startCooldown(msg);
                             } else {
                                 msg = `<div class='alert alert-danger'>${data.message}</div>`;
+                                document.getElementById('modal-cambio-mensaje').innerHTML = msg;
                             }
                             document.getElementById('modal-doc-usuario').value = usuarioActual.doc_usuario;
                             document.getElementById('modal-id-tarjeta').value = idTarjeta;
-                            document.getElementById('modal-cambio-mensaje').innerHTML = msg;
                             var modal = new bootstrap.Modal(document.getElementById('modalCambioTitularidad'));
                             modal.show();
                         });
@@ -249,16 +283,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    function updateCooldownBtn() {
-        document.querySelectorAll('.btn-asignar-tarjeta, .btn-cambiar-tarjeta-final').forEach(function(btn) {
-            if (cooldown > 0) {
-                btn.disabled = true;
-                btn.innerHTML = btn.classList.contains('btn-cambiar-tarjeta-final') ? 'Seleccionar (' + cooldown + 's)' : 'Asignar (' + cooldown + 's)';
-            } else {
-                btn.disabled = false;
-                btn.innerHTML = btn.classList.contains('btn-cambiar-tarjeta-final') ? 'Seleccionar' : 'Asignar';
+    function startCooldown(msgHtml) {
+        const mensaje = document.getElementById('modal-cambio-mensaje');
+        if (cooldownInterval) clearInterval(cooldownInterval);
+        // Forzar cooldown a máximo 60 y mínimo 0
+        cooldown = Math.max(0, Math.min(60, cooldown));
+        if (cooldown === 0) {
+            mensaje.innerHTML = '';
+            return;
+        }
+        mensaje.innerHTML = `<div class='alert alert-warning mt-2'>Puedes reenviar el código en <span id='cooldown-timer'></span></div>`;
+        function renderCooldown() {
+            // Siempre mostrar solo segundos
+            let display = `${cooldown}s`;
+            document.getElementById('cooldown-timer').textContent = display;
+        }
+        renderCooldown();
+        cooldownInterval = setInterval(() => {
+            cooldown--;
+            renderCooldown();
+            if (cooldown <= 0) {
+                clearInterval(cooldownInterval);
+                mensaje.innerHTML = '';
             }
-        });
+        }, 1000);
     }
 });
 </script>
