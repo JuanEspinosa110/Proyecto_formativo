@@ -307,6 +307,10 @@
         const output = document.getElementById(outputId);
         if (!startInput || !startInput.value) {
             output.value = '';
+            // Si es el de creación, bloquear selects
+            if (inputId === 'create_fecha') {
+                toggleModalSelects(false);
+            }
             return;
         }
 
@@ -314,8 +318,69 @@
         if (isNaN(startDate.getTime())) return;
 
         const endDate = new Date(startDate.getTime() + (8 * 60 * 60 * 1000));
-        const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+        const options = { hour: '2-digit', minute: '2-digit', hour12: false };
         output.value = endDate.toLocaleTimeString([], options);
+
+        // Si es el modal de creación, habilitar y cargar disponibilidad
+        if (inputId === 'create_fecha') {
+            toggleModalSelects(true);
+            actualizarDisponibilidadModal(startInput.value);
+        }
+    }
+
+    function toggleModalSelects(enabled) {
+        const placa = document.getElementById('create_placa');
+        const cond = document.getElementById('create_doc_us');
+        if (!placa || !cond) return;
+
+        placa.disabled = !enabled;
+        cond.disabled = !enabled;
+        placa.title = enabled ? "" : "Fije fecha primero";
+        cond.title = enabled ? "" : "Fije fecha primero";
+    }
+
+    function actualizarDisponibilidadModal(fechaValue) {
+        const placaSelect = document.getElementById('create_placa');
+        const condSelect = document.getElementById('create_doc_us');
+        if (!placaSelect || !condSelect) return;
+
+        placaSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
+        condSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
+
+        fetch(`{{ route('empresa.asignaciones.disponibilidad') }}?fecha=${fechaValue}`)
+            .then(r => r.json())
+            .then(data => {
+                // Placas
+                placaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+                if (data.buses.length === 0) {
+                    placaSelect.innerHTML = '<option value="" disabled>Sin buses disponibles</option>';
+                } else {
+                    data.buses.forEach(b => {
+                        let opt = document.createElement('option');
+                        opt.value = b.placa;
+                        opt.textContent = b.label;
+                        placaSelect.appendChild(opt);
+                    });
+                }
+
+                // Conductores
+                condSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+                if (data.conductores.length === 0) {
+                    condSelect.innerHTML = '<option value="" disabled>Sin conductores disponibles</option>';
+                } else {
+                    data.conductores.forEach(c => {
+                        let opt = document.createElement('option');
+                        opt.value = c.doc_usuario;
+                        opt.textContent = c.nombre_completo;
+                        condSelect.appendChild(opt);
+                    });
+                }
+            })
+            .catch(err => {
+                console.error('Error AJAX:', err);
+                placaSelect.innerHTML = '<option value="" disabled>Error al cargar</option>';
+                condSelect.innerHTML = '<option value="" disabled>Error al cargar</option>';
+            });
     }
 
     // Listeners para cambio de fecha

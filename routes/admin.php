@@ -29,6 +29,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('buses/propietario/{doc_propietario}', [BusController::class, 'getPropietario'])->name('buses.propietario');
 
         // Módulo de Asignaciones
+        Route::get('asignaciones/disponibilidad', [AsignacionController::class, 'getDisponibilidad'])->name('asignaciones.disponibilidad');
         Route::resource('asignaciones', AsignacionController::class)
             ->only(['index', 'create', 'store', 'update', 'destroy']);
 

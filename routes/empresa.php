@@ -20,6 +20,7 @@ Route::prefix('empresa')->name('empresa.')->group(function () {
             Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
 
             // Módulo de Asignaciones - sólo GET/listado
+            Route::get('asignaciones/disponibilidad', [AsignacionController::class, 'getDisponibilidad'])->name('asignaciones.disponibilidad');
             Route::get('asignaciones', [AsignacionController::class, 'index'])->name('asignaciones.index');
             Route::get('asignaciones/create', [AsignacionController::class, 'create'])->name('asignaciones.create');
 

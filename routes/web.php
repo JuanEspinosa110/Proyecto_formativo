@@ -139,29 +139,7 @@ Route::middleware(['auth:web', 'role:5', 'CheckNit'])->prefix('propietario')->na
     Route::get('/asignacion/{id}/detalle', [PropietarioController::class, 'getDetalleAsignacion'])->name('detalleAsignacion');
 });
 
-// ==========================================
-// PANEL AUXILIAR (Independiente)
-// ==========================================
-Route::middleware(['auth:web', 'role:1,4', 'CheckNit'])->prefix('empresa')->name('empresa.')->group(function () {
-    Route::get('/dashboard', [EmpresaController::class, 'dashboard'])->name('dashboard');
-    Route::get('/dashboard/stats', [EmpresaController::class, 'stats'])->name('dashboard.stats');
-    
-    // Usuarios (Propietarios, Conductores)
-    Route::post('/usuarios', [EmpresaController::class, 'storeUsuario'])->name('usuarios.store');
-
-    // Buses
-    Route::post('/buses', [EmpresaController::class, 'storeBus'])->name('buses.store');
-
-    // Documentos
-    Route::post('/documentos/{id}/aprobar', [EmpresaController::class, 'aprobarDocumento'])->name('documentos.aprobar');
-    Route::post('/documentos/{id}/rechazar', [EmpresaController::class, 'rechazarDocumento'])->name('documentos.rechazar');
-
-    // Asignaciones
-    Route::post('/asignaciones', [EmpresaController::class, 'storeAsignacion'])->name('asignaciones.store');
-
-    // Reportes
-    Route::get('/reportes/export', [EmpresaController::class, 'descargarReporte'])->name('reportes.export');
-});
+// PANEL AUXILIAR (Administrado en routes/empresa.php)
 
 
 

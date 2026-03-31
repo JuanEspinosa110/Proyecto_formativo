@@ -43,6 +43,11 @@ class Bus extends Model
         return $this->hasMany(Asignacion::class, 'placa', 'placa');
     }
 
+    public function viajes()
+    {
+        return $this->hasMany(Viaje::class, 'placa', 'placa');
+    }
+
     public function documentos()
     {
         return $this->hasMany(Documento::class, 'placa', 'placa');
