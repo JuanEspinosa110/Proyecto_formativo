@@ -64,7 +64,10 @@ class CheckRole
                 ->with('error', 'Acceso restringido.');
         }
 
-        return redirect()->route('cliclkpasajes')->with('error', 'Acceso no autorizado.');
+        if ($user->id_tipo_usuario == 8) {
+            return redirect()->route('gestor-recargas.recargar');
+        }
+        return redirect('/')->with('error', 'Acceso no autorizado.');
 
     }
 }
