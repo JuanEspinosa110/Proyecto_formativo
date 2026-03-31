@@ -83,15 +83,15 @@
                     <!-- Mi Bus -->
                     <div class="col-md-6 col-xl-3">
                         <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
-                            <div class="card-body p-0">
+                            <div class="card-body p-0 container-card">
                                 <div class="d-flex flex-column gap-3">
                                     <div class="text-primary">
                                         <span class="material-symbols-rounded" style="font-size: 3rem;">directions_bus</span>
                                     </div>
                                     <div>
-                                        <h2 class="fw-black mb-1 text-dark text-truncate" title="{{ $buses->count() }}">
+                                        <h2 class="fw-black mb-1 text-dark adaptive-number" title="{{ $buses->count() }}">
                                             {{ $buses->count() }}</h2>
-                                        <p class="text-muted small fw-bold text-uppercase mb-0">Vehículos Registrados</p>
+                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Vehículos Registrados</p>
                                     </div>
                                 </div>
                             </div>
@@ -100,15 +100,32 @@
                     <!-- Ingresos -->
                     <div class="col-md-6 col-xl-3">
                         <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
-                            <div class="card-body p-0">
+                            <style>
+                                .adaptive-number {
+                                    font-size: clamp(1.2rem, 5cqw, 2rem);
+                                    line-height: 1.2;
+                                    white-space: nowrap;
+                                }
+                                .container-card {
+                                    container-type: inline-size;
+                                }
+                            </style>
+                            <div class="card-body p-0 container-card">
                                 <div class="d-flex flex-column gap-3">
                                     <div class="text-success">
                                         <span class="material-symbols-rounded" style="font-size: 3rem;">monetization_on</span>
                                     </div>
                                     <div class="overflow-hidden">
-                                        <h2 class="fw-black mb-1 text-dark text-truncate"
+                                        @php
+                                            $val = $ingresosTotales;
+                                            $display = '$' . number_format($val);
+                                            if ($val >= 1000000000) $display = '$' . number_format($val / 1000000000, 1) . 'B';
+                                            elseif ($val >= 1000000) $display = '$' . number_format($val / 1000000, 1) . 'M';
+                                            elseif ($val >= 100000) $display = '$' . number_format($val / 1000, 0) . 'K';
+                                        @endphp
+                                        <h2 class="fw-black mb-1 text-dark adaptive-number"
                                             title="${{ number_format($ingresosTotales) }}">
-                                            ${{ number_format($ingresosTotales) }}</h2>
+                                            {{ $display }}</h2>
                                         <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Ingresos Totales
                                             ({{ $conteoPasajeros }} Pax)</p>
                                     </div>
@@ -119,15 +136,15 @@
                     <!-- Viajes Realizados -->
                     <div class="col-md-6 col-xl-3">
                         <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
-                            <div class="card-body p-0">
+                            <div class="card-body p-0 container-card">
                                 <div class="d-flex flex-column gap-3">
                                     <div class="text-warning">
                                         <span class="material-symbols-rounded" style="font-size: 3rem;">route</span>
                                     </div>
                                     <div>
-                                        <h2 class="fw-black mb-1 text-dark text-truncate" title="{{ $conteoAsignaciones }}">
+                                        <h2 class="fw-black mb-1 text-dark adaptive-number" title="{{ $conteoAsignaciones }}">
                                             {{ $conteoAsignaciones }}</h2>
-                                        <p class="text-muted small fw-bold text-uppercase mb-0">Viajes Realizados</p>
+                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Viajes Realizados</p>
                                     </div>
                                 </div>
                             </div>
@@ -136,15 +153,15 @@
                     <!-- Documentos -->
                     <div class="col-md-6 col-xl-3">
                         <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
-                            <div class="card-body p-0">
+                            <div class="card-body p-0 container-card">
                                 <div class="d-flex flex-column gap-3">
                                     <div class="text-info">
                                         <span class="material-symbols-rounded" style="font-size: 3rem;">folder_open</span>
                                     </div>
                                     <div>
-                                        <h2 class="fw-black mb-1 text-dark text-truncate" title="{{ $conteoDocumentos }}">
+                                        <h2 class="fw-black mb-1 text-dark adaptive-number" title="{{ $conteoDocumentos }}">
                                             {{ $conteoDocumentos }}</h2>
-                                        <p class="text-muted small fw-bold text-uppercase mb-0">Documentos Activos</p>
+                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Documentos Activos</p>
                                     </div>
                                 </div>
                             </div>
@@ -767,6 +784,10 @@
                     .card-gradient-earnings {
                         background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%) !important;
                     }
+
+                    .adaptive-title {
+                        font-size: clamp(1.5rem, 8cqw, 3rem);
+                    }
                 </style>
 
                 <!-- 1. ENCABEZADO: TÍTULO + FILTRO -->
@@ -801,21 +822,39 @@
                             <div class="row align-items-center">
                                 <div class="col-md-12">
                                     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                                        <div>
+                                        <div class="container-card">
                                             <span class="text-white-50 small fw-bold text-uppercase d-block mb-1"
                                                 id="earnings_label">Ingresos de Hoy</span>
-                                            <h1 class="display-5 fw-black mb-0 text-white" id="earnings_amount">
-                                                ${{ number_format($gananciasHoy ?? 0) }}</h1>
+                                            @php
+                                                $valH = $gananciasHoy ?? 0;
+                                                $dispDH = '$' . number_format($valH);
+                                                if ($valH >= 1000000) $dispDH = '$' . number_format($valH / 1000000, 1) . 'M';
+                                                elseif ($valH >= 100000) $dispDH = '$' . number_format($valH / 1000, 0) . 'K';
+                                            @endphp
+                                            <h1 class="fw-black mb-0 text-white adaptive-title" id="earnings_amount" title="${{ number_format($valH) }}">
+                                                {{ $dispDH }}</h1>
                                         </div>
                                         <div class="d-flex gap-2 bg-white bg-opacity-10 p-1 rounded-pill">
+                                            @php
+                                                $fH = function($v) {
+                                                    if ($v >= 1000000) return '$' . number_format($v / 1000000, 1) . 'M';
+                                                    if ($v >= 100000) return '$' . number_format($v / 1000, 0) . 'K';
+                                                    return '$' . number_format($v);
+                                                };
+                                            @endphp
                                             <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch active"
-                                                data-amount="{{ number_format($gananciasHoy ?? 0) }}" data-label="Ingresos de Hoy"
+                                                data-amount="{{ number_format($gananciasHoy ?? 0) }}" 
+                                                data-display="{{ $fH($gananciasHoy ?? 0) }}"
+                                                data-label="Ingresos de Hoy"
                                                 onclick="switchEarnings(this)">Hoy</button>
                                             <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch"
                                                 data-amount="{{ number_format($gananciasSemana ?? 0) }}"
+                                                data-display="{{ $fH($gananciasSemana ?? 0) }}"
                                                 data-label="Ingresos de la Semana" onclick="switchEarnings(this)">Semana</button>
                                             <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch"
-                                                data-amount="{{ number_format($gananciasMes ?? 0) }}" data-label="Ingresos del Mes"
+                                                data-amount="{{ number_format($gananciasMes ?? 0) }}" 
+                                                data-display="{{ $fH($gananciasMes ?? 0) }}"
+                                                data-label="Ingresos del Mes"
                                                 onclick="switchEarnings(this)">Mes</button>
                                         </div>
                                     </div>
@@ -889,9 +928,15 @@
                                         <span>{{ number_format($bus->total_pasajeros) }} Pax</span>
                                     </div>
                                 </div>
-                                <div class="mt-3 text-center">
+                                <div class="mt-3 text-center container-card">
                                     <span class="text-muted x-small text-uppercase fw-bold d-block">Ganancia Acumulada</span>
-                                    <h3 class="fw-black mb-0 text-success">${{ number_format($bus->total_ingresos) }}</h3>
+                                    @php
+                                        $valB = $bus->total_ingresos;
+                                        $dispB = '$' . number_format($valB);
+                                        if ($valB >= 1000000) $dispB = '$' . number_format($valB / 1000000, 1) . 'M';
+                                        elseif ($valB >= 100000) $dispB = '$' . number_format($valB / 1000, 0) . 'K';
+                                    @endphp
+                                    <h3 class="fw-black mb-0 text-success adaptive-number" title="${{ number_format($valB) }}">{{ $dispB }}</h3>
                                 </div>
                             </div>
                         </div>
@@ -1810,9 +1855,12 @@
                     btn.classList.add('active');
 
                     const amount = btn.getAttribute('data-amount');
+                    const display = btn.getAttribute('data-display');
                     const label = btn.getAttribute('data-label');
 
-                    document.getElementById('earnings_amount').innerText = '$' + amount;
+                    const amountEl = document.getElementById('earnings_amount');
+                    amountEl.innerText = display;
+                    amountEl.title = '$' + amount;
                     document.getElementById('earnings_label').innerText = label;
                 };
 

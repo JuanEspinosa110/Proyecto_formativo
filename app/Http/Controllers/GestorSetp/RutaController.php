@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Ruta;
 use App\Models\Barrio;
 use App\Models\Empresa;
-use App\Models\Asignacion;
+use App\Models\ConcesionRuta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
@@ -23,10 +23,9 @@ class RutaController extends Controller
     {
         $ciudad = auth()->user()->id_ciudad;
 
-        $query = Ruta::with(['barrioOrigen', 'barrioDestino', 'ciudad', 'asignaciones' => function($q) {
-            $q->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)
-              ->where('id_estado', 1);
-        }, 'asignaciones.empresa'])
+        $query = Ruta::with(['barrioOrigen', 'barrioDestino', 'ciudad', 'concesiones' => function($q) {
+            $q->where('id_estado', 1);
+        }, 'concesiones.empresa'])
             ->where('id_ciudad', $ciudad);
 
         if ($request->filled('codigo')) {
@@ -161,10 +160,10 @@ class RutaController extends Controller
             ->firstOrFail();
 
         $ruta->update([
-            'codigo_ruta'    => $request->codigo_ruta,
-            'id_barrio_orig' => $request->id_barrio_orig,
-            'id_barrio_dest' => $request->id_barrio_dest,
-            'id_estado'      => $request->id_estado,
+            'codigo_ruta'       => $request->codigo_ruta,
+            'id_barrio_origen'  => $request->id_barrio_origen,
+            'id_barrio_destino' => $request->id_barrio_destino,
+            'id_estado'         => $request->id_estado,
         ]);
 
         return redirect()->route('gestor-setp.rutas.index')
@@ -187,9 +186,9 @@ class RutaController extends Controller
     // ── formAsignar ───────────────────────────────────────────────
     public function formAsignar($id)
     {
-        $ruta = Ruta::with(['barrioOrigen', 'barrioDestino', 'asignaciones' => function($q) {
-                $q->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)->where('id_estado', 1);
-            }, 'asignaciones.empresa'])
+        $ruta = Ruta::with(['barrioOrigen', 'barrioDestino', 'concesiones' => function($q) {
+                $q->where('id_estado', 1);
+            }, 'concesiones.empresa'])
             ->where('id_ruta', $id)
             ->where('id_ciudad', auth()->user()->id_ciudad)
             ->firstOrFail();
@@ -210,56 +209,63 @@ class RutaController extends Controller
             ->firstOrFail();
 
         $data = $request->validate([
-            'Nit'           => 'required|exists:empresa,NIT',
-            'fecha_inicio'  => 'required|date',
-            'fecha_fin'     => 'nullable|date|after:fecha_inicio',
+            'NIT'           => 'required|exists:empresa,NIT',
+            'fecha_inicio'  => 'required|date|after_or_equal:today',
+            'fecha_fin'     => [
+                'nullable',
+                'date',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value) {
+                        $inicio = \Carbon\Carbon::parse($request->fecha_inicio);
+                        $fin    = \Carbon\Carbon::parse($value);
+                        if ($fin->lt($inicio->copy()->addMonth())) {
+                            $fail('La fecha de fin debe ser al menos 1 mes posterior a la fecha de inicio.');
+                        }
+                    }
+                },
+            ],
         ], [
-            'Nit.required'          => 'Debe seleccionar una empresa.',
-            'Nit.exists'            => 'La empresa seleccionada no existe.',
+            'NIT.required'          => 'Debe seleccionar una empresa.',
+            'NIT.exists'            => 'La empresa seleccionada no existe.',
             'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
-            'fecha_fin.after'       => 'La fecha de fin debe ser posterior a la de inicio.',
+            'fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser anterior a hoy.',
         ]);
 
-        // Verificar que la empresa no esté ya asignada a esta ruta con estado activo
-        $yaAsignada = Asignacion::where('id_ruta', $ruta->id_ruta)
-            ->where('Nit', $data['Nit'])
+        // Verificar que la empresa no esté ya concesionada a esta ruta con estado activo
+        $yaAsignada = ConcesionRuta::where('id_ruta', $ruta->id_ruta)
+            ->where('NIT', $data['NIT'])
             ->where('id_estado', 1)
             ->exists();
 
         if ($yaAsignada) {
-            return back()->with('error', 'Esta empresa ya tiene una asignación activa en esta ruta.');
+            return back()->with('error', 'Esta empresa ya tiene una concesión activa en esta ruta.');
         }
 
-        Asignacion::create([
-            'id_tipo_asignacion' => self::TIPO_ASIGNACION_RUTA,
+        ConcesionRuta::create([
             'id_ruta'            => $ruta->id_ruta,
-            'Nit'                => $data['Nit'],
+            'NIT'                => $data['NIT'],
             'fecha_inicio'       => $data['fecha_inicio'],
             'fecha_fin'          => $data['fecha_fin'] ?? null,
             'id_estado'          => 1,
-            'doc_usuario'        => auth()->id(),
-            'placa'              => null,
         ]);
 
         return redirect()->route('gestor-setp.rutas.index')
-            ->with('success', 'Empresa asignada a la ruta correctamente.');
+            ->with('success', 'Empresa autorizada (concesión) para la ruta correctamente.');
     }
 
     // ── desasignar ────────────────────────────────────────────────
-    public function desasignar($idAsignacion)
+    public function desasignar($idConcesion)
     {
-        $asignacion = Asignacion::where('id_asignacion', $idAsignacion)
-            ->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)
-            ->firstOrFail();
+        $concesion = ConcesionRuta::where('id_concesion', $idConcesion)->firstOrFail();
 
         // Verificar que la ruta pertenece a la ciudad del gestor
-        $ruta = Ruta::where('id_ruta', $asignacion->id_ruta)
+        $ruta = Ruta::where('id_ruta', $concesion->id_ruta)
             ->where('id_ciudad', auth()->user()->id_ciudad)
             ->firstOrFail();
 
-        $asignacion->update(['id_estado' => 2]);
+        $concesion->update(['id_estado' => 2]);
 
-        return back()->with('success', 'Empresa desasignada de la ruta correctamente.');
+        return back()->with('success', 'Concesión de empresa retirada correctamente.');
     }
 
     private function generarIdRutaAleatorio()

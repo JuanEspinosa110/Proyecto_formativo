@@ -14,12 +14,21 @@ class ViajeSeeder extends Seeder
     public function run(): void
     {
         // 1. Obtener asignaciones activas
-        $asignaciones = DB::table('asignacion')
+        $asignacionesTotales = DB::table('asignacion')
             ->where('id_estado', 1)
             ->get();
 
-        if ($asignaciones->isEmpty()) {
+        if ($asignacionesTotales->isEmpty()) {
             $this->command->warn('No hay asignaciones activas para generar viajes.');
+            return;
+        }
+
+        // Dejar un 20% de los buses/asignaciones sin viajes (Requerimiento)
+        $cantidadAProcesar = (int) (count($asignacionesTotales) * 0.8);
+        $asignaciones = $asignacionesTotales->shuffle()->take($cantidadAProcesar);
+
+        if ($asignaciones->isEmpty()) {
+            $this->command->warn('No hay asignaciones seleccionadas para generar viajes.');
             return;
         }
 

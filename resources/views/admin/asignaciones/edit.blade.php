@@ -79,10 +79,14 @@
                                     <select name="id_ruta" class="form-select bg-light border-0 py-2 @error('id_ruta') is-invalid @enderror" required>
                                         @foreach($rutas as $r)
                                             <option value="{{ $r->id_ruta }}" {{ (old('id_ruta', $asignacion->id_ruta) == $r->id_ruta) ? 'selected' : '' }}>
-                                                ID: {{ $r->id_ruta }} - {{ $r->nombre_ruta ?? 'Ruta Actual' }}
+                                                #{{ $r->codigo_ruta }} - {{ $r->nombre_ruta ?? 'Ruta' }}
+                                                @if($r->concesiones->isEmpty()) (Uso Público) @endif
                                             </option>
                                         @endforeach
                                     </select>
+                                    @error('id_ruta')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
 

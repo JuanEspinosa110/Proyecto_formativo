@@ -41,7 +41,10 @@
                     <select name="id_ruta" class="form-select bg-light">
                         <option value="">Ruta...</option>
                         @foreach($rutas as $ruta)
-                        <option value="{{ $ruta->id_ruta }}" {{ request('id_ruta') == $ruta->id_ruta ? 'selected' : '' }}>{{ $ruta->nombre_ruta ?? 'Ruta '.$ruta->id_ruta }}</option>
+                        <option value="{{ $ruta->id_ruta }}" {{ request('id_ruta') == $ruta->id_ruta ? 'selected' : '' }}>
+                            #{{ $ruta->codigo_ruta }} - {{ $ruta->nombre_ruta ?? 'Ruta' }}
+                            @if($ruta->concesiones->isEmpty()) (Uso Público) @endif
+                        </option>
                         @endforeach
                     </select>
                 </div>
@@ -125,7 +128,7 @@
                             <input type="hidden" name="id_ruta" id="edit_id_ruta_hidden">
                             <select id="edit_id_ruta" class="form-select form-select-sm bg-light" disabled>
                                 @foreach($rutas as $ruta)
-                                <option value="{{ $ruta->id_ruta }}">{{ $ruta->nombre_ruta ?? 'Ruta #'.$ruta->id_ruta }}</option>
+                                <option value="{{ $ruta->id_ruta }}">{{ $ruta->nombre_ruta ?? 'Ruta #'.$ruta->codigo_ruta }}</option>
                                 @endforeach
                             </select>
                         </div>

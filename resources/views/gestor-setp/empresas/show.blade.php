@@ -144,9 +144,9 @@
                     </div>
                     <div class="stat-pill">
                         <span class="stat-pill-label">
-                            <span class="material-symbols-rounded">alt_route</span> Rutas asignadas
+                            <span class="material-symbols-rounded">alt_route</span> Rutas operativas
                         </span>
-                        <span class="stat-pill-val">{{ $rutas->count() }}</span>
+                        <span class="stat-pill-val">{{ $rutas->total() }}</span>
                     </div>
                     <div class="stat-pill">
                         <span class="stat-pill-label">
@@ -161,7 +161,7 @@
             <div class="emp-show-card">
                 <div class="emp-show-card-head">
                     <span class="material-symbols-rounded">alt_route</span>
-                    Rutas asignadas
+                    Rutas operativas ({{ $rutas->total() }})
                 </div>
                 @if($rutas->count())
                 @foreach($rutas as $ruta)
@@ -173,15 +173,28 @@
                         <span style="font-size:.78rem;color:var(--text-2);margin-left:.35rem">
                             {{ $ruta->barrioOrigen->nombre ?? '?' }} → {{ $ruta->barrioDestino->nombre ?? '?' }}
                         </span>
+                        @if($ruta->concesiones->where('NIT', $empresa->NIT)->where('id_estado', 1)->count())
+                            <span class="badge bg-success-subtle text-success border border-success-subtle ms-1" style="font-size:.65rem">Ruta Autorizada</span>
+                        @else
+                            <span class="badge bg-light text-dark border ms-1" style="font-size:.65rem">Uso Público</span>
+                        @endif
                     </div>
                     <span style="background:{{ $ruta->id_estado==1?'var(--ok-bg)':'var(--err-bg)' }};color:{{ $ruta->id_estado==1?'var(--ok)':'var(--err)' }};border-radius:var(--r-xl);padding:.15rem .5rem;font-size:.7rem;font-weight:600">
                         {{ $ruta->id_estado==1?'Activa':'Inactiva' }}
                     </span>
                 </div>
                 @endforeach
+
+                {{-- Paginación de rutas --}}
+                @if($rutas->hasPages())
+                <div class="p-3 border-top d-flex justify-content-center">
+                    {{ $rutas->fragment('rutas-list')->links() }}
+                </div>
+                @endif
+
                 @else
                 <div style="padding:1.25rem;text-align:center;font-size:.85rem;color:var(--text-2)">
-                    Sin rutas asignadas.
+                    Sin rutas operativas disponibles.
                 </div>
                 @endif
             </div>

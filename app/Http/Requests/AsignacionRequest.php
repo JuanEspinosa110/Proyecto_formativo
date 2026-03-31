@@ -59,6 +59,26 @@ class AsignacionRequest extends FormRequest
             $user = auth()->user();
             $nit = $user ? $user->getActiveNit() : null;
 
+            // 0. Validación de Autorización de la RUTA para esta Empresa
+            if ($nit && $this->id_ruta) {
+                $autorizado = \App\Models\ConcesionRuta::where('id_ruta', $this->id_ruta)
+                    ->where('NIT', $nit)
+                    ->where('id_estado', 1)
+                    ->exists();
+                
+                // Si no tiene concesión específica, ver si es de uso público (sin ninguna concesión)
+                if (!$autorizado) {
+                    $esPublica = !\App\Models\ConcesionRuta::where('id_ruta', $this->id_ruta)
+                        ->where('id_estado', 1)
+                        ->exists();
+                    
+                    if (!$esPublica) {
+                        $validator->errors()->add('id_ruta', 'Su empresa no tiene una concesión activa para operar esta ruta y la misma ya está asignada a otras empresas.');
+                        return;
+                    }
+                }
+            }
+
             // 1. No permitir fechas de días pasados (permitimos registrar lo ocurrido hoy)
             if ($fechaObj->isBefore(now()->startOfDay()) && !$this->isMethod('PUT')) {
                  $validator->errors()->add('fecha', 'No se permiten asignaciones de días anteriores al actual.');

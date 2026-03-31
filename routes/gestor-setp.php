@@ -38,7 +38,7 @@ Route::middleware(['auth:web', 'role:gestor_setp', 'CheckNit'])
             // Asignación de ruta a empresa
             Route::get('/{id}/asignar',  [RutaController::class, 'formAsignar']) ->name('form-asignar');
             Route::post('/{id}/asignar', [RutaController::class, 'asignar'])     ->name('asignar');
-            Route::delete('/{id_asignacion}/desasignar', [RutaController::class, 'desasignar'])->name('desasignar');
+            Route::delete('/{id_concesion}/desasignar', [RutaController::class, 'desasignar'])->name('desasignar');
         });
 
         // ── Empresas de transporte ───────────────────────────────────

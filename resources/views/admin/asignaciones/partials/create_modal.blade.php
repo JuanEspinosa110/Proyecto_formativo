@@ -30,10 +30,13 @@
                             <select name="id_ruta" class="form-select form-select-sm @error('id_ruta') is-invalid @enderror" required>
                                 <option value="" selected disabled>Seleccionar...</option>
                                 @foreach($rutas as $ruta)
-                                <option value="{{ $ruta->id_ruta }}" @if(old('id_ruta') == $ruta->id_ruta) selected @endif>{{ $ruta->nombre_ruta ?? 'Ruta #'.$ruta->id_ruta }}</option>
+                                <option value="{{ $ruta->id_ruta }}" @if(old('id_ruta') == $ruta->id_ruta) selected @endif>
+                                    #{{ $ruta->codigo_ruta }} - {{ $ruta->nombre_ruta ?? 'Ruta' }}
+                                    @if($ruta->concesiones->isEmpty()) (Uso Público) @endif
+                                </option>
                                 @endforeach
                             </select>
-                            @error('id_ruta') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            @error('id_ruta') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="col-md-12">

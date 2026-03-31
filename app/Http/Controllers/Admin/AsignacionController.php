@@ -8,6 +8,7 @@ use App\Models\Bus;
 use App\Models\Ruta;
 use App\Models\Usuario;
 use App\Models\Estado;
+use App\Models\ConcesionRuta;
 use App\Models\HistorialBus;
 use App\Http\Requests\AsignacionRequest;
 use Illuminate\Http\Request;
@@ -78,7 +79,20 @@ class AsignacionController extends Controller
 
         // Datos para los modales
         $buses = Bus::where('NIT', $nit)->get();
-        $rutas = Ruta::orderBy('id_ruta', 'asc')->get();
+        // Rutas disponibles: Las autorizadas para esta empresa O las que no tienen NINGUNA concesión activa (Públicas)
+        $rutas = Ruta::where(function($query) use ($nit) {
+            $query->whereHas('concesiones', function($q) use ($nit) {
+                $q->where('NIT', '=', (string)$nit)->where('id_estado', 1);
+            })
+            ->orWhereDoesntHave('concesiones', function($q) {
+                $q->where('id_estado', 1);
+            });
+        })
+        ->with(['concesiones' => function($q) {
+            $q->where('id_estado', 1);
+        }])
+        ->orderBy('id_ruta', 'asc')
+        ->get();
         $adminRoleIds = \Illuminate\Support\Facades\DB::table('tipo_usuario')
             ->where('nombre_tipo', 'like', '%admin%')
             ->pluck('id_tipo_usuario');
@@ -123,7 +137,20 @@ class AsignacionController extends Controller
         $nit = $user->getActiveNit();
 
         $buses = Bus::where('NIT', $nit)->get();
-        $rutas = Ruta::orderBy('id_ruta', 'asc')->get();
+        // Rutas disponibles: Las autorizadas para esta empresa O las que no tienen NINGUNA concesión activa (Públicas)
+        $rutas = Ruta::where(function($query) use ($nit) {
+            $query->whereHas('concesiones', function($q) use ($nit) {
+                $q->where('NIT', '=', (string)$nit)->where('id_estado', 1);
+            })
+            ->orWhereDoesntHave('concesiones', function($q) {
+                $q->where('id_estado', 1);
+            });
+        })
+        ->with(['concesiones' => function($q) {
+            $q->where('id_estado', 1);
+        }])
+        ->orderBy('id_ruta', 'asc')
+        ->get();
         
         $adminRoleIds = \Illuminate\Support\Facades\DB::table('tipo_usuario')
             ->where('nombre_tipo', 'like', '%admin%')

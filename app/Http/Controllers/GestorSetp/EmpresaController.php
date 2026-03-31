@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Empresa;
 use App\Models\Bus;
 use App\Models\Asignacion;
+use App\Models\ConcesionRuta;
 use App\Models\Documento;
+use App\Models\Ruta;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -43,12 +45,11 @@ class EmpresaController extends Controller
         // Conteos en memoria tras paginar para evitar subqueries complejos
         $empresas = $query->orderBy('nombre_empresa')->paginate(12);
 
-        // Calcular rutas de "Uso Libre" (sin ninguna empresa asignada actualmente)
-        $rutasLibresCount = \App\Models\Ruta::where('id_ciudad', $ciudad)
+        // Calcular rutas de "Uso Público" (sin ninguna empresa asignada actualmente)
+        $rutasLibresCount = Ruta::where('id_ciudad', $ciudad)
             ->where('id_estado', 1)
-            ->whereDoesntHave('asignaciones', function ($q) {
-                $q->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)
-                  ->where('id_estado', 1);
+            ->whereDoesntHave('concesiones', function ($q) {
+                $q->where('id_estado', 1);
             })->count();
 
         // Añadir conteos y documentos pendientes a cada empresa
@@ -57,11 +58,9 @@ class EmpresaController extends Controller
 
             $empresa->buses_count = $placas->count();
 
-            $rutasPropias = Asignacion::where('Nit', $empresa->NIT)
-                                              ->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)
-                                              ->where('id_estado', 1)
-                                              ->distinct('id_ruta')
-                                              ->count('id_ruta');
+            $rutasPropias = ConcesionRuta::where('NIT', $empresa->NIT)
+                ->where('id_estado', 1)
+                ->count();
             
             $empresa->rutas_count = $rutasPropias + $rutasLibresCount;
 
@@ -98,28 +97,17 @@ class EmpresaController extends Controller
                         return $bus;
                     });
 
-        // Rutas asignadas activas (propias de la empresa)
-        $rutasAsignadas = Asignacion::with(['ruta.barrioOrigen', 'ruta.barrioDestino'])
-                            ->where('Nit', $empresa->NIT)
-                            ->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)
-                            ->where('id_estado', 1)
-                            ->get()
-                            ->pluck('ruta')
-                            ->filter();
-
-        // Rutas de Uso Libre (sin asignación a ninguna empresa)
-        $rutasLibres = \App\Models\Ruta::with(['barrioOrigen', 'barrioDestino'])
+        // Rutas operativas (Asignadas a ella O de Uso Público)
+        $rutas = Ruta::with(['barrioOrigen', 'barrioDestino'])
             ->where('id_ciudad', auth()->user()->id_ciudad)
             ->where('id_estado', 1)
-            ->whereDoesntHave('asignaciones', function ($q) {
-                $q->where('id_tipo_asignacion', self::TIPO_ASIGNACION_RUTA)
-                  ->where('id_estado', 1);
-            })->get();
-
-        // Todas las rutas operativas para esta empresa (Propias + Libres)
-        $rutas = $rutasAsignadas->merge($rutasLibres)
-            ->unique('id_ruta')
-            ->values();
+            ->where(function($q) use ($empresa) {
+                $q->whereHas('concesiones', function($sq) use ($empresa) {
+                    $sq->where('NIT', $empresa->NIT)->where('id_estado', 1);
+                })
+                ->orDoesntHave('concesiones');
+            })
+            ->paginate(10);
 
         // Total de documentos pendientes de todos los buses
         $placas = $buses->pluck('placa');

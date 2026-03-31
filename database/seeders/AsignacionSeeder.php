@@ -36,8 +36,11 @@ class AsignacionSeeder extends Seeder
         }
 
         // 3. Crear asignaciones
-        // Para cada bus, intentamos asignar un conductor y una ruta
-        foreach ($buses as $bus) {
+        // Dejar un 10% de los buses sin asignaciones para mayor realismo (Requerimiento)
+        $busesAProcesar = $buses->shuffle()->take((int) (count($buses) * 0.9));
+
+        // Para cada bus seleccionado, intentamos asignar un conductor y una ruta
+        foreach ($busesAProcesar as $bus) {
             // Filtrar conductores de la misma empresa (NIT) si es posible
             $conductorEmpresa = $conductores->where('NIT', $bus->NIT)->shuffle()->first();
             
