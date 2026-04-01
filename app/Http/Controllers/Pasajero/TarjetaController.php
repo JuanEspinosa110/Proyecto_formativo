@@ -178,17 +178,36 @@ class TarjetaController extends Controller
         $viajesQuery = VentaViaje::with(['viaje.ruta.barrioOrigen', 'viaje.ruta.barrioDestino'])
             ->where('id_tarjeta', $tarjeta->id_tarjeta);
 
+        $now = Carbon::now();
+        $mesActual = $now->month;
+        $anioActual = $now->year;
+
+        $lastMonth = (clone $now)->subMonth();
+        $mesPasado = $lastMonth->month;
+        $anioPasado = $lastMonth->year;
+
         $viajesMes = (clone $viajesQuery)
-            ->whereMonth('fecha', Carbon::now()->month)
-            ->whereYear('fecha', Carbon::now()->year)
+            ->whereMonth('fecha', $mesActual)
+            ->whereYear('fecha', $anioActual)
             ->get();
 
-        // Calculate total spent in the month using real data from the database
         $totalGastadoMes = $viajesMes->sum('valor');
+
+        $viajesMesAnterior = (clone $viajesQuery)
+            ->whereMonth('fecha', $mesPasado)
+            ->whereYear('fecha', $anioPasado)
+            ->get();
+
+        $totalGastadoMesAnterior = $viajesMesAnterior->sum('valor');
+        $conteoViajesMesAnterior = $viajesMesAnterior->count();
 
         $viajes = $viajesQuery->orderBy('fecha', 'desc')->take(3)->get();
 
-        return view('pasajero.saldo.index', compact('tarjeta', 'titularidad', 'recargas', 'totalRecargado', 'viajes', 'viajesMes', 'totalGastadoMes'));
+        return view('pasajero.saldo.index', compact(
+            'tarjeta', 'titularidad', 'recargas', 'totalRecargado',
+            'viajes', 'viajesMes', 'totalGastadoMes',
+            'totalGastadoMesAnterior', 'conteoViajesMesAnterior'
+        ));
     }
 
     /**

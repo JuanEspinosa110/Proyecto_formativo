@@ -1474,6 +1474,124 @@
     margin-top: .45rem;
 }
 
+/* --- Nuevos Estilos  --- */
+.pas-recarga-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    margin-bottom: .75rem;
+    transition: all .2s ease;
+}
+
+.pas-recarga-item:hover {
+    transform: translateX(4px);
+    border-color: var(--pas-m);
+    box-shadow: var(--sh-sm);
+}
+
+.pas-recarga-item-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: .75rem;
+    background: var(--pas-l);
+    color: var(--pas);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pas-recarga-item-icon .material-symbols-rounded {
+    font-size: 1.25rem;
+    font-variation-settings: var(--ms-on);
+}
+
+.pas-recarga-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.pas-recarga-title {
+    font-weight: 700;
+    font-size: .88rem;
+    color: var(--text);
+    margin-bottom: .15rem;
+}
+
+.pas-recarga-date {
+    font-size: .75rem;
+    color: var(--text-3);
+}
+
+.pas-recarga-monto {
+    font-family: var(--ff-d);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ok);
+    text-align: right;
+}
+
+.pas-stat-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    height: 100%;
+}
+
+.pas-stat-label {
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: .5rem;
+    display: block;
+}
+
+.pas-stat-value {
+    font-family: var(--ff-d);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.1;
+    display: block;
+}
+
+.pas-stat-sub {
+    font-size: .78rem;
+    margin-top: .4rem;
+    display: flex;
+    align-items: center;
+    gap: .25rem;
+}
+
+.pas-stat-sub.up {
+    color: var(--ok);
+}
+
+.pas-stat-sub.down {
+    color: var(--err);
+}
+
+.pas-stat-sub.neutral {
+    color: var(--text-3);
+}
+
+.glass-pill {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 2rem;
+    padding: .2rem .75rem;
+    font-size: .72rem;
+    font-weight: 600;
+}
+
 /* ══════════════════════════════════════════════════════════════
    6. RUTAS
 ══════════════════════════════════════════════════════════════ */
