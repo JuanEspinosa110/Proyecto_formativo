@@ -20,7 +20,8 @@ class CheckRole
         'gestor_setp' => 6,
         'coordinador_bus' => 7,
         'ganagana' => 8, // Alias heredado — ahora es GESTOR DE RECARGAS
-        'gestor_recargas' => 8,
+        'gestor_recargas' => [8, 10], // Permitir ambos roles
+        'admin_recargas' => 10,
         'jefe_mantenimiento' => 9,
     ];
 

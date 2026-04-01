@@ -141,22 +141,26 @@ class Usuario extends Authenticatable
             'propietario' => 5,
             'gestor_setp' => 6,
             'coordinador_bus' => 7,
-            'gestor_recargas' => 8,
+            'gestor_recargas' => [8, 10], // Acepta ambos: gestor y admin recargas
+            'admin_recargas' => 10,
             'jefe_mantenimiento' => 9,
         ];
 
-        $targetId = is_numeric($role) ? (int) $role : ($roleMap[$role] ?? null);
-
-        if (!$targetId)
+        if (is_numeric($role)) {
+            $targetIds = [(int) $role];
+        } elseif (isset($roleMap[$role])) {
+            $targetIds = (array) $roleMap[$role];
+        } else {
             return false;
+        }
 
-        // El usuario tiene el rol exacto
-        if ((int) $this->id_tipo_usuario === $targetId) {
+        // El usuario tiene alguno de los roles aceptados
+        if (in_array((int) $this->id_tipo_usuario, $targetIds, true)) {
             return true;
         }
 
         // Lógica de herencia: Cualquier usuario autenticado tiene acceso a "pasajero" (ID 2)
-        if ($targetId === 2) {
+        if (in_array(2, $targetIds, true)) {
             return true;
         }
 
@@ -175,7 +179,7 @@ class Usuario extends Authenticatable
             5 => 'propietario.dashboard',
             6 => 'gestor-setp.dashboard',
             7 => 'controlador-tiempo.dashboard',
-            8 => 'gestor-recargas.dashboard', 
+            8 => 'gestor-recargas.dashboard',
             9 => 'jefemantenimiento.dashboard',
             default => 'pasajero.dashboard',
         };
