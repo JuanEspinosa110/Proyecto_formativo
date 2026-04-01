@@ -68,6 +68,10 @@ class CheckRole
         if ($user->id_tipo_usuario == 8) {
             return redirect()->route('gestor-recargas.recargar');
         }
+
+        if ($user->id_tipo_usuario == 10) {
+            return redirect()->route('gestor-recargas.dashboard');
+        }
         return redirect('/')->with('error', 'Acceso no autorizado.');
 
     }

@@ -181,6 +181,7 @@ class Usuario extends Authenticatable
             7 => 'controlador-tiempo.dashboard',
             8 => 'gestor-recargas.dashboard',
             9 => 'jefemantenimiento.dashboard',
+            10 => 'gestor-recargas.dashboard',
             default => 'pasajero.dashboard',
         };
     }
