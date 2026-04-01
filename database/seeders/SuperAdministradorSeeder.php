@@ -54,5 +54,20 @@ class SuperAdministradorSeeder extends Seeder
                 'id_estado' => 1,
             ]
         );
+
+        // Nuevo Super Administrador solicitado
+        SuperAdministrador::firstOrCreate(
+            [
+                'doc_super_admin' => 78092026
+            ],
+            [
+                'nombre' => 'Cesar Esquivel',
+                'correo' => 'esquivel7809@gmail.com',
+                'telefono' => '3100000000',
+                'foto_perfil' => null,
+                'password' => Hash::make('Qwerty2026-$'),
+                'id_estado' => 1,
+            ]
+        );
     }
 }

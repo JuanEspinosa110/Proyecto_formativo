@@ -26,7 +26,7 @@
             <div class="bg-white rounded-3 shadow-sm p-4 h-100 d-flex flex-column ct-kpi">
                 <span class="material-symbols-rounded mb-2 ct-kpi-icon" style="font-size:1.8rem;">radar</span>
                 <span class="fs-1 fw-bold lh-1">{{ $busesEnRuta }}</span>
-                <span class="text-muted small mt-1">Buses activos</span>
+                <span class="text-muted small mt-1">Buses con viajes (Hoy)</span>
             </div>
         </div>
 
@@ -42,7 +42,7 @@
             <div class="bg-white rounded-3 shadow-sm p-4 h-100 d-flex flex-column ct-kpi">
                 <span class="material-symbols-rounded mb-2" style="font-size:1.8rem; color:#e53e3e;">warning</span>
                 <span class="fs-1 fw-bold lh-1">{{ $busesInactivos }}</span>
-                <span class="text-muted small mt-1">Buses inactivos / taller</span>
+                <span class="text-muted small mt-1">Buses sin viajes (Hoy)</span>
             </div>
         </div>
 
@@ -138,27 +138,37 @@
         <div class="col-12">
             <div class="bg-white rounded-3 shadow-sm p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0">Asignaciones Recientes</h6>
-                    <a href="{{ route('controlador-tiempo.despacho.index') }}" class="small" style="color:var(--ct-accent); text-decoration:none;">Ver todas →</a>
+                    <h6 class="fw-bold mb-0">Últimos Viajes Registrados</h6>
+                    <a href="{{ route('controlador-tiempo.despacho.index') }}" class="small" style="color:var(--ct-accent); text-decoration:none;">Ver todos →</a>
                 </div>
 
                 @forelse($asignaciones as $asig)
+                    @php
+                        $fechaViaje = \Carbon\Carbon::parse($asig->fecha);
+                        $statusText = 'Programado';
+                        $statusClass = 'bg-warning';
+                        if($asig->id_estado == 5) { $statusText = 'Finalizado'; $statusClass = 'bg-success'; }
+                        elseif($asig->recorridos()->exists()) { $statusText = 'En Curso'; $statusClass = 'bg-primary'; }
+                    @endphp
                     <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                         <div class="d-flex align-items-center gap-3">
                             <span class="material-symbols-rounded text-muted" style="font-size:1.2rem;">directions_bus</span>
                             <div>
-                                <span class="fw-semibold">{{ $asig->placa ?? $asig->bus->placa ?? '—' }}</span>
-                                <span class="text-muted small ms-2">
+                                <div class="fw-semibold">
+                                    {{ $asig->placa ?? '—' }} 
+                                    <span class="text-muted small fw-normal ms-1">({{ $fechaViaje->format('d/m/Y h:i A') }})</span>
+                                </div>
+                                <span class="text-muted small">
                                     {{ $asig->ruta->barrioOrigen->nombre ?? '?' }} → {{ $asig->ruta->barrioDestino->nombre ?? '?' }}
                                 </span>
                             </div>
                         </div>
                         <div>
-                            <span class="badge-ct">Activa</span>
+                            <span class="badge {{ $statusClass }} bg-opacity-10 text-dark border-0" style="font-size: 0.7rem;">{{ $statusText }}</span>
                         </div>
                     </div>
                 @empty
-                    <p class="text-muted small text-center py-3">No hay asignaciones registradas.</p>
+                    <p class="text-muted small text-center py-3">No hay viajes recientes registrados.</p>
                 @endforelse
             </div>
         </div>
