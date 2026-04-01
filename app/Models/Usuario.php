@@ -184,4 +184,12 @@ class Usuario extends Authenticatable
             default => 'pasajero.dashboard',
         };
     }
+
+    /**
+     * Relación con los viajes (asignaciones) del conductor
+     */
+    public function viajes()
+    {
+        return $this->hasMany(Viaje::class, 'doc_us', 'doc_usuario');
+    }
 }

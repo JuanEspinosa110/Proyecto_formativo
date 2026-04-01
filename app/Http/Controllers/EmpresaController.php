@@ -69,7 +69,7 @@ class EmpresaController extends Controller
                 $query->where('placa', $request->placa);
             }
             $data['asignaciones'] = $query->orderBy('fecha', 'desc')->paginate(10, ['*'], 'page_asig');
-            $data['busesDisponibles'] = Bus::where('NIT', $nit)->get()->filter(fn($b) => $b->isOperable());
+            $data['busesDisponibles'] = Bus::where('NIT', $nit)->get()->filter(fn(Bus $b) => $b->isOperable());
             $data['rutas'] = Ruta::get();
             $data['conductores'] = Usuario::where('NIT', $nit)->where('id_tipo_usuario', 3)->get();
         } 
@@ -257,4 +257,92 @@ class EmpresaController extends Controller
     {
         return redirect()->back()->with('success', 'Descarga de reporte en desarrollo.');
     }
+
+    /**
+     * Consulta disponibilidad de conductores y buses vía AJAX para el panel de Auxiliar.
+     */
+    public function getDisponibilidad(Request $request)
+    {
+        $user = Auth::user();
+        $nit = $user->getActiveNit();
+        
+        $fecha = $request->fecha;
+        $hora = $request->hora_salida;
+
+        if (!$fecha) {
+            return response()->json(['conductores' => [], 'buses' => []]);
+        }
+
+        try {
+            // Combinar fecha y hora
+            $datetimeStr = $fecha . ($hora ? ' ' . $hora : ' 00:00:00');
+            $fechaObj = \Carbon\Carbon::parse($datetimeStr);
+
+            $fechaSoloDia = $fechaObj->toDateString();
+            $proposedStart = $fechaObj->toDateTimeString();
+            $proposedEnd = $fechaObj->copy()->addHours(8)->toDateTimeString();
+
+            // 1. Filtrar Conductores (Mismas reglas que Admin)
+            $adminRoleIds = \Illuminate\Support\Facades\DB::table('tipo_usuario')
+                ->where('nombre_tipo', 'like', '%admin%')
+                ->pluck('id_tipo_usuario');
+
+            $licenciasVigentes = \App\Models\Documento::where('id_tipo_documento', 3)
+                ->where('id_estado', 1)
+                ->whereDate('fecha_vencimiento', '>=', now()->format('Y-m-d'))
+                ->pluck('doc_usuario');
+
+            $conductores = Usuario::where('NIT', $nit)
+                ->where('id_estado', 1)
+                ->whereIn('doc_usuario', $licenciasVigentes)
+                ->whereNotIn('id_tipo_usuario', $adminRoleIds)
+                ->whereDoesntHave('viajes', function($q) use ($fechaSoloDia, $proposedStart, $proposedEnd) {
+                    $q->whereIn('id_estado', [1, 5]) // Solo bloquean viajes ACTIVOS o FINALIZADOS
+                      ->where(function($sq) use ($fechaSoloDia, $proposedStart, $proposedEnd) {
+                          $sq->whereDate('fecha', $fechaSoloDia)
+                             ->orWhere(function($ssq) use ($proposedStart, $proposedEnd) {
+                                 $ssq->where('fecha', '<', $proposedEnd)
+                                     ->whereRaw('DATE_ADD(fecha, INTERVAL 8 HOUR) > ?', [$proposedStart]);
+                             });
+                      });
+                })
+                ->get()
+                ->map(fn($c) => [
+                    'doc_usuario' => $c->doc_usuario,
+                    'nombre_completo' => "{$c->primer_nombre} {$c->primer_apellido} ({$c->doc_usuario})"
+                ]);
+
+            // 2. Filtrar Buses
+            $buses = Bus::where('NIT', $nit)
+                ->get()
+                ->filter(function($bus) use ($proposedStart, $proposedEnd) {
+                    /** @var Bus $bus */
+                    if (!$bus->isOperable()) return false;
+                    
+                    $conflict = Viaje::where('placa', $bus->placa)
+                        ->where(function($q) use ($proposedStart, $proposedEnd) {
+                            $q->where('fecha', '<', $proposedEnd)
+                              ->whereRaw('DATE_ADD(fecha, INTERVAL 8 HOUR) > ?', [$proposedStart]);
+                        })
+                        ->exists();
+                    
+                    return !$conflict;
+                })
+                ->values()
+                ->map(fn($b) => [
+                    'placa' => $b->placa,
+                    'modelo' => $b->modelo,
+                    'label' => "{$b->placa} - {$b->modelo}"
+                ]);
+
+            return response()->json([
+                'conductores' => $conductores,
+                'buses' => $buses
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
 }
+ 

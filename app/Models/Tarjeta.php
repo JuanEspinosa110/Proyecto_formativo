@@ -23,7 +23,6 @@ class Tarjeta extends Model
         'codigo_tarjeta',
         'saldo',
         'id_estado',
-        'doc_usuario',
     ];
 
     protected static function boot()
@@ -51,9 +50,19 @@ class Tarjeta extends Model
         });
     }
 
-    public function usuarioActual(): BelongsTo
+    /**
+     * Obtiene el usuario actual vinculado a esta tarjeta a través de la titularidad activa.
+     */
+    public function usuarioActual()
     {
-        return $this->belongsTo(Usuario::class, 'doc_usuario', 'doc_usuario');
+        return $this->hasOneThrough(
+            Usuario::class,
+            TitularidadTarjeta::class,
+            'id_tarjeta', // FK en TitularidadTarjeta
+            'doc_usuario', // FK en Usuario
+            'id_tarjeta', // Local Key en Tarjeta
+            'doc_usuario'  // Local Key en TitularidadTarjeta
+        )->where('titularidad_tarjeta.id_estado', 1);
     }
 
     public function titularidades(): HasMany

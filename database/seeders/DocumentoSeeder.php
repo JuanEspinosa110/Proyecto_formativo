@@ -24,7 +24,7 @@ class DocumentoSeeder extends Seeder
         foreach ($conductores as $c) {
             $documentos[] = [
                 'nombre' => 'LICENCIA DE CONDUCCIÓN - ' . $c->doc_usuario,
-                'archivo' => 'seeders/licencia_default.pdf',
+                'archivo' => 'seeders/licencia_default.jpg',
                 'fecha_expedicion' => Carbon::now()->subYears(2)->format('Y-m-d'),
                 'fecha_vencimiento' => Carbon::now()->addYears(3)->format('Y-m-d'),
                 'id_tipo_documento' => 3, // Licencia de Tránsito/Conducir
@@ -42,7 +42,7 @@ class DocumentoSeeder extends Seeder
             // SOAT
             $documentos[] = [
                 'nombre' => 'SOAT - ' . $b->placa,
-                'archivo' => 'seeders/soat_default.pdf',
+                'archivo' => 'seeders/soat_default.jpg',
                 'fecha_expedicion' => Carbon::now()->subMonths(6)->format('Y-m-d'),
                 'fecha_vencimiento' => Carbon::now()->addMonths(6)->format('Y-m-d'),
                 'id_tipo_documento' => 1, // SOAT
@@ -57,7 +57,7 @@ class DocumentoSeeder extends Seeder
             // Técnico Mecánica
             $documentos[] = [
                 'nombre' => 'TECNOMECÁNICA - ' . $b->placa,
-                'archivo' => 'seeders/tecno_default.pdf',
+                'archivo' => 'seeders/tecno_default.jpg',
                 'fecha_expedicion' => Carbon::now()->subMonths(8)->format('Y-m-d'),
                 'fecha_vencimiento' => Carbon::now()->addMonths(4)->format('Y-m-d'),
                 'id_tipo_documento' => 2, // Tecno

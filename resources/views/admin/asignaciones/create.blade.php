@@ -42,40 +42,8 @@
                         @csrf
                         
                         <div class="row g-4">
-                            <!-- Conductor -->
+                            <!-- 1. Ruta -->
                             <div class="col-md-12">
-                                <label class="form-label small fw-bold text-muted text-uppercase mb-2">Conductor Responsable <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0"><span class="material-symbols-rounded text-muted">person</span></span>
-                                    <select name="doc_us" class="form-select bg-light border-0 py-2 @error('doc_us') is-invalid @enderror" required>
-                                        <option value="" selected disabled>Seleccione un conductor...</option>
-                                        @foreach($conductores as $c)
-                                            <option value="{{ $c->doc_usuario }}" {{ old('doc_us') == $c->doc_usuario ? 'selected' : '' }}>
-                                                {{ $c->primer_nombre }} {{ $c->primer_apellido }} ({{ $c->doc_usuario }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- Bus -->
-                            <div class="col-md-6">
-                                <label class="form-label small fw-bold text-muted text-uppercase mb-2">Vehículo asignado (Placa) <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0"><span class="material-symbols-rounded text-muted">directions_bus</span></span>
-                                    <select name="placa" class="form-select bg-light border-0 py-2 @error('placa') is-invalid @enderror" required>
-                                        <option value="" selected disabled>Buscar placa...</option>
-                                        @foreach($buses as $b)
-                                            <option value="{{ $b->placa }}" {{ old('placa') == $b->placa ? 'selected' : '' }}>
-                                                {{ $b->placa }} - {{ $b->modelo }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- Ruta -->
-                            <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-2">Ruta de operación <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-0"><span class="material-symbols-rounded text-muted">route</span></span>
@@ -88,23 +56,58 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('id_ruta')
-                                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                                    @enderror
                                 </div>
                             </div>
 
-                            <!-- Fecha y Hora -->
+                            <!-- 2. Fecha y Hora de Inicio -->
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-2">Fecha y Hora de Inicio <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-0"><span class="material-symbols-rounded text-muted">calendar_today</span></span>
-                                    <input type="datetime-local" name="fecha" class="form-control bg-light border-0 py-2 @error('fecha') is-invalid @enderror" value="{{ old('fecha', now()->format('Y-m-d\TH:i')) }}" required>
+                                    <input type="datetime-local" name="fecha" id="fecha_asignacion" class="form-control bg-light border-0 py-2 @error('fecha') is-invalid @enderror" value="{{ old('fecha', now()->format('Y-m-d\TH:i')) }}" required>
                                 </div>
                             </div>
 
-                            <!-- Estado -->
+                            <!-- 3. Hora Fin Estimada + Botón Turno -->
                             <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase mb-2">Hora Fin (Estimada) <span class="material-symbols-rounded fs-6 align-middle" title="Calculada automáticamente +8h para turnos">help</span></label>
+                                <div class="d-flex gap-2">
+                                    <div class="input-group flex-fill">
+                                        <span class="input-group-text bg-light border-0"><span class="material-symbols-rounded text-muted">timer</span></span>
+                                        <input type="datetime-local" id="fecha_fin_estimada" class="form-control bg-light border-0 py-2 text-muted" readonly disabled>
+                                    </div>
+                                    <button type="button" id="btn_turno_8h" class="btn btn-outline-primary btn-sm px-3 fw-bold rounded-3 text-nowrap" style="font-size: 0.75rem;">
+                                        TURNO 8H
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 4. Bus -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase mb-2">Vehículo asignado (Placa) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0"><span class="material-symbols-rounded text-muted">directions_bus</span></span>
+                                    <select name="placa" id="select_bus" class="form-select bg-light border-0 py-2 @error('placa') is-invalid @enderror" required disabled title="Seleccione fecha primero">
+                                        <option value="" selected disabled>Buscar placa...</option>
+                                        {{-- Se llena vía AJAX --}}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 5. Conductor -->
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase mb-2">Conductor Responsable <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0"><span class="material-symbols-rounded text-muted">person</span></span>
+                                    <select name="doc_us" id="select_conductor" class="form-select bg-light border-0 py-2 @error('doc_us') is-invalid @enderror" required disabled title="Seleccione fecha primero">
+                                        <option value="" selected disabled>Seleccione un conductor...</option>
+                                        {{-- Se llena vía AJAX --}}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 6. Estado -->
+                            <div class="col-md-12">
                                 <label class="form-label small fw-bold text-muted text-uppercase mb-2">Estado de la Asignación <span class="text-danger">*</span></label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-light border-0"><span class="material-symbols-rounded text-muted">info</span></span>
@@ -140,4 +143,96 @@
     .form-select, .form-control { border-radius: 0 0.5rem 0.5rem 0 !important; }
     .card { border-radius: 1.5rem !important; }
 </style>
-@endsection
+<script>
+ document.addEventListener('DOMContentLoaded', function() {
+     const fechaInput = document.getElementById('fecha_asignacion');
+     const fechaFinInput = document.getElementById('fecha_fin_estimada');
+     const btnTurno8h = document.getElementById('btn_turno_8h');
+     const conductorSelect = document.getElementById('select_conductor');
+     const busSelect = document.getElementById('select_bus');
+ 
+     function calcularHoraFin(isoString) {
+         if (!isoString) return '';
+         const date = new Date(isoString);
+         date.setHours(date.getHours() + 8);
+         
+         const pad = (n) => n.toString().padStart(2, '0');
+         return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+     }
+ 
+     function actualizarUI() {
+         const fechaValue = fechaInput.value;
+         fechaFinInput.value = calcularHoraFin(fechaValue);
+ 
+         if (fechaValue) {
+             conductorSelect.disabled = false;
+             busSelect.disabled = false;
+             conductorSelect.title = "";
+             busSelect.title = "";
+             actualizarDisponibilidad();
+         } else {
+             conductorSelect.disabled = true;
+             busSelect.disabled = true;
+             conductorSelect.title = "Seleccione fecha primero";
+             busSelect.title = "Seleccione fecha primero";
+         }
+     }
+ 
+     function actualizarDisponibilidad() {
+         const fechaValue = fechaInput.value;
+         if (!fechaValue) return;
+ 
+         conductorSelect.innerHTML = '<option value="" disabled selected>Cargando conductores...</option>';
+         busSelect.innerHTML = '<option value="" disabled selected>Cargando buses...</option>';
+ 
+         fetch(`{{ route('empresa.asignaciones.disponibilidad') }}?fecha=${fechaValue}`)
+             .then(response => response.json())
+             .then(data => {
+                 conductorSelect.innerHTML = '<option value="" disabled selected>Seleccione un conductor...</option>';
+                 if (data.conductores.length === 0) {
+                     conductorSelect.innerHTML = '<option value="" disabled>No hay conductores disponibles</option>';
+                 } else {
+                     data.conductores.forEach(c => {
+                         const option = document.createElement('option');
+                         option.value = c.doc_usuario;
+                         option.textContent = c.nombre_completo;
+                         conductorSelect.appendChild(option);
+                     });
+                 }
+ 
+                 busSelect.innerHTML = '<option value="" disabled selected>Seleccione un vehículo...</option>';
+                 if (data.buses.length === 0) {
+                     busSelect.innerHTML = '<option value="" disabled>No hay buses disponibles</option>';
+                 } else {
+                     data.buses.forEach(b => {
+                         const option = document.createElement('option');
+                         option.value = b.placa;
+                         option.textContent = b.label;
+                         busSelect.appendChild(option);
+                     });
+                 }
+             })
+             .catch(error => {
+                 console.error('Error:', error);
+                 conductorSelect.innerHTML = '<option value="" disabled>Error al cargar</option>';
+                 busSelect.innerHTML = '<option value="" disabled>Error al cargar</option>';
+             });
+     }
+ 
+     fechaInput.addEventListener('change', actualizarUI);
+ 
+     btnTurno8h.addEventListener('click', function() {
+         const now = new Date();
+         const pad = (n) => n.toString().padStart(2, '0');
+         const nowISO = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+         
+         fechaInput.value = nowISO;
+         actualizarUI();
+     });
+     
+     if (fechaInput.value) {
+         actualizarUI();
+     }
+ });
+ </script>
+ @endsection

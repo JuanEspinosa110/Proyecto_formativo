@@ -85,11 +85,7 @@ class TarjetaController extends Controller
                 ->withInput();
         }
 
-        if (!empty($tarjeta->doc_usuario)) {
-            return back()
-                ->withErrors(['codigo_tarjeta' => 'Esta tarjeta ya está asociada a un pasajero.'])
-                ->withInput();
-        }
+        // En el nuevo esquema, no comprobamos tarjeta->doc_usuario sino TitularidadTarjeta
 
         if ($tarjeta->id_estado != 2) {
             return back()
@@ -118,9 +114,8 @@ class TarjetaController extends Controller
             'motivo_cambio' => 'Registro inicial por el pasajero',
         ]);
 
-        // Aseguramos de que el plástico quede asignado y activo
+        // Aseguramos de que el plástico quede activo
         $tarjeta->update([
-            'doc_usuario' => $user->doc_usuario,
             'id_estado' => 1
         ]);
 
@@ -233,9 +228,7 @@ class TarjetaController extends Controller
         }
 
         // Verificar que no esté asignada a ningún usuario en la tabla Tarjeta
-        if (!empty($nuevaTarjeta->doc_usuario)) {
-            return back()->withErrors(['codigo_tarjeta_nueva' => 'Esta tarjeta ya está asociada a un pasajero.'])->withInput();
-        }
+        // En el nuevo esquema, no comprobamos tarjeta->doc_usuario sino TitularidadTarjeta
 
         // Verificar que la tarjeta nueva esté activa (id_estado == 1)
         if ($nuevaTarjeta->id_estado != 2) {
@@ -413,10 +406,9 @@ class TarjetaController extends Controller
             'motivo_cambio' => $motivo,
         ]);
 
-        // 4. Activar plástico tarjeta nueva y asignar documento
+        // 4. Activar plástico tarjeta nueva
         $tarjetaNueva->update([
-            'id_estado' => 1,
-            'doc_usuario' => $user->doc_usuario
+            'id_estado' => 1
         ]);
 
         // 5. Traspaso de saldo (Historial de Recargas + Actualización de campo)
