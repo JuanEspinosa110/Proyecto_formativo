@@ -24,29 +24,48 @@
         <div id="tarjetas-disponibles-cambio" class="mt-3"></div>
     </div>
 
-    <!-- Modal para cambio de titularidad -->
-    <div class="modal fade" id="modalCambioTitularidad" tabindex="-1" aria-labelledby="modalCambioTitularidadLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalCambioTitularidadLabel">Confirmar cambio de titularidad</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            <form id="form-cambio-titularidad">
-                <input type="hidden" id="modal-doc-usuario" name="doc_usuario">
-                <input type="hidden" id="modal-id-tarjeta" name="id_tarjeta">
-                <div class="mb-3">
-                    <label for="codigo_verificacion" class="form-label">Código de verificación (enviado al correo del usuario)</label>
-                    <input type="text" class="form-control" id="codigo_verificacion" name="codigo_verificacion" required>
+        <!-- Modal para cambio de titularidad -->
+        <div class="modal fade" id="modalCambioTitularidad" tabindex="-1" aria-labelledby="modalCambioTitularidadLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalCambioTitularidadLabel">Confirmar cambio de titularidad</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="form-cambio-titularidad">
+                                <input type="hidden" id="modal-doc-usuario" name="doc_usuario">
+                                <input type="hidden" id="modal-id-tarjeta" name="id_tarjeta">
+                                <input type="hidden" id="modal-correo-usuario" name="correo_usuario">
+                                <div class="mb-3">
+                                    <label for="codigo_verificacion" class="form-label">Código de verificación (enviado al correo del usuario)</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="codigo_verificacion" name="codigo_verificacion" required disabled>
+                                        <button type="button" class="btn btn-outline-primary" id="btn-enviar-codigo">Enviar código</button>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-success" id="btn-confirmar-cambio" disabled>Confirmar cambio</button>
+                        </form>
+                        <div id="modal-cambio-mensaje" class="mt-2"></div>
+                        <div id="modal-reenviar-codigo" class="mt-2"></div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-success">Confirmar cambio</button>
-            </form>
-            <div id="modal-cambio-mensaje" class="mt-2"></div>
-          </div>
+            </div>
         </div>
-      </div>
-    </div>
+
+        <!-- Modal informativo de nueva titularidad -->
+        <div class="modal fade" id="modalInfoTitularidad" tabindex="-1" aria-labelledby="modalInfoTitularidadLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalInfoTitularidadLabel">Nueva titularidad asignada</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body" id="info-titularidad-body">
+                    </div>
+                </div>
+            </div>
+        </div>
 </div>
 @endsection
 
@@ -60,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let tarjetasDisponibles = [];
     let cooldown = 0;
     let cooldownInterval = null;
+    let correoUsuario = null;
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -79,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 resultado.innerHTML = '<div class="alert alert-danger">' + data.message + '</div>';
             } else {
                 usuarioActual = data.usuario;
+                correoUsuario = data.usuario.correo;
                 tarjetasDisponibles = data.tarjetas_disponibles || [];
                 // Guardar id de tarjeta activa para validaciones frontend
                 usuarioActual.tarjeta_activa_id = data.titularidad && data.tarjeta ? data.tarjeta.id_tarjeta : null;
@@ -102,6 +123,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 resultado.innerHTML = html;
                 tarjetasCambioDiv.innerHTML = '';
+                // Guardar correo en input oculto
+                document.getElementById('modal-correo-usuario').value = correoUsuario;
 
                 // Botón para cambiar tarjeta si tiene activa
                 const btnCambio = document.getElementById('btn-cambiar-tarjeta');
@@ -150,60 +173,28 @@ document.addEventListener('DOMContentLoaded', function() {
                             // Reasignar eventos a los botones de selección
                             document.querySelectorAll('.btn-cambiar-tarjeta-final').forEach(function(btn) {
                                 btn.addEventListener('click', function() {
+                                    btn.disabled = true;
+                                    tarjetasCambioDiv.innerHTML += `<div id='cargando-modal' class='alert alert-info mt-2'>Cargando...</div>`;
                                     const idTarjeta = this.getAttribute('data-id');
                                     if (usuarioActual.tarjeta_activa_id && usuarioActual.tarjeta_activa_id == idTarjeta) {
                                         tarjetasCambioDiv.innerHTML += `<div class='alert alert-danger mt-2'>Debes seleccionar una tarjeta diferente a la actual.</div>`;
                                         return;
                                     }
-                                    // Consultar cooldown antes de intentar enviar código
-                                    fetch("{{ route('gestor-recargas.titularidad.consultar-cooldown') }}", {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value
-                                        },
-                                        body: JSON.stringify({ doc_usuario: usuarioActual.doc_usuario })
-                                    })
-                                    .then(res => res.json())
-                                    .then(cooldownData => {
-                                        if (cooldownData.cooldown_active) {
-                                            cooldown = cooldownData.wait;
-                                            document.getElementById('modal-doc-usuario').value = usuarioActual.doc_usuario;
-                                            document.getElementById('modal-id-tarjeta').value = idTarjeta;
-                                            var modal = new bootstrap.Modal(document.getElementById('modalCambioTitularidad'));
-                                            modal.show();
-                                            startCooldown(`<div class='alert alert-warning mt-2'>Ya se envió un código recientemente. Espera para reenviar.</div>`);
-                                        } else {
-                                            // No hay cooldown, ahora sí enviar código
-                                            fetch("{{ route('gestor-recargas.titularidad.enviar-codigo') }}", {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value
-                                                },
-                                                body: JSON.stringify({ doc_usuario: usuarioActual.doc_usuario, id_tarjeta: idTarjeta })
-                                            })
-                                            .then(res => res.json())
-                                            .then(data => {
-                                                let msg = '';
-                                                if(data.success) {
-                                                    msg = `<div class='alert alert-success'>${data.message}</div>`;
-                                                    cooldown = 60;
-                                                    startCooldown(msg);
-                                                } else if(data.wait) {
-                                                    cooldown = data.wait;
-                                                    startCooldown(`<div class='alert alert-danger'>${data.message}</div>`);
-                                                } else {
-                                                    msg = `<div class='alert alert-danger'>${data.message}</div>`;
-                                                    document.getElementById('modal-cambio-mensaje').innerHTML = msg;
-                                                }
-                                                document.getElementById('modal-doc-usuario').value = usuarioActual.doc_usuario;
-                                                document.getElementById('modal-id-tarjeta').value = idTarjeta;
-                                                var modal = new bootstrap.Modal(document.getElementById('modalCambioTitularidad'));
-                                                modal.show();
-                                            });
-                                        }
-                                    });
+                                    document.getElementById('modal-doc-usuario').value = usuarioActual.doc_usuario;
+                                    document.getElementById('modal-id-tarjeta').value = idTarjeta;
+                                    document.getElementById('modal-correo-usuario').value = correoUsuario;
+                                    var modal = new bootstrap.Modal(document.getElementById('modalCambioTitularidad'));
+                                    modal.show();
+                                    // Habilitar botón enviar código y deshabilitar campo código y confirmar
+                                    document.getElementById('btn-enviar-codigo').disabled = false;
+                                    document.getElementById('codigo_verificacion').disabled = true;
+                                    document.getElementById('btn-confirmar-cambio').disabled = true;
+                                    if (cooldownInterval) clearInterval(cooldownInterval);
+                                    document.getElementById('modal-cambio-mensaje').innerHTML = '';
+                                    document.getElementById('modal-reenviar-codigo').innerHTML = '';
+                                    btn.disabled = false;
+                                    const cargandoDiv = document.getElementById('cargando-modal');
+                                    if (cargandoDiv) cargandoDiv.remove();
                                 });
                             });
                         }
@@ -261,6 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         const btn = this.querySelector('button[type=submit]');
         btn.disabled = true;
+        btn.textContent = 'Procesando...';
         fetch("{{ route('gestor-recargas.titularidad.cambiar') }}", {
             method: 'POST',
             headers: {
@@ -273,11 +265,23 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             let msg = '';
             if(data.success) {
-                msg = `<div class='alert alert-success'>${data.message}</div>`;
-                setTimeout(() => window.location.reload(), 1500);
+                // Mostrar modal informativo con nueva titularidad y saldo transferido
+                var modalCambio = bootstrap.Modal.getInstance(document.getElementById('modalCambioTitularidad'));
+                if (modalCambio) modalCambio.hide();
+                let infoHtml = `<div class='alert alert-success'>${data.message}</div>`;
+                if(data.nueva_titularidad) {
+                    infoHtml += `<div class='card p-3 mt-2'><b>Nueva tarjeta asignada:</b> ${data.nueva_titularidad.id_tarjeta}<br><b>Fecha inicio:</b> ${data.nueva_titularidad.fecha_inicio ?? ''}</div>`;
+                }
+                if(data.saldo_transferido !== undefined) {
+                    infoHtml += `<div class='card p-3 mt-2'><b>Saldo transferido:</b> $${data.saldo_transferido}</div>`;
+                }
+                document.getElementById('info-titularidad-body').innerHTML = infoHtml;
+                var modalInfo = new bootstrap.Modal(document.getElementById('modalInfoTitularidad'));
+                modalInfo.show();
             } else {
                 msg = `<div class='alert alert-danger'>${data.message}</div>`;
                 btn.disabled = false;
+                btn.textContent = 'Confirmar cambio';
             }
             document.getElementById('modal-cambio-mensaje').innerHTML = msg;
         });
@@ -285,29 +289,62 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function startCooldown(msgHtml) {
         const mensaje = document.getElementById('modal-cambio-mensaje');
+        const btnEnviarCodigo = document.getElementById('btn-enviar-codigo');
         if (cooldownInterval) clearInterval(cooldownInterval);
-        // Forzar cooldown a máximo 60 y mínimo 0
         cooldown = Math.max(0, Math.min(60, cooldown));
-        if (cooldown === 0) {
-            mensaje.innerHTML = '';
-            return;
-        }
-        mensaje.innerHTML = `<div class='alert alert-warning mt-2'>Puedes reenviar el código en <span id='cooldown-timer'></span></div>`;
         function renderCooldown() {
-            // Siempre mostrar solo segundos
-            let display = `${cooldown}s`;
-            document.getElementById('cooldown-timer').textContent = display;
+            if (cooldown > 0) {
+                mensaje.innerHTML = `<div class='alert alert-warning mt-2'>Puedes reenviar el código en <span id='cooldown-timer'></span></div>`;
+                btnEnviarCodigo.disabled = true;
+                document.getElementById('cooldown-timer').textContent = `${cooldown}s`;
+            } else {
+                mensaje.innerHTML = '';
+                btnEnviarCodigo.disabled = false;
+            }
         }
         renderCooldown();
-        cooldownInterval = setInterval(() => {
-            cooldown--;
-            renderCooldown();
-            if (cooldown <= 0) {
-                clearInterval(cooldownInterval);
-                mensaje.innerHTML = '';
-            }
-        }, 1000);
+        if (cooldown > 0) {
+            cooldownInterval = setInterval(() => {
+                cooldown--;
+                renderCooldown();
+                if (cooldown <= 0) {
+                    clearInterval(cooldownInterval);
+                    renderCooldown();
+                }
+            }, 1000);
+        }
     }
+
+    // Evento para enviar código manualmente
+    document.getElementById('btn-enviar-codigo').addEventListener('click', function() {
+        const doc_usuario = document.getElementById('modal-doc-usuario').value;
+        const id_tarjeta = document.getElementById('modal-id-tarjeta').value;
+        const correo_usuario = document.getElementById('modal-correo-usuario').value;
+        this.disabled = true;
+        document.getElementById('modal-cambio-mensaje').innerHTML = `<span class='text-info'>Enviando código...</span>`;
+        fetch("{{ route('gestor-recargas.titularidad.enviar-codigo') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value
+            },
+            body: JSON.stringify({ doc_usuario, id_tarjeta, correo: correo_usuario })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                cooldown = 60;
+                startCooldown(`<div class='alert alert-success'>${data.message}</div>`);
+                document.getElementById('codigo_verificacion').disabled = false;
+                document.getElementById('btn-confirmar-cambio').disabled = false;
+            } else if(data.wait) {
+                cooldown = data.wait;
+                startCooldown(`<div class='alert alert-danger'>${data.message}</div>`);
+            } else {
+                document.getElementById('modal-cambio-mensaje').innerHTML = `<div class='alert alert-danger'>${data.message}</div>`;
+            }
+        });
+    });
 });
 </script>
 @endpush

@@ -5,9 +5,10 @@ use App\Http\Controllers\GestorRecargas\GestorRecargaController;
 use App\Http\Controllers\GestorRecargas\TitularidadTarjetaController;
 
 
-// Dashboard solo para ADMIN RECARGAS (rol 10)
+// Dashboard y módulos para ADMIN RECARGAS (rol 10)
 Route::middleware(['auth:web', 'role:10', 'CheckNit'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
     Route::get('/dashboard', [GestorRecargaController::class, 'dashboard'])->name('dashboard');
+    Route::get('/historial', [GestorRecargaController::class, 'historial'])->name('historial');
 });
 
 // Resto de módulos solo para GESTOR DE RECARGAS (rol 8)

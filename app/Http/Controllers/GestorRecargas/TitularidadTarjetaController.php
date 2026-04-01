@@ -73,34 +73,49 @@ class TitularidadTarjetaController extends Controller
         if (!$usuario) {
             return response()->json(['success' => false, 'message' => 'Usuario no encontrado.']);
         }
-        $cooldown = 60; // segundos
-        $lastSent = session('codigo_verificacion_last_sent_' . $doc_usuario);
-        if ($lastSent && now()->diffInSeconds($lastSent) < $cooldown) {
-            $wait = $cooldown - now()->diffInSeconds($lastSent);
-            $wait = max(0, min($cooldown, ceil($wait)));
-            return response()->json([
-                'success' => false,
-                'message' => "Debes esperar $wait segundos para reenviar el código.",
-                'wait' => $wait,
-                'cooldown_active' => true
+            $cooldown = 60; // segundos
+            \Log::info('Sesión antes de validar cooldown', [
+                'last_sent' => session('codigo_verificacion_last_sent_' . $doc_usuario),
+                'codigo' => session('codigo_verificacion_' . $doc_usuario)
             ]);
-        }
+            $lastSent = session('codigo_verificacion_last_sent_' . $doc_usuario);
+            if ($lastSent && now()->diffInSeconds($lastSent) < $cooldown) {
+                $wait = $cooldown - now()->diffInSeconds($lastSent);
+                $wait = max(0, min($cooldown, ceil($wait)));
+                \Log::info('Cooldown activo', [
+                    'wait' => $wait,
+                    'last_sent' => $lastSent,
+                    'now' => now()
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => "Debes esperar $wait segundos para reenviar el código.",
+                    'wait' => $wait,
+                    'cooldown_active' => true
+                ]);
+            }
         // Generar código aleatorio de 6 dígitos
         $codigo = random_int(100000, 999999);
         // Guardar código, timestamp y resetear intentos
-        session([
-            'codigo_verificacion_' . $doc_usuario => $codigo,
-            'codigo_verificacion_last_sent_' . $doc_usuario => now(),
-            'codigo_verificacion_intentos_' . $doc_usuario => 0,
-            'codigo_verificacion_expira_' . $doc_usuario => now()->addMinutes(10),
-        ]);
-        // Enviar correo
+            session([
+                'codigo_verificacion_' . $doc_usuario => $codigo,
+                'codigo_verificacion_last_sent_' . $doc_usuario => now(),
+                'codigo_verificacion_intentos_' . $doc_usuario => 0,
+                'codigo_verificacion_expira_' . $doc_usuario => now()->addMinutes(10),
+            ]);
+            \Log::info('Sesión después de guardar código', [
+                'codigo' => session('codigo_verificacion_' . $doc_usuario),
+                'last_sent' => session('codigo_verificacion_last_sent_' . $doc_usuario),
+            ]);
+            \Log::info('Intentando enviar correo a: ' . $usuario->correo);
         try {
             Mail::raw("Su código de verificación para cambio de tarjeta es: $codigo", function($message) use ($usuario) {
                 $message->to($usuario->correo)->subject('Código de verificación - Cambio de Tarjeta');
             });
+            \Log::info('Correo enviado correctamente a: ' . $usuario->correo);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'No se pudo enviar el correo.']);
+            \Log::error('Error al enviar correo: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => 'No se pudo enviar el correo: ' . $e->getMessage()]);
         }
         return response()->json(['success' => true, 'message' => 'Código enviado al correo del usuario.', 'wait' => $cooldown, 'cooldown_active' => false]);
     }
