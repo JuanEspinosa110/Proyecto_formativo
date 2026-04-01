@@ -16,12 +16,23 @@ class DashboardController extends Controller
 
         // Buses activos de la empresa del controlador
         $totalBuses     = Bus::where('NIT', $user->NIT)->count();
-        $busesEnRuta    = Bus::where('NIT', $user->NIT)->where('id_estado', 1)->count();
-        $busesInactivos = Bus::where('NIT', $user->NIT)->where('id_estado', '!=', 1)->count();
+        
+        // Buses que tienen viajes programados o en curso para HOY
+        $busesEnRuta = Bus::where('NIT', $user->NIT)
+            ->whereHas('viajes', function($q) {
+                $q->whereDate('fecha', \Carbon\Carbon::today());
+            })
+            ->count();
 
-        $asignaciones = Asignacion::with(['bus', 'usuario', 'ruta'])
+        $busesInactivos = Bus::where('NIT', $user->NIT)
+            ->whereDoesntHave('viajes', function($q) {
+                $q->whereDate('fecha', \Carbon\Carbon::today());
+            })
+            ->count();
+
+        $asignaciones = \App\Models\Viaje::with(['bus', 'conductor', 'ruta.barrioOrigen', 'ruta.barrioDestino'])
             ->whereHas('bus', fn($q) => $q->where('NIT', $user->NIT))
-            ->orderBy('id_asignacion', 'desc')
+            ->orderBy('id_viaje', 'desc')
             ->take(10)
             ->get();
 

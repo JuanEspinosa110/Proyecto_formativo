@@ -83,4 +83,12 @@ class Viaje extends Model
     {
         return $this->hasMany(VentaViaje::class, 'id_viaje', 'id_viaje');
     }
+
+    /**
+     * Relación con los recorridos del viaje.
+     */
+    public function recorridos()
+    {
+        return $this->hasMany(Recorrido::class, 'id_viaje', 'id_viaje');
+    }
 }

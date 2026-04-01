@@ -21,10 +21,19 @@
   top: 0;
   bottom: 0;
   left: 0;
-  padding: 1rem 0;
+  padding: 0; /* Changed from 1rem 0 to handle inner flex */
   box-shadow: 2px 6px 18px rgba(31,36,48,0.06);
   border-right: 1px solid rgba(45,52,73,0.06);
   z-index: 50;
+  overflow-y: auto; /* Ensure scrollability on short screens */
+  scrollbar-width: thin;
+}
+
+.sigu-admin-layout .sigu-sidebar .sigu-sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 1rem 0;
 }
 
 .sigu-admin-layout .sigu-sidebar .sigu-brand {
@@ -120,6 +129,27 @@
 /* Botones coherentes con paleta */
 .sigu-admin-layout .btn-primary{ background: var(--accent); border-color: transparent; color: #fff; box-shadow: 0 8px 20px rgba(106,76,197,0.12); }
 .sigu-admin-layout .btn-outline-primary{ border-color: rgba(106,76,197,0.16); color: var(--accent); }
+
+/* Ghost button for Admin - commonly used for Logout */
+.sigu-admin-layout .sigu-btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-2);
+  opacity: 0.8;
+  transition: all .2s ease;
+  width: 100%;
+  justify-content: flex-start;
+  padding-left: 1.25rem;
+}
+.sigu-admin-layout .sigu-btn-ghost:hover {
+  background: rgba(45,52,73,0.05);
+  color: var(--err);
+  opacity: 1;
+  transform: translateX(2px);
+}
+.sigu-admin-layout .sigu-btn-ghost span {
+  font-size: 1.1rem;
+}
 
 /* Separación específica para el form de filtro en la lista de usuarios */
 .sigu-admin-layout .admin-filter { margin-bottom: 1.75rem; }
@@ -219,7 +249,15 @@
 
 /* Responsive */
 @media (max-width: 992px) {
-  .sigu-admin-layout .sigu-sidebar { position: relative; width: 100%; height: auto; box-shadow:none }
+  .sigu-admin-layout .sigu-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    max-height: 400px; /* Limit height on mobile so user doesn't have to scroll too much */
+    box-shadow: none;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .sigu-admin-layout .sigu-sidebar .sigu-sidebar-inner { min-height: auto; }
   .sigu-admin-layout .sigu-main-with-sidebar { margin-left: 0; padding: 1rem }
   .sigu-admin-layout .sigu-footer { padding-left: 1.5rem; }
 }
