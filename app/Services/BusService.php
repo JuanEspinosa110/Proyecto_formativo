@@ -108,7 +108,7 @@ class BusService
             ->first();
 
         // Obtener documentos del vehículo
-        $documentos = Documento::where('placa', $placa)
+        $documentos = \App\Models\Documento::where('placa', $placa)
             ->with(['tipoDocumento', 'estado'])
             ->get()
             ->map(function($doc) {

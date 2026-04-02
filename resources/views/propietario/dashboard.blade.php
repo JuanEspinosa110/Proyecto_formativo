@@ -843,15 +843,18 @@
                                                 };
                                             @endphp
                                             <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch active"
+                                                data-periodo="hoy"
                                                 data-amount="{{ number_format($gananciasHoy ?? 0) }}" 
                                                 data-display="{{ $fH($gananciasHoy ?? 0) }}"
                                                 data-label="Ingresos de Hoy"
                                                 onclick="switchEarnings(this)">Hoy</button>
                                             <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch"
+                                                data-periodo="semana"
                                                 data-amount="{{ number_format($gananciasSemana ?? 0) }}"
                                                 data-display="{{ $fH($gananciasSemana ?? 0) }}"
                                                 data-label="Ingresos de la Semana" onclick="switchEarnings(this)">Semana</button>
                                             <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch"
+                                                data-periodo="mes"
                                                 data-amount="{{ number_format($gananciasMes ?? 0) }}" 
                                                 data-display="{{ $fH($gananciasMes ?? 0) }}"
                                                 data-label="Ingresos del Mes"
@@ -918,25 +921,32 @@
                 </h6>
                 <div class="row g-3 mb-4">
                     @forelse($ingresosPorBus as $bus)
-                        <div class="col-md-4">
+                        <div class="col-md-4 bus-earnings-card" 
+                            data-hoy-ingresos="{{ number_format($bus->hoy_ingresos) }}"
+                            data-hoy-pasajeros="{{ number_format($bus->hoy_pasajeros) }}"
+                            data-semana-ingresos="{{ number_format($bus->semana_ingresos) }}"
+                            data-semana-pasajeros="{{ number_format($bus->semana_pasajeros) }}"
+                            data-mes-ingresos="{{ number_format($bus->mes_ingresos) }}"
+                            data-mes-pasajeros="{{ number_format($bus->mes_pasajeros) }}">
                             <div class="card border-0 shadow-sm rounded-4 p-3 bg-white hover-lift">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <span
                                         class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 rounded-pill fw-bold">{{ $bus->placa }}</span>
                                     <div class="d-flex align-items-center gap-1 text-muted small">
                                         <span class="material-symbols-rounded fs-6">groups</span>
-                                        <span>{{ number_format($bus->total_pasajeros) }} Pax</span>
+                                        <span class="pax-count">{{ number_format($bus->hoy_pasajeros) }} Pax</span>
                                     </div>
                                 </div>
                                 <div class="mt-3 text-center container-card">
                                     <span class="text-muted x-small text-uppercase fw-bold d-block">Ganancia Acumulada</span>
                                     @php
-                                        $valB = $bus->total_ingresos;
+                                        // Por defecto mostramos Hoy
+                                        $valB = $bus->hoy_ingresos;
                                         $dispB = '$' . number_format($valB);
                                         if ($valB >= 1000000) $dispB = '$' . number_format($valB / 1000000, 1) . 'M';
                                         elseif ($valB >= 100000) $dispB = '$' . number_format($valB / 1000, 0) . 'K';
                                     @endphp
-                                    <h3 class="fw-black mb-0 text-success adaptive-number" title="${{ number_format($valB) }}">{{ $dispB }}</h3>
+                                    <h3 class="fw-black mb-0 text-success adaptive-number income-amount" title="${{ number_format($valB) }}">{{ $dispB }}</h3>
                                 </div>
                             </div>
                         </div>
@@ -1854,14 +1864,57 @@
                     container.querySelectorAll('.btn-switch').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
 
+                    const periodo = btn.getAttribute('data-periodo'); // hoy, semana, mes
                     const amount = btn.getAttribute('data-amount');
                     const display = btn.getAttribute('data-display');
                     const label = btn.getAttribute('data-label');
 
+                    // 1. Actualizar Tarjeta Principal
                     const amountEl = document.getElementById('earnings_amount');
-                    amountEl.innerText = display;
-                    amountEl.title = '$' + amount;
-                    document.getElementById('earnings_label').innerText = label;
+                    if (amountEl) {
+                        amountEl.innerText = display;
+                        amountEl.title = '$' + amount;
+                    }
+                    const labelEl = document.getElementById('earnings_label');
+                    if (labelEl) labelEl.innerText = label;
+
+                    // 2. Actualizar Tarjetas de Buses (Sincrónico)
+                    document.querySelectorAll('.bus-earnings-card').forEach(card => {
+                        const inc = card.getAttribute(`data-${periodo}-ingresos`);
+                        const pax = card.getAttribute(`data-${periodo}-pasajeros`);
+                        
+                        const incEl = card.querySelector('.income-amount');
+                        const paxEl = card.querySelector('.pax-count');
+                        
+                        if (incEl) {
+                            // Formateo corto ($1.2M, $450K, $5,000)
+                            const val = parseInt(inc.replace(/,/g, ''));
+                            let disp = '$' + inc;
+                            if (val >= 1000000) disp = '$' + (val / 1000000).toFixed(1) + 'M';
+                            else if (val >= 100000) disp = '$' + Math.round(val / 1000) + 'K';
+                            
+                            incEl.innerText = disp;
+                            incEl.title = '$' + inc;
+                        }
+                        if (paxEl) paxEl.innerText = pax + ' Pax';
+                    });
+
+                    // 3. Recargar Tabla de Trayectos (AJAX)
+                    const tableContainer = document.getElementById('ganancias-table-container');
+                    if (tableContainer) {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('periodo', periodo);
+                        url.searchParams.set('section', 'ganancias');
+                        url.searchParams.delete('page_gan'); // Reset a pág 1 al cambiar periodo
+
+                        tableContainer.style.opacity = '0.5';
+                        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                            .then(r => r.text())
+                            .then(html => {
+                                tableContainer.innerHTML = html;
+                                tableContainer.style.opacity = '1';
+                            });
+                    }
                 };
 
                 // 7. Paginación AJAX para la Tabla de Ganancias

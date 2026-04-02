@@ -26,7 +26,7 @@ class UsuarioController extends Controller
         }
 
         $roles = DB::table('tipo_usuario')
-            ->whereIn('id_tipo_usuario', [1, 3, 4, 5, 7, 8]) // Solo roles de empresa
+            ->whereIn('id_tipo_usuario', [1, 3, 4, 5, 7]) // Solo roles de empresa (Coordinador Bus 7)
             ->orderBy('id_tipo_usuario')
             ->when($user->id_tipo_usuario != 1, function ($q) {
                 $q->where(function($sub) {
@@ -41,6 +41,7 @@ class UsuarioController extends Controller
             ->leftJoin('ciudad', 'usuario.id_ciudad', '=', 'ciudad.id_ciudad')
             ->leftJoin('tipo_usuario', 'usuario.id_tipo_usuario', '=', 'tipo_usuario.id_tipo_usuario')
             ->where('usuario.NIT', $nit)
+            ->where('usuario.id_tipo_usuario', '!=', 8) // El admin no debe manejar este rol
             ->select('usuario.*', 'estado.nombre_estado', 'ciudad.nombre_city', 'tipo_usuario.nombre_tipo');
 
         if ($user->id_tipo_usuario != 1) {

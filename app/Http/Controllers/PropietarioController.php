@@ -94,21 +94,40 @@ class PropietarioController extends Controller
             // Si hay un mes seleccionado diferente al actual, 'gananciasMes' mostrará ese mes.
             $gananciasMes = $ingresosTotales;
 
-            // 3. Ingresos individuales por bus (Filtrados por mes)
+            // 3. Ingresos individuales por bus (Filtrados por los 3 periodos: Hoy, Semana, Mes)
             $viajesTotalesBus = \App\Models\Viaje::whereIn('placa', $busIds)
-                ->withCount(['ventas as total_pasajeros' => function($q) use ($year, $month) {
+                // Mes Actual (o seleccionado)
+                ->withCount(['ventas as count_mes' => function($q) use ($year, $month) {
                     $q->whereYear('fecha', $year)->whereMonth('fecha', $month);
                 }])
-                ->withSum(['ventas as total_ingresos' => function($q) use ($year, $month) {
+                ->withSum(['ventas as sum_mes' => function($q) use ($year, $month) {
                     $q->whereYear('fecha', $year)->whereMonth('fecha', $month);
+                }], 'valor')
+                // Hoy
+                ->withCount(['ventas as count_hoy' => function($q) use ($hoy) {
+                    $q->whereDate('fecha', $hoy);
+                }])
+                ->withSum(['ventas as sum_hoy' => function($q) use ($hoy) {
+                    $q->whereDate('fecha', $hoy);
+                }], 'valor')
+                // Semana
+                ->withCount(['ventas as count_semana' => function($q) use ($semana) {
+                    $q->where('fecha', '>=', $semana);
+                }])
+                ->withSum(['ventas as sum_semana' => function($q) use ($semana) {
+                    $q->where('fecha', '>=', $semana);
                 }], 'valor')
                 ->get();
                 
             $ingresosPorBus = $viajesTotalesBus->groupBy('placa')->map(function ($viajes, $placa) {
                 return (object)[
                     'placa' => $placa,
-                    'total_ingresos' => $viajes->sum('total_ingresos') ?? 0,
-                    'total_pasajeros' => $viajes->sum('total_pasajeros') ?? 0
+                    'mes_ingresos' => $viajes->sum('sum_mes') ?? 0,
+                    'mes_pasajeros' => $viajes->sum('count_mes') ?? 0,
+                    'hoy_ingresos' => $viajes->sum('sum_hoy') ?? 0,
+                    'hoy_pasajeros' => $viajes->sum('count_hoy') ?? 0,
+                    'semana_ingresos' => $viajes->sum('sum_semana') ?? 0,
+                    'semana_pasajeros' => $viajes->sum('count_semana') ?? 0,
                 ];
             })->values();
 
@@ -166,6 +185,14 @@ class PropietarioController extends Controller
         
         if ($mesFiltro) {
              $queryGanancias->whereYear('fecha', $year)->whereMonth('fecha', $month);
+        }
+
+        // Si es AJAX y viene periodo, sobreescribimos filtros de tiempo
+        if ($request->ajax() && $request->filled('periodo')) {
+            $periodo = $request->periodo;
+            if ($periodo == 'hoy') $queryGanancias->whereDate('fecha', $hoy);
+            elseif ($periodo == 'semana') $queryGanancias->where('fecha', '>=', $semana);
+            elseif ($periodo == 'mes') $queryGanancias->whereYear('fecha', $year)->whereMonth('fecha', $month);
         }
 
         $asignacionesGanancias = $queryGanancias->orderBy('fecha', 'desc')

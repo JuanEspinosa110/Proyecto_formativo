@@ -62,7 +62,7 @@ class Usuario extends Authenticatable
                     'admin' => 1,
                     'operador' => 4,
                     'usuario' => 3,
-                    'controlador_tiempo' => 7,
+                    'coordinador_bus' => 7,
                     'gestor_recargas' => 8,
                     default => 1
                 };

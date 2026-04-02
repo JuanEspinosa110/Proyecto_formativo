@@ -24,6 +24,7 @@ class SuperAdministradorSeeder extends Seeder
                 'foto_perfil' => null,
                 'password' => Hash::make('Juanes110*'),
                 'id_estado' => 1,
+                'id_ciudad' => '730001',
             ]
         );
         // Ejemplo de otro superadministrador
@@ -38,6 +39,7 @@ class SuperAdministradorSeeder extends Seeder
                 'foto_perfil' => null,
                 'password' => Hash::make('Luis2801.'),
                 'id_estado' => 1,
+                'id_ciudad' => '730001',
             ]
         );
 
@@ -52,6 +54,7 @@ class SuperAdministradorSeeder extends Seeder
                 'foto_perfil' => null,
                 'password' => Hash::make('Derly3107.'),
                 'id_estado' => 1,
+                'id_ciudad' => '730001',
             ]
         );
 
@@ -67,6 +70,7 @@ class SuperAdministradorSeeder extends Seeder
                 'foto_perfil' => null,
                 'password' => Hash::make('Qwerty2026-$'),
                 'id_estado' => 1,
+                'id_ciudad' => '730001',
             ]
         );
     }
