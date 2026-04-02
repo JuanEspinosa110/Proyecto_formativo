@@ -25,7 +25,7 @@
     </div>
 
         <!-- Modal para cambio de titularidad -->
-        <div class="modal fade" id="modalCambioTitularidad" tabindex="-1" aria-labelledby="modalCambioTitularidadLabel" aria-hidden="true">
+        <div class="modal fade" id="modalCambioTitularidad" tabindex="-1" data-bs-backdrop="true" data-bs-keyboard="true" aria-labelledby="modalCambioTitularidadLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -38,13 +38,26 @@
                                 <input type="hidden" id="modal-id-tarjeta" name="id_tarjeta">
                                 <input type="hidden" id="modal-correo-usuario" name="correo_usuario">
                                 <div class="mb-3">
-                                    <label for="codigo_verificacion" class="form-label">Código de verificación (enviado al correo del usuario)</label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="codigo_verificacion" name="codigo_verificacion" required disabled>
-                                        <button type="button" class="btn btn-outline-primary" id="btn-enviar-codigo">Enviar código</button>
+                                    <label for="codigo_verificacion" class="form-label fw-bold">Código de verificación <span class="fw-normal text-muted">(Haz clic en "Enviar código" para recibirlo)</span></label>
+                                    <input type="text" 
+                                           class="form-control form-control-lg text-center letter-spacing-2" 
+                                           id="codigo_verificacion" 
+                                           name="codigo_verificacion" 
+                                           placeholder="Ej: 123456" 
+                                           maxlength="6" 
+                                           minlength="6" 
+                                           pattern="\d{6}" 
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6); document.getElementById('btn-confirmar-cambio').disabled = this.value.length !== 6;" 
+                                           required>
+                                    <div class="mt-2 text-end">
+                                        <button type="button" class="btn btn-outline-primary btn-sm" id="btn-enviar-codigo">
+                                            <i class="bi bi-envelope"></i> Enviar código
+                                        </button>
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-success" id="btn-confirmar-cambio" disabled>Confirmar cambio</button>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-success" id="btn-confirmar-cambio" disabled>Confirmar cambio</button>
+                                </div>
                         </form>
                         <div id="modal-cambio-mensaje" class="mt-2"></div>
                         <div id="modal-reenviar-codigo" class="mt-2"></div>
@@ -183,11 +196,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                     document.getElementById('modal-doc-usuario').value = usuarioActual.doc_usuario;
                                     document.getElementById('modal-id-tarjeta').value = idTarjeta;
                                     document.getElementById('modal-correo-usuario').value = correoUsuario;
-                                    var modal = new bootstrap.Modal(document.getElementById('modalCambioTitularidad'));
+                                    var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCambioTitularidad'));
                                     modal.show();
-                                    // Habilitar botón enviar código y deshabilitar campo código y confirmar
+                                    // Habilitar botón enviar código y limpiar campo
                                     document.getElementById('btn-enviar-codigo').disabled = false;
-                                    document.getElementById('codigo_verificacion').disabled = true;
+                                    document.getElementById('codigo_verificacion').value = '';
+                                    document.getElementById('codigo_verificacion').disabled = false;
                                     document.getElementById('btn-confirmar-cambio').disabled = true;
                                     if (cooldownInterval) clearInterval(cooldownInterval);
                                     document.getElementById('modal-cambio-mensaje').innerHTML = '';
@@ -228,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                             document.getElementById('modal-doc-usuario').value = usuarioActual.doc_usuario;
                             document.getElementById('modal-id-tarjeta').value = idTarjeta;
-                            var modal = new bootstrap.Modal(document.getElementById('modalCambioTitularidad'));
+                            var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCambioTitularidad'));
                             modal.show();
                         });
                     });
@@ -236,7 +250,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(() => {
-            resultado.innerHTML = '<div class="alert alert-danger">Error en la búsqueda.</div>';
+            const cargandoDiv = document.getElementById('cargando-modal');
+            if (cargandoDiv) cargandoDiv.remove();
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            document.getElementById('tarjetas-cambio-contenedor').innerHTML += '<div class="alert alert-danger mt-2">Error de red en la búsqueda del usuario.</div>';
         });
     });
 
@@ -250,6 +268,11 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('modal-cambio-mensaje').innerHTML = `<div class='alert alert-danger'>Todos los campos son obligatorios.</div>`;
             return;
         }
+        // Validación frontend: exactamente 6 dígitos numéricos
+        if (!/^\d{6}$/.test(codigo)) {
+            document.getElementById('modal-cambio-mensaje').innerHTML = `<div class='alert alert-danger'>El código debe tener exactamente 6 dígitos numéricos.</div>`;
+            return;
+        }
         const btn = this.querySelector('button[type=submit]');
         btn.disabled = true;
         btn.textContent = 'Procesando...';
@@ -261,29 +284,41 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({ doc_usuario, id_tarjeta, codigo_verificacion: codigo })
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok && res.status === 422) {
+                return res.json().then(errData => { throw errData; });
+            }
+            return res.json();
+        })
         .then(data => {
-            let msg = '';
             if(data.success) {
                 // Mostrar modal informativo con nueva titularidad y saldo transferido
-                var modalCambio = bootstrap.Modal.getInstance(document.getElementById('modalCambioTitularidad'));
+                var modalCambioEl = document.getElementById('modalCambioTitularidad');
+                var modalCambio = bootstrap.Modal.getInstance(modalCambioEl);
                 if (modalCambio) modalCambio.hide();
                 let infoHtml = `<div class='alert alert-success'>${data.message}</div>`;
                 if(data.nueva_titularidad) {
-                    infoHtml += `<div class='card p-3 mt-2'><b>Nueva tarjeta asignada:</b> ${data.nueva_titularidad.id_tarjeta}<br><b>Fecha inicio:</b> ${data.nueva_titularidad.fecha_inicio ?? ''}</div>`;
+                    infoHtml += `<div class='card p-3 mt-2'><b>Nueva tarjeta asignada:</b> ${data.nueva_titularidad.id_tarjeta}<br><b>Fecha inicio:</b> ${data.nueva_titularidad.fecha_inicio || ''}</div>`;
                 }
                 if(data.saldo_transferido !== undefined) {
                     infoHtml += `<div class='card p-3 mt-2'><b>Saldo transferido:</b> $${data.saldo_transferido}</div>`;
                 }
                 document.getElementById('info-titularidad-body').innerHTML = infoHtml;
-                var modalInfo = new bootstrap.Modal(document.getElementById('modalInfoTitularidad'));
+                var modalInfo = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalInfoTitularidad'));
                 modalInfo.show();
             } else {
-                msg = `<div class='alert alert-danger'>${data.message}</div>`;
+                document.getElementById('modal-cambio-mensaje').innerHTML = `<div class='alert alert-danger'>${data.message}</div>`;
                 btn.disabled = false;
                 btn.textContent = 'Confirmar cambio';
             }
-            document.getElementById('modal-cambio-mensaje').innerHTML = msg;
+        })
+        .catch(err => {
+            let errorMsg = 'Ha ocurrido un error inesperado. Intenta de nuevo.';
+            if (err && err.message) errorMsg = err.message;
+            if (err && err.errors) errorMsg = Object.values(err.errors).flat().join(', ');
+            document.getElementById('modal-cambio-mensaje').innerHTML = `<div class='alert alert-danger'>${errorMsg}</div>`;
+            btn.disabled = false;
+            btn.textContent = 'Confirmar cambio';
         });
     });
 
@@ -335,15 +370,38 @@ document.addEventListener('DOMContentLoaded', function() {
             if(data.success) {
                 cooldown = 60;
                 startCooldown(`<div class='alert alert-success'>${data.message}</div>`);
-                document.getElementById('codigo_verificacion').disabled = false;
-                document.getElementById('btn-confirmar-cambio').disabled = false;
             } else if(data.wait) {
                 cooldown = data.wait;
                 startCooldown(`<div class='alert alert-danger'>${data.message}</div>`);
             } else {
                 document.getElementById('modal-cambio-mensaje').innerHTML = `<div class='alert alert-danger'>${data.message}</div>`;
+                document.getElementById('btn-enviar-codigo').disabled = false;
             }
+        })
+        .catch(err => {
+            console.error('Fetch error:', err);
+            document.getElementById('modal-cambio-mensaje').innerHTML = `<div class='alert alert-danger'>Error de comunicación con el servidor. Por favor, revisa la consola o recarga la página.</div>`;
+            document.getElementById('btn-enviar-codigo').disabled = false;
         });
+    });
+
+    // Limpiar backdrop y estado cuando se cierra cualquier modal
+    document.getElementById('modalCambioTitularidad').addEventListener('hidden.bs.modal', function () {
+        // Eliminar backdrops huérfanos
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+        // Limpiar mensajes y resetear estado del formulario
+        document.getElementById('modal-cambio-mensaje').innerHTML = '';
+        document.getElementById('modal-reenviar-codigo').innerHTML = '';
+    });
+
+    document.getElementById('modalInfoTitularidad').addEventListener('hidden.bs.modal', function () {
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
     });
 });
 </script>

@@ -110,7 +110,7 @@ class TitularidadTarjetaController extends Controller
             \Log::info('Intentando enviar correo a: ' . $usuario->correo);
         try {
             Mail::raw("Su código de verificación para cambio de tarjeta es: $codigo", function($message) use ($usuario) {
-                $message->to($usuario->correo)->subject('Código de verificación - Cambio de Tarjeta');
+                $message->to($usuario->correo)->subject('Código de verificación - Cambio de Tarjeta ' . time());
             });
             \Log::info('Correo enviado correctamente a: ' . $usuario->correo);
         } catch (\Exception $e) {
@@ -158,6 +158,10 @@ class TitularidadTarjetaController extends Controller
         if (!$id_tarjeta || !$codigo) {
             return response()->json(['success' => false, 'message' => 'Todos los campos son obligatorios.']);
         }
+
+        if (!preg_match('/^\d{6}$/', $codigo)) {
+            return response()->json(['success' => false, 'message' => 'El código debe tener exactamente 6 dígitos numéricos.']);
+        }
         // Validar código y expiración
         $codigo_guardado = session('codigo_verificacion_' . $doc_usuario);
         $expira = session('codigo_verificacion_expira_' . $doc_usuario);
@@ -192,10 +196,10 @@ class TitularidadTarjetaController extends Controller
             $titularidad_anterior->fecha_fin = now();
             $titularidad_anterior->motivo_cambio = 'Cambio de tarjeta por gestión';
             $titularidad_anterior->save();
-            // Poner la tarjeta anterior en INACTIVO
+            // Poner la tarjeta anterior en SUSPENDIDO
             $tarjeta_anterior = \App\Models\Tarjeta::find($titularidad_anterior->id_tarjeta);
             if ($tarjeta_anterior) {
-                $tarjeta_anterior->id_estado = 2; // INACTIVO
+                $tarjeta_anterior->id_estado = 3; // SUSPENDIDA
                 $tarjeta_anterior->save();
             }
         }
@@ -209,12 +213,14 @@ class TitularidadTarjetaController extends Controller
         $nueva->save();
         // Activar tarjeta
         $tarjeta = \App\Models\Tarjeta::find($id_tarjeta);
+        $saldo_transferido = 0;
         if ($tarjeta) {
             $tarjeta->id_estado = 1; // ACTIVO
             // Traspasar saldo si había tarjeta anterior
             if ($titularidad_anterior) {
                 $tarjeta_anterior = \App\Models\Tarjeta::find($titularidad_anterior->id_tarjeta);
                 if ($tarjeta_anterior && $tarjeta_anterior->saldo > 0) {
+                    $saldo_transferido = $tarjeta_anterior->saldo;
                     $tarjeta->saldo += $tarjeta_anterior->saldo;
                     $tarjeta_anterior->saldo = 0;
                     $tarjeta_anterior->save();
@@ -229,90 +235,19 @@ class TitularidadTarjetaController extends Controller
             'codigo_verificacion_intentos_' . $doc_usuario,
             'codigo_verificacion_expira_' . $doc_usuario,
         ]);
-        return response()->json(['success' => true, 'message' => 'Cambio de titularidad realizado correctamente.']);
-    }
 
-    /**
-     * Cambia la tarjeta activa de un usuario, validando el código y transfiriendo el saldo.
-     */
-    public function cambiar(Request $request)
-    {
-        $request->validate([
-            'doc_usuario' => 'required',
-            'id_tarjeta' => 'required|exists:tarjetas,id_tarjeta',
-            'codigo_verificacion' => 'required|string',
+        return response()->json([
+            'success' => true, 
+            'message' => 'Cambio de titularidad realizado correctamente.',
+            'nueva_titularidad' => [
+                'id_tarjeta' => $nueva->id_tarjeta,
+                'fecha_inicio' => $nueva->fecha_inicio ? $nueva->fecha_inicio->format('Y-m-d H:i:s') : now()->format('Y-m-d H:i:s')
+            ],
+            'saldo_transferido' => $saldo_transferido
         ]);
-
-        $usuario = Usuario::where('doc_usuario', $request->doc_usuario)->first();
-        if (!$usuario) {
-            return response()->json(['success' => false, 'message' => 'Usuario no encontrado.']);
-        }
-
-        // Obtener la titularidad actual y saldo
-        $titularidadActual = TitularidadTarjeta::where('doc_usuario', $usuario->doc_usuario)
-            ->where('activa', true)->first();
-        if (!$titularidadActual) {
-            return response()->json(['success' => false, 'message' => 'El usuario no tiene tarjeta activa.']);
-        }
-        if ($titularidadActual->id_tarjeta == $request->id_tarjeta) {
-            return response()->json(['success' => false, 'message' => 'Debe seleccionar una tarjeta diferente a la actual.']);
-        }
-        $tarjetaActual = Tarjeta::find($titularidadActual->id_tarjeta);
-        $saldo = $tarjetaActual ? $tarjetaActual->saldo : 0;
-
-        // Validar código de verificación
-        $sessionKey = 'codigo_verificacion_' . $usuario->doc_usuario;
-        $codigoData = session($sessionKey);
-        if (!$codigoData) {
-            return response()->json(['success' => false, 'message' => 'No se ha solicitado código de verificación.']);
-        }
-        if (now()->gt($codigoData['expira'])) {
-            session()->forget($sessionKey);
-            return response()->json(['success' => false, 'message' => 'El código ha expirado. Solicite uno nuevo.']);
-        }
-        if ($codigoData['codigo'] !== $request->codigo_verificacion) {
-            // Incrementar intentos
-            $codigoData['intentos'] = ($codigoData['intentos'] ?? 0) + 1;
-            session([$sessionKey => $codigoData]);
-            if ($codigoData['intentos'] >= 3) {
-                session()->forget($sessionKey);
-                return response()->json(['success' => false, 'message' => 'Demasiados intentos fallidos. Solicite un nuevo código.']);
-            }
-            return response()->json(['success' => false, 'message' => 'Código incorrecto.']);
-        }
-
-        // Verificar que la tarjeta seleccionada esté disponible
-        $tarjetaNueva = Tarjeta::where('id_tarjeta', $request->id_tarjeta)->where('estado', 'disponible')->first();
-        if (!$tarjetaNueva) {
-            return response()->json(['success' => false, 'message' => 'La tarjeta seleccionada no está disponible.']);
-        }
-
-        // Desactivar titularidad y tarjeta actual
-        $titularidadActual->activa = false;
-        $titularidadActual->save();
-        if ($tarjetaActual) {
-            $tarjetaActual->estado = 'disponible';
-            $tarjetaActual->saldo = 0;
-            $tarjetaActual->save();
-        }
-
-        // Asignar nueva titularidad y transferir saldo
-        $titularidadNueva = new TitularidadTarjeta();
-        $titularidadNueva->doc_usuario = $usuario->doc_usuario;
-        $titularidadNueva->id_tarjeta = $tarjetaNueva->id_tarjeta;
-        $titularidadNueva->activa = true;
-        $titularidadNueva->fecha_asignacion = now();
-        $titularidadNueva->save();
-
-        $tarjetaNueva->estado = 'asignada';
-        $tarjetaNueva->saldo = $saldo;
-        $tarjetaNueva->save();
-
-        // Limpiar código de sesión
-        session()->forget($sessionKey);
-
-        return response()->json(['success' => true, 'message' => 'Cambio de tarjeta realizado correctamente. El saldo ha sido transferido.']);
     }
+
+
 
     /**
      * Endpoint temporal para resetear el cooldown del código de verificación (solo pruebas)
