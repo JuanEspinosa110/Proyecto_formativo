@@ -120,10 +120,15 @@ class PropietarioController extends Controller
                 ->get();
                 
             $ingresosPorBus = $viajesTotalesBus->groupBy('placa')->map(function ($viajes, $placa) {
+                $mesIngresos = $viajes->sum('sum_mes') ?? 0;
+                $mesPasajeros = $viajes->sum('count_mes') ?? 0;
+                
                 return (object)[
                     'placa' => $placa,
-                    'mes_ingresos' => $viajes->sum('sum_mes') ?? 0,
-                    'mes_pasajeros' => $viajes->sum('count_mes') ?? 0,
+                    'mes_ingresos' => $mesIngresos,
+                    'mes_pasajeros' => $mesPasajeros,
+                    'total_ingresos' => $mesIngresos, // Alias para compatibilidad con la vista
+                    'total_pasajeros' => $mesPasajeros, // Alias para compatibilidad con la vista
                     'hoy_ingresos' => $viajes->sum('sum_hoy') ?? 0,
                     'hoy_pasajeros' => $viajes->sum('count_hoy') ?? 0,
                     'semana_ingresos' => $viajes->sum('sum_semana') ?? 0,

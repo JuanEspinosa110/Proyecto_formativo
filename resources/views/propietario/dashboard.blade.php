@@ -54,6 +54,7 @@
             </div>
         @endif
 
+
         <!-- 1. SECCIÓN DASHBOARD (GENERAL) -->
         @if(!request()->has('section') || request('section') == 'dashboard')
             <div id="section-dashboard">
@@ -90,8 +91,10 @@
                                     </div>
                                     <div>
                                         <h2 class="fw-black mb-1 text-dark adaptive-number" title="{{ $buses->count() }}">
-                                            {{ $buses->count() }}</h2>
-                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Vehículos Registrados</p>
+                                            {{ $buses->count() }}
+                                        </h2>
+                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Vehículos
+                                            Registrados</p>
                                     </div>
                                 </div>
                             </div>
@@ -106,6 +109,7 @@
                                     line-height: 1.2;
                                     white-space: nowrap;
                                 }
+
                                 .container-card {
                                     container-type: inline-size;
                                 }
@@ -119,13 +123,17 @@
                                         @php
                                             $val = $ingresosTotales;
                                             $display = '$' . number_format($val);
-                                            if ($val >= 1000000000) $display = '$' . number_format($val / 1000000000, 1) . 'B';
-                                            elseif ($val >= 1000000) $display = '$' . number_format($val / 1000000, 1) . 'M';
-                                            elseif ($val >= 100000) $display = '$' . number_format($val / 1000, 0) . 'K';
+                                            if ($val >= 1000000000)
+                                                $display = '$' . number_format($val / 1000000000, 1) . 'B';
+                                            elseif ($val >= 1000000)
+                                                $display = '$' . number_format($val / 1000000, 1) . 'M';
+                                            elseif ($val >= 100000)
+                                                $display = '$' . number_format($val / 1000, 0) . 'K';
                                         @endphp
                                         <h2 class="fw-black mb-1 text-dark adaptive-number"
                                             title="${{ number_format($ingresosTotales) }}">
-                                            {{ $display }}</h2>
+                                            {{ $display }}
+                                        </h2>
                                         <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Ingresos Totales
                                             ({{ $conteoPasajeros }} Pax)</p>
                                     </div>
@@ -143,8 +151,10 @@
                                     </div>
                                     <div>
                                         <h2 class="fw-black mb-1 text-dark adaptive-number" title="{{ $conteoAsignaciones }}">
-                                            {{ $conteoAsignaciones }}</h2>
-                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Viajes Realizados</p>
+                                            {{ $conteoAsignaciones }}
+                                        </h2>
+                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Viajes Realizados
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -160,8 +170,10 @@
                                     </div>
                                     <div>
                                         <h2 class="fw-black mb-1 text-dark adaptive-number" title="{{ $conteoDocumentos }}">
-                                            {{ $conteoDocumentos }}</h2>
-                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Documentos Activos</p>
+                                            {{ $conteoDocumentos }}
+                                        </h2>
+                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Documentos Activos
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -755,156 +767,156 @@
 
         <!-- 6. SECCIÓN GANANCIAS (INGRESOS) -->
         @if(request('section') == 'ganancias')
-                <style>
-                    .hover-lift {
-                        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-                    }
+            <style>
+                .hover-lift {
+                    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+                }
 
-                    .hover-lift:hover {
-                        transform: translateY(-4px) !important;
-                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
-                    }
+                .hover-lift:hover {
+                    transform: translateY(-4px) !important;
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+                }
 
-                    .btn-switch {
-                        transition: all 0.2s;
-                        color: rgba(255, 255, 255, 0.7);
-                    }
+                .btn-switch {
+                    transition: all 0.2s;
+                    color: rgba(255, 255, 255, 0.7);
+                }
 
-                    .btn-switch:hover {
-                        color: white;
-                    }
+                .btn-switch:hover {
+                    color: white;
+                }
 
-                    .btn-switch.active {
-                        background-color: white !important;
-                        color: #0f172a !important;
-                        font-weight: 700 !important;
-                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-                    }
+                .btn-switch.active {
+                    background-color: white !important;
+                    color: #0f172a !important;
+                    font-weight: 700 !important;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+                }
 
-                    .card-gradient-earnings {
-                        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%) !important;
-                    }
+                .card-gradient-earnings {
+                    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%) !important;
+                }
 
-                    .adaptive-title {
-                        font-size: clamp(1.5rem, 8cqw, 3rem);
-                    }
-                </style>
+                .adaptive-title {
+                    font-size: clamp(1.5rem, 8cqw, 3rem);
+                }
+            </style>
 
-                <!-- 1. ENCABEZADO: TÍTULO + FILTRO -->
-                <div class="d-flex align-items-center justify-content-between gap-4 mb-4 flex-wrap">
-                    <div>
-                        <h2 class="h4 fw-bold text-dark mb-1 d-flex align-items-center gap-2">
-                            <span class="material-symbols-rounded text-primary">analytics</span>
-                            Ganancias del Bus
-                        </h2>
-                        <p class="text-muted mb-0 small">Consulta detallada de los ingresos generados por la operación.</p>
-                    </div>
-                    <!-- Filtro por Mes Compacto -->
-                    <div class="bg-white p-2 rounded-4 shadow-sm border">
-                        <form action="{{ route('propietario.dashboard') }}" method="GET"
-                            class="d-flex align-items-center gap-2 m-0">
-                            <input type="hidden" name="section" value="ganancias">
-                            <div class="d-flex align-items-center gap-2">
-                                <label class="form-label x-small fw-bold text-muted text-uppercase mb-0 text-nowrap">Mes:</label>
-                                <input type="month" name="mes_seleccionado"
-                                    class="form-control form-control-sm border-0 bg-light rounded-3"
-                                    value="{{ request('mes_seleccionado') }}" style="width: 140px;">
-                            </div>
-                            <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">Filtrar</button>
-                        </form>
-                    </div>
+            <!-- 1. ENCABEZADO: TÍTULO + FILTRO -->
+            <div class="d-flex align-items-center justify-content-between gap-4 mb-4 flex-wrap">
+                <div>
+                    <h2 class="h4 fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                        <span class="material-symbols-rounded text-primary">analytics</span>
+                        Ganancias del Bus
+                    </h2>
+                    <p class="text-muted mb-0 small">Consulta detallada de los ingresos generados por la operación.</p>
                 </div>
+                <!-- Filtro por Mes Compacto -->
+                <div class="bg-white p-2 rounded-4 shadow-sm border">
+                    <form action="{{ route('propietario.dashboard') }}" method="GET"
+                        class="d-flex align-items-center gap-2 m-0">
+                        <input type="hidden" name="section" value="ganancias">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="form-label x-small fw-bold text-muted text-uppercase mb-0 text-nowrap">Mes:</label>
+                            <input type="month" name="mes_seleccionado"
+                                class="form-control form-control-sm border-0 bg-light rounded-3"
+                                value="{{ request('mes_seleccionado') }}" style="width: 140px;">
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">Filtrar</button>
+                    </form>
+                </div>
+            </div>
 
-                <!-- 2. TARJETA RESUMEN CON TABS -->
-                <div class="row g-4 mb-4">
-                    <div class="col-lg-12">
-                        <div class="card border-0 shadow-lg rounded-5 overflow-hidden p-4 text-white card-gradient-earnings">
-                            <div class="row align-items-center">
-                                <div class="col-md-12">
-                                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                                        <div class="container-card">
-                                            <span class="text-white-50 small fw-bold text-uppercase d-block mb-1"
-                                                id="earnings_label">Ingresos de Hoy</span>
-                                            @php
-                                                $valH = $gananciasHoy ?? 0;
-                                                $dispDH = '$' . number_format($valH);
-                                                if ($valH >= 1000000) $dispDH = '$' . number_format($valH / 1000000, 1) . 'M';
-                                                elseif ($valH >= 100000) $dispDH = '$' . number_format($valH / 1000, 0) . 'K';
-                                            @endphp
-                                            <h1 class="fw-black mb-0 text-white adaptive-title" id="earnings_amount" title="${{ number_format($valH) }}">
-                                                {{ $dispDH }}</h1>
-                                        </div>
-                                        <div class="d-flex gap-2 bg-white bg-opacity-10 p-1 rounded-pill">
-                                            @php
-                                                $fH = function($v) {
-                                                    if ($v >= 1000000) return '$' . number_format($v / 1000000, 1) . 'M';
-                                                    if ($v >= 100000) return '$' . number_format($v / 1000, 0) . 'K';
-                                                    return '$' . number_format($v);
-                                                };
-                                            @endphp
-                                            <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch active"
-                                                data-periodo="hoy"
-                                                data-amount="{{ number_format($gananciasHoy ?? 0) }}" 
-                                                data-display="{{ $fH($gananciasHoy ?? 0) }}"
-                                                data-label="Ingresos de Hoy"
-                                                onclick="switchEarnings(this)">Hoy</button>
-                                            <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch"
-                                                data-periodo="semana"
-                                                data-amount="{{ number_format($gananciasSemana ?? 0) }}"
-                                                data-display="{{ $fH($gananciasSemana ?? 0) }}"
-                                                data-label="Ingresos de la Semana" onclick="switchEarnings(this)">Semana</button>
-                                            <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch"
-                                                data-periodo="mes"
-                                                data-amount="{{ number_format($gananciasMes ?? 0) }}" 
-                                                data-display="{{ $fH($gananciasMes ?? 0) }}"
-                                                data-label="Ingresos del Mes"
-                                                onclick="switchEarnings(this)">Mes</button>
+            <!-- 2. TARJETA RESUMEN CON TABS -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-12">
+                    <div class="card border-0 shadow-lg rounded-5 overflow-hidden p-4 text-white card-gradient-earnings">
+                        <div class="row align-items-center">
+                            <div class="col-md-12">
+                                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                                    <div class="container-card">
+                                        <span class="text-white-50 small fw-bold text-uppercase d-block mb-1"
+                                            id="earnings_label">Ingresos de Hoy</span>
+                                        @php
+                                            $valH = $gananciasHoy ?? 0;
+                                            $dispDH = '$' . number_format($valH);
+                                            if ($valH >= 1000000)
+                                                $dispDH = '$' . number_format($valH / 1000000, 1) . 'M';
+                                            elseif ($valH >= 100000)
+                                                $dispDH = '$' . number_format($valH / 1000, 0) . 'K';
+                                        @endphp
+                                        <h1 class="fw-black mb-0 text-white adaptive-title" id="earnings_amount"
+                                            title="${{ number_format($valH) }}">
+                                            {{ $dispDH }}
+                                        </h1>
+                                    </div>
+                                    <div class="d-flex gap-2 bg-white bg-opacity-10 p-1 rounded-pill">
+                                        @php
+                                            $fH = function ($v) {
+                                                if ($v >= 1000000)
+                                                    return '$' . number_format($v / 1000000, 1) . 'M';
+                                                if ($v >= 100000)
+                                                    return '$' . number_format($v / 1000, 0) . 'K';
+                                                return '$' . number_format($v);
+                                            };
+                                        @endphp
+                                        <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch active"
+                                            data-periodo="hoy" data-amount="{{ number_format($gananciasHoy ?? 0) }}"
+                                            data-display="{{ $fH($gananciasHoy ?? 0) }}" data-label="Ingresos de Hoy"
+                                            onclick="switchEarnings(this)">Hoy</button>
+                                        <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch" data-periodo="semana"
+                                            data-amount="{{ number_format($gananciasSemana ?? 0) }}"
+                                            data-display="{{ $fH($gananciasSemana ?? 0) }}" data-label="Ingresos de la Semana"
+                                            onclick="switchEarnings(this)">Semana</button>
+                                        <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch" data-periodo="mes"
+                                            data-amount="{{ number_format($gananciasMes ?? 0) }}"
+                                            data-display="{{ $fH($gananciasMes ?? 0) }}" data-label="Ingresos del Mes"
+                                            onclick="switchEarnings(this)">Mes</button>
+                                    </div>
+                                </div>
+
+                                <hr class="border-white border-opacity-10 my-4">
+
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div
+                                            class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
+                                            <div
+                                                class="bg-warning bg-opacity-25 p-2 rounded-3 text-warning d-flex align-items-center justify-content-center">
+                                                <span class="material-symbols-rounded">local_shipping</span>
+                                            </div>
+                                            <div>
+                                                <span class="small d-block text-white-50">Viajes Realizados</span>
+                                                <span class="h5 fw-black text-warning mb-0">{{ $conteoAsignaciones }}
+                                                    viajes</span>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <hr class="border-white border-opacity-10 my-4">
-
-                                    <div class="row g-3">
-                                        <div class="col-md-4">
+                                    <div class="col-md-4">
+                                        <div
+                                            class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
                                             <div
-                                                class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
-                                                <div
-                                                    class="bg-warning bg-opacity-25 p-2 rounded-3 text-warning d-flex align-items-center justify-content-center">
-                                                    <span class="material-symbols-rounded">local_shipping</span>
-                                                </div>
-                                                <div>
-                                                    <span class="small d-block text-white-50">Viajes Realizados</span>
-                                                    <span class="h5 fw-black text-warning mb-0">{{ $conteoAsignaciones }}
-                                                        viajes</span>
-                                                </div>
+                                                class="bg-success bg-opacity-25 p-2 rounded-3 text-success d-flex align-items-center justify-content-center">
+                                                <span class="material-symbols-rounded">groups</span>
+                                            </div>
+                                            <div>
+                                                <span class="small d-block text-white-50">Pasajeros Transportados</span>
+                                                <span
+                                                    class="h5 fw-black text-success mb-0">{{ number_format($conteoPasajeros) }}
+                                                    pax</span>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div
+                                            class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
                                             <div
-                                                class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
-                                                <div
-                                                    class="bg-success bg-opacity-25 p-2 rounded-3 text-success d-flex align-items-center justify-content-center">
-                                                    <span class="material-symbols-rounded">groups</span>
-                                                </div>
-                                                <div>
-                                                    <span class="small d-block text-white-50">Pasajeros Transportados</span>
-                                                    <span
-                                                        class="h5 fw-black text-success mb-0">{{ number_format($conteoPasajeros) }}
-                                                        pax</span>
-                                                </div>
+                                                class="bg-info bg-opacity-25 p-2 rounded-3 text-info d-flex align-items-center justify-content-center">
+                                                <span class="material-symbols-rounded">payments</span>
                                             </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div
-                                                class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
-                                                <div
-                                                    class="bg-info bg-opacity-25 p-2 rounded-3 text-info d-flex align-items-center justify-content-center">
-                                                    <span class="material-symbols-rounded">payments</span>
-                                                </div>
-                                                <div>
-                                                    <span class="small d-block text-white-50">Tarifa Promedio</span>
-                                                    <span class="h5 fw-black text-info mb-0">$3,300</span>
-                                                </div>
+                                            <div>
+                                                <span class="small d-block text-white-50">Tarifa Promedio</span>
+                                                <span class="h5 fw-black text-info mb-0">$3,300</span>
                                             </div>
                                         </div>
                                     </div>
@@ -913,16 +925,16 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- 3. INGRESO CONSOLIDADO POR VEHÍCULO -->
-                <h6 class="fw-bold text-muted text-uppercase small letter-spacing-1 mb-3 d-flex align-items-center gap-2">
-                    <span class="material-symbols-rounded fs-5 text-primary">directions_bus</span>
-                    Ingreso Consolidado por Vehículo
-                </h6>
-                <div class="row g-3 mb-4">
-                    @forelse($ingresosPorBus as $bus)
-                        <div class="col-md-4 bus-earnings-card" 
-                            data-hoy-ingresos="{{ number_format($bus->hoy_ingresos) }}"
+            <!-- 3. INGRESO CONSOLIDADO POR VEHÍCULO -->
+            <h6 class="fw-bold text-muted text-uppercase small letter-spacing-1 mb-3 d-flex align-items-center gap-2">
+                <span class="material-symbols-rounded fs-5 text-primary">directions_bus</span>
+                Ingreso Consolidado por Vehículo
+            </h6>
+            <div class="row g-3 mb-4">
+                @forelse($ingresosPorBus as $bus)
+                        <div class="col-md-4 bus-earnings-card" data-hoy-ingresos="{{ number_format($bus->hoy_ingresos) }}"
                             data-hoy-pasajeros="{{ number_format($bus->hoy_pasajeros) }}"
                             data-semana-ingresos="{{ number_format($bus->semana_ingresos) }}"
                             data-semana-pasajeros="{{ number_format($bus->semana_pasajeros) }}"
@@ -934,23 +946,28 @@
                                         class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 rounded-pill fw-bold">{{ $bus->placa }}</span>
                                     <div class="d-flex align-items-center gap-1 text-muted small">
                                         <span class="material-symbols-rounded fs-6">groups</span>
+                                        <span>{{ number_format($bus->total_pasajeros) }} Pax</span>
                                         <span class="pax-count">{{ number_format($bus->hoy_pasajeros) }} Pax</span>
                                     </div>
                                 </div>
                                 <div class="mt-3 text-center container-card">
                                     <span class="text-muted x-small text-uppercase fw-bold d-block">Ganancia Acumulada</span>
                                     @php
+                                        $valB = $bus->total_ingresos;
                                         // Por defecto mostramos Hoy
                                         $valB = $bus->hoy_ingresos;
                                         $dispB = '$' . number_format($valB);
-                                        if ($valB >= 1000000) $dispB = '$' . number_format($valB / 1000000, 1) . 'M';
-                                        elseif ($valB >= 100000) $dispB = '$' . number_format($valB / 1000, 0) . 'K';
+                                        if ($valB >= 1000000)
+                                            $dispB = '$' . number_format($valB / 1000000, 1) . 'M';
+                                        elseif ($valB >= 100000)
+                                            $dispB = '$' . number_format($valB / 1000, 0) . 'K';
                                     @endphp
-                                    <h3 class="fw-black mb-0 text-success adaptive-number income-amount" title="${{ number_format($valB) }}">{{ $dispB }}</h3>
+                                    <h3 class="fw-black mb-0 text-success adaptive-number income-amount"
+                                        title="${{ number_format($valB) }}">{{ $dispB }}</h3>
                                 </div>
                             </div>
                         </div>
-                    @empty
+                @empty
                         <div class="col-12">
                             <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white">
                                 <span class="material-symbols-rounded display-5 text-muted opacity-25 mb-2">money_off</span>
@@ -966,335 +983,330 @@
                 </div>
             </div>
         @endif
-
     </div>
 
-    <!-- Modales -->
-    @if($buses->isNotEmpty())
-        <!-- Modal Subir Documento -->
-        <div class="modal fade" id="modalSubirDocumento" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg rounded-4">
-                    <div class="modal-header border-0 pt-4 px-4">
-                        <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
-                            <span class="material-symbols-rounded text-primary">add_circle</span>
-                            Nuevo Documento
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form action="{{ route('propietario.subirDocumento') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="modal-body p-4">
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Vehículo <span
-                                            class="text-danger">*</span></label>
-                                    <select name="placa" id="subir_placa" class="form-select rounded-3 shadow-sm border-light"
-                                        required>
-                                        <option value="" disabled selected>Seleccionar placa...</option>
-                                        @foreach($buses as $b)
-                                            <option value="{{ $b->placa }}"
-                                                data-modelo="{{ preg_replace('/[^0-9]/', '', $b->modelo) }}">{{ $b->placa }} -
-                                                {{ $b->modelo }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Tipo de Documento <span
-                                            class="text-danger">*</span></label>
-                                    <select name="id_tipo_documento" id="subir_id_tipo_documento"
-                                        class="form-select rounded-3 shadow-sm border-light" required>
-                                        <option value="" disabled selected>Elegir tipo...</option>
-                                        @foreach($tiposDocumento as $tipo)
-                                            <option value="{{ $tipo->id_tipo_documento }}">{{ $tipo->nombre }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="col-12 d-none" id="col_fecha_nacimiento">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Fecha de Nacimiento
-                                        (Conductor) <span class="text-danger">*</span></label>
-                                    <input type="date" name="fecha_nacimiento" id="subir_fecha_nacimiento"
-                                        class="form-control rounded-3" placeholder="Para calcular vigencia">
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Expedición</label>
-                                    <input type="date" name="fecha_expedicion" id="subir_fecha_expedicion"
-                                        class="form-control rounded-3" required>
-                                </div>
-                                <div class="col-6" id="div_fecha_vencimiento">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Vencimiento</label>
-                                    <input type="date" name="fecha_vencimiento" id="subir_fecha_vencimiento"
-                                        class="form-control rounded-3" required>
-                                    <div class="invalid-feedback fw-bold">Fecha de vencimiento es inválida (ya expiró).</div>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Archivo digital
-                                        (PDF/JPG)</label>
-                                    <input type="file" name="archivo" class="form-control rounded-3"
-                                        accept=".pdf,.jpg,.jpeg,.png" required>
-                                </div>
+    <!-- Modal Subir Documento -->
+    <div class="modal fade" id="modalSubirDocumento" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
+                        <span class="material-symbols-rounded text-primary">add_circle</span>
+                        Nuevo Documento
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('propietario.subirDocumento') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Vehículo <span
+                                        class="text-danger">*</span></label>
+                                <select name="placa" id="subir_placa" class="form-select rounded-3 shadow-sm border-light"
+                                    required>
+                                    <option value="" disabled selected>Seleccionar placa...</option>
+                                    @foreach($buses as $b)
+                                        <option value="{{ $b->placa }}"
+                                            data-modelo="{{ preg_replace('/[^0-9]/', '', $b->modelo) }}">{{ $b->placa }} -
+                                            {{ $b->modelo }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Tipo de Documento <span
+                                        class="text-danger">*</span></label>
+                                <select name="id_tipo_documento" id="subir_id_tipo_documento"
+                                    class="form-select rounded-3 shadow-sm border-light" required>
+                                    <option value="" disabled selected>Elegir tipo...</option>
+                                    @foreach($tiposDocumento as $tipo)
+                                        <option value="{{ $tipo->id_tipo_documento }}">{{ $tipo->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-12 d-none" id="col_fecha_nacimiento">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Fecha de Nacimiento
+                                    (Conductor) <span class="text-danger">*</span></label>
+                                <input type="date" name="fecha_nacimiento" id="subir_fecha_nacimiento"
+                                    class="form-control rounded-3" placeholder="Para calcular vigencia">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Expedición</label>
+                                <input type="date" name="fecha_expedicion" id="subir_fecha_expedicion"
+                                    class="form-control rounded-3" required>
+                            </div>
+                            <div class="col-6" id="div_fecha_vencimiento">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Vencimiento</label>
+                                <input type="date" name="fecha_vencimiento" id="subir_fecha_vencimiento"
+                                    class="form-control rounded-3" required>
+                                <div class="invalid-feedback fw-bold">Fecha de vencimiento es inválida (ya expiró).</div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Archivo digital
+                                    (PDF/JPG)</label>
+                                <input type="file" name="archivo" class="form-control rounded-3"
+                                    accept=".pdf,.jpg,.jpeg,.png" required>
                             </div>
                         </div>
-                        <div class="modal-footer border-0 p-4 pt-0">
-                            <button type="button" class="btn btn-light fw-bold px-4 rounded-pill"
-                                data-bs-dismiss="modal">Cerrar</button>
-                            <button type="submit" class="btn btn-primary fw-bold px-4 shadow-sm rounded-pill">Subir
-                                archivo</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer border-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light fw-bold px-4 rounded-pill"
+                            data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary fw-bold px-4 shadow-sm rounded-pill">Subir
+                            archivo</button>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
 
-        <!-- Modal Actualizar Documento -->
-        <div class="modal fade" id="modalActualizarDocumento" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg rounded-4">
-                    <div class="modal-header border-0 pt-4 px-4">
-                        <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
-                            <span class="material-symbols-rounded text-warning">edit_square</span>
-                            Corregir Documento
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form id="formActualizarDoc" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-body p-4">
-                            <div class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Documento</label>
-                                    <input type="text" id="edit_nombre_display" class="form-control bg-light rounded-3" readonly
-                                        disabled>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Expedición</label>
-                                    <input type="date" name="fecha_expedicion" id="edit_expedicion"
-                                        class="form-control rounded-3" required>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Vencimiento</label>
-                                    <input type="date" name="fecha_vencimiento" id="edit_vencimiento"
-                                        class="form-control rounded-3" required>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Nuevo Archivo
-                                        (Opcional)</label>
-                                    <input type="file" name="archivo" class="form-control rounded-3"
-                                        accept=".pdf,.jpg,.jpeg,.png">
-                                </div>
+    <!-- Modal Actualizar Documento -->
+    <div class="modal fade" id="modalActualizarDocumento" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pt-4 px-4">
+                    <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2">
+                        <span class="material-symbols-rounded text-warning">edit_square</span>
+                        Corregir Documento
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formActualizarDoc" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Documento</label>
+                                <input type="text" id="edit_nombre_display" class="form-control bg-light rounded-3" readonly
+                                    disabled>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Expedición</label>
+                                <input type="date" name="fecha_expedicion" id="edit_expedicion"
+                                    class="form-control rounded-3" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Vencimiento</label>
+                                <input type="date" name="fecha_vencimiento" id="edit_vencimiento"
+                                    class="form-control rounded-3" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Nuevo Archivo
+                                    (Opcional)</label>
+                                <input type="file" name="archivo" class="form-control rounded-3"
+                                    accept=".pdf,.jpg,.jpeg,.png">
                             </div>
                         </div>
-                        <div class="modal-footer border-0 p-4 pt-0">
-                            <button type="button" class="btn btn-light fw-bold px-4 rounded-pill"
-                                data-bs-dismiss="modal">Descartar</button>
-                            <button type="submit" class="btn btn-warning fw-bold px-4 shadow-sm rounded-pill text-dark">Aplicar
-                                cambios</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="modal-footer border-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light fw-bold px-4 rounded-pill"
+                            data-bs-dismiss="modal">Descartar</button>
+                        <button type="submit" class="btn btn-warning fw-bold px-4 shadow-sm rounded-pill text-dark">Aplicar
+                            cambios</button>
+                    </div>
+                </form>
             </div>
         </div>
-        <!-- Modal Registrar Gasto -->
+    </div>
+    <!-- Modal Registrar Gasto -->
 
-        <!-- Modal Ver Vehículo (Ficha Completa) -->
-        <div class="modal fade" id="modalVerVehiculo" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content border-0 shadow-lg rounded-4">
-                    <div class="modal-header border-0 p-4 bg-light">
-                        <h5 class="modal-title fw-black text-dark d-flex align-items-center gap-3">
-                            <div class="bg-primary bg-opacity-10 p-2 rounded-circle">
-                                <span class="material-symbols-rounded text-primary">analytics</span>
-                            </div>
-                            Expediente del Vehículo: <span id="ver_placa" class="text-primary">---</span>
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-4 bg-light">
-                        <!-- 1. Información General y Conductor -->
-                        <div class="row g-4 mb-4">
-                            <!-- Datos Técnicos -->
-                            <div class="col-lg-8">
-                                <div class="card border-0 shadow-sm rounded-4 h-100">
-                                    <div class="card-body p-4">
-                                        <h6 class="fw-bold text-muted text-uppercase mb-4 d-flex align-items-center gap-2">
-                                            <span class="material-symbols-rounded fs-5 text-primary">info</span>
-                                            Información Técnica
-                                        </h6>
-                                        <div class="row g-3">
-                                            <div class="col-md-3 col-6">
-                                                <div class="p-3 rounded-4 bg-light border border-white h-100">
-                                                    <label
-                                                        class="text-muted x-small fw-bold text-uppercase d-block mb-1">Capacidad</label>
-                                                    <span id="ver_capacidad" class="text-dark fw-bold">---</span>
-                                                </div>
+    <!-- Modal Ver Vehículo (Ficha Completa) -->
+    <div class="modal fade" id="modalVerVehiculo" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 p-4 bg-light">
+                    <h5 class="modal-title fw-black text-dark d-flex align-items-center gap-3">
+                        <div class="bg-primary bg-opacity-10 p-2 rounded-circle">
+                            <span class="material-symbols-rounded text-primary">analytics</span>
+                        </div>
+                        Expediente del Vehículo: <span id="ver_placa" class="text-primary">---</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 bg-light">
+                    <!-- 1. Información General y Conductor -->
+                    <div class="row g-4 mb-4">
+                        <!-- Datos Técnicos -->
+                        <div class="col-lg-8">
+                            <div class="card border-0 shadow-sm rounded-4 h-100">
+                                <div class="card-body p-4">
+                                    <h6 class="fw-bold text-muted text-uppercase mb-4 d-flex align-items-center gap-2">
+                                        <span class="material-symbols-rounded fs-5 text-primary">info</span>
+                                        Información Técnica
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-3 col-6">
+                                            <div class="p-3 rounded-4 bg-light border border-white h-100">
+                                                <label
+                                                    class="text-muted x-small fw-bold text-uppercase d-block mb-1">Capacidad</label>
+                                                <span id="ver_capacidad" class="text-dark fw-bold">---</span>
                                             </div>
-                                            <div class="col-md-3 col-6">
-                                                <div class="p-3 rounded-4 bg-light border border-white h-100">
-                                                    <label
-                                                        class="text-muted x-small fw-bold text-uppercase d-block mb-1">Kilometraje</label>
-                                                    <span id="ver_kilometraje" class="text-dark fw-bold">---</span>
-                                                </div>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <div class="p-3 rounded-4 bg-light border border-white h-100">
+                                                <label
+                                                    class="text-muted x-small fw-bold text-uppercase d-block mb-1">Kilometraje</label>
+                                                <span id="ver_kilometraje" class="text-dark fw-bold">---</span>
                                             </div>
-                                            <div class="col-md-3 col-6">
-                                                <div class="p-3 rounded-4 bg-light border border-white h-100">
-                                                    <label
-                                                        class="text-muted x-small fw-bold text-uppercase d-block mb-1">Licencia</label>
-                                                    <span id="ver_licencia" class="text-dark fw-bold">---</span>
-                                                </div>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <div class="p-3 rounded-4 bg-light border border-white h-100">
+                                                <label
+                                                    class="text-muted x-small fw-bold text-uppercase d-block mb-1">Licencia</label>
+                                                <span id="ver_licencia" class="text-dark fw-bold">---</span>
                                             </div>
-                                            <div class="col-md-3 col-6">
-                                                <div class="p-3 rounded-4 bg-light border border-white h-100">
-                                                    <label
-                                                        class="text-muted x-small fw-bold text-uppercase d-block mb-1">Estado</label>
-                                                    <span id="ver_estado" class="badge rounded-pill px-3 py-2">---</span>
-                                                </div>
+                                        </div>
+                                        <div class="col-md-3 col-6">
+                                            <div class="p-3 rounded-4 bg-light border border-white h-100">
+                                                <label
+                                                    class="text-muted x-small fw-bold text-uppercase d-block mb-1">Estado</label>
+                                                <span id="ver_estado" class="badge rounded-pill px-3 py-2">---</span>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="p-3 rounded-4 bg-light border border-white">
-                                                    <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Número
-                                                        de Chasis</label>
-                                                    <span id="ver_chasis"
-                                                        class="text-dark family-monospace small fw-bold">---</span>
-                                                </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="p-3 rounded-4 bg-light border border-white">
+                                                <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Número
+                                                    de Chasis</label>
+                                                <span id="ver_chasis"
+                                                    class="text-dark family-monospace small fw-bold">---</span>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="p-3 rounded-4 bg-light border border-white">
-                                                    <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Número
-                                                        de Motor</label>
-                                                    <span id="ver_motor"
-                                                        class="text-dark family-monospace small fw-bold">---</span>
-                                                </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="p-3 rounded-4 bg-light border border-white">
+                                                <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Número
+                                                    de Motor</label>
+                                                <span id="ver_motor"
+                                                    class="text-dark family-monospace small fw-bold">---</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Conductor -->
-                            <div class="col-lg-4">
-                                <div class="card border-0 shadow-sm rounded-4 h-100">
-                                    <div class="card-body p-4">
-                                        <h6 class="fw-bold text-muted text-uppercase mb-4 d-flex align-items-center gap-2">
-                                            <span class="material-symbols-rounded fs-5 text-primary">person</span>
-                                            Conductor Actual
-                                        </h6>
-                                        <div id="ver_conductor_box" class="h-100">
-                                            <div class="d-flex align-items-center gap-3 mb-3">
-                                                <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
-                                                    <span class="material-symbols-rounded fs-2">person</span>
-                                                </div>
-                                                <div>
-                                                    <h5 id="cond_nombre" class="fw-black mb-0">Cargando...</h5>
-                                                    <span class="badge bg-primary-subtle text-primary x-small"
-                                                        id="cond_ruta">---</span>
-                                                </div>
+                        </div>
+                        <!-- Conductor -->
+                        <div class="col-lg-4">
+                            <div class="card border-0 shadow-sm rounded-4 h-100">
+                                <div class="card-body p-4">
+                                    <h6 class="fw-bold text-muted text-uppercase mb-4 d-flex align-items-center gap-2">
+                                        <span class="material-symbols-rounded fs-5 text-primary">person</span>
+                                        Conductor Actual
+                                    </h6>
+                                    <div id="ver_conductor_box" class="h-100">
+                                        <div class="d-flex align-items-center gap-3 mb-3">
+                                            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle">
+                                                <span class="material-symbols-rounded fs-2">person</span>
                                             </div>
-                                            <div class="p-3 rounded-4 bg-light border d-flex flex-column gap-2 small">
-                                                <div class="d-flex justify-content-between">
-                                                    <span class="text-muted">Documento:</span>
-                                                    <span id="cond_doc" class="fw-bold">---</span>
-                                                </div>
-                                                <div class="d-flex justify-content-between">
-                                                    <span class="text-muted">Licencia:</span>
-                                                    <span id="cond_lic" class="fw-bold">---</span>
-                                                </div>
+                                            <div>
+                                                <h5 id="cond_nombre" class="fw-black mb-0">Cargando...</h5>
+                                                <span class="badge bg-primary-subtle text-primary x-small"
+                                                    id="cond_ruta">---</span>
                                             </div>
                                         </div>
-                                        <div id="no_conductor_box"
-                                            class="d-none alert alert-light text-center rounded-4 p-4 mb-0">
-                                            <p class="mb-0 text-muted small">No hay conductores asignados actualmente.</p>
+                                        <div class="p-3 rounded-4 bg-light border d-flex flex-column gap-2 small">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="text-muted">Documento:</span>
+                                                <span id="cond_doc" class="fw-bold">---</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <span class="text-muted">Licencia:</span>
+                                                <span id="cond_lic" class="fw-bold">---</span>
+                                            </div>
                                         </div>
+                                    </div>
+                                    <div id="no_conductor_box"
+                                        class="d-none alert alert-light text-center rounded-4 p-4 mb-0">
+                                        <p class="mb-0 text-muted small">No hay conductores asignados actualmente.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- 2. Documentación del Vehículo -->
-                        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                            <div class="card-header bg-white border-0 p-4">
-                                <h6 class="fw-bold text-dark text-uppercase mb-0 d-flex align-items-center gap-2">
-                                    <span class="material-symbols-rounded text-primary">folder_shared</span>
-                                    Documentación del Vehículo
-                                </h6>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0">
-                                    <thead class="bg-light">
-                                        <tr>
-                                            <th class="ps-4 border-0 small fw-bold text-muted">TIPO DE DOCUMENTO</th>
-                                            <th class="border-0 small fw-bold text-muted">FECHA CARGA</th>
-                                            <th class="border-0 small fw-bold text-muted">VENCIMIENTO</th>
-                                            <th class="border-0 small fw-bold text-muted">ESTADO</th>
-                                            <th class="border-0 small fw-bold text-muted text-center pe-4">ACCIONES</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="ver_docs_body">
-                                        <!-- Los documentos se cargarán aquí -->
-                                    </tbody>
-                                </table>
-                            </div>
+                    <!-- 2. Documentación del Vehículo -->
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                        <div class="card-header bg-white border-0 p-4">
+                            <h6 class="fw-bold text-dark text-uppercase mb-0 d-flex align-items-center gap-2">
+                                <span class="material-symbols-rounded text-primary">folder_shared</span>
+                                Documentación del Vehículo
+                            </h6>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4 border-0 small fw-bold text-muted">TIPO DE DOCUMENTO</th>
+                                        <th class="border-0 small fw-bold text-muted">FECHA CARGA</th>
+                                        <th class="border-0 small fw-bold text-muted">VENCIMIENTO</th>
+                                        <th class="border-0 small fw-bold text-muted">ESTADO</th>
+                                        <th class="border-0 small fw-bold text-muted text-center pe-4">ACCIONES</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ver_docs_body">
+                                    <!-- Los documentos se cargarán aquí -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="modal-footer border-0 p-4 bg-light">
-                        <button type="button" class="btn btn-dark fw-bold px-5 rounded-pill" data-bs-dismiss="modal">Cerrar
-                            Expediente</button>
+                </div>
+                <div class="modal-footer border-0 p-4 bg-light">
+                    <button type="button" class="btn btn-dark fw-bold px-5 rounded-pill" data-bs-dismiss="modal">Cerrar
+                        Expediente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Bóveda Histórica -->
+    <div class="modal fade" id="modalBovedaHistorial" tabindex="-1" aria-hidden="true" style="z-index: 1055;">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-bottom p-4" style="background: #f8fafc;">
+                    <h5 class="modal-title fw-bold d-flex align-items-center gap-3 text-dark">
+                        <span class="material-symbols-rounded text-primary">history_edu</span>
+                        Bóveda Histórica de Documentos: <span id="boveda_placa" class="text-primary">---</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 bg-light">
+                    <div id="boveda_content" class="d-flex flex-column gap-4">
+                        <!-- Dynamic content groups -->
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 bg-light">
+                    <button type="button" class="btn btn-dark fw-bold px-5 rounded-pill" data-bs-dismiss="modal">Cerrar
+                        Bóveda</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Visor de Documentos -->
+    <div class="modal fade" id="modalVisorDocumento" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pt-4 px-4 bg-dark text-white">
+                    <h5 class="modal-title fw-bold" id="visor_titulo">Visualización de Documento</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 bg-secondary bg-opacity-10" style="height: 70vh;">
+                    <iframe id="visor_iframe" class="w-100 h-100 d-none border-0" src=""></iframe>
+                    <div id="visor_image_container"
+                        class="w-100 h-100 d-none d-flex align-items-center justify-content-center p-3">
+                        <img id="visor_img" src="" class="img-fluid rounded-3 shadow-sm" style="max-height: 100%;">
+                    </div>
+                    <div id="visor_error"
+                        class="w-100 h-100 d-none d-flex flex-column align-items-center justify-content-center text-muted">
+                        <span class="material-symbols-rounded display-1 mb-3">error</span>
+                        <p class="fw-bold">No se puede previsualizar este archivo.</p>
+                        <a id="visor_download" href="#" class="btn btn-primary rounded-pill px-4" download>Descargar
+                            Archivo</a>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Modal Bóveda Histórica -->
-        <div class="modal fade" id="modalBovedaHistorial" tabindex="-1" aria-hidden="true" style="z-index: 1055;">
-            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content border-0 shadow-lg rounded-4">
-                    <div class="modal-header border-bottom p-4" style="background: #f8fafc;">
-                        <h5 class="modal-title fw-bold d-flex align-items-center gap-3 text-dark">
-                            <span class="material-symbols-rounded text-primary">history_edu</span>
-                            Bóveda Histórica de Documentos: <span id="boveda_placa" class="text-primary">---</span>
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-4 bg-light">
-                        <div id="boveda_content" class="d-flex flex-column gap-4">
-                            <!-- Dynamic content groups -->
-                        </div>
-                    </div>
-                    <div class="modal-footer border-0 p-4 bg-light">
-                        <button type="button" class="btn btn-dark fw-bold px-5 rounded-pill" data-bs-dismiss="modal">Cerrar
-                            Bóveda</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal Visor de Documentos -->
-        <div class="modal fade" id="modalVisorDocumento" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg rounded-4">
-                    <div class="modal-header border-0 pt-4 px-4 bg-dark text-white">
-                        <h5 class="modal-title fw-bold" id="visor_titulo">Visualización de Documento</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body p-0 bg-secondary bg-opacity-10" style="height: 70vh;">
-                        <iframe id="visor_iframe" class="w-100 h-100 d-none border-0" src=""></iframe>
-                        <div id="visor_image_container"
-                            class="w-100 h-100 d-none d-flex align-items-center justify-content-center p-3">
-                            <img id="visor_img" src="" class="img-fluid rounded-3 shadow-sm" style="max-height: 100%;">
-                        </div>
-                        <div id="visor_error"
-                            class="w-100 h-100 d-none d-flex flex-column align-items-center justify-content-center text-muted">
-                            <span class="material-symbols-rounded display-1 mb-3">error</span>
-                            <p class="fw-bold">No se puede previsualizar este archivo.</p>
-                            <a id="visor_download" href="#" class="btn btn-primary rounded-pill px-4" download>Descargar
-                                Archivo</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
+    </div>
 
     <!-- Modal Detalle Asignación -->
     <div class="modal fade" id="modalDetalleAsignacion" tabindex="-1" aria-hidden="true">
@@ -1367,14 +1379,13 @@
                     <div class="row g-3">
                         <div class="col-md-3">
                             <div class="card border-0 shadow-sm rounded-4 p-3 mb-0 bg-white">
-                                <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Viajes de Ida</label>
+                                <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Viajes O → D</label>
                                 <h3 id="stat_od" class="fw-black text-dark mb-0">0</h3>
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="card border-0 shadow-sm rounded-4 p-3 mb-0 bg-white">
-                                <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Viajes de
-                                    Vuelta</label>
+                                <label class="text-muted x-small fw-bold text-uppercase d-block mb-1">Viajes D → O</label>
                                 <h3 id="stat_do" class="fw-black text-dark mb-0">0</h3>
                             </div>
                         </div>
@@ -1460,11 +1471,7 @@
 
                             const elEstado = document.getElementById('ver_estado');
                             elEstado.innerText = data.bus.estado.nombre_estado;
-                            let statusClass = 'danger';
-                            if (data.bus.id_estado == 1) statusClass = 'success';
-                            else if (data.bus.id_estado == 4) statusClass = 'warning';
-
-                            elEstado.className = 'badge rounded-pill px-3 py-2 bg-' + statusClass + '-subtle text-' + statusClass;
+                            elEstado.className = 'badge rounded-pill px-3 py-2 bg-' + (data.bus.id_estado == 1 ? 'success' : 'danger') + '-subtle text-' + (data.bus.id_estado == 1 ? 'success' : 'danger');
 
                             // Llenar Conductor
                             if (data.conductor) {
@@ -1500,37 +1507,37 @@
                                 const fechaVenc = new Date(doc.fecha_vencimiento).toLocaleDateString();
 
                                 tr.innerHTML = `
-                                            <td class="ps-4">
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <div class="bg-${doc.status_color} bg-opacity-10 text-${doc.status_color} p-2 rounded-3">
-                                                        <span class="material-symbols-rounded">description</span>
-                                                    </div>
-                                                    <div class="fw-bold text-dark small">${doc.tipo_documento.nombre}</div>
-                                                </div>
-                                            </td>
-                                            <td class="text-muted small">${fechaCarga}</td>
-                                            <td class="fw-bold text-dark small">${fechaVenc}</td>
-                                            <td>
-                                                <span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} rounded-pill px-3 x-small fw-bold border border-${doc.status_color}">${doc.status_vigencia}</span>
-                                            </td>
-                                            <td class="text-end pe-4">
-                                                <div class="d-flex justify-content-end gap-2">
-                                                    <button class="btn btn-sm btn-light border p-2 rounded-circle btn-visualizar-table" 
-                                                            data-url="${doc.url_archivo}" 
-                                                            data-nombre="${doc.tipo_documento.nombre}"
-                                                            title="Vista Previa">
-                                                        <span class="material-symbols-rounded fs-6">visibility</span>
-                                                    </button>
-                                                    <a href="${doc.url_archivo}" 
-                                                       class="btn btn-sm btn-light border p-2 rounded-circle text-primary" 
-                                                       download
-                                                       title="Descargar">
-                                                        <span class="material-symbols-rounded fs-6">download</span>
-                                                    </a>
-                                                    ${renewBtn}
-                                                </div>
-                                            </td>
-                                        `;
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-${doc.status_color} bg-opacity-10 text-${doc.status_color} p-2 rounded-3">
+                                                <span class="material-symbols-rounded">description</span>
+                                            </div>
+                                            <div class="fw-bold text-dark small">${doc.tipo_documento.nombre}</div>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted small">${fechaCarga}</td>
+                                    <td class="fw-bold text-dark small">${fechaVenc}</td>
+                                    <td>
+                                        <span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} rounded-pill px-3 x-small fw-bold border border-${doc.status_color}">${doc.status_vigencia}</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <button class="btn btn-sm btn-light border p-2 rounded-circle btn-visualizar-table" 
+                                                    data-url="${doc.url_archivo}" 
+                                                    data-nombre="${doc.tipo_documento.nombre}"
+                                                    title="Vista Previa">
+                                                <span class="material-symbols-rounded fs-6">visibility</span>
+                                            </button>
+                                            <a href="${doc.url_archivo}" 
+                                               class="btn btn-sm btn-light border p-2 rounded-circle text-primary" 
+                                               download
+                                               title="Descargar">
+                                                <span class="material-symbols-rounded fs-6">download</span>
+                                            </a>
+                                            ${renewBtn}
+                                        </div>
+                                    </td>
+                                `;
                                 docsBody.appendChild(tr);
                             });
 
@@ -1747,19 +1754,19 @@
                             if (data.recorridos.length > 0) {
                                 data.recorridos.forEach(rec => {
                                     const row = `
-                                                <tr>
-                                                    <td class="ps-3">
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            <span class="material-symbols-rounded text-muted small">${rec.es_regreso ? 'keyboard_return' : 'near_me'}</span>
-                                                            <span class="fw-bold text-dark small">${rec.trayecto}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td><span class="badge bg-light text-dark fw-medium">${rec.hora_salida}</span></td>
-                                                    <td><span class="badge bg-light text-dark fw-medium">${rec.hora_llegada}</span></td>
-                                                    <td class="text-center"><span class="fw-bold">${rec.cantidad_pasajeros}</span></td>
-                                                    <td class="text-end pe-3 fw-bold text-success">$${new Intl.NumberFormat().format(rec.ingresos)}</td>
-                                                </tr>
-                                            `;
+                                        <tr>
+                                            <td class="ps-3">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="material-symbols-rounded text-muted small">${rec.es_regreso ? 'keyboard_return' : 'near_me'}</span>
+                                                    <span class="fw-bold text-dark small">${rec.trayecto}</span>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-light text-dark fw-medium">${rec.hora_salida}</span></td>
+                                            <td><span class="badge bg-light text-dark fw-medium">${rec.hora_llegada}</span></td>
+                                            <td class="text-center"><span class="fw-bold">${rec.cantidad_pasajeros}</span></td>
+                                            <td class="text-end pe-3 fw-bold text-success">$${new Intl.NumberFormat().format(rec.ingresos)}</td>
+                                        </tr>
+                                    `;
                                     tbody.innerHTML += row;
                                 });
                             } else {
@@ -1807,48 +1814,48 @@
                                         const isArchivado = doc.es_archivado;
                                         const trClass = isArchivado ? 'opacity-75 bg-light' : '';
                                         rows += `
-                                                <tr class="${trClass}">
-                                                    <td class="ps-4">
-                                                        <div class="fw-bold text-dark small text-truncate" style="max-width: 250px;" title="${doc.nombre}">${doc.nombre}</div>
-                                                        ${isArchivado ? '<span class="badge bg-secondary-subtle text-secondary x-small border border-secondary mt-1">Archivado</span>' : (doc.status_vigencia === 'VENCIDO' ? '<span class="badge bg-danger-subtle text-danger x-small border border-danger mt-1">Vencido</span>' : '<span class="badge bg-success-subtle text-success x-small border border-success mt-1">Activo</span>')}
-                                                    </td>
-                                                    <td class="text-muted small">${doc.fecha_carga}</td>
-                                                    <td class="fw-bold text-dark small">${doc.fecha_vencimiento}</td>
-                                                    <td><span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} px-3 py-1 x-small border border-${doc.status_color} rounded-pill fw-bold">${doc.status_vigencia}</span></td>
-                                                    <td class="text-end pe-4">
-                                                        <div class="d-flex justify-content-end gap-2">
-                                                            ${doc.url_archivo ? `
-                                                            <button class="btn btn-sm btn-light border p-2 rounded-circle text-dark" onclick="mostrarVisor('${doc.url_archivo}', '${tipo}')" title="Vista Previa"><span class="material-symbols-rounded fs-6">visibility</span></button>
-                                                            <a href="${doc.url_archivo}" download class="btn btn-sm btn-light border text-primary p-2 rounded-circle" title="Descargar PDF"><span class="material-symbols-rounded fs-6">download</span></a>
-                                                            ` : '<span class="text-muted small">N/A</span>'}
-                                                        </div>
-                                                    </td>
-                                                </tr>`;
+                                        <tr class="${trClass}">
+                                            <td class="ps-4">
+                                                <div class="fw-bold text-dark small text-truncate" style="max-width: 250px;" title="${doc.nombre}">${doc.nombre}</div>
+                                                ${isArchivado ? '<span class="badge bg-secondary-subtle text-secondary x-small border border-secondary mt-1">Archivado</span>' : (doc.status_vigencia === 'VENCIDO' ? '<span class="badge bg-danger-subtle text-danger x-small border border-danger mt-1">Vencido</span>' : '<span class="badge bg-success-subtle text-success x-small border border-success mt-1">Activo</span>')}
+                                            </td>
+                                            <td class="text-muted small">${doc.fecha_carga}</td>
+                                            <td class="fw-bold text-dark small">${doc.fecha_vencimiento}</td>
+                                            <td><span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} px-3 py-1 x-small border border-${doc.status_color} rounded-pill fw-bold">${doc.status_vigencia}</span></td>
+                                            <td class="text-end pe-4">
+                                                <div class="d-flex justify-content-end gap-2">
+                                                    ${doc.url_archivo ? `
+                                                    <button class="btn btn-sm btn-light border p-2 rounded-circle text-dark" onclick="mostrarVisor('${doc.url_archivo}', '${tipo}')" title="Vista Previa"><span class="material-symbols-rounded fs-6">visibility</span></button>
+                                                    <a href="${doc.url_archivo}" download class="btn btn-sm btn-light border text-primary p-2 rounded-circle" title="Descargar PDF"><span class="material-symbols-rounded fs-6">download</span></a>
+                                                    ` : '<span class="text-muted small">N/A</span>'}
+                                                </div>
+                                            </td>
+                                        </tr>`;
                                     });
 
                                     content.innerHTML += `
-                                            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-3">
-                                                <div class="card-header bg-white border-0 p-4">
-                                                    <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 text-uppercase letter-spacing-1 small">
-                                                        <span class="material-symbols-rounded text-primary fs-5">folder_open</span>
-                                                        ${tipo}
-                                                    </h6>
-                                                </div>
-                                                <div class="table-responsive">
-                                                    <table class="table table-hover align-middle mb-0">
-                                                        <thead class="bg-light">
-                                                            <tr>
-                                                                <th class="ps-4 py-3 border-0 small text-muted fw-bold">NOMBRES Y ESTADO</th>
-                                                                <th class="py-3 border-0 small text-muted fw-bold">CARGA</th>
-                                                                <th class="py-3 border-0 small text-muted fw-bold">VENCIMIENTO</th>
-                                                                <th class="py-3 border-0 small text-muted fw-bold">VIGENCIA</th>
-                                                                <th class="py-3 border-0 text-end pe-4 small text-muted fw-bold">ACCIONES</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>${rows}</tbody>
-                                                    </table>
-                                                </div>
-                                            </div>`;
+                                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-3">
+                                        <div class="card-header bg-white border-0 p-4">
+                                            <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 text-uppercase letter-spacing-1 small">
+                                                <span class="material-symbols-rounded text-primary fs-5">folder_open</span>
+                                                ${tipo}
+                                            </h6>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-hover align-middle mb-0">
+                                                <thead class="bg-light">
+                                                    <tr>
+                                                        <th class="ps-4 py-3 border-0 small text-muted fw-bold">NOMBRES Y ESTADO</th>
+                                                        <th class="py-3 border-0 small text-muted fw-bold">CARGA</th>
+                                                        <th class="py-3 border-0 small text-muted fw-bold">VENCIMIENTO</th>
+                                                        <th class="py-3 border-0 small text-muted fw-bold">VIGENCIA</th>
+                                                        <th class="py-3 border-0 text-end pe-4 small text-muted fw-bold">ACCIONES</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>${rows}</tbody>
+                                            </table>
+                                        </div>
+                                    </div>`;
                                 }
                             }
                             modalBoveda.show();
@@ -1864,95 +1871,54 @@
                     container.querySelectorAll('.btn-switch').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
 
-                    const periodo = btn.getAttribute('data-periodo'); // hoy, semana, mes
-                    const amount = btn.getAttribute('data-amount');
-                    const display = btn.getAttribute('data-display');
+                    const amount = btn.getAttribute('data-data-display') || btn.getAttribute('data-display');
                     const label = btn.getAttribute('data-label');
+                    const periodo = btn.getAttribute('data-periodo');
 
                     // 1. Actualizar Tarjeta Principal
-                    const amountEl = document.getElementById('earnings_amount');
-                    if (amountEl) {
-                        amountEl.innerText = display;
-                        amountEl.title = '$' + amount;
-                    }
-                    const labelEl = document.getElementById('earnings_label');
-                    if (labelEl) labelEl.innerText = label;
+                    document.getElementById('earnings_amount').innerText = amount;
+                    document.getElementById('earnings_label').innerText = label;
 
-                    // 2. Actualizar Tarjetas de Buses (Sincrónico)
+                    // 2. Actualizar tarjetas individuales de buses
                     document.querySelectorAll('.bus-earnings-card').forEach(card => {
-                        const inc = card.getAttribute(`data-${periodo}-ingresos`);
+                        const ing = card.getAttribute(`data-${periodo}-ingresos`);
                         const pax = card.getAttribute(`data-${periodo}-pasajeros`);
                         
-                        const incEl = card.querySelector('.income-amount');
-                        const paxEl = card.querySelector('.pax-count');
-                        
-                        if (incEl) {
-                            // Formateo corto ($1.2M, $450K, $5,000)
-                            const val = parseInt(inc.replace(/,/g, ''));
-                            let disp = '$' + inc;
-                            if (val >= 1000000) disp = '$' + (val / 1000000).toFixed(1) + 'M';
-                            else if (val >= 100000) disp = '$' + Math.round(val / 1000) + 'K';
+                        // Actualizar monto de ingresos en la tarjeta con formato corto (K, M)
+                        const amountEl = card.querySelector('.income-amount');
+                        if (amountEl) {
+                            let val = parseInt(ing.replace(/,/g, ''));
+                            let display = '$' + val.toLocaleString();
+                            if (val >= 1000000) display = '$' + (val / 1000000).toFixed(1) + 'M';
+                            else if (val >= 100000) display = '$' + Math.floor(val / 1000) + 'K';
                             
-                            incEl.innerText = disp;
-                            incEl.title = '$' + inc;
+                            amountEl.innerText = display;
+                            amountEl.title = '$' + val.toLocaleString();
                         }
+                        
+                        // Actualizar pax
+                        const paxEl = card.querySelector('.pax-count');
                         if (paxEl) paxEl.innerText = pax + ' Pax';
                     });
 
-                    // 3. Recargar Tabla de Trayectos (AJAX)
+                    // 3. Actualizar Tabla de Ingresos por AJAX
                     const tableContainer = document.getElementById('ganancias-table-container');
                     if (tableContainer) {
-                        const url = new URL(window.location.href);
-                        url.searchParams.set('periodo', periodo);
-                        url.searchParams.set('section', 'ganancias');
-                        url.searchParams.delete('page_gan'); // Reset a pág 1 al cambiar periodo
-
                         tableContainer.style.opacity = '0.5';
-                        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                            .then(r => r.text())
-                            .then(html => {
-                                tableContainer.innerHTML = html;
-                                tableContainer.style.opacity = '1';
-                            });
+                        fetch(`?section=ganancias&periodo=${periodo}`, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        })
+                        .then(response => response.text())
+                        .then(html => {
+                            tableContainer.innerHTML = html;
+                            tableContainer.style.opacity = '1';
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            tableContainer.style.opacity = '1';
+                        });
                     }
                 };
-
-                // 7. Paginación AJAX para la Tabla de Ganancias
-                const earningsContainer = document.getElementById('ganancias-table-container');
-                if (earningsContainer) {
-                    earningsContainer.addEventListener('click', function (e) {
-                        const link = e.target.closest('.pagination a');
-                        if (link) {
-                            e.preventDefault();
-                            const url = link.href;
-
-                            earningsContainer.style.opacity = '0.5';
-                            earningsContainer.style.pointerEvents = 'none';
-
-                            fetch(url, {
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                }
-                            })
-                                .then(response => {
-                                    if (!response.ok) throw new Error('Error en la red');
-                                    return response.text();
-                                })
-                                .then(html => {
-                                    earningsContainer.innerHTML = html;
-                                    earningsContainer.style.opacity = '1';
-                                    earningsContainer.style.pointerEvents = 'auto';
-                                })
-                                .catch(error => {
-                                    console.error('Error en paginación AJAX:', error);
-                                    earningsContainer.style.opacity = '1';
-                                    earningsContainer.style.pointerEvents = 'auto';
-                                    // Fallback: recargar si falla el AJAX
-                                    window.location.href = url;
-                                });
-                        }
-                    });
-                }
             });
         </script>
 

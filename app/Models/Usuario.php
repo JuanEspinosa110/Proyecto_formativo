@@ -192,4 +192,20 @@ class Usuario extends Authenticatable
     {
         return $this->hasMany(Viaje::class, 'doc_us', 'doc_usuario');
     }
+
+    /**
+     * Accessor para compatibilidad con vistas que esperan nombre_tipo directamente.
+     */
+    public function getNombreTipoAttribute()
+    {
+        return $this->tipoUsuario->nombre_tipo ?? 'N/A';
+    }
+
+    /**
+     * Accessor para compatibilidad con vistas que esperan nombre_estado directamente.
+     */
+    public function getNombreEstadoAttribute()
+    {
+        return $this->estado->nombre_estado ?? 'N/A';
+    }
 }

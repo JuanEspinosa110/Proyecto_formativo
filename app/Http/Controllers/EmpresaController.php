@@ -13,9 +13,16 @@ use App\Models\Estado;
 use App\Models\HistorialBus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Services\BusService;
 
 class EmpresaController extends Controller
 {
+    protected $busService;
+
+    public function __construct(BusService $busService)
+    {
+        $this->busService = $busService;
+    }
     /**
      * Muestra el dashboard de la empresa para el Auxiliar.
      */
@@ -28,60 +35,92 @@ class EmpresaController extends Controller
             return redirect()->route('home')->with('error', 'No tienes empresa asociada.');
         }
 
-        $section = $request->query('section', 'dashboard');
+        $tab = $request->query('tab', 'personal');
         
+        // --- 1. DATOS COMPARTIDOS Y METADATOS ---
         $data = [
-            'section' => $section,
+            'tab' => $tab,
+            'section' => $tab,
+            'roles' => \Illuminate\Support\Facades\DB::table('tipo_usuario')->whereIn('id_tipo_usuario', [3, 4, 5])->get(),
+            'estados' => Estado::whereIn('id_estado', [1, 2])->get(),
+            'estadosBus' => Estado::whereIn('id_estado', [1, 2, 9])->get(), // Activo, Inactivo, En mantenimiento
+            'rutas' => Ruta::all(),
+            'tiposDocumento' => TipoDocumento::all(),
+            'propietarios' => Usuario::where('NIT', $nit)->where('id_tipo_usuario', 5)->get(), // Solo para selección de bus
+            'conductores' => Usuario::where('NIT', $nit)->where('id_tipo_usuario', 3)->get(),
+            'busesDisponibles' => Bus::where('NIT', $nit)->get()->filter(function(Bus $b) { return $b->isOperable(); }),
         ];
 
-        if ($section == 'usuarios') {
-            $query = Usuario::where('NIT', $nit)->whereIn('id_tipo_usuario', [3, 6]); // Conductor y Propietario
+        // --- 2. CARGA DE LISTADOS (PAGINADOS) ---
+        // Inicializamos las variables con paginación base para evitar errores en las vistas de pestañas no activas
+        
+        // Pestaña Personal (Solo Conductores, Auxiliares y Propietarios por requerimiento)
+        $queryUsr = Usuario::with(['tipoUsuario', 'estado'])->where('NIT', $nit)->whereIn('id_tipo_usuario', [3, 4, 5]);
+        if ($tab == 'personal') {
             if ($request->filled('search')) {
                 $search = $request->search;
-                $query->where(function($q) use ($search) {
+                $queryUsr->where(function($q) use ($search) {
                     $q->where('primer_nombre', 'like', "%{$search}%")
                       ->orWhere('primer_apellido', 'like', "%{$search}%")
                       ->orWhere('doc_usuario', 'like', "%{$search}%");
                 });
             }
-            $data['usuarios'] = $query->paginate(10, ['*'], 'page_usr');
-            $data['tiposUsuario'] = \Illuminate\Support\Facades\DB::table('tipo_usuario')->whereIn('id_tipo_usuario', [3, 6])->get();
-            $data['estados'] = Estado::whereIn('id_estado', [1, 2])->get();
-        } 
-        elseif ($section == 'buses') {
-            $query = Bus::where('NIT', $nit)->with('estado');
-            if ($request->filled('placa')) {
-                $query->where('placa', 'like', '%' . $request->placa . '%');
+            if ($request->filled('role')) {
+                $queryUsr->where('id_tipo_usuario', $request->role);
+                $data['selectedRole'] = $request->role;
             }
-            $data['buses'] = $query->paginate(10, ['*'], 'page_bus');
-            $data['propietarios'] = Usuario::where('NIT', $nit)->where('id_tipo_usuario', 6)->get();
-        } 
-        elseif ($section == 'documentos') {
-            $query = Documento::where('NIT', $nit)->with(['tipoDocumento', 'estado', 'bus'])->whereNotNull('placa');
-            if ($request->filled('placa')) {
-                $query->where('placa', 'like', '%' . $request->placa . '%');
-            }
-            $data['documentos'] = $query->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page_doc');
-        } 
-        elseif ($section == 'asignaciones') {
-            $query = Viaje::whereHas('bus', function($q) use ($nit) { $q->where('NIT', $nit); })->with(['ruta', 'conductor', 'estado']);
-            if ($request->filled('placa')) {
-                $query->where('placa', $request->placa);
-            }
-            $data['asignaciones'] = $query->orderBy('fecha', 'desc')->paginate(10, ['*'], 'page_asig');
-            $data['busesDisponibles'] = Bus::where('NIT', $nit)->get()->filter(fn(Bus $b) => $b->isOperable());
-            $data['rutas'] = Ruta::get();
-            $data['conductores'] = Usuario::where('NIT', $nit)->where('id_tipo_usuario', 3)->get();
-        } 
-        else {
-            // Stats para dashboard principal
-            $data['stats'] = [
-                'usuarios' => Usuario::where('NIT', $nit)->whereIn('id_tipo_usuario', [3, 6])->count(),
-                'buses' => Bus::where('NIT', $nit)->count(),
-                'documentos_pendientes' => Documento::where('NIT', $nit)->where('id_estado', 5)->count(),
-                'asignaciones_hoy' => Viaje::whereHas('bus', function($q) use ($nit) { $q->where('NIT', $nit); })->whereDate('fecha', now()->toDateString())->count(),
-            ];
         }
+        $data['usuarios'] = $queryUsr->paginate(10, ['*'], 'page_usr');
+
+        // Pestaña Flota
+        $queryBus = Bus::where('NIT', $nit)->with('estado');
+        if ($tab == 'flota') {
+            if ($request->filled('search_bus')) {
+                $queryBus->where('placa', 'like', '%' . $request->search_bus . '%');
+            }
+            if ($request->filled('estado_bus')) {
+                $queryBus->where('id_estado', $request->estado_bus);
+            }
+        }
+        $data['buses'] = $queryBus->paginate(10, ['*'], 'page_bus');
+
+        // Pestaña Documentos
+        $queryDoc = Documento::where('NIT', $nit)->with(['tipoDocumento', 'estado', 'bus'])->whereNotNull('placa');
+        if ($tab == 'documentacion') {
+            if ($request->filled('placa')) {
+                $queryDoc->where('placa', 'like', '%' . $request->placa . '%');
+            }
+        }
+        $data['documentos'] = $queryDoc->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page_doc');
+
+        // Pestaña Asignaciones
+        $queryAsig = Viaje::whereHas('bus', function($q) use ($nit) { $q->where('NIT', $nit); })->with(['ruta', 'conductor', 'estado', 'bus.propietario']);
+        if ($tab == 'asignaciones') {
+            if ($request->filled('search_asignacion')) {
+                $s = $request->search_asignacion;
+                $queryAsig->where(function($q) use ($s) {
+                    $q->where('placa', 'like', "%$s%")
+                      ->orWhereHas('conductor', fn($sq) => $sq->where('primer_nombre', 'like', "%$s%")->orWhere('primer_apellido', 'like', "%$s%"));
+                });
+            }
+            if ($request->filled('id_ruta')) {
+                $queryAsig->where('id_ruta', $request->id_ruta);
+            }
+        }
+        $data['asignaciones'] = $queryAsig->orderBy('fecha', 'desc')->paginate(10, ['*'], 'page_asig');
+
+        // --- 3. ESTADÍSTICAS Y ALERTAS ---
+        $data['licenciasAlerta'] = Documento::where('id_tipo_documento', 3) // Licencias
+            ->whereHas('usuario', fn($q) => $q->where('NIT', $nit))
+            ->where('id_estado', '!=', 1) // No aprobadas o por vencer
+            ->get();
+
+        $data['stats'] = [
+            'total_usuarios' => Usuario::where('NIT', $nit)->count(),
+            'total_buses' => Bus::where('NIT', $nit)->count(),
+            'pendientes_doc' => Documento::where('NIT', $nit)->where('id_estado', 5)->count(),
+            'viajes_hoy' => Viaje::whereHas('bus', fn($q) => $q->where('NIT', $nit))->whereDate('fecha', now()->toDateString())->count(),
+        ];
 
         return view('empresa.dashboard', $data);
     }
@@ -93,31 +132,30 @@ class EmpresaController extends Controller
     {
         try {
             $user = Auth::user();
-            $nit  = $user->NIT ?? null;
+            $nit  = $user->getActiveNit();
 
             if (!$nit) {
                 return response()->json(['error' => 'Sin empresa asociada'], 400);
             }
 
-            $empresa    = \App\Models\Empresa::where('NIT', $nit)->first();
             $usuarios   = Usuario::where('NIT', $nit)->get();
             $documentos = Documento::where('NIT', $nit)->get();
             $buses      = Bus::with('estado')->where('NIT', $nit)->get();
-            $viajes     = Viaje::with('ruta')
-                ->whereHas('bus', fn($q) => $q->where('NIT', $nit))
-                ->get();
+            $asignaciones_hoy = Viaje::whereHas('bus', fn($q) => $q->where('NIT', $nit))
+                ->whereDate('fecha', now()->toDateString())
+                ->count();
 
             return response()->json([
-                'empresa'    => $empresa,
-                'usuarios'   => $usuarios,
-                'documentos' => $documentos,
-                'buses'      => $buses,
-                'viajes'     => $viajes,
-                'totales'    => [
+                'totales' => [
                     'usuarios'   => $usuarios->count(),
-                    'documentos' => $documentos->count(),
                     'buses'      => $buses->count(),
+                    'documentos_pendientes' => $documentos->where('id_estado', 5)->count(),
+                    'asignaciones_hoy' => $asignaciones_hoy
                 ],
+                'buses_estado' => [
+                    'operables' => $buses->filter(function(Bus $b) { return $b->isOperable(); })->count(),
+                    'proximos_vencer' => $buses->filter(function(Bus $b) { return $b->hasDocumentsExpiringSoon(); })->count()
+                ]
             ]);
         } catch (\Throwable $e) {
             Log::error('EmpresaController@stats: ' . $e->getMessage());
@@ -126,27 +164,121 @@ class EmpresaController extends Controller
     }
 
     /**
-     * Crear nuevo usuario (Conductor/Propietario)
+     * Devuelve detalles de un bus para el modal Expediente.
      */
+    public function showBus($placa)
+    {
+        try {
+            $nit = Auth::user()->getActiveNit();
+            // Verificar pertenencia
+            $bus = Bus::where('placa', $placa)->where('NIT', $nit)->firstOrFail();
+            
+            $detalles = $this->busService->getBusDetails($placa);
+            return response()->json($detalles);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'No se encontró el vehículo o no pertenece a su empresa.'], 404);
+        }
+    }
+
+    /**
+     * Devuelve el historial completo (bóveda) de documentos para un vehículo (Auxiliar).
+     */
+    public function historialDocumental($placa)
+    {
+        try {
+            $nit = Auth::user()->getActiveNit();
+            $bus = Bus::where('placa', $placa)->where('NIT', $nit)->firstOrFail();
+
+            $documentos = \App\Models\Documento::with('tipoDocumento')
+                ->where('placa', $placa)
+                ->orderBy('id_estado', 'asc')
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function($doc) {
+                    return [
+                        'id_documento' => $doc->id_documento,
+                        'nombre' => $doc->nombre ?? 'Sin nombre',
+                        'tipo_nombre' => $doc->tipoDocumento->nombre ?? 'Documento',
+                        'fecha_carga' => $doc->created_at->format('d/m/Y'),
+                        'fecha_vencimiento' => $doc->fecha_vencimiento->format('d/m/Y'),
+                        'status_vigencia' => $doc->estado_expiracion,
+                        'status_color' => $doc->status_color,
+                        'es_archivado' => $doc->id_estado == 2,
+                        'url_archivo' => $doc->archivo ? asset('storage/' . $doc->archivo) : null
+                    ];
+                });
+
+            $grupos = [];
+            foreach ($documentos as $doc) {
+                $grupos[$doc['tipo_nombre']][] = $doc;
+            }
+
+            return response()->json([
+                'placa' => $placa,
+                'grupos' => $grupos
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Acceso denegado o vehículo no encontrado.'], 403);
+        }
+    }
+
     public function storeUsuario(Request $request)
     {
         $request->validate([
             'primer_nombre' => 'required|string|max:50',
             'primer_apellido' => 'required|string|max:50',
             'doc_usuario' => 'required|digits_between:6,15|numeric|unique:usuario,doc_usuario',
-            'id_tipo_usuario' => 'required|in:3,6', // 3=Conductor, 6=Propietario ONLY
+            'id_tipo_usuario' => 'required|in:3,4,5', // 3=Conductor, 4=Auxiliar, 5=Propietario ONLY
             'id_estado' => 'required|exists:estado,id_estado',
             'correo' => 'required|email|unique:usuario,correo',
-            'password' => 'required|min:6',
+            'password' => 'nullable|min:6',
         ]);
 
-        $data = $request->except(['password']);
-        $data['password'] = bcrypt($request->password);
+        $data = $request->except(['password', 'fecha_expedicion', 'fecha_vencimiento', 'archivo_licencia']);
+        $passGenerada = $request->filled('password') ? $request->password : \Illuminate\Support\Str::random(10);
+        $data['password'] = bcrypt($passGenerada);
         $data['NIT'] = Auth::user()->getActiveNit();
+        $data['id_ciudad'] = Auth::user()->id_ciudad;
 
-        Usuario::create($data);
+        $user = Usuario::create($data);
 
-        return redirect()->back()->with('success', 'Usuario creado exitosamente.');
+        // Si es conductor, crear el documento de licencia
+        if ($request->id_tipo_usuario == 3 && $request->hasFile('archivo_licencia')) {
+            $pathLicencia = $request->file('archivo_licencia')->store('documentos', 'public');
+            Documento::create([
+                'nombre' => 'LICENCIA CONDUCCION',
+                'archivo' => $pathLicencia,
+                'fecha_expedicion' => $request->fecha_expedicion,
+                'fecha_vencimiento' => $request->fecha_vencimiento,
+                'id_tipo_documento' => 3, 
+                'doc_usuario' => $user->doc_usuario,
+                'NIT' => $data['NIT'],
+                'id_estado' => 1
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Usuario creado exitosamente. Contraseña enviada/generada: ' . $passGenerada);
+    }
+
+    /**
+     * Actualiza un usuario existente
+     */
+    public function updateUsuario(Request $request, $doc_usuario)
+    {
+        $request->validate([
+            'primer_nombre' => 'required|string|max:50',
+            'primer_apellido' => 'required|string|max:50',
+            'id_tipo_usuario' => 'required|in:3,4,5',
+            'correo' => 'required|email|unique:usuario,correo,'.$doc_usuario.',doc_usuario',
+            'telefono' => 'required|numeric'
+        ]);
+
+        $user = Usuario::where('doc_usuario', $doc_usuario)->where('NIT', Auth::user()->getActiveNit())->firstOrFail();
+        
+        $data = $request->only(['primer_nombre', 'primer_apellido', 'segundo_nombre', 'segundo_apellido', 'correo', 'telefono', 'id_tipo_usuario', 'id_estado']);
+        $user->update($data);
+
+        return redirect()->back()->with('success', 'Usuario actualizado con éxito.');
     }
 
     /**
@@ -251,11 +383,88 @@ class EmpresaController extends Controller
     }
 
     /**
-     * Descargar Reporte
+     * Inactiva una asignación (Cambiar a Estado 2), solo si es Programada y no ha iniciado.
+     */
+    public function inactivarViaje($id_viaje)
+    {
+        try {
+            $viaje = Viaje::findOrFail($id_viaje);
+            $nit = Auth::user()->getActiveNit();
+
+            // Verificar pertenencia (a través del bus)
+            if ($viaje->bus->NIT != $nit) {
+                return back()->with('error', 'Acceso denegado.');
+            }
+
+            // Solo inactivar si es Programada (1) y no tiene recorridos
+            if ($viaje->id_estado != 1 || $viaje->recorridos()->exists()) {
+                return back()->with('error', 'Solo se pueden inactivar viajes programados que no hayan iniciado.');
+            }
+
+            $viaje->id_estado = 2; // INACTIVO
+            $viaje->save();
+
+            HistorialBus::create([
+                'placa' => $viaje->placa,
+                'id_ruta' => $viaje->id_ruta,
+                'doc_us' => $viaje->doc_us,
+                'tipo_cambio' => 'INACTIVACION',
+                'detalle' => "Viaje #$id_viaje inactivado por Auxiliar."
+            ]);
+
+            return back()->with('success', 'Asignación inactivada correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al procesar la solicitud: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Descargar Reporte Completo de Operación (CSV).
      */
     public function descargarReporte(Request $request)
     {
-        return redirect()->back()->with('success', 'Descarga de reporte en desarrollo.');
+        try {
+            $nit = Auth::user()->getActiveNit();
+            $viajes = Viaje::with(['ruta', 'conductor', 'bus', 'estado'])
+                ->whereHas('bus', fn($q) => $q->where('NIT', $nit))
+                ->orderBy('fecha', 'desc')
+                ->get();
+
+            $filename = "Reporte_Operacion_" . now()->format('Y-m-d_H-i-s') . ".csv";
+            $headers = [
+                "Content-type"        => "text/csv; charset=UTF-8",
+                "Content-Disposition" => "attachment; filename=$filename",
+                "Pragma"              => "no-cache",
+                "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+                "Expires"             => "0"
+            ];
+
+            $columns = ['ID_Viaje', 'Fecha', 'Placa', 'Ruta', 'Conductor', 'Documento_Cond', 'Estado'];
+
+            $callback = function() use ($viajes, $columns) {
+                $file = fopen('php://output', 'w');
+                // BOM para UTF-8 en Excel
+                fputs($file, (chr(0xEF) . chr(0xBB) . chr(0xBF)));
+                fputcsv($file, $columns, ';');
+
+                foreach ($viajes as $v) {
+                    fputcsv($file, [
+                        $v->id_viaje,
+                        $v->fecha,
+                        $v->placa,
+                        $v->ruta->nombre_ruta ?? 'N/A',
+                        ($v->conductor->primer_nombre ?? '---') . ' ' . ($v->conductor->primer_apellido ?? ''),
+                        $v->doc_us,
+                        $v->estado->nombre_estado ?? '---'
+                    ], ';');
+                }
+                fclose($file);
+            };
+
+            return response()->stream($callback, 200, $headers);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al generar el reporte.');
+        }
     }
 
     /**

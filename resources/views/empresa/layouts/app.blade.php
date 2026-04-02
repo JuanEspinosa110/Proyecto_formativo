@@ -13,7 +13,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/validaciones.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/validacion.css') }}">
 
     @stack('styles')
 </head>
@@ -26,7 +26,7 @@
                 <div class="sigu-brand-mark" aria-hidden="true"><span class="material-symbols-rounded">route</span></div>
                 <div class="sigu-brand-text">
                     <span class="sigu-brand-name">SIGU</span>
-                    <span class="sigu-brand-sub">Auxilar Admin</span>
+                    <span class="sigu-brand-sub">Auxiliar Empresa</span>
                 </div>
             </a>
 
@@ -35,18 +35,17 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">dashboard</span></span>
                     <span>Dashboard</span>
                 </a>
+
+                <div class="sigu-sb-divider" style="height:1px; background:rgba(255,255,255,0.1); margin:1rem 0;"></div>
                 
-               
-                <!--
-                <a href="#" class="sigu-sb-link">
-                    <span class="sb-ico"><span class="material-symbols-rounded">people</span></span>
-                    <span>Personal</span>
+                <a href="{{ route('pasajero.dashboard') }}" class="sigu-sb-link {{ request()->routeIs('pasajero.dashboard') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">credit_card</span></span>
+                    <span>Mi Tarjeta</span>
                 </a>
-                -->
             </nav>
 
             <div class="sigu-sidebar-footer">
-                <form id="empresa-logout-form-sidebar" method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="sigu-btn sigu-btn-ghost">
                         <span class="material-symbols-rounded">logout</span>
