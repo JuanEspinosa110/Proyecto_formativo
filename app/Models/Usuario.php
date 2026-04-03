@@ -62,7 +62,7 @@ class Usuario extends Authenticatable
                     'admin' => 1,
                     'operador' => 4,
                     'usuario' => 3,
-                    'controlador_tiempo' => 7,
+                    'coordinador_bus' => 7,
                     'gestor_recargas' => 8,
                     default => 1
                 };
@@ -192,5 +192,21 @@ class Usuario extends Authenticatable
     public function viajes()
     {
         return $this->hasMany(Viaje::class, 'doc_us', 'doc_usuario');
+    }
+
+    /**
+     * Accessor para compatibilidad con vistas que esperan nombre_tipo directamente.
+     */
+    public function getNombreTipoAttribute()
+    {
+        return $this->tipoUsuario->nombre_tipo ?? 'N/A';
+    }
+
+    /**
+     * Accessor para compatibilidad con vistas que esperan nombre_estado directamente.
+     */
+    public function getNombreEstadoAttribute()
+    {
+        return $this->estado->nombre_estado ?? 'N/A';
     }
 }

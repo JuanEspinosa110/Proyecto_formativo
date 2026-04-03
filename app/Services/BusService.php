@@ -108,7 +108,7 @@ class BusService
             ->first();
 
         // Obtener documentos del vehículo
-        $documentos = Documento::where('placa', $placa)
+        $documentos = \App\Models\Documento::where('placa', $placa)
             ->with(['tipoDocumento', 'estado'])
             ->get()
             ->map(function($doc) {
@@ -148,17 +148,23 @@ class BusService
     /**
      * Exportar buses a Excel: Eager loading + Filtros + Estilo Premium
      */
+    /**
+     * Exportar buses a Excel: Eager loading + Filtros + Estilo Premium
+     */
     public function exportExcel(Request $request)
     {
         $user = Auth::guard('web')->user();
         $nit = $user->getActiveNit();
-        $query = Bus::with(['estado', 'empresa'])->where('NIT', $nit);
+        // Cargar propietario también si está relacionado (doc_propietario)
+        $query = Bus::with(['estado', 'empresa', 'propietario'])->where('NIT', $nit);
 
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('placa', 'like', "%{$search}%")
-                  ->orWhere('modelo', 'like', "%{$search}%");
+                  ->orWhere('modelo', 'like', "%{$search}%")
+                  ->orWhere('nombre_propietario', 'like', "%{$search}%")
+                  ->orWhere('doc_propietario', 'like', "%{$search}%");
             });
         }
 
@@ -170,40 +176,46 @@ class BusService
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Inventario Flota');
 
         // Header
-        $headers = ['Placa', 'Empresa', 'Modelo', 'Capacidad', 'Kilometraje', 'Estado'];
-        $cols = ['A', 'B', 'C', 'D', 'E', 'F'];
+        $headers = ['Placa', 'Modelo', 'Capacidad', 'Kilometraje', 'Propietario', 'Teléfono Prop', 'Estado'];
+        $cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
         foreach ($cols as $index => $col) {
             $sheet->setCellValue($col . '1', $headers[$index]);
             $sheet->getStyle($col . '1')->getFont()->setBold(true);
             $sheet->getStyle($col . '1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle($col . '1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFDDEBF7');
         }
 
         // Body
         $row = 2;
         foreach ($buses as $bus) {
             $sheet->setCellValue('A' . $row, $bus->placa);
-            $sheet->setCellValue('B' . $row, optional($bus->empresa)->nombre_empresa ?? $bus->NIT);
-            $sheet->setCellValue('C' . $row, $bus->modelo);
-            $sheet->setCellValue('D' . $row, $bus->capacidad_pasajeros);
-            $sheet->setCellValue('E' . $row, $bus->kilometraje);
-            $sheet->setCellValue('F' . $row, optional($bus->estado)->nombre_estado ?? 'N/A');
+            $sheet->setCellValue('B' . $row, $bus->modelo);
+            $sheet->setCellValue('C' . $row, $bus->capacidad_pasajeros);
+            $sheet->setCellValue('D' . $row, $bus->kilometraje . ' KM');
+            $sheet->setCellValue('E' . $row, $bus->nombre_propietario ?? ($bus->propietario ? ($bus->propietario->primer_nombre . ' ' . $bus->propietario->primer_apellido) : 'PARTICULAR'));
+            $sheet->setCellValue('F' . $row, $bus->telefono ?? ($bus->propietario ? $bus->propietario->telefono : '---'));
+            $sheet->setCellValue('G' . $row, optional($bus->estado)->nombre_estado ?? 'N/A');
             $row++;
         }
 
-        // Premium Styles
+        // Auto-fit y bordes
         foreach ($cols as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
-        $sheet->getStyle('A1:F' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+        $sheet->getStyle('A1:G' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
         $writer = new Xlsx($spreadsheet);
-        $filename = 'Reporte_Buses_' . date('Ymd_His') . '.xlsx';
-        $temp = tempnam(sys_get_temp_dir(), 'xlsx');
-        $writer->save($temp);
+        $filename = 'Reporte_Flota_' . $nit . '_' . date('Ymd_His') . '.xlsx';
 
-        return response()->download($temp, $filename)->deleteFileAfterSend(true);
+        return response()->streamDownload(function() use ($writer) {
+            $writer->save('php://output');
+        }, $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Cache-Control' => 'max-age=0',
+        ]);
     }
 }

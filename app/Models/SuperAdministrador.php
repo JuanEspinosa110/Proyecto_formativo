@@ -26,6 +26,7 @@ class SuperAdministrador extends Authenticatable
         'foto_perfil',
         'password',
         'id_estado',
+        'id_ciudad',
     ];
 
     protected $hidden = [
@@ -43,6 +44,14 @@ class SuperAdministrador extends Authenticatable
     public function estado()
     {
         return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
+    }
+
+    /**
+     * Relación con ciudad
+     */
+    public function ciudad()
+    {
+        return $this->belongsTo(Ciudad::class, 'id_ciudad', 'id_ciudad');
     }
 
 

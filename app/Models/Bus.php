@@ -33,6 +33,11 @@ class Bus extends Model
         return $this->belongsTo(Estado::class, 'id_estado');
     }
 
+    public function propietario()
+    {
+        return $this->belongsTo(Usuario::class, 'doc_propietario', 'doc_usuario');
+    }
+
     public function empresa()
     {
         return $this->belongsTo(Empresa::class, 'NIT', 'NIT');
@@ -82,5 +87,19 @@ class Bus extends Model
 
         // 3. Debe tener exactamente un documento aprobado por cada tipo requerido
         return $approvedCount === $requiredTypes->count();
+    }
+
+    /**
+     * Verifica si algún documento obligatorio está a menos de 30 días de vencer.
+     */
+    public function hasDocumentsExpiringSoon()
+    {
+        $hoy = now();
+        $vencimientoLimite = $hoy->copy()->addDays(30);
+
+        return Documento::where('placa', $this->placa)
+            ->where('id_estado', 1)
+            ->whereBetween('fecha_vencimiento', [$hoy, $vencimientoLimite])
+            ->exists();
     }
 }

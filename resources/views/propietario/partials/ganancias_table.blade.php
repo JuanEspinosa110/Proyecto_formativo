@@ -47,6 +47,6 @@
         </table>
     </div>
     <div class="mt-4">
-        {{ $asignacionesGanancias->appends(['section' => 'ganancias', 'mes_seleccionado' => request('mes_seleccionado')])->links() }}
+        {{ $asignacionesGanancias->appends(['section' => 'ganancias', 'mes_seleccionado' => request('mes_seleccionado'), 'periodo' => request('periodo')])->links() }}
     </div>
 </div>

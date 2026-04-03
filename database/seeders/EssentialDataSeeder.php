@@ -29,9 +29,10 @@ class EssentialDataSeeder extends Seeder
             TipoEmpresaSeeder::class,
             TipoUsuarioSeeder::class,
 
-            // 4. Configuración Administrativa (Para el SuperAdmin)
+            // 4. Configuración Administrativa y Operativa Base
             PlanesLicenciaSeeder::class,
             SuperAdministradorSeeder::class, // Incluye a Cesar Esquivel
+            RutaSeeder::class,               // Rutas base del sistema
         ]);
 
         $this->command->info('¡Datos esenciales cargados con éxito!');
