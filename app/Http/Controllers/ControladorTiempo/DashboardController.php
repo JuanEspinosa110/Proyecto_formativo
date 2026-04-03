@@ -36,10 +36,6 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
-        // Rutas de la empresa (basadas en buses asignados)
-        $rutasActivas = Ruta::whereHas('asignaciones.bus', fn($q) => $q->where('NIT', $user->NIT))
-            ->with(['barrioOrigen', 'barrioDestino'])
-            ->count();
 
         // ─── LÓGICA DE FRECUENCIAS ───
         $rutasDetalle = Ruta::whereHas('asignaciones.bus', fn($q) => $q->where('NIT', $user->NIT))
@@ -69,7 +65,6 @@ class DashboardController extends Controller
             'busesEnRuta',
             'busesInactivos',
             'asignaciones',
-            'rutasActivas',
             'rutasDetalle'
         ));
     }

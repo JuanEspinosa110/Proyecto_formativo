@@ -45,7 +45,17 @@ class DespachoController extends Controller
             }
         }
 
-        $despachos = $query->orderBy('fecha', 'asc')->paginate(15)->withQueryString();
+        // Ordenamiento personalizado:
+        // 1 = Activo CON recorridos (En curso)
+        // 2 = Activo SIN recorridos (Pendiente)
+        // 3 = Finalizado
+        $despachos = $query->orderByRaw("
+            CASE 
+                WHEN id_estado != 5 AND EXISTS (SELECT 1 FROM recorridos WHERE recorridos.id_viaje = viaje.id_viaje) THEN 1
+                WHEN id_estado != 5 THEN 2
+                ELSE 3
+            END ASC
+        ")->orderBy('fecha', 'asc')->paginate(15)->withQueryString();
             
         // Buses que ya iniciaron recorrido hoy
         $busesIniciados = \App\Models\Viaje::whereHas('bus', fn($q) => $q->where('NIT', $user->NIT))

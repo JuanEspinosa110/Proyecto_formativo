@@ -16,8 +16,14 @@ class MonitoreoController extends Controller
         // 1. Obtener estadísticas de TODA la flota de la empresa
         $todosLosBuses = Bus::where('NIT', $user->NIT)->get();
 
+        $enRutaCount = \App\Models\Viaje::whereHas('bus', fn($q) => $q->where('NIT', $user->NIT))
+            ->whereDate('fecha', \Carbon\Carbon::today())
+            ->whereHas('recorridos')
+            ->where('id_estado', '!=', 5)
+            ->count();
+
         $estadisticas = [
-            'en_ruta' => $todosLosBuses->where('id_estado', 1)->count(),
+            'en_ruta' => $enRutaCount,
             'inactivos' => $todosLosBuses->where('id_estado', 2)->count(),
             'en_taller' => $todosLosBuses->where('id_estado', 4)->count(),
             'total' => $todosLosBuses->count(),

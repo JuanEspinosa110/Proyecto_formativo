@@ -61,7 +61,7 @@
                 <div class="mb-4 form-check text-start">
                     <input type="checkbox" class="form-check-input" id="remember_device" name="remember_device" value="1" checked>
                     <label class="form-check-label text-muted small" for="remember_device" style="user-select: none; cursor: pointer;">
-                        No volver a pedir código en este equipo por 7 días
+                        No volver a pedir código en este equipo por 1 día
                     </label>
                 </div>
 

@@ -12,7 +12,7 @@
 
     {{-- ─── Resumen rápido ───────────────────────────────────────── --}}
     <div class="row g-3 mt-2 mb-3">
-        <div class="col-6 col-md-4">
+        <div class="col-6">
             <div class="bg-white rounded-3 shadow-sm p-3 ct-kpi d-flex align-items-center gap-3">
                 <span class="material-symbols-rounded fs-2 ct-kpi-icon">directions_bus</span>
                 <div>
@@ -21,16 +21,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-4">
-            <div class="bg-white rounded-3 shadow-sm p-3 ct-kpi d-flex align-items-center gap-3">
-                <span class="material-symbols-rounded fs-2 ct-kpi-icon">alt_route</span>
-                <div>
-                    <div class="fs-3 fw-bold lh-1">{{ $rutas->count() }}</div>
-                    <div class="text-muted small">Rutas activas</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4">
+        <div class="col-6">
             <div class="bg-white rounded-3 shadow-sm p-3 ct-kpi d-flex align-items-center gap-3">
                 <span class="material-symbols-rounded fs-2 ct-kpi-icon">assignment_ind</span>
                 <div>
