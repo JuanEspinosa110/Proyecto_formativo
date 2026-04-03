@@ -87,13 +87,49 @@ class EmpresaController extends Controller
         $data['buses'] = $queryBus->paginate(10, ['*'], 'page_bus');
 
         // Pestaña Documentos
-        $queryDoc = Documento::where('NIT', $nit)->with(['tipoDocumento', 'estado', 'bus'])->whereNotNull('placa');
+        $queryDoc = Documento::where('NIT', $nit)->with(['tipoDocumento', 'estado', 'bus.propietario', 'usuario']);
+        
         if ($tab == 'documentacion') {
-            if ($request->filled('placa')) {
-                $queryDoc->where('placa', 'like', '%' . $request->placa . '%');
+            // Document View:
+            // Filter by search_doc (Placa or Document Name)
+            if ($request->filled('search_doc')) {
+                $search = $request->search_doc;
+                $queryDoc->where(function($q) use ($search) {
+                    $q->where('placa', 'like', "%{$search}%")
+                      ->orWhere('nombre', 'like', "%{$search}%");
+                });
+            }
+
+            // Filter by status (Vigente, Próximo, Vencido) handled by model logic usually, 
+            // but here we filter by the explicit state if possible or custom logic
+            if ($request->filled('status_doc')) {
+                $status = $request->status_doc;
+                $queryDoc->where(function($q) use ($status) {
+                    if ($status == 'vencido') {
+                        $q->where('fecha_vencimiento', '<', now());
+                    } elseif ($status == 'proximo') {
+                        $q->whereBetween('fecha_vencimiento', [now(), now()->addDays(30)]);
+                    } elseif ($status == 'vigente') {
+                        $q->where('fecha_vencimiento', '>', now()->addDays(30));
+                    }
+                });
+            }
+
+            // [NEW] Filter by Tipo de Documento
+            if ($request->filled('tipo_doc')) {
+                $queryDoc->where('id_tipo_documento', $request->tipo_doc);
+            }
+
+            // [NEW] Filter by Propietario (Placa owner)
+            if ($request->filled('search_prop')) {
+                $prop = $request->search_prop;
+                $queryDoc->whereHas('bus', function($q) use ($prop) {
+                    $q->where('nombre_propietario', 'like', "%{$prop}%")
+                      ->orWhere('doc_propietario', 'like', "%{$prop}%");
+                });
             }
         }
-        $data['documentos'] = $queryDoc->orderBy('created_at', 'desc')->paginate(10, ['*'], 'page_doc');
+        $data['documentos'] = $queryDoc->orderBy('fecha_vencimiento', 'asc')->paginate(10, ['*'], 'page_doc');
 
         // Pestaña Asignaciones
         $queryAsig = Viaje::whereHas('bus', function($q) use ($nit) { $q->where('NIT', $nit); })->with(['ruta', 'conductor', 'estado', 'bus.propietario']);
@@ -107,6 +143,9 @@ class EmpresaController extends Controller
             }
             if ($request->filled('id_ruta')) {
                 $queryAsig->where('id_ruta', $request->id_ruta);
+            }
+            if ($request->filled('fecha_viaje')) {
+                $queryAsig->whereDate('fecha', $request->fecha_viaje);
             }
         }
         $data['asignaciones'] = $queryAsig->orderBy('fecha', 'desc')->paginate(10, ['*'], 'page_asig');
@@ -381,6 +420,7 @@ class EmpresaController extends Controller
 
         $data = $request->all();
         $data['id_viaje'] = $id;
+        $data['fecha_asignacion'] = now();
         $data['id_estado'] = 1; // Programado
 
         $viaje = Viaje::create($data);

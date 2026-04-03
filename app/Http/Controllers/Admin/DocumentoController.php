@@ -126,8 +126,7 @@ class DocumentoController extends Controller
         }
 
         $query = Documento::where('NIT', $empresa->NIT)
-            ->with(['tipoDocumento', 'estado', 'bus'])
-            ->whereNotNull('placa'); // Centrarse en documentos de vehículos
+            ->with(['tipoDocumento', 'estado', 'bus', 'usuario']);
 
         // Filtros
         if ($request->filled('tipo')) {
@@ -177,8 +176,7 @@ class DocumentoController extends Controller
         }
 
         $query = Documento::where('NIT', $empresa->NIT)
-            ->with(['tipoDocumento', 'estado', 'bus'])
-            ->whereNotNull('placa');
+            ->with(['tipoDocumento', 'estado', 'bus', 'usuario']);
 
         // Filtrar solicitudes: Excluir Aprobados (1) y Rechazados (8)
         $query->whereNotIn('id_estado', [1, 8]);
@@ -261,6 +259,10 @@ class DocumentoController extends Controller
 
             // Crear documento
             Documento::create($validated);
+
+            if (auth()->user()->id_tipo_usuario == 4) {
+                return redirect()->back()->with('success', 'Documento creado exitosamente.');
+            }
 
             return redirect()->route('admin.documentos.index')
                 ->with('success', '  Documento creado exitosamente');
@@ -345,6 +347,10 @@ class DocumentoController extends Controller
             // Actualizar documento
             $documento->update($validated);
 
+            if (auth()->user()->id_tipo_usuario == 4) {
+                return redirect()->back()->with('success', 'Documento actualizado correctamente.');
+            }
+
             return redirect()->route('admin.documentos.index')
                 ->with('success', '  Documento actualizado exitosamente');
         } catch (\Exception $e) {
@@ -376,6 +382,10 @@ class DocumentoController extends Controller
 
             $documento->delete();
 
+            if (auth()->user()->id_tipo_usuario == 4) {
+                return redirect()->back()->with('success', 'Documento eliminado correctamente.');
+            }
+
             return redirect()->route('admin.documentos.index')
                 ->with('success', '  Documento eliminado exitosamente');
         } catch (\Exception $e) {
@@ -400,7 +410,8 @@ class DocumentoController extends Controller
             ->firstOrFail();
 
         if (!Storage::disk('uploads')->exists($documento->archivo)) {
-            return redirect()->route('admin.documentos.index')
+            $redirectRoute = auth()->user()->id_tipo_usuario == 4 ? 'empresa.dashboard' : 'admin.documentos.index';
+            return redirect()->route($redirectRoute)
                 ->with('error', '  El archivo no existe o fue eliminado');
         }
 
@@ -411,7 +422,8 @@ class DocumentoController extends Controller
             );
         } catch (\Exception $e) {
             Log::error('Error al descargar documento: ' . $e->getMessage());
-            return redirect()->route('admin.documentos.index')
+            $redirectRoute = auth()->user()->id_tipo_usuario == 4 ? 'empresa.dashboard' : 'admin.documentos.index';
+            return redirect()->route($redirectRoute)
                 ->with('error', '  Error al descargar el archivo');
         }
     }

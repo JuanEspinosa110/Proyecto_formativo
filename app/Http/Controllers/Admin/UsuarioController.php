@@ -301,6 +301,10 @@ class UsuarioController extends Controller
             return redirect('/login')->with('error', 'Tu cuenta ha sido inactivada o bloqueada.');
         }
 
+        if (auth()->user()->id_tipo_usuario == 4) {
+            return redirect()->back()->with('success', 'Usuario actualizado correctamente.');
+        }
+
         return redirect()->route('admin.usuarios.index')->with('success', 'Registro actualizado correctamente');
     }
 

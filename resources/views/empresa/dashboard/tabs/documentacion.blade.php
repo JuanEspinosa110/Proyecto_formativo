@@ -5,15 +5,30 @@
         <div class="card-body p-3 bg-white">
             <form method="GET" action="{{ route('empresa.dashboard') }}" class="row g-2 align-items-center">
                 <input type="hidden" name="tab" value="documentacion">
-                <div class="col-md-5">
+                <div class="col-md-3">
                     <div class="input-group input-group-sm">
                         <span class="input-group-text bg-light border-0 ps-3">
                             <span class="material-symbols-rounded text-muted fs-5">search</span>
                         </span>
-                        <input type="text" name="search_doc" class="form-control bg-light border-0 py-2" placeholder="Buscar por placa o documento..." value="{{ request('search_doc') }}">
+                        <input type="text" name="search_doc" class="form-control bg-light border-0 py-2" placeholder="Placa o Nombre..." value="{{ request('search_doc') }}">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <!-- [NEW] Filtro por Propietario -->
+                <div class="col-md-2">
+                    <input type="text" name="search_prop" class="form-control form-control-sm bg-light border-0 py-2" placeholder="Propietario CC/Nombre" value="{{ request('search_prop') }}">
+                </div>
+                <!-- [NEW] Filtro por Tipo -->
+                <div class="col-md-2">
+                    <select name="tipo_doc" class="form-select form-select-sm bg-light border-0">
+                        <option value="">Tipo Documento</option>
+                        @foreach($tiposDocumento as $td)
+                            <option value="{{ $td->id_tipo_documento }}" {{ request('tipo_doc') == $td->id_tipo_documento ? 'selected' : '' }}>
+                                {{ $td->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
                     <select name="status_doc" class="form-select form-select-sm bg-light border-0">
                         <option value="">Cualquier estado</option>
                         <option value="vigente" {{ request('status_doc') == 'vigente' ? 'selected' : '' }}>Al día (Vigentes)</option>
@@ -47,19 +62,28 @@
                         <tr>
                             <td class="ps-4">
                                 <div class="d-flex align-items-center gap-3">
-                                    <div class="bg-{{ $doc->status_color }} text-{{ $doc->status_color == 'warning' ? 'dark' : 'white' }} p-2 rounded-3 shadow-sm">
-                                        <span class="material-symbols-rounded fs-4">description</span>
+                                    <div class="bg-dark text-white p-2 rounded-3 shadow-sm">
+                                        <span class="material-symbols-rounded fs-4">
+                                            {{ $doc->placa ? 'directions_bus' : 'person' }}
+                                        </span>
                                     </div>
                                     <div>
-                                        <h6 class="mb-0 fw-black text-dark">{{ $doc->tipoDocumento->nombre ?? 'Documento' }}</h6>
-                                        <span class="x-small text-muted fw-bold">PLACA: {{ $doc->placa }}</span>
+                                        <h6 class="mb-0 fw-black text-dark small-1">{{ $doc->tipoDocumento->nombre ?? 'Documento' }}</h6>
+                                        <span class="x-small text-muted fw-bold text-uppercase">
+                                            {{ $doc->placa ? 'Placa: ' . $doc->placa : 'Personal / Conductor' }}
+                                        </span>
                                     </div>
                                 </div>
                             </td>
                             <td>
                                 <div class="d-flex flex-column small">
-                                    <span class="fw-bold text-dark">{{ $doc->bus->propietario->primer_nombre ?? 'N/A' }} {{ $doc->bus->propietario->primer_apellido ?? '' }}</span>
-                                    <span class="x-small text-muted">{{ $doc->bus->propietario->doc_usuario ?? '' }}</span>
+                                    @if($doc->placa)
+                                        <span class="fw-bold text-dark">{{ $doc->bus->nombre_propietario ?? 'N/A' }}</span>
+                                        <span class="x-small text-muted">{{ $doc->bus->doc_propietario ?? '' }}</span>
+                                    @else
+                                        <span class="fw-bold text-dark">{{ $doc->usuario->primer_nombre ?? 'N/A' }} {{ $doc->usuario->primer_apellido ?? '' }}</span>
+                                        <span class="x-small text-muted">{{ $doc->doc_usuario ?? '' }}</span>
+                                    @endif
                                 </div>
                             </td>
                             <td class="text-center small fw-medium text-muted">
@@ -78,7 +102,7 @@
                                             data-venc="{{ $doc->fecha_vencimiento->format('d/m/Y') }}"
                                             data-estado="{{ $doc->estado_expiracion }}"
                                             data-color="{{ $doc->status_color }}"
-                                            data-archivo="{{ asset('storage/' . $doc->archivo) }}">
+                                            data-archivo="{{ asset($doc->archivo) }}">
                                         Ver Archivo
                                     </button>
                                 </div>

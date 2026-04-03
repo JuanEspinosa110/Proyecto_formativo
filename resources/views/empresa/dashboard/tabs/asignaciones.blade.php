@@ -5,7 +5,7 @@
         <div class="card-body p-3 bg-white">
             <form method="GET" action="{{ route('empresa.dashboard') }}" class="row g-2 align-items-center">
                 <input type="hidden" name="tab" value="asignaciones">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <div class="input-group input-group-sm">
                         <span class="input-group-text bg-light border-0 ps-3">
                             <span class="material-symbols-rounded text-muted fs-5">search</span>
@@ -13,7 +13,7 @@
                         <input type="text" name="search_asignacion" class="form-control bg-light border-0 py-2" placeholder="Buscar por placa o conductor..." value="{{ request('search_asignacion') }}">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <select name="id_ruta" class="form-select form-select-sm bg-light border-0">
                         <option value="">Todas las rutas</option>
                         @foreach($rutas as $r)
@@ -22,6 +22,9 @@
                             </option>
                         @endforeach
                     </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="date" name="fecha_viaje" class="form-control form-control-sm bg-light border-0" value="{{ request('fecha_viaje') }}" title="Filtrar por día">
                 </div>
                 <div class="col-md-4 text-end d-flex gap-1 justify-content-end">
                     <button type="submit" class="btn btn-dark btn-sm rounded-pill px-3 fw-semibold shadow-sm w-100">Consultar</button>

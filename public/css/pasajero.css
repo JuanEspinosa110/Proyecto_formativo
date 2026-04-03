@@ -2174,3 +2174,61 @@
     border-radius: 50%;
     flex-shrink: 0;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   11. RECARGA DE TARJETA
+══════════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
+
+.recharge-page {
+    font-family: 'Outfit', sans-serif !important;
+}
+
+.recharge-page .fw-black {
+    font-weight: 900 !important;
+}
+
+.recharge-page .x-small {
+    font-size: 0.75rem !important;
+}
+
+.recharge-page .transition-all {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.recharge-page .cursor-pointer {
+    cursor: pointer !important;
+}
+
+.recharge-page .amount-card {
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.recharge-page .amount-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+    border-color: var(--bs-primary) !important;
+}
+
+.recharge-page .amount-card.active {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    border-color: transparent !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3) !important;
+}
+
+.recharge-page .amount-card.active h4,
+.recharge-page .amount-card.active span {
+    color: white !important;
+}
+
+.recharge-page .selection-summary {
+    background: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.recharge-page #toggle-more:hover {
+    opacity: 0.8 !important;
+}

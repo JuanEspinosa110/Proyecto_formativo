@@ -44,8 +44,8 @@
                         <div class="col-md-12">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1 d-block mb-2">Franjas Rápidas (Turnos 8h)</label>
                             <div class="d-flex flex-wrap gap-2">
-                                <button type="button" class="btn btn-xs btn-outline-primary py-1 px-3 small quick-time" data-time="04:30">04:30 - 12:30</button>
-                                <button type="button" class="btn btn-xs btn-outline-primary py-1 px-3 small quick-time" data-time="12:30">12:30 - 20:30</button>
+                                <button type="button" class="btn btn-xs btn-outline-primary py-1 px-3 small quick-time" data-time="04:30">04:30 AM - 12:30 PM</button>
+                                <button type="button" class="btn btn-xs btn-outline-primary py-1 px-3 small quick-time" data-time="12:30">12:30 PM - 08:30 PM</button>
                             </div>
                         </div>
 

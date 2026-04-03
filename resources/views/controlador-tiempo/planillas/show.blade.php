@@ -99,11 +99,11 @@
                     </div>
 
                     {{-- Filtro de fecha interno --}}
-                    <form action="{{ route('controlador-tiempo.planillas.show', $asig->id_asignacion) }}" method="GET" class="d-flex gap-2">
+                    <form action="{{ route('controlador-tiempo.planillas.show', $asig->id_viaje) }}" method="GET" class="d-flex gap-2">
                         <input type="date" name="fecha" value="{{ request('fecha') }}" class="form-control form-control-sm border-0 bg-light shadow-none rounded-pill px-3" style="width: 150px;">
                         <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold">Filtrar</button>
                         @if(request('fecha'))
-                            <a href="{{ route('controlador-tiempo.planillas.show', $asig->id_asignacion) }}" class="btn btn-light btn-sm rounded-pill border shadow-none" title="Limpiar">
+                            <a href="{{ route('controlador-tiempo.planillas.show', $asig->id_viaje) }}" class="btn btn-light btn-sm rounded-pill border shadow-none" title="Limpiar">
                                 <span class="material-symbols-rounded align-middle fs-6">restart_alt</span>
                             </a>
                         @endif

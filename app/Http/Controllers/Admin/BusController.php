@@ -39,6 +39,10 @@ class BusController extends Controller
     {
         $this->busService->storeBus($request->validated());
         
+        if (auth()->user()->id_tipo_usuario == 4) {
+            return redirect()->back()->with('success', 'Vehículo registrado correctamente.');
+        }
+        
         return redirect()->route('admin.buses.index')
             ->with('success', 'Registro creado correctamente');
     }
@@ -50,6 +54,10 @@ class BusController extends Controller
     {
         $this->busService->updateBus($bus, $request->validated());
         
+        if (auth()->user()->id_tipo_usuario == 4) {
+            return redirect()->back()->with('success', 'Vehículo actualizado correctamente.');
+        }
+        
         return redirect()->route('admin.buses.index')
             ->with('success', 'Registro actualizado correctamente');
     }
@@ -60,6 +68,10 @@ class BusController extends Controller
     public function destroy(Bus $bus)
     {
         $this->busService->deleteBus($bus);
+        
+        if (auth()->user()->id_tipo_usuario == 4) {
+            return redirect()->back()->with('success', 'Vehículo eliminado correctamente.');
+        }
         
         return redirect()->route('admin.buses.index')
             ->with('success', 'Registro eliminado correctamente');

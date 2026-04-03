@@ -191,6 +191,7 @@ class AsignacionController extends Controller
         } while (Viaje::where('id_viaje', $id)->exists());
 
         $data['id_viaje'] = $id;
+        $data['fecha_asignacion'] = now();
 
         Viaje::create($data);
 
@@ -205,6 +206,10 @@ class AsignacionController extends Controller
             'tipo_cambio' => 'ASIGNACION',
             'detalle' => "Nueva asignación. Ruta: " . ($ruta->nombre_ruta ?? $data['id_ruta']) . ". Conductor: " . ($conductor ? ($conductor->primer_nombre . ' ' . $conductor->primer_apellido) : $data['doc_us'])
         ]);
+
+        if (Auth::user()->id_tipo_usuario == 4) { // Auxiliar
+            return redirect()->back()->with('success', 'Asignación creada correctamente');
+        }
 
         return redirect()->route('admin.asignaciones.index')
             ->with('success', 'Registro creado correctamente');
@@ -255,6 +260,10 @@ class AsignacionController extends Controller
             'detalle' => implode(". ", $detalles) ?: 'Actualización general de datos'
         ]);
 
+        if (Auth::user()->id_tipo_usuario == 4) { // Auxiliar
+            return redirect()->back()->with('success', 'Asignación actualizada correctamente');
+        }
+
         return redirect()->route('admin.asignaciones.index')
             ->with('success', 'Registro actualizado correctamente');
     }
@@ -281,6 +290,10 @@ class AsignacionController extends Controller
         ]);
 
         $viaje->delete();
+
+        if (Auth::user()->id_tipo_usuario == 4) { // Auxiliar
+            return redirect()->back()->with('success', 'Asignación eliminada correctamente');
+        }
 
         return redirect()->route('admin.asignaciones.index')
             ->with('success', 'Registro eliminado correctamente');

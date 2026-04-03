@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\ControladorTiempo;
 
 use App\Http\Controllers\Controller;
-use App\Models\Asignacion;
+use App\Models\Viaje;
 use App\Models\Bus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,49 +14,52 @@ class PlanillaController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
+        $nit = $user->getActiveNit();
 
         // 1. Obtener listas para los filtros
-        $busesList = Bus::where('NIT', $user->NIT)->orderBy('placa')->get();
-        $conductoresList = \App\Models\Usuario::where('NIT', $user->NIT)
+        $busesList = Bus::where('NIT', $nit)->orderBy('placa')->get();
+        $conductoresList = \App\Models\Usuario::where('NIT', $nit)
             ->where('id_tipo_usuario', 3) // Conductores
             ->orderBy('primer_nombre')
             ->get();
         
-        // Rutas que tienen asignaciones en esta empresa
-        $rutasList = \App\Models\Ruta::whereHas('asignaciones', function($q) use ($user) {
-            $q->where('Nit', $user->NIT);
+        // Rutas que tienen viajes en esta empresa
+        $rutasList = \App\Models\Ruta::whereHas('viajes', function($q) use ($nit) {
+            $q->whereHas('bus', fn($sq) => $sq->where('NIT', $nit));
         })->get();
 
         // 2. Query con filtros
-        $query = Asignacion::with([
+        $query = Viaje::with([
                 'bus', 
-                'usuario', 
+                'conductor', 
                 'ruta.barrioOrigen', 
                 'ruta.barrioDestino',
                 'recorridos.novedades'
             ])
-            ->where('Nit', $user->NIT);
+            ->whereHas('bus', function($q) use ($nit) {
+                $q->where('NIT', $nit);
+            });
 
         if ($request->filled('placa')) {
             $query->where('placa', $request->placa);
         }
         if ($request->filled('doc_usuario')) {
-            $query->where('doc_usuario', $request->doc_usuario);
+            $query->where('doc_us', $request->doc_usuario);
         }
         if ($request->filled('id_ruta')) {
             $query->where('id_ruta', $request->id_ruta);
         }
         if ($request->filled('fecha')) {
-            $query->whereDate('fecha_inicio', $request->fecha);
+            $query->whereDate('fecha', $request->fecha);
         }
 
-        $planilla = $query->orderBy('id_asignacion', 'desc')->paginate(20)->withQueryString();
+        $planilla = $query->orderBy('id_viaje', 'desc')->paginate(20)->withQueryString();
 
-        // Novedades: buses en taller (mantenimiento) o inactivos como referencia
+        // Novedades: Para controladores de tiempo, los buses fuera de servicio (No operables)
         $novedades = Bus::with(['estado'])
-            ->where('NIT', $user->NIT)
-            ->where('id_estado', '!=', 1)
-            ->get();
+            ->where('NIT', $nit)
+            ->get()
+            ->filter(fn($b) => !$b->isOperable());
 
         return view('controlador-tiempo.planillas.index', compact(
             'planilla', 
@@ -69,18 +72,20 @@ class PlanillaController extends Controller
 
     public function show(Request $request, $id)
     {
-        $asig = Asignacion::with([
+        $user = Auth::user();
+        $nit = $user->getActiveNit();
+
+        $asig = Viaje::with([
             'bus', 
-            'usuario', 
+            'conductor', 
             'ruta.barrioOrigen', 
             'ruta.barrioDestino'
-        ])->findOrFail($id);
+        ])
+        ->whereHas('bus', fn($q) => $q->where('NIT', $nit))
+        ->findOrFail($id);
 
         $query = \App\Models\Recorrido::with('novedades')
-            ->whereHas('viaje', function($q) use ($asig) {
-                $q->where('placa', $asig->placa)
-                  ->where('doc_us', $asig->doc_usuario);
-            });
+            ->where('id_viaje', $asig->id_viaje);
 
         if ($request->filled('fecha')) {
             $query->whereDate('hora_salida', $request->fecha);

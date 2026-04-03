@@ -48,6 +48,19 @@ class OperacionHoySeeder extends Seeder
                 'NIT' => $nit,
                 'fecha_nacimiento' => '1990-01-01'
             ]);
+
+            // Licencia de Conducción (Vigente)
+            DB::table('documentos')->updateOrInsert(
+                ['doc_usuario' => $d, 'id_tipo_documento' => 3],
+                [
+                    'nombre' => 'LICENCIA DE CONDUCCIÓN - ' . $d,
+                    'archivo' => 'uploads/documentos/seeders/licencia_default.png',
+                    'fecha_expedicion' => Carbon::now()->format('Y-m-d'),
+                    'fecha_vencimiento' => Carbon::now()->addYear()->format('Y-m-d'),
+                    'NIT' => $nit,
+                    'id_estado' => 1
+                ]
+            );
         }
 
         echo "4. Buses...\n";
@@ -60,7 +73,7 @@ class OperacionHoySeeder extends Seeder
                 'capacidad_pasajeros' => 20,
                 'kilometraje' => 0,
                 'id_estado' => 1,
-                'linc_transito' => (int)(800000 + $idx),
+                'linc_transito' => (int) (800000 + $idx),
                 'numero_chasis' => 'CH' . $idx . $nit,
                 'numero_motor' => 'MT' . $idx . $nit,
                 'doc_propietario' => $docPropietario,
@@ -70,11 +83,22 @@ class OperacionHoySeeder extends Seeder
             ]);
 
             echo "   Docs $placa...\n";
+            // SOAT
             DB::table('documentos')->updateOrInsert(['placa' => $placa, 'id_tipo_documento' => 1], [
-                'nombre' => 'SOAT',
-                'archivo' => 'seeds/soat.pdf',
-                'fecha_expedicion' => '2024-01-01',
-                'fecha_vencimiento' => '2025-01-01',
+                'nombre' => 'SOAT - ' . $placa,
+                'archivo' => 'uploads/documentos/seeders/soat_default.png',
+                'fecha_expedicion' => Carbon::now()->format('Y-m-d'),
+                'fecha_vencimiento' => Carbon::now()->addYear()->format('Y-m-d'),
+                'NIT' => $nit,
+                'id_estado' => 1
+            ]);
+
+            // Técnico Mecánica
+            DB::table('documentos')->updateOrInsert(['placa' => $placa, 'id_tipo_documento' => 2], [
+                'nombre' => 'TECNOMECÁNICA - ' . $placa,
+                'archivo' => 'uploads/documentos/seeders/tecno_default.png',
+                'fecha_expedicion' => Carbon::now()->format('Y-m-d'),
+                'fecha_vencimiento' => Carbon::now()->addYear()->format('Y-m-d'),
                 'NIT' => $nit,
                 'id_estado' => 1
             ]);
@@ -83,16 +107,32 @@ class OperacionHoySeeder extends Seeder
         echo "5. Viajes...\n";
         $maxId = DB::table('viaje')->max('id_viaje') ?? 0;
         foreach ($placas as $idx => $placa) {
-            $fechaViaje = date('Y-m-d 21:00:00');
-            DB::table('viaje')->updateOrInsert(
-                ['placa' => $placa, 'fecha' => $fechaViaje],
-                [
+            $fechaViaje = date('Y-m-d 22:00:00');
+
+            $existing = DB::table('viaje')
+                ->where('placa', $placa)
+                ->where('fecha', $fechaViaje)
+                ->first();
+
+            if (!$existing) {
+                $maxId++;
+                DB::table('viaje')->insert([
+                    'id_viaje' => $maxId,
+                    'placa' => $placa,
+                    'fecha' => $fechaViaje,
                     'doc_us' => $docs[$idx],
                     'id_ruta' => $id_ruta,
                     'fecha_asignacion' => date('Y-m-d H:i:s'),
                     'id_estado' => 1
-                ]
-            );
+                ]);
+            } else {
+                DB::table('viaje')->where('id_viaje', $existing->id_viaje)->update([
+                    'doc_us' => $docs[$idx],
+                    'id_ruta' => $id_ruta,
+                    'fecha_asignacion' => date('Y-m-d H:i:s'),
+                    'id_estado' => 1
+                ]);
+            }
         }
 
         echo "Seeder Finalizado OK.\n";

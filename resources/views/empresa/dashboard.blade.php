@@ -654,9 +654,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             const end = new Date(start.getTime() + (8 * 60 * 60 * 1000));
-            const endH = String(end.getHours()).padStart(2, '0');
-            const endM = String(end.getMinutes()).padStart(2, '0');
-            createHoraFin.value = `${endH}:${endM}`;
+            const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+            createHoraFin.value = end.toLocaleTimeString([], options).toUpperCase();
 
             toggleModalSelects(true);
             fetchDisponibilidad(val);
@@ -727,12 +726,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (btnQuick) {
                 console.log("Quick Time click detectado:", btnQuick.dataset.time);
                 const time = btnQuick.dataset.time;
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const fullDateTime = `${year}-${month}-${day}T${time}`;
-                createFechaIn.value = fullDateTime;
+                
+                // Preservar la fecha ya ingresada o usar hoy si está vacío
+                let datePart = createFechaIn.value ? createFechaIn.value.split('T')[0] : new Date().toISOString().split('T')[0];
+                
+                createFechaIn.value = `${datePart}T${time}`;
                 updateHoraFin();
             }
         });

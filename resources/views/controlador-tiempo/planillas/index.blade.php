@@ -160,7 +160,7 @@
                             </td>
                             <td>
                                 <div class="small fw-semibold text-dark">
-                                    {{ \Carbon\Carbon::parse($asig->fecha_inicio)->format('d/m/Y') }}
+                                    {{ \Carbon\Carbon::parse($asig->fecha)->format('d/m/Y') }}
                                 </div>
                             </td>
                             <td class="text-center">
@@ -169,7 +169,7 @@
                                     $checkpoints = $allNovedades->where('tipo', 'CHECKPOINT')->count();
                                     $incidencias = $allNovedades->where('tipo', 'INCIDENCIA')->count();
                                 @endphp
-                                <a href="{{ route('controlador-tiempo.planillas.show', $asig->id_asignacion) }}" class="text-decoration-none">
+                                <a href="{{ route('controlador-tiempo.planillas.show', $asig->id_viaje) }}" class="text-decoration-none">
                                     <div class="d-flex justify-content-center gap-2">
                                         <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25" title="Checkpoints">
                                             <span class="material-symbols-rounded align-middle fs-6">beenhere</span> {{ $checkpoints }}

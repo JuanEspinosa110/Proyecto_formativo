@@ -481,9 +481,15 @@ class TarjetaController extends Controller
      */
     public function procesarRecarga(Request $request)
     {
+        $allowedAmounts = [5000, 10000, 20000, 30000, 50000, 100000, 200000, 300000];
+
         $request->validate([
             'id_tarjeta' => 'required|string|exists:tarjeta,id_tarjeta',
-            'monto' => 'required|numeric|min:1000',
+            'monto' => 'required|numeric|in:' . implode(',', $allowedAmounts),
+        ], [
+            'monto.required' => 'Debes seleccionar un monto para recargar.',
+            'monto.numeric'  => 'El monto debe ser un valor numérico.',
+            'monto.in'       => 'El monto seleccionado no es válido. Por favor, elige una de las opciones sugeridas.',
         ]);
 
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
