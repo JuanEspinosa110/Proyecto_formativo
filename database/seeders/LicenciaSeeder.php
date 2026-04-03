@@ -28,7 +28,7 @@ class LicenciaSeeder extends Seeder
             $fecha_inicio = Carbon::now();
             $fecha_vencimiento = $fecha_inicio->copy()->addMonths($plan->duracion_meses);
 
-            DB::table('licencias')->insert([
+            DB::table('licencias')->insertOrIgnore([
                 'id_licencia' => 'LIC-' . $empresa->NIT . '-' . ($index + 1),
                 'NIT' => $empresa->NIT,
                 'id_plan' => $plan->id_plan,

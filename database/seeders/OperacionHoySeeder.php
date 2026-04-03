@@ -53,11 +53,8 @@ class OperacionHoySeeder extends Seeder
         echo "4. Buses...\n";
         $placas = ['NUEVO-01', 'NUEVO-02'];
         foreach ($placas as $idx => $placa) {
-            // Limpieza radical
-            DB::table('bus')->where('placa', $placa)->delete();
-            
-            DB::table('bus')->insert([
-                'placa' => $placa,
+            echo "   Bus $placa...\n";
+            DB::table('bus')->updateOrInsert(['placa' => $placa], [
                 'NIT' => $nit,
                 'modelo' => 'Toyota 2024',
                 'capacidad_pasajeros' => 20,
@@ -86,15 +83,16 @@ class OperacionHoySeeder extends Seeder
         echo "5. Viajes...\n";
         $maxId = DB::table('viaje')->max('id_viaje') ?? 0;
         foreach ($placas as $idx => $placa) {
-            DB::table('viaje')->insert([
-                'id_viaje' => ++$maxId,
-                'placa' => $placa,
-                'doc_us' => $docs[$idx],
-                'id_ruta' => $id_ruta,
-                'fecha' => date('Y-m-d 21:00:00'),
-                'fecha_asignacion' => date('Y-m-d H:i:s'),
-                'id_estado' => 1
-            ]);
+            $fechaViaje = date('Y-m-d 21:00:00');
+            DB::table('viaje')->updateOrInsert(
+                ['placa' => $placa, 'fecha' => $fechaViaje],
+                [
+                    'doc_us' => $docs[$idx],
+                    'id_ruta' => $id_ruta,
+                    'fecha_asignacion' => date('Y-m-d H:i:s'),
+                    'id_estado' => 1
+                ]
+            );
         }
 
         echo "Seeder Finalizado OK.\n";

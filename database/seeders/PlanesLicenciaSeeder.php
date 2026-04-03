@@ -43,6 +43,6 @@ class PlanesLicenciaSeeder extends Seeder
             ],
         ];
 
-        DB::table('planes_licencia')->insert($planes);
+        DB::table('planes_licencia')->insertOrIgnore($planes);
     }
 }

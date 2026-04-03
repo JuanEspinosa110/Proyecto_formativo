@@ -1119,7 +1119,7 @@ class UsuarioEmpresaSeeder extends Seeder
 
         // --- ADMIN RECARGAS (nuevo rol 10) ---
         info('Intentando insertar ADMIN RECARGAS en el seeder');
-        DB::table('usuario')->insert([
+        DB::table('usuario')->insertOrIgnore([
         [
         'doc_usuario' => 8002223010,
         'NIT' => 800222333,

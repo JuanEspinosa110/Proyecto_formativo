@@ -102,7 +102,7 @@
                                     <input type="text" name="telefono" class="form-control form-control-sm" required minlength="10" maxlength="10" pattern="[0-9]{10}">
                                 </div>
 
-                                <div class="col-md-12" id="wrapper_password_crear" style="display: none;">
+                                <div class="col-md-12" id="wrapper_password_crear">
                                     <label class="form-label small fw-bold text-muted text-uppercase ls-1">Contraseña de Acceso <span class="text-info" id="msg_pass_obligatorio">(Opcional)</span></label>
                                     <div class="input-group input-group-sm">
                                         <input type="password" name="password" id="pass_crear" class="form-control" placeholder="Mínimo 8 caracteres">
@@ -110,7 +110,7 @@
                                             <span class="material-symbols-rounded fs-6 align-middle">visibility</span>
                                         </button>
                                     </div>
-                                    <small class="text-muted fs-xs">Si se deja vacío, se generará una contraseña aleatoria.</small>
+                                    <small class="text-muted fs-xs">Si se deja vacío, se generará una contraseña aleatoria y se enviará al correo del usuario.</small>
                                 </div>
 
                                 <!-- SECCIÓN EXCLUSIVA PARA CONDUCTORES -->
@@ -182,11 +182,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const wrapperPass = document.getElementById('wrapper_password_crear');
             const msgPass = document.getElementById('msg_pass_obligatorio');
 
-            wrapperPass.style.display = 'block';
+            // El campo ahora es visible por defecto
             if (val.includes('propietario')) {
                 msgPass.textContent = '(Recomendado)';
+                msgPass.className = 'text-warning small fw-bold';
             } else {
                 msgPass.textContent = '(Opcional)';
+                msgPass.className = 'text-info small fw-bold';
             }
 
             if (wrapperLic) {

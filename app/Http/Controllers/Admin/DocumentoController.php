@@ -247,7 +247,7 @@ class DocumentoController extends Controller
                     return redirect()->back()->with('error', '  El archivo no pudo ser validado correctamente.');
                 }
 
-                $ruta = $archivo->store('documentos', 'public');
+                $ruta = $archivo->store('uploads/documentos', 'uploads');
 
                 if (!$ruta) {
                     return redirect()->back()->with('error', '  Error al guardar el archivo. Intenta de nuevo.');
@@ -329,11 +329,11 @@ class DocumentoController extends Controller
                 }
 
                 // Eliminar archivo anterior
-                if ($documento->archivo && Storage::disk('public')->exists($documento->archivo)) {
-                    Storage::disk('public')->delete($documento->archivo);
+                if ($documento->archivo && Storage::disk('uploads')->exists($documento->archivo)) {
+                    Storage::disk('uploads')->delete($documento->archivo);
                 }
 
-                $ruta = $archivo->store('documentos', 'public');
+                $ruta = $archivo->store('uploads/documentos', 'uploads');
 
                 if (!$ruta) {
                     return redirect()->back()->with('error', '  Error al guardar el archivo. Intenta de nuevo.');
@@ -370,8 +370,8 @@ class DocumentoController extends Controller
 
         try {
             // Eliminar archivo
-            if ($documento->archivo && Storage::disk('public')->exists($documento->archivo)) {
-                Storage::disk('public')->delete($documento->archivo);
+            if ($documento->archivo && Storage::disk('uploads')->exists($documento->archivo)) {
+                Storage::disk('uploads')->delete($documento->archivo);
             }
 
             $documento->delete();
@@ -399,13 +399,13 @@ class DocumentoController extends Controller
             ->where('NIT', $empresa->NIT)
             ->firstOrFail();
 
-        if (!Storage::disk('public')->exists($documento->archivo)) {
+        if (!Storage::disk('uploads')->exists($documento->archivo)) {
             return redirect()->route('admin.documentos.index')
                 ->with('error', '  El archivo no existe o fue eliminado');
         }
 
         try {
-            return Storage::disk('public')->download(
+            return Storage::disk('uploads')->download(
                 $documento->archivo,
                 basename($documento->archivo)
             );

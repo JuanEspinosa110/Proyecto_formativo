@@ -189,62 +189,77 @@ class TitularidadTarjetaController extends Controller
             $restantes = 2 - $intentos;
             return response()->json(['success' => false, 'message' => "Código incorrecto. Intentos restantes: $restantes"]);
         }
-        // Suspender titularidad anterior si existe
-        $titularidad_anterior = $usuario->titularidadesTarjeta()->where('id_estado', 1)->first();
-        if ($titularidad_anterior) {
-            $titularidad_anterior->id_estado = 3; // SUSPENDIDO
-            $titularidad_anterior->fecha_fin = now();
-            $titularidad_anterior->motivo_cambio = 'Cambio de tarjeta por gestión';
-            $titularidad_anterior->save();
-            // Poner la tarjeta anterior en SUSPENDIDO
-            $tarjeta_anterior = \App\Models\Tarjeta::find($titularidad_anterior->id_tarjeta);
-            if ($tarjeta_anterior) {
-                $tarjeta_anterior->id_estado = 3; // SUSPENDIDA
-                $tarjeta_anterior->save();
-            }
-        }
-        // Crear nueva titularidad
-        $nueva = new \App\Models\TitularidadTarjeta();
-        $nueva->id_tarjeta = $id_tarjeta;
-        $nueva->doc_usuario = $doc_usuario;
-        $nueva->fecha_inicio = now();
-        $nueva->id_estado = 1; // ACTIVO
-        $nueva->motivo_cambio = 'Asignación/cambio por gestión';
-        $nueva->save();
-        // Activar tarjeta
-        $tarjeta = \App\Models\Tarjeta::find($id_tarjeta);
-        $saldo_transferido = 0;
-        if ($tarjeta) {
-            $tarjeta->id_estado = 1; // ACTIVO
-            // Traspasar saldo si había tarjeta anterior
+        // Iniciar transacción para asegurar coherencia
+        \DB::beginTransaction();
+        try {
+            // Suspender titularidad anterior si existe
+            $titularidad_anterior = $usuario->titularidadesTarjeta()->where('id_estado', 1)->first();
             if ($titularidad_anterior) {
+                $titularidad_anterior->id_estado = 3; // SUSPENDIDO
+                $titularidad_anterior->fecha_fin = now();
+                $titularidad_anterior->motivo_cambio = 'Cambio de tarjeta por gestión';
+                $titularidad_anterior->save();
+
+                // Poner la tarjeta anterior en SUSPENDIDO
                 $tarjeta_anterior = \App\Models\Tarjeta::find($titularidad_anterior->id_tarjeta);
-                if ($tarjeta_anterior && $tarjeta_anterior->saldo > 0) {
-                    $saldo_transferido = $tarjeta_anterior->saldo;
-                    $tarjeta->saldo += $tarjeta_anterior->saldo;
-                    $tarjeta_anterior->saldo = 0;
+                if ($tarjeta_anterior) {
+                    $tarjeta_anterior->id_estado = 3; // SUSPENDIDA
                     $tarjeta_anterior->save();
                 }
             }
-            $tarjeta->save();
-        }
-        // Limpiar código y datos de sesión
-        session()->forget([
-            'codigo_verificacion_' . $doc_usuario,
-            'codigo_verificacion_last_sent_' . $doc_usuario,
-            'codigo_verificacion_intentos_' . $doc_usuario,
-            'codigo_verificacion_expira_' . $doc_usuario,
-        ]);
 
-        return response()->json([
-            'success' => true, 
-            'message' => 'Cambio de titularidad realizado correctamente.',
-            'nueva_titularidad' => [
-                'id_tarjeta' => $nueva->id_tarjeta,
-                'fecha_inicio' => $nueva->fecha_inicio ? $nueva->fecha_inicio->format('Y-m-d H:i:s') : now()->format('Y-m-d H:i:s')
-            ],
-            'saldo_transferido' => $saldo_transferido
-        ]);
+            // Crear nueva titularidad
+            $nueva = new \App\Models\TitularidadTarjeta();
+            $nueva->id_tarjeta = $id_tarjeta;
+            $nueva->doc_usuario = $doc_usuario;
+            $nueva->fecha_inicio = now();
+            $nueva->id_estado = 1; // ACTIVO
+            $nueva->motivo_cambio = 'Asignación/cambio por gestión';
+            $nueva->save();
+
+            // ACTIVAR TARJETA Y USUARIO
+            $tarjeta = \App\Models\Tarjeta::find($id_tarjeta);
+            $saldo_transferido = 0;
+            if ($tarjeta) {
+                $tarjeta->id_estado = 1; // ACTIVO
+                
+                // Traspasar saldo si había tarjeta anterior
+                if ($titularidad_anterior) {
+                    $t_ant = \App\Models\Tarjeta::find($titularidad_anterior->id_tarjeta);
+                    if ($t_ant && $t_ant->saldo > 0) {
+                        $saldo_transferido = $t_ant->saldo;
+                        $tarjeta->saldo += $t_ant->saldo;
+                        $t_ant->saldo = 0;
+                        $t_ant->save();
+                    }
+                }
+                $tarjeta->save();
+            }
+
+            \DB::commit();
+
+            // Limpiar código y datos de sesión
+            session()->forget([
+                'codigo_verificacion_' . $doc_usuario,
+                'codigo_verificacion_last_sent_' . $doc_usuario,
+                'codigo_verificacion_intentos_' . $doc_usuario,
+                'codigo_verificacion_expira_' . $doc_usuario,
+            ]);
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'Cambio de titularidad realizado correctamente.',
+                'nueva_titularidad' => [
+                    'id_tarjeta' => $nueva->id_tarjeta,
+                    'fecha_inicio' => $nueva->fecha_inicio ? $nueva->fecha_inicio->format('Y-m-d H:i:s') : now()->format('Y-m-d H:i:s')
+                ],
+                'saldo_transferido' => $saldo_transferido
+            ]);
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error al procesar el cambio: ' . $e->getMessage()]);
+        }
     }
 
 

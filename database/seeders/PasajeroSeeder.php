@@ -14,11 +14,16 @@ class PasajeroSeeder extends Seeder
      */
     public function run(): void
     {
+        if (DB::table('usuario')->where('id_tipo_usuario', 2)->exists()) {
+            $this->command->info('PasajeroSeeder: Los datos ya existen, saltando...');
+            return;
+        }
+
         $faker = Faker::create('es_CO');
 
         for ($i = 0; $i < 10; $i++) {
             $doc_usuario = $faker->unique()->numberBetween(1000000000, 1999999999);
-            $id_tarjeta = $faker->unique()->numerify('##########');
+            $id_tarjeta = strtoupper(\Illuminate\Support\Str::random(12));
 
             // 1. Crear Usuario (Pasajero)
             DB::table('usuario')->insert([
@@ -54,7 +59,7 @@ class PasajeroSeeder extends Seeder
 
         // 4. Crear Tarjetas sin asociar (Estado 2, doc_usuario = null, sin titularidad)
         for ($i = 0; $i < 10; $i++) {
-            $id_tarjeta_nueva = $faker->unique()->numerify('##########');
+            $id_tarjeta_nueva = strtoupper(\Illuminate\Support\Str::random(12));
 
             DB::table('tarjeta')->insert([
                 'id_tarjeta' => $id_tarjeta_nueva,

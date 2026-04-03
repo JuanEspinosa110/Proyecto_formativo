@@ -11,6 +11,7 @@
             </div>
             <form method="POST" action="{{ $formAction ?? route('admin.usuarios.store') }}" id="formCrearUsuario" enctype="multipart/form-data">
                 @csrf
+                <input type="hidden" name="form_type" value="create">
                 <div class="modal-body p-4">
                     {{-- Errores de validación (Solo para campos sin validación en tiempo real) --}}
                     @if($errors->any() && old('form_type') == 'create')
@@ -110,8 +111,8 @@
                             @error('telefono') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
-                        <div class="col-md-12" id="wrapper_password_crear" style="display: none;">
-                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Contraseña de Acceso <span class="text-info" id="msg_pass_obligatorio">(Opcional para otros roles)</span></label>
+                        <div class="col-md-12" id="wrapper_password_crear">
+                            <label class="form-label small fw-bold text-muted text-uppercase ls-1">Contraseña de Acceso <span class="text-info" id="msg_pass_obligatorio">(Opcional)</span></label>
                             <div class="input-group input-group-sm">
                                 <input type="password" name="password" id="pass_crear" class="form-control @error('password') is-invalid @enderror" placeholder="Mínimo 8 caracteres">
                                 <button class="btn btn-outline-secondary" type="button" onclick="togglePasswordVisibility('pass_crear')">
@@ -119,7 +120,7 @@
                                 </button>
                             </div>
                             @error('password') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                            <small class="text-muted fs-xs">Si se deja vacío, se generará una contraseña aleatoria.</small>
+                            <small class="text-muted fs-xs">Si se deja vacío, se generará una contraseña aleatoria y se enviará al correo del usuario.</small>
                         </div>
 
                         <!-- SECCIÓN EXCLUSIVA PARA CONDUCTORES -->

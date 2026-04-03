@@ -13,6 +13,11 @@ class VentaViajeSeeder extends Seeder
      */
     public function run(): void
     {
+        if (DB::table('venta_viaje')->exists()) {
+            $this->command->info('VentaViajeSeeder: Los datos ya existen, saltando...');
+            return;
+        }
+
         // Obtener solo los IDs de los viajes que tienen recorridos reales registrados
         $viajesIdsConRecorridos = DB::table('recorridos')->pluck('id_viaje')->unique();
 

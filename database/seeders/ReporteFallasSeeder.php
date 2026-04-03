@@ -13,6 +13,11 @@ class ReporteFallasSeeder extends Seeder
      */
     public function run(): void
     {
+        if (DB::table('reportes_fallas')->exists()) {
+            $this->command->info('ReporteFallasSeeder: Los datos ya existen, saltando...');
+            return;
+        }
+
         $faker = Faker::create('es_CO');
 
         // Conductores disponibles

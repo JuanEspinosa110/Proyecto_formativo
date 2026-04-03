@@ -13,6 +13,11 @@ class ViajeSeeder extends Seeder
      */
     public function run(): void
     {
+        if (DB::table('viaje')->exists()) {
+            $this->command->info('ViajeSeeder: Los datos ya existen, saltando...');
+            return;
+        }
+
         // 1. Obtener asignaciones activas
         $asignacionesTotales = DB::table('asignacion')
             ->where('id_estado', 1)

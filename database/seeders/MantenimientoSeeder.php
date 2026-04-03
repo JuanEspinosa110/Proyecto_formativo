@@ -14,6 +14,11 @@ class MantenimientoSeeder extends Seeder
      */
     public function run(): void
     {
+        if (DB::table('mantenimiento')->exists()) {
+            $this->command->info('MantenimientoSeeder: Los datos ya existen, saltando...');
+            return;
+        }
+
         $faker = Faker::create('es_CO');
 
         $buses = DB::table('bus')->get();

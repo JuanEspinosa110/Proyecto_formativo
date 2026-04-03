@@ -329,8 +329,8 @@ class PropietarioController extends Controller
                         ->where('id_estado', 1)
                         ->update(['id_estado' => 11]); // 11 = Archivado
 
-                // Almacenar el archivo en storage/app/public/documentos
-                $path = $request->file('archivo')->store('documentos', 'public');
+                // Almacenar el archivo en public/uploads/documentos
+                $path = $request->file('archivo')->store('uploads/documentos', 'uploads');
 
                 if ($path) {
                     $tipoDoc = TipoDocumento::find($request->id_tipo_documento);
@@ -411,8 +411,8 @@ class PropietarioController extends Controller
                     Storage::disk('public')->delete($documento->archivo);
                 }
 
-                // Guardar usando el método store estándar sugerido
-                $ruta = $request->file('archivo')->store('documentos', 'public');
+                // Guardar usando el método store estándar en la carpeta pública
+                $ruta = $request->file('archivo')->store('uploads/documentos', 'uploads');
                 
                 if ($ruta) {
                     $data['archivo'] = $ruta;
@@ -460,7 +460,7 @@ class PropietarioController extends Controller
                     'created_at' => $doc->created_at->format('Y-m-d H:i:s'),
                     'status_vigencia' => $doc->estado_expiracion,
                     'status_color' => $doc->status_color,
-                    'url_archivo' => $doc->archivo ? asset('storage/' . $doc->archivo) : null
+                    'url_archivo' => $doc->archivo ? asset($doc->archivo) : null
                 ];
             });
 
@@ -503,7 +503,7 @@ class PropietarioController extends Controller
                     'status_vigencia' => $doc->estado_expiracion,
                     'status_color' => $doc->status_color,
                     'es_archivado' => $doc->id_estado == 11,
-                    'url_archivo' => $doc->archivo ? asset('storage/' . $doc->archivo) : null
+                    'url_archivo' => $doc->archivo ? asset($doc->archivo) : null
                 ];
             });
 

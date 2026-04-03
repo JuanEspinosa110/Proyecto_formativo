@@ -14,6 +14,8 @@ use App\Models\HistorialBus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Services\BusService;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NuevoUsuarioCreado;
 
 class EmpresaController extends Controller
 {
@@ -229,18 +231,30 @@ class EmpresaController extends Controller
             'primer_apellido' => 'required|string|max:50',
             'doc_usuario' => 'required|digits_between:6,15|numeric|unique:usuario,doc_usuario',
             'id_tipo_usuario' => 'required|in:3,4,5', // 3=Conductor, 4=Auxiliar, 5=Propietario ONLY
-            'id_estado' => 'required|exists:estado,id_estado',
             'correo' => 'required|email|unique:usuario,correo',
             'password' => 'nullable|min:6',
         ]);
 
-        $data = $request->except(['password', 'fecha_expedicion', 'fecha_vencimiento', 'archivo_licencia']);
+        $data = $request->except(['password', 'fecha_expedicion', 'fecha_vencimiento', 'archivo_licencia', 'id_estado']);
+        $data['id_estado'] = 1; // Activo por defecto
         $passGenerada = $request->filled('password') ? $request->password : \Illuminate\Support\Str::random(10);
         $data['password'] = bcrypt($passGenerada);
         $data['NIT'] = Auth::user()->getActiveNit();
         $data['id_ciudad'] = Auth::user()->id_ciudad;
 
         $user = Usuario::create($data);
+
+        // Enviar correo de notificación al nuevo usuario
+        try {
+            Mail::to($request->correo)->send(new NuevoUsuarioCreado(
+                $request->primer_nombre . ' ' . $request->primer_apellido,
+                $request->doc_usuario,
+                $passGenerada,
+                $data['NIT']
+            ));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error enviando correo de bienvenida (Aux): ' . $e->getMessage());
+        }
 
         // Si es conductor, crear el documento de licencia
         if ($request->id_tipo_usuario == 3 && $request->hasFile('archivo_licencia')) {

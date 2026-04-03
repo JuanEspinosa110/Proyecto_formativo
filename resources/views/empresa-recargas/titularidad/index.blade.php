@@ -186,11 +186,21 @@ document.addEventListener('DOMContentLoaded', function() {
                             // Reasignar eventos a los botones de selección
                             document.querySelectorAll('.btn-cambiar-tarjeta-final').forEach(function(btn) {
                                 btn.addEventListener('click', function() {
-                                    btn.disabled = true;
-                                    tarjetasCambioDiv.innerHTML += `<div id='cargando-modal' class='alert alert-info mt-2'>Cargando...</div>`;
+                                    // Usar insertAdjacentHTML para NO destruir event listeners existentes
+                                    const loadingDiv = document.createElement('div');
+                                    loadingDiv.id = 'cargando-modal';
+                                    loadingDiv.className = 'alert alert-info mt-2';
+                                    loadingDiv.textContent = 'Cargando...';
+                                    tarjetasCambioDiv.appendChild(loadingDiv);
+
                                     const idTarjeta = this.getAttribute('data-id');
                                     if (usuarioActual.tarjeta_activa_id && usuarioActual.tarjeta_activa_id == idTarjeta) {
-                                        tarjetasCambioDiv.innerHTML += `<div class='alert alert-danger mt-2'>Debes seleccionar una tarjeta diferente a la actual.</div>`;
+                                        loadingDiv.remove();
+                                        const errorDiv = document.createElement('div');
+                                        errorDiv.className = 'alert alert-danger mt-2';
+                                        errorDiv.textContent = 'Debes seleccionar una tarjeta diferente a la actual.';
+                                        tarjetasCambioDiv.appendChild(errorDiv);
+                                        setTimeout(() => errorDiv.remove(), 3000);
                                         return;
                                     }
                                     document.getElementById('modal-doc-usuario').value = usuarioActual.doc_usuario;
@@ -206,9 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     if (cooldownInterval) clearInterval(cooldownInterval);
                                     document.getElementById('modal-cambio-mensaje').innerHTML = '';
                                     document.getElementById('modal-reenviar-codigo').innerHTML = '';
-                                    btn.disabled = false;
-                                    const cargandoDiv = document.getElementById('cargando-modal');
-                                    if (cargandoDiv) cargandoDiv.remove();
+                                    loadingDiv.remove();
                                 });
                             });
                         }
@@ -216,37 +224,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }
 
-                // Asignar eventos a los botones de asignar tarjeta (cuando no tiene activa)
-                document.querySelectorAll('.btn-asignar-tarjeta').forEach(function(btn) {
-                    btn.addEventListener('click', function() {
-                        const idTarjeta = this.getAttribute('data-id');
-                        if (cooldown > 0) return;
-                        fetch("{{ route('gestor-recargas.titularidad.enviar-codigo') }}", {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('input[name=_token]').value
-                            },
-                            body: JSON.stringify({ doc_usuario: usuarioActual.doc_usuario, id_tarjeta: idTarjeta })
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            let msg = '';
-                            if(data.success) {
-                                msg = `<div class='alert alert-success'>${data.message}</div>`;
-                                cooldown = 60;
-                                startCooldown(msg);
-                            } else {
-                                msg = `<div class='alert alert-danger'>${data.message}</div>`;
-                                document.getElementById('modal-cambio-mensaje').innerHTML = msg;
-                            }
+                // Asignar eventos a los botones de seleccionar tarjeta (cuando NO tiene tarjeta activa)
+                if (!btnCambio) {
+                    document.querySelectorAll('.btn-cambiar-tarjeta-final').forEach(function(btn) {
+                        btn.addEventListener('click', function() {
+                            const idTarjeta = this.getAttribute('data-id');
                             document.getElementById('modal-doc-usuario').value = usuarioActual.doc_usuario;
                             document.getElementById('modal-id-tarjeta').value = idTarjeta;
+                            document.getElementById('modal-correo-usuario').value = correoUsuario;
                             var modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalCambioTitularidad'));
                             modal.show();
+                            // Habilitar botón enviar código y limpiar campo
+                            document.getElementById('btn-enviar-codigo').disabled = false;
+                            document.getElementById('codigo_verificacion').value = '';
+                            document.getElementById('codigo_verificacion').disabled = false;
+                            document.getElementById('btn-confirmar-cambio').disabled = true;
+                            if (cooldownInterval) clearInterval(cooldownInterval);
+                            document.getElementById('modal-cambio-mensaje').innerHTML = '';
+                            document.getElementById('modal-reenviar-codigo').innerHTML = '';
                         });
                     });
-                });
+                }
             }
         })
         .catch(() => {

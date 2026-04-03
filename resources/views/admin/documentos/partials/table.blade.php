@@ -63,7 +63,7 @@ $routePrefix = Auth::user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
                             <button class="btn btn-sm btn-primary rounded-pill px-2 fw-bold btn-visor" 
-                                data-url="{{ asset('storage/' . $documento->archivo) }}" 
+                                data-url="{{ asset($documento->archivo) }}" 
                                 data-nombre="{{ $documento->nombre }}"
                                 title="Previsualizar">
                                 <span class="material-symbols-rounded fs-5">visibility</span>

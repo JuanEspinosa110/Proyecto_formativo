@@ -532,7 +532,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (selectRol) {
         const checkRol = () => {
+            const selectValue = selectRol.value;
             const text = selectRol.options[selectRol.selectedIndex].text.toLowerCase();
+            const wrapperPass = document.getElementById('msg_pass_obligatorio');
+
+            if (wrapperPass) {
+                if (text.includes('propietario')) {
+                    wrapperPass.textContent = '(Recomendado)';
+                    wrapperPass.className = 'text-warning small fw-bold';
+                } else {
+                    wrapperPass.textContent = '(Opcional)';
+                    wrapperPass.className = 'text-info small fw-bold';
+                }
+            }
+
             if (wrapperLicencia) {
                 if (text.includes('conductor')) {
                     wrapperLicencia.style.display = 'block';
@@ -725,12 +738,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         @if($errors->any())
-        const modalEl = document.getElementById('modalAsignarConductor');
-        if (modalEl) {
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
-            if(createFechaIn.value) updateHoraFin();
-        }
+            @if(old('form_type') === 'create')
+                const modalUsr = new bootstrap.Modal(document.getElementById('modalCrearUsuario'));
+                modalUsr.show();
+            @else
+                const modalAsig = new bootstrap.Modal(document.getElementById('modalAsignarConductor'));
+                if (modalAsig) {
+                    modalAsig.show();
+                    if(typeof updateHoraFin === 'function' && createFechaIn && createFechaIn.value) updateHoraFin();
+                }
+            @endif
         @endif
     } else {
         console.error("No se encontraron los elementos create_fecha o create_hora_fin");

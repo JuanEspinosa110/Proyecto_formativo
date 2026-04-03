@@ -18,6 +18,6 @@ class TipoMantenimientoSeeder extends Seeder
             ['nombre' => 'Predictivo'],
         ];
 
-        DB::table('tipo_mantenimiento')->insert($tipos);
+        DB::table('tipo_mantenimiento')->insertOrIgnore($tipos);
     }
 }

@@ -10,6 +10,8 @@ use App\Http\Requests\StoreUsuarioRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\Usuario;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NuevoUsuarioCreado;
 
 class UsuarioController extends Controller
 {
@@ -160,11 +162,23 @@ class UsuarioController extends Controller
 
             Usuario::create($data);
 
+            // Enviar correo de notificación al nuevo usuario
+            try {
+                Mail::to($request->correo)->send(new NuevoUsuarioCreado(
+                    $request->primer_nombre . ' ' . $request->primer_apellido,
+                    $request->doc_usuario,
+                    $passwordGenerada,
+                    Auth::user()->NIT
+                ));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error enviando correo de bienvenida: ' . $e->getMessage());
+            }
+
             // Si es conductor, crear el documento
             if ($esConductor && $request->hasFile('archivo_licencia')) {
                 // Cálculo de vigencia en Backend (Precalculado arriba)
 
-                $pathLicencia = $request->file('archivo_licencia')->store('documentos', 'public');
+                $pathLicencia = $request->file('archivo_licencia')->store('uploads/documentos', 'uploads');
                 \App\Models\Documento::create([
                     'nombre' => 'LICENCIA CONDUCCION',
                     'archivo' => $pathLicencia,
@@ -264,7 +278,7 @@ class UsuarioController extends Controller
                 if ($docLicencia && $docLicencia->archivo) {
                     \Illuminate\Support\Facades\Storage::disk('public')->delete($docLicencia->archivo);
                 }
-                $docData['archivo'] = $request->file('archivo_licencia')->store('documentos', 'public');
+                $docData['archivo'] = $request->file('archivo_licencia')->store('uploads/documentos', 'uploads');
             }
 
             if ($docLicencia) {
