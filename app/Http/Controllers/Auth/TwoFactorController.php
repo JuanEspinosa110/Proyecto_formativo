@@ -57,10 +57,10 @@ class TwoFactorController extends Controller
         $request->session()->forget('2fa_pending');
         $request->session()->regenerate();
 
-        // Opcional: Recordar dispositivo por 7 días
+        // Opcional: Recordar dispositivo por 1 día
         if ($request->has('remember_device')) {
             $cookieName = '2fa_device_' . $pending['tipo_usuario'] . '_' . $pending['documento'];
-            cookie()->queue($cookieName, 'trusted', 60 * 24 * 7); // 7 días (minutos)
+            cookie()->queue($cookieName, 'trusted', 60 * 24); // 1 día (minutos)
         }
 
         if ($pending['tipo_usuario'] == 'superadmin') {
