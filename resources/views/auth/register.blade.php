@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Login - Sistema de Transporte</title>
@@ -10,218 +11,196 @@
 
     <!-- CSS propio -->
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+
 <body class="login-body">
 
-<header class="login-header">
-    <div class="navbar-index-brand">
-        <img src="{{ asset('imagenes/logo-sigu.png') }}" alt="SIGU Logo" class="navbar-index-logo-img">
-        <div class="navbar-index-logo-text">
-            <h1 class="navbar-index-logo-title">SIGU</h1>
-            <p class="navbar-index-logo-subtitle">Sistema Integral de Gestión Urbana</p>
+    <header class="login-header">
+        <div class="navbar-index-brand">
+            <img src="{{ asset('imagenes/logo-sigu.png') }}" alt="SIGU Logo" class="navbar-index-logo-img">
+            <div class="navbar-index-logo-text">
+                <h1 class="navbar-index-logo-title">SIGU</h1>
+                <p class="navbar-index-logo-subtitle">Sistema Integral de Gestión Urbana</p>
+            </div>
+        </div>
+
+        <div class="header-right top-navigation">
+            <a href="{{ route('home') }}" class="btn-home">
+                Volver al inicio
+            </a>
+        </div>
+    </header>
+
+    <div class="regis-wrapper">
+        <div class="regis-card">
+
+            <div class="regis-header">
+                <h1>Crear cuenta de pasajero</h1>
+                <p>Complete sus datos para registrarse en el sistema</p>
+            </div>
+
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <strong>Ups </strong> Corrige los siguientes errores:
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('register.store') }}">
+                @csrf
+
+                <div class="regis-group">
+                    <label>Número de documento</label>
+                    <input type="text" name="doc_usuario" value="{{ old('doc_usuario') }}"
+                        class="regis-input @error('doc_usuario') is-invalid @enderror" required>
+                    @error('doc_usuario')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="regis-row">
+                    <div class="regis-group">
+                        <label>Primer nombre</label>
+                        <input type="text" name="primer_nombre" value="{{ old('primer_nombre') }}"
+                            class="regis-input @error('primer_nombre') is-invalid @enderror" required>
+                        @error('primer_nombre')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="regis-group">
+                        <label>Segundo nombre</label>
+                        <input type="text" name="segundo_nombre" value="{{ old('segundo_nombre') }}"
+                            class="regis-input @error('segundo_nombre') is-invalid @enderror">
+                        @error('segundo_nombre')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="regis-row">
+                    <div class="regis-group">
+                        <label>Primer apellido</label>
+                        <input type="text" name="primer_apellido" value="{{ old('primer_apellido') }}"
+                            class="regis-input @error('primer_apellido') is-invalid @enderror" required>
+                        @error('primer_apellido')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="regis-group">
+                        <label>Segundo apellido</label>
+                        <input type="text" name="segundo_apellido" value="{{ old('segundo_apellido') }}"
+                            class="regis-input @error('segundo_apellido') is-invalid @enderror">
+                        @error('segundo_apellido')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="regis-row">
+                    <div class="regis-group">
+                        <label>Correo electrónico</label>
+                        <input type="email" name="correo" value="{{ old('correo') }}"
+                            class="regis-input @error('correo') is-invalid @enderror" required>
+                        @error('correo')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="regis-group">
+                        <label>Teléfono</label>
+                        <input type="text" name="telefono" value="{{ old('telefono') }}"
+                            class="regis-input @error('telefono') is-invalid @enderror" required>
+                        @error('telefono')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="regis-row">
+                    <div class="regis-group">
+                        <label>Contraseña</label>
+                        <input type="password" name="password"
+                            class="regis-input @error('password') is-invalid @enderror" required>
+                        <small class="text-muted">
+                            La contraseña debe tener mínimo 8 caracteres, una mayúscula,
+                            un número y un símbolo.
+                        </small>
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="regis-group">
+                        <label>Confirmar contraseña</label>
+                        <input type="password" name="password_confirmation"
+                            class="regis-input @error('password_confirmation') is-invalid @enderror" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="regis-btn">
+                    Registrarse
+                </button>
+            </form>
+
+
+            <div class="regis-footer">
+                ¿Ya tienes cuenta?
+                <a href="{{ route('login') }}">Iniciar sesión</a>
+            </div>
+
         </div>
     </div>
 
-    <div class="header-right top-navigation">
-        <a href="{{ route('home') }}" class="btn-home">
-            Volver al inicio
-        </a>
-    </div>
-</header>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. Documento: Solo números, máximo 10 caracteres
+            const docInput = document.querySelector('input[name="doc_usuario"]');
+            if (docInput) {
+                docInput.setAttribute('maxlength', '10');
+                docInput.addEventListener('input', function (e) {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                });
+            }
 
-<div class="regis-wrapper">
-    <div class="regis-card">
+            // 2. Teléfono: Solo números, máximo 10 caracteres
+            const telInput = document.querySelector('input[name="telefono"]');
+            if (telInput) {
+                telInput.setAttribute('maxlength', '10');
+                telInput.addEventListener('input', function (e) {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                });
+            }
 
-        <div class="regis-header">
-            <h1>Crear cuenta de pasajero</h1>
-            <p>Complete sus datos para registrarse en el sistema</p>
-        </div>
-
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <strong>Ups </strong> Corrige los siguientes errores:
-                <ul class="mb-0 mt-2">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-
-       <form method="POST" action="{{ route('register.store') }}">
-            @csrf
-
-            <div class="regis-group">
-                <label>Número de documento</label>
-                <input type="text" 
-                    name="doc_usuario" 
-                    value="{{ old('doc_usuario') }}"
-                    class="regis-input @error('doc_usuario') is-invalid @enderror"
-                    required>
-                @error('doc_usuario')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-
-            <div class="regis-row">
-                <div class="regis-group">
-                    <label>Primer nombre</label>
-                    <input type="text" 
-                        name="primer_nombre"
-                        value="{{ old('primer_nombre') }}"
-                        class="regis-input @error('primer_nombre') is-invalid @enderror"
-                        required>
-                    @error('primer_nombre')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="regis-group">
-                    <label>Segundo nombre</label>
-                    <input type="text" 
-                        name="segundo_nombre"
-                        value="{{ old('segundo_nombre') }}"
-                        class="regis-input @error('segundo_nombre') is-invalid @enderror">
-                    @error('segundo_nombre')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="regis-row">
-                <div class="regis-group">
-                    <label>Primer apellido</label>
-                    <input type="text" 
-                        name="primer_apellido"
-                        value="{{ old('primer_apellido') }}"
-                        class="regis-input @error('primer_apellido') is-invalid @enderror"
-                        required>
-                    @error('primer_apellido')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="regis-group">
-                    <label>Segundo apellido</label>
-                    <input type="text" 
-                        name="segundo_apellido"
-                        value="{{ old('segundo_apellido') }}"
-                        class="regis-input @error('segundo_apellido') is-invalid @enderror">
-                    @error('segundo_apellido')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="regis-row">
-                <div class="regis-group">
-                    <label>Correo electrónico</label>
-                    <input type="email" 
-                        name="correo"
-                        value="{{ old('correo') }}"
-                        class="regis-input @error('correo') is-invalid @enderror"
-                        required>
-                    @error('correo')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="regis-group">
-                    <label>Teléfono</label>
-                    <input type="text" 
-                        name="telefono"
-                        value="{{ old('telefono') }}"
-                        class="regis-input @error('telefono') is-invalid @enderror"
-                        required>
-                    @error('telefono')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="regis-row">
-                <div class="regis-group">
-                    <label>Contraseña</label>
-                    <input type="password" 
-                        name="password"
-                        class="regis-input @error('password') is-invalid @enderror"
-                        required>
-                    <small class="text-muted">
-                        La contraseña debe tener mínimo 8 caracteres, una mayúscula,
-                        un número y un símbolo.
-                    </small>
-                    @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="regis-group">
-                    <label>Confirmar contraseña</label>
-                    <input type="password" 
-                        name="password_confirmation"
-                        class="regis-input @error('password_confirmation') is-invalid @enderror"
-                        required>
-                </div>
-            </div>
-
-            <button type="submit" class="regis-btn">
-                Registrarse
-            </button>
-        </form>
-
-
-        <div class="regis-footer">
-            ¿Ya tienes cuenta?
-            <a href="{{ route('login') }}">Iniciar sesión</a>
-        </div>
-
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // 1. Documento: Solo números, máximo 10 caracteres
-        const docInput = document.querySelector('input[name="doc_usuario"]');
-        if(docInput) {
-            docInput.setAttribute('maxlength', '10');
-            docInput.addEventListener('input', function(e) {
-                this.value = this.value.replace(/[^0-9]/g, '');
+            // 3. Nombres y Apellidos: Solo letras (incluidas tildes y ñ), SIN espacios
+            const nameInputs = document.querySelectorAll('input[name="primer_nombre"], input[name="segundo_nombre"], input[name="primer_apellido"], input[name="segundo_apellido"]');
+            nameInputs.forEach(input => {
+                input.setAttribute('maxlength', '100');
+                input.addEventListener('input', function (e) {
+                    // Remueve cualquier caracter que NO sea letra latina
+                    this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g, '');
+                });
             });
-        }
 
-        // 2. Teléfono: Solo números, máximo 20 caracteres
-        const telInput = document.querySelector('input[name="telefono"]');
-        if(telInput) {
-            telInput.setAttribute('maxlength', '20');
-            telInput.addEventListener('input', function(e) {
-                this.value = this.value.replace(/[^0-9]/g, '');
-            });
-        }
-
-        // 3. Nombres y Apellidos: Solo letras (incluidas tildes y ñ), SIN espacios
-        const nameInputs = document.querySelectorAll('input[name="primer_nombre"], input[name="segundo_nombre"], input[name="primer_apellido"], input[name="segundo_apellido"]');
-        nameInputs.forEach(input => {
-            input.setAttribute('maxlength', '100');
-            input.addEventListener('input', function(e) {
-                // Remueve cualquier caracter que NO sea letra latina
-                this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g, '');
-            });
+            // 4. Correo electrónico: Prevenir que tecleen espacios
+            const emailInput = document.querySelector('input[name="correo"]');
+            if (emailInput) {
+                emailInput.addEventListener('input', function (e) {
+                    this.value = this.value.replace(/\s+/g, '');
+                });
+            }
         });
-
-        // 4. Correo electrónico: Prevenir que tecleen espacios
-        const emailInput = document.querySelector('input[name="correo"]');
-        if(emailInput) {
-            emailInput.addEventListener('input', function(e) {
-                this.value = this.value.replace(/\s+/g, '');
-            });
-        }
-    });
-</script>
+    </script>
 </body>
-</html>
 
+</html>
