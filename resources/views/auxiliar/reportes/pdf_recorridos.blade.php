@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Reporte de Recorridos</title>
+    <title>Itinerario de Viajes</title>
     <style>
         body { font-family: sans-serif; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
@@ -11,7 +11,7 @@
     </style>
 </head>
 <body>
-    <h2>Reporte de Recorridos (Asignaciones)</h2>
+    <h2>Itinerario de Viajes (Asignaciones)</h2>
     <table>
         <thead>
             <tr>
@@ -25,13 +25,17 @@
         </thead>
         <tbody>
             @foreach($recorridos as $r)
+            @php
+                $salida = $r->fecha_asignacion ? \Carbon\Carbon::parse($r->fecha_asignacion)->format('d/m/Y h:i A') : 'N/A';
+                $llegada = $r->fecha_asignacion ? \Carbon\Carbon::parse($r->fecha_asignacion)->addHours(8)->format('d/m/Y h:i A') : 'N/A';
+            @endphp
             <tr>
                 <td>{{ $r->fecha }}</td>
                 <td>{{ $r->placa }}</td>
                 <td>{{ $r->ruta->nombre_ruta ?? $r->id_ruta }}</td>
                 <td>{{ $r->conductor ? ($r->conductor->primer_nombre . ' ' . $r->conductor->primer_apellido) : 'N/A' }}</td>
-                <td>{{ $r->hora_salida }}</td>
-                <td>{{ $r->hora_llegada }}</td>
+                <td>{{ $salida }}</td>
+                <td>{{ $llegada }}</td>
             </tr>
             @endforeach
         </tbody>

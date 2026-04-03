@@ -110,12 +110,15 @@ class ReporteController extends Controller
             $sheet->setCellValue('B' . $row, $r->placa);
             $sheet->setCellValue('C' . $row, $r->ruta->nombre_ruta ?? $r->id_ruta);
             $sheet->setCellValue('D' . $row, $r->conductor ? ($r->conductor->primer_nombre . ' ' . $r->conductor->primer_apellido) : 'N/A');
-            $sheet->setCellValue('E' . $row, $r->hora_salida);
-            $sheet->setCellValue('F' . $row, $r->hora_llegada);
+            $salida = $r->fecha_asignacion ? \Carbon\Carbon::parse($r->fecha_asignacion)->format('d/m/Y h:i A') : 'N/A';
+            $llegada = $r->fecha_asignacion ? \Carbon\Carbon::parse($r->fecha_asignacion)->addHours(8)->format('d/m/Y h:i A') : 'N/A';
+            
+            $sheet->setCellValue('E' . $row, $salida);
+            $sheet->setCellValue('F' . $row, $llegada);
             $row++;
         }
 
-        $this->formatExcelReport($sheet, 'Reporte de Recorridos', $headers, count($recorridos));
+        $this->formatExcelReport($sheet, 'Itinerario de Viajes', $headers, count($recorridos));
 
         return $this->downloadExcel($spreadsheet, 'Reporte_Recorridos');
     }

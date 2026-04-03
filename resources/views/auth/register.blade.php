@@ -183,6 +183,45 @@
     </div>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Documento: Solo números, máximo 10 caracteres
+        const docInput = document.querySelector('input[name="doc_usuario"]');
+        if(docInput) {
+            docInput.setAttribute('maxlength', '10');
+            docInput.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+
+        // 2. Teléfono: Solo números, máximo 20 caracteres
+        const telInput = document.querySelector('input[name="telefono"]');
+        if(telInput) {
+            telInput.setAttribute('maxlength', '20');
+            telInput.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+
+        // 3. Nombres y Apellidos: Solo letras (incluidas tildes y ñ), SIN espacios
+        const nameInputs = document.querySelectorAll('input[name="primer_nombre"], input[name="segundo_nombre"], input[name="primer_apellido"], input[name="segundo_apellido"]');
+        nameInputs.forEach(input => {
+            input.setAttribute('maxlength', '100');
+            input.addEventListener('input', function(e) {
+                // Remueve cualquier caracter que NO sea letra latina
+                this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g, '');
+            });
+        });
+
+        // 4. Correo electrónico: Prevenir que tecleen espacios
+        const emailInput = document.querySelector('input[name="correo"]');
+        if(emailInput) {
+            emailInput.addEventListener('input', function(e) {
+                this.value = this.value.replace(/\s+/g, '');
+            });
+        }
+    });
+</script>
 </body>
 </html>
 
