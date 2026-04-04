@@ -30,9 +30,9 @@ class Tarjeta extends Model
         parent::boot();
 
         static::creating(function ($tarjeta) {
-            // Generar id_tarjeta aleatorio de 16 caracteres si no está definido
+            // Generar id_tarjeta aleatorio de 12 caracteres si no está definido
             if (empty($tarjeta->id_tarjeta)) {
-                $tarjeta->id_tarjeta = Str::random(16);
+                $tarjeta->id_tarjeta = Str::upper(Str::random(12));
             }
 
             // Generar código secuencial para codigo_tarjeta si no está definido

@@ -119,7 +119,7 @@ class BusService
                     'created_at' => $doc->created_at->format('Y-m-d H:i:s'),
                     'status_vigencia' => $doc->estado_expiracion,
                     'status_color' => $doc->status_color,
-                    'url_archivo' => $doc->archivo ? asset('storage/' . $doc->archivo) : null
+                    'url_archivo' => $doc->archivo ? asset($doc->archivo) : null
                 ];
             });
 

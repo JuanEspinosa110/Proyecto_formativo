@@ -562,11 +562,11 @@
                                                 @if($doc->archivo)
                                                     <button type="button"
                                                         class="btn btn-sm btn-light border p-2 rounded-circle text-dark"
-                                                        onclick="mostrarVisor('{{ asset('storage/' . $doc->archivo) }}', '{{ $doc->tipoDocumento->nombre ?? 'Archivo' }}')"
+                                                        onclick="mostrarVisor('{{ asset($doc->archivo) }}', '{{ $doc->tipoDocumento->nombre ?? 'Archivo' }}')"
                                                         title="Vista Previa">
                                                         <span class="material-symbols-rounded fs-6">visibility</span>
                                                     </button>
-                                                    <a href="{{ asset('storage/' . $doc->archivo) }}" download
+                                                    <a href="{{ asset($doc->archivo) }}" download
                                                         class="btn btn-sm btn-light border p-2 rounded-circle text-primary"
                                                         title="Descargar">
                                                         <span class="material-symbols-rounded fs-6">download</span>

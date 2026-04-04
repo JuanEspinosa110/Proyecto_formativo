@@ -137,7 +137,7 @@ class BusController extends Controller
                     'status_vigencia' => $doc->estado_expiracion,
                     'status_color' => $doc->status_color,
                     'es_archivado' => $doc->id_estado == 2,
-                    'url_archivo' => $doc->archivo ? asset('storage/' . $doc->archivo) : null
+                    'url_archivo' => $doc->archivo ? asset($doc->archivo) : null
                 ];
             });
 
