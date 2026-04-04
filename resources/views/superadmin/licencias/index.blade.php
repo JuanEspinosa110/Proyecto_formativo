@@ -197,7 +197,7 @@
     </div>
 
     <!-- Información de filtros aplicados -->
-    @if(request()->hasAny(['search', 'estado', 'plan', 'filter']))
+    @if(request()->filled('search') || request()->filled('estado') || request()->filled('plan') || request()->filled('filter'))
     <div class="alert alert-info d-flex justify-content-between align-items-center mb-3">
         <div>
             <i class="fas fa-info-circle me-2"></i>

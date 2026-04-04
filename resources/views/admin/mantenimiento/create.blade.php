@@ -4,17 +4,14 @@
 
 @section('content')
 <div class="sigu-fade">
-    @if(Auth::user()->id_tipo_usuario == 1)
-    <div class="alert alert-warning shadow-sm d-flex align-items-center gap-3 p-4 mb-4" style="border-radius:1rem; border-left: 6px solid #d69e2e; background: #fffaf0;">
-        <span class="material-symbols-rounded fs-1 text-warning">lock</span>
+    <div class="sigu-page-hd">
         <div>
-            <h5 class="fw-bold mb-1">Acceso Restringido</h5>
-            <p class="mb-0">Como Administrador, no tienes permisos para enviar vehículos al taller desde este formulario. Solo el Jefe de Mantenimiento está autorizado para esta acción.</p>
+            <h1 class="sigu-page-title">Registrar Mantenimiento</h1>
+            <p class="sigu-page-sub">Envíe un vehículo al taller y registre las tareas a realizar.</p>
         </div>
     </div>
-    @endif
 
-    <div class="bg-white rounded-lg shadow-sm p-4 mt-4" style="max-width:800px; @if(Auth::user()->id_tipo_usuario == 1) opacity: 0.6; pointer-events: none; @endif">
+    <div class="bg-white rounded-lg shadow-sm p-4 mt-4" style="max-width:800px;">
         
         @if ($errors->any())
             <div class="alert alert-danger" style="border-radius:0.5rem; border-left:4px solid #c53030; background-color:#fff5f5; color:#c53030;">
@@ -34,7 +31,6 @@
             @csrf
             <input type="hidden" name="origen" value="admin">
 
-
             <div class="row mb-4">
                 <div class="col-md-6 mb-3">
                     <label for="placa" class="form-label fw-semibold">Bus (Placa) <span class="text-danger">*</span></label>
@@ -51,7 +47,6 @@
                     </select>
                     @if(isset($placa_predefinida) && $placa_predefinida)
                         <input type="hidden" name="placa" value="{{ $placa_predefinida }}">
-                        <small class="text-muted">Placa vinculada al reporte.</small>
                     @endif
                 </div>
                 <div class="col-md-6 mb-3">
@@ -60,9 +55,8 @@
                 </div>
             </div>
 
-
             <hr class="mb-4">
-            <h5 class="mb-3">Tareas a realizar</h5>
+            <h5 class="mb-3 fw-bold">Tareas a realizar</h5>
             <div id="detalles-container">
                 <div class="detalle-row mb-3 p-3 rounded" style="background:#f8fafc; border:1px solid #e2e8f0;">
                     <div class="row align-items-end">
@@ -123,13 +117,11 @@
             </div>
 
             <div class="d-flex gap-3 mt-2">
-                @if(Auth::user()->id_tipo_usuario != 1)
-                    <button type="submit" class="btn" style="background:var(--p); color:white; padding:0.5rem 2rem;">
-                        Enviar al Taller
-                    </button>
-                @endif
+                <button type="submit" class="btn" style="background:var(--p); color:white; padding:0.5rem 2rem;">
+                    Enviar al Taller
+                </button>
                 <a href="{{ route('admin.mantenimiento.index') }}" class="btn btn-light" style="padding:0.5rem 2rem;">
-                    @if(Auth::user()->id_tipo_usuario == 1) Regresar @else Cancelar @endif
+                    Cancelar
                 </a>
             </div>
         </form>

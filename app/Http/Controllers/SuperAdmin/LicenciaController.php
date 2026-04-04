@@ -39,9 +39,23 @@ class LicenciaController extends Controller
             });
         }
 
-        // Aplicar filtro de estado
+        // Aplicar filtro de estado (con lógica de fecha para consistencia)
         if ($request->filled('estado')) {
-            $query->where('licencias.id_estado', $request->estado);
+            $estadoSeleccionado = (int)$request->estado;
+            if ($estadoSeleccionado === 1) { // ACTIVA
+                $query->where('licencias.id_estado', 1)
+                      ->where('licencias.fecha_vencimiento', '>=', now()->toDateString());
+            } elseif ($estadoSeleccionado === 8) { // VENCIDA
+                $query->where(function($q) {
+                    $q->where('licencias.id_estado', 8)
+                      ->orWhere(function($q2) {
+                          $q2->where('licencias.id_estado', 1)
+                             ->where('licencias.fecha_vencimiento', '<', now()->toDateString());
+                      });
+                });
+            } else {
+                $query->where('licencias.id_estado', $estadoSeleccionado);
+            }
         }
 
         // Aplicar filtro de plan
@@ -53,14 +67,21 @@ class LicenciaController extends Controller
         if ($request->filled('filter')) {
             switch ($request->filter) {
                 case 'activas':
-                    $query->where('licencias.id_estado', 1);
+                    $query->where('licencias.id_estado', 1)
+                        ->where('licencias.fecha_vencimiento', '>=', now()->toDateString());
                     break;
                 case 'por_vencer':
                     $query->where('licencias.id_estado', 1)
                         ->whereRaw('DATEDIFF(licencias.fecha_vencimiento, CURDATE()) BETWEEN 0 AND 30');
                     break;
                 case 'vencidas':
-                    $query->where('licencias.id_estado', 6);
+                    $query->where(function($q) {
+                        $q->where('licencias.id_estado', 8)
+                          ->orWhere(function($q2) {
+                              $q2->where('licencias.id_estado', 1)
+                                 ->where('licencias.fecha_vencimiento', '<', now()->toDateString());
+                          });
+                    });
                     break;
             }
         }
@@ -78,18 +99,21 @@ class LicenciaController extends Controller
 
         $stats = [
             'total' => $allLicencias->count(),
-            'activas' => $allLicencias->where('id_estado', 1)->count(),
+            'activas' => $allLicencias->where('id_estado', 1)
+                ->where('fecha_vencimiento', '>=', now()->toDateString())->count(),
             'proximas_vencer' => $allLicencias->filter(function ($lic) {
                 if ($lic->id_estado != 1) return false;
                 $diasRestantes = (int)Carbon::today()->diffInDays(Carbon::parse($lic->fecha_vencimiento), false);
                 return $diasRestantes >= 0 && $diasRestantes <= 30;
             })->count(),
-            'vencidas' => $allLicencias->where('id_estado', 6)->count(),
+            'vencidas' => $allLicencias->filter(function ($lic) {
+                return $lic->id_estado == 8 || ($lic->id_estado == 1 && Carbon::parse($lic->fecha_vencimiento)->lt(Carbon::today()));
+            })->count(),
         ];
 
         // Obtener listas para filtros
         $estados = DB::table('estado')
-            ->whereIn('id_estado', [1, 3, 6]) // Solo estados relevantes
+            ->whereIn('id_estado', [1, 8]) // Solo Activa (1) y Vencida (8)
             ->orderBy('nombre_estado')
             ->get();
 
@@ -524,7 +548,7 @@ class LicenciaController extends Controller
             ->first();
         if (!$licencia) return redirect()->route('superadmin.licencias.index')->with('error', 'Licencia no encontrada');
         $planes = DB::table('planes_licencia')->where('id_estado', 1)->get();
-        $estados = DB::table('estado')->whereIn('id_estado', [1, 3, 6])->get();
+        $estados = DB::table('estado')->whereIn('id_estado', [1, 8])->get();
         return view('superadmin.licencias.editar', compact('licencia', 'planes', 'estados'));
     }
 
@@ -553,7 +577,7 @@ class LicenciaController extends Controller
             ->select('licencias.*', 'empresa.nombre_empresa', 'planes_licencia.nombre_plan', 'estado.nombre_estado')
             ->first();
         if (!$licencia) return redirect()->route('superadmin.licencias.index')->with('error', 'No encontrada');
-        $estados = DB::table('estado')->whereIn('id_estado', [1, 3, 6, 9])->get();
+        $estados = DB::table('estado')->whereIn('id_estado', [1, 8, 9])->get();
         return view('superadmin.licencias.gestionar_estado', compact('licencia', 'estados'));
     }
 
@@ -873,7 +897,7 @@ class LicenciaController extends Controller
                         ->whereRaw('DATEDIFF(licencias.fecha_vencimiento, CURDATE()) BETWEEN 0 AND 30');
                     break;
                 case 'vencidas':
-                    $query->where('licencias.id_estado', 6);
+                    $query->where('licencias.id_estado', 8);
                     break;
             }
         }

@@ -30,8 +30,11 @@
                     <h5 class="fw-black mb-1">Inventario de Flota</h5>
                     <p class="text-muted small mb-4">Reporte detallado de vehículos, estados operativos y kilometraje.</p>
                     <div class="d-flex flex-column gap-2">
-                        <a href="{{ route('empresa.buses.export') }}" class="btn btn-outline-success btn-sm rounded-pill fw-bold shadow-sm py-2">
+                        <a href="{{ route('empresa.buses.export', ['format' => 'excel']) }}" class="btn btn-outline-success btn-sm rounded-pill fw-bold shadow-sm py-2">
                             <span class="material-symbols-rounded fs-6 align-middle me-1">file_download</span> EXCEL DE FLOTA
+                        </a>
+                        <a href="{{ route('empresa.buses.export', ['format' => 'pdf']) }}" class="btn btn-outline-danger btn-sm rounded-pill fw-bold shadow-sm py-2">
+                            <span class="material-symbols-rounded fs-6 align-middle me-1">picture_as_pdf</span> DESCARGAR PDF
                         </a>
                     </div>
                 </div>
@@ -46,11 +49,14 @@
                     </div>
                     <h5 class="fw-black mb-1">Estado Documental</h5>
                     <p class="text-muted small mb-4">Listado de vencimientos de SOAT, Tecnomecánica y Licencias.</p>
-                    <div class="d-flex flex-column gap-2">
-                        <a href="{{ route('empresa.documentos.export') }}" class="btn btn-outline-primary btn-sm rounded-pill fw-bold shadow-sm py-2">
-                            <span class="material-symbols-rounded fs-6 align-middle me-1">description</span> REPORTE VENCIMIENTOS
-                        </a>
-                    </div>
+                        <div class="d-flex flex-column gap-2">
+                            <a href="{{ route('empresa.reportes.export', ['tipo_reporte' => 'documentos', 'formato' => 'excel']) }}" class="btn btn-outline-primary btn-sm rounded-pill fw-bold shadow-sm py-2">
+                                <span class="material-symbols-rounded fs-6 align-middle me-1">description</span> REPORTE EXCEL (VENCIMIENTOS)
+                            </a>
+                            <a href="{{ route('empresa.reportes.export', ['tipo_reporte' => 'documentos', 'formato' => 'pdf']) }}" class="btn btn-outline-danger btn-sm rounded-pill fw-bold shadow-sm py-2">
+                                <span class="material-symbols-rounded fs-6 align-middle me-1">picture_as_pdf</span> DESCARGAR PDF (ESTADO)
+                            </a>
+                        </div>
                 </div>
             </div>
         </div>

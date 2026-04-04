@@ -56,7 +56,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/error/licencia-vencida', function () {
         // Obtener un correo de contacto de SuperAdmin para soporte
-        $contacto = DB::table('super_admin')->value('correo') ?? 'soporte@sigu.com';
+        $contacto = Illuminate\Support\Facades\DB::table('super_administrador')->value('correo') ?? 'soporte@sigu.com';
         return view('errors.licencia-vencida', compact('contacto'));
     })->name('error.licencia-vencida');
 });

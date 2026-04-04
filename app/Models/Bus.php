@@ -109,6 +109,24 @@ class Bus extends Model
     }
 
     /**
+     * Verifica si el bus está apto para viajar (Documentos vigentes + Sin fallas críticas).
+     */
+    public function isAptForTravel()
+    {
+        // 1. Debe ser "Operable" (Estado activo + Documentos vigentes)
+        if (!$this->isOperable()) {
+            return false;
+        }
+
+        // 2. No debe tener fallas de nivel ALTO pendientes
+        if ($this->hasPendingHighLevelFaults()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Verifica si el bus tiene algún reporte de falla de nivel ALTO pendiente.
      */
     public function hasPendingHighLevelFaults()
