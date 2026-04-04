@@ -12,6 +12,7 @@ Route::prefix('jefemantenimiento')->name('jefemantenimiento.')->group(function (
         // Módulo de Reportes de Fallas
         Route::get('reportes', [ReporteFallaController::class, 'index'])->name('reportes');
         Route::get('reportes/{id}/atender', [ReporteFallaController::class, 'attend'])->name('reportes.attend');
+        Route::get('api/reportes-pendientes/{placa}', [ReporteFallaController::class, 'getPendingByBus'])->name('api.reportes-pendientes');
         
         // Módulo de Mantenimiento (Taller)
         Route::get('mantenimiento', [MantenimientoController::class, 'index'])->name('index');

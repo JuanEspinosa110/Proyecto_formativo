@@ -1,11 +1,11 @@
-@extends('admin.layouts.app')
+@extends(auth()->user()->id_tipo_usuario == 1 ? 'admin.layouts.app' : 'empresa.layouts.app')
 
 @section('title', 'Editar Documento - SIGU')
 
 @section('content')
 <div class="sa-content-header">
     <div class="sa-content-title">
-        <a href="{{ route('admin.documentos.index') }}" class="back-link">
+        <a href="{{ auth()->user()->id_tipo_usuario == 1 ? route('admin.documentos.index') : route('empresa.dashboard', ['tab' => 'documentacion']) }}" class="back-link">
             <span class="material-symbols-rounded">arrow_back</span>
         </a>
         <div>
@@ -249,7 +249,7 @@
         </div>
 
         <div class="form-actions">
-            <a href="{{ route('admin.documentos.index') }}" class="sigu-btn sigu-btn-ghost">
+            <a href="{{ auth()->user()->id_tipo_usuario == 1 ? route('admin.documentos.index') : route('empresa.dashboard', ['tab' => 'documentacion']) }}" class="sigu-btn sigu-btn-ghost">
                 <span class="material-symbols-rounded">close</span> Cancelar
             </a>
             <button type="submit" class="sigu-btn sigu-btn-primary" id="btn-submit">

@@ -192,24 +192,26 @@
                  if (data.conductores.length === 0) {
                      conductorSelect.innerHTML = '<option value="" disabled>No hay conductores disponibles</option>';
                  } else {
-                     data.conductores.forEach(c => {
-                         const option = document.createElement('option');
-                         option.value = c.doc_usuario;
-                         option.textContent = c.nombre_completo;
-                         conductorSelect.appendChild(option);
-                     });
+                 data.conductores.forEach(c => {
+                     const option = document.createElement('option');
+                     option.value = c.doc_usuario;
+                     option.textContent = c.nombre_completo;
+                     if (c.disabled) option.disabled = true;
+                     conductorSelect.appendChild(option);
+                 });
                  }
  
                  busSelect.innerHTML = '<option value="" disabled selected>Seleccione un vehículo...</option>';
                  if (data.buses.length === 0) {
                      busSelect.innerHTML = '<option value="" disabled>No hay buses disponibles</option>';
                  } else {
-                     data.buses.forEach(b => {
-                         const option = document.createElement('option');
-                         option.value = b.placa;
-                         option.textContent = b.label;
-                         busSelect.appendChild(option);
-                     });
+                 data.buses.forEach(b => {
+                     const option = document.createElement('option');
+                     option.value = b.placa;
+                     option.textContent = b.label;
+                     if (b.disabled) option.disabled = true;
+                     busSelect.appendChild(option);
+                 });
                  }
              })
              .catch(error => {

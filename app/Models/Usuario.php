@@ -209,4 +209,15 @@ class Usuario extends Authenticatable
     {
         return $this->estado->nombre_estado ?? 'N/A';
     }
+    /**
+     * Verifica si el usuario tiene una licencia de tránsito vigente y aprobada.
+     */
+    public function hasValidLicense()
+    {
+        return Documento::where('doc_usuario', $this->doc_usuario)
+            ->where('id_tipo_documento', 3) // Licencia de Tránsito
+            ->where('id_estado', 1) // Activo/Aprobado
+            ->whereDate('fecha_vencimiento', '>', now())
+            ->exists();
+    }
 }

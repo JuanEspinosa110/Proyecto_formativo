@@ -325,21 +325,21 @@ class MantenimientoController extends Controller
                     $fotoPath = $file->store('mantenimientos', 'public');
                 }
 
-                DetalleMantenimiento::create([
-                    'id_mantenimiento'      => $mantenimiento->id_mantenimiento,
+                $detalleModel = $mantenimiento->detalles()->create([
                     'id_tipo_mantenimiento' => $detalle['id_tipo_mantenimiento'],
                     'descripcion'           => $detalle['descripcion'],
                     'evidencia_foto'        => $fotoPath,
+                    'id_reporte'            => $detalle['id_reporte'] ?? null,
                 ]);
+
+                // Actualizar estado del reporte vinculado si existe
+                if ($detalleModel->id_reporte) {
+                    ReporteFalla::where('id_reporte', $detalleModel->id_reporte)->update(['id_estado' => 4]); // 4 = En Taller
+                }
             }
 
             // *** Cambiar bus a "En Mantenimiento" (id=7) ***
             $bus->update(['id_estado' => ESTADO_BUS_EN_MANTENIMIENTO]);
-
-            // Si viene de un reporte, marcarlo como atendido (4 = En Curso/Taller)
-            if ($request->reporte_id) {
-                ReporteFalla::find($request->reporte_id)?->update(['id_estado' => 4]);
-            }
 
             DB::commit();
 
@@ -378,11 +378,21 @@ class MantenimientoController extends Controller
 
             $mantenimiento = Mantenimiento::with('bus')->findOrFail($id);
 
-            if ((int)$mantenimiento->id_estado === ESTADO_MANT_FINALIZADO) {
-                return back()->with('error', 'Este mantenimiento ya está finalizado.');
+            $mantenimiento->update(['id_estado' => ESTADO_MANT_FINALIZADO]);
+            
+            // Finalizar TODOS los reportes vinculados en las tareas (detalles)
+            $reporteIds = $mantenimiento->detalles()->whereNotNull('id_reporte')->pluck('id_reporte')->unique();
+            if ($reporteIds->isNotEmpty()) {
+                ReporteFalla::whereIn('id_reporte', $reporteIds)->update(['id_estado' => 5]); // 5 = Finalizado
             }
 
-            $mantenimiento->update(['id_estado' => ESTADO_MANT_FINALIZADO]);
+            // Verificación de seguridad: ¿Tiene otras fallas críticas?
+            if ($mantenimiento->bus?->hasPendingHighLevelFaults()) {
+                DB::commit();
+                return redirect()->route('admin.mantenimiento.index')
+                    ->with('warning', "Tareas completadas, pero el bus {$mantenimiento->placa} PERMANECE en taller por tener otras fallas de nivel ALTO pendientes.");
+            }
+
             $mantenimiento->bus?->update(['id_estado' => ESTADO_BUS_ACTIVO]);
 
             DB::commit();
@@ -404,11 +414,21 @@ class MantenimientoController extends Controller
 
             $mantenimiento = Mantenimiento::with('bus')->findOrFail($id);
 
-            if ((int)$mantenimiento->id_estado === ESTADO_MANT_FINALIZADO) {
-                return back()->with('error', 'Este mantenimiento ya fue aprobado.');
+            $mantenimiento->update(['id_estado' => ESTADO_MANT_FINALIZADO]);
+            
+            // Finalizar TODOS los reportes vinculados en las tareas (detalles)
+            $reporteIds = $mantenimiento->detalles()->whereNotNull('id_reporte')->pluck('id_reporte')->unique();
+            if ($reporteIds->isNotEmpty()) {
+                ReporteFalla::whereIn('id_reporte', $reporteIds)->update(['id_estado' => 5]); // 5 = Finalizado
             }
 
-            $mantenimiento->update(['id_estado' => ESTADO_MANT_FINALIZADO]);
+            // Verificación de seguridad: ¿Tiene otras fallas críticas?
+            if ($mantenimiento->bus?->hasPendingHighLevelFaults()) {
+                DB::commit();
+                return redirect()->route('jefemantenimiento.index')
+                    ->with('warning', "Salida aprobada, pero el bus {$mantenimiento->placa} NO puebe habilitarse aún por fallas de nivel ALTO pendientes.");
+            }
+
             $mantenimiento->bus?->update(['id_estado' => ESTADO_BUS_ACTIVO]);
 
             DB::commit();

@@ -68,7 +68,12 @@ class Bus extends Model
      */
     public function isOperable()
     {
-        // 1. Obtener tipos de documento requeridos para Bus (requiere_placa = 1)
+        // 1. Debe estar en estado ACTIVO (id_estado = 1)
+        if ($this->id_estado != 1) {
+            return false;
+        }
+
+        // 2. Obtener tipos de documento requeridos para Bus (requiere_placa = 1)
         $requiredTypes = TipoDocumento::where('requiere_placa', 1)
             ->where('id_estado', 1) // Activo
             ->pluck('id_tipo_documento');
@@ -77,7 +82,7 @@ class Bus extends Model
             return true; // Si no hay requeridos, es operable por defecto
         }
 
-        // 2. Contar documentos aprobados y vigentes para este bus (por tipo de documento)
+        // 3. Contar documentos aprobados y vigentes para este bus (por tipo de documento)
         $approvedCount = Documento::where('placa', $this->placa)
             ->whereIn('id_tipo_documento', $requiredTypes)
             ->where('id_estado', 1) // 1 = ACTIVO/APROBADO
@@ -85,7 +90,7 @@ class Bus extends Model
             ->distinct('id_tipo_documento')
             ->count('id_tipo_documento');
 
-        // 3. Debe tener exactamente un documento aprobado por cada tipo requerido
+        // 4. Debe tener exactamente un documento aprobado por cada tipo requerido
         return $approvedCount === $requiredTypes->count();
     }
 
@@ -100,6 +105,17 @@ class Bus extends Model
         return Documento::where('placa', $this->placa)
             ->where('id_estado', 1)
             ->whereBetween('fecha_vencimiento', [$hoy, $vencimientoLimite])
+            ->exists();
+    }
+
+    /**
+     * Verifica si el bus tiene algún reporte de falla de nivel ALTO pendiente.
+     */
+    public function hasPendingHighLevelFaults()
+    {
+        return ReporteFalla::where('placa', $this->placa)
+            ->where('nivel_urgencia', 'Alto')
+            ->where('id_estado', '!=', 5) // 5 = FINALIZADO
             ->exists();
     }
 }

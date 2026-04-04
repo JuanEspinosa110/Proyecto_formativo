@@ -60,7 +60,6 @@
                         <th>Descripción</th>
                         <th>Urgencia</th>
                         <th>Estado</th>
-                        <th>Acción</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,30 +81,30 @@
                             </td>
                             <td style="max-width:250px;">{{ Str::limit($reporte->descripcion, 80) }}</td>
                             <td>
-                                @php $urgencia = strtoupper($reporte->urgencia ?? ''); @endphp
-                                @if($urgencia === 'ALTA' || $urgencia === 'CRITICA')
-                                    <span class="badge bg-danger">{{ $urgencia }}</span>
-                                @elseif($urgencia === 'MEDIA')
-                                    <span class="badge bg-warning text-dark">{{ $urgencia }}</span>
-                                @else
-                                    <span class="badge bg-success">{{ $urgencia ?: 'BAJA' }}</span>
-                                @endif
-                            </td>
-                            <td>
-                                <span class="badge bg-light text-dark">
-                                    {{ $reporte->estado->nombre_estado ?? 'Sin estado' }}
+                                @php $nivel = $reporte->nivel_urgencia; @endphp
+                                <span class="badge @if($nivel == 'Alto') bg-danger @elseif($nivel == 'Medio') bg-warning text-dark @else bg-success @endif">
+                                    {{ $nivel ?: 'BAJA' }}
                                 </span>
                             </td>
                             <td>
-                                <a href="{{ route('admin.mantenimiento.reportes.attend', $reporte->id_reporte) }}"
-                                   class="btn btn-sm" style="background:var(--p); color:white; border-radius:0.5rem; padding:0.25rem 0.6rem; text-decoration:none;">
-                                    Enviar al Taller
-                                </a>
+                                @if($reporte->id_estado == 5)
+                                    <span class="text-success fw-bold small d-flex align-items-center gap-1">
+                                        <span class="material-symbols-rounded fs-6">task_alt</span> FINALIZADO
+                                    </span>
+                                @elseif($reporte->id_estado == 4)
+                                    <span class="text-info fw-bold small d-flex align-items-center gap-1">
+                                        <span class="material-symbols-rounded fs-6">engineering</span> EN TALLER
+                                    </span>
+                                @else
+                                    <span class="text-secondary fw-bold small d-flex align-items-center gap-1">
+                                        <span class="material-symbols-rounded fs-6">pending</span> NO ATENDIDO
+                                    </span>
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center py-4 text-muted">No hay reportes de fallas registrados.</td>
+                            <td colspan="6" class="text-center py-4 text-muted">No hay reportes de fallas registrados.</td>
                         </tr>
                     @endforelse
                 </tbody>

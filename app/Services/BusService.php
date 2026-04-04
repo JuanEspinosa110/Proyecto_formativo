@@ -70,6 +70,13 @@ class BusService
         $oldStatus = $bus->id_estado;
         // La placa no debe actualizarse para evitar conflictos con llaves foráneas (FK en tabla viaje)
         unset($data['placa']);
+
+        // Bloqueo de seguridad: No permitir ACTIVO si hay fallas ALTO pendientes
+        if (isset($data['id_estado']) && (int)$data['id_estado'] === 1) {
+            if ($bus->hasPendingHighLevelFaults()) {
+                throw new \Exception("El vehículo no puede marcarse como ACTIVO porque aún tiene reportes de falla de nivel ALTO pendientes de resolución.");
+            }
+        }
         
         $updated = $bus->update($data);
 
@@ -113,6 +120,7 @@ class BusService
             ->get()
             ->map(function($doc) {
                 return [
+                    'id_documento' => $doc->id_documento,
                     'id_tipo_documento' => $doc->id_tipo_documento,
                     'tipo_documento' => $doc->tipoDocumento,
                     'fecha_vencimiento' => $doc->fecha_vencimiento->format('Y-m-d'),

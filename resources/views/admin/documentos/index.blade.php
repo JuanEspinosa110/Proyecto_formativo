@@ -1,4 +1,6 @@
-@extends('admin.layouts.app')
+@php
+$routePrefix = auth()->user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
+@endphp
 
 @section('title', 'Documentos - SIGU')
 
@@ -9,7 +11,10 @@
         <p>Revisión y control de legalidad de la flota de {{ $empresa->nombre_empresa }}</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="{{ route('admin.documentos.export') }}" class="btn btn-outline-success d-flex align-items-center gap-2 px-3 fw-bold shadow-sm">
+        <a href="{{ route($routePrefix . '.documentos.create') }}" class="btn btn-primary d-flex align-items-center gap-2 px-3 fw-bold shadow-sm">
+            <span class="material-symbols-rounded">add_circle</span> Registrar Nuevo
+        </a>
+        <a href="{{ route($routePrefix . '.documentos.export') }}" class="btn btn-outline-success d-flex align-items-center gap-2 px-3 fw-bold shadow-sm">
             <span class="material-symbols-rounded">file_download</span> Exportar Excel
         </a>
     </div>

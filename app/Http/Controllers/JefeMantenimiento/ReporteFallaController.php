@@ -77,4 +77,22 @@ class ReporteFallaController extends Controller
             'origen'     => 'admin',
         ]);
     }
+
+    public function getPendingByBus($placa)
+    {
+        $reportes = ReporteFalla::where('placa', $placa)
+            ->whereIn('id_estado', [1, 6]) // 1: No Atendido, 6: Pendiente
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($r) {
+                return [
+                    'id_reporte' => $r->id_reporte,
+                    'nivel'      => $r->nivel_urgencia,
+                    'descripcion' => $r->descripcion,
+                    'fecha'      => $r->created_at->format('d/m/Y'),
+                ];
+            });
+
+        return response()->json($reportes);
+    }
 }

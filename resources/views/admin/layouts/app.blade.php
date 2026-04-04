@@ -164,6 +164,10 @@
             } else if (type === 'error') {
                 toastEl.classList.add('bg-danger');
                 toastIcon.textContent = 'error';
+            } else if (type === 'warning') {
+                toastEl.classList.add('bg-warning', 'text-dark');
+                toastIcon.textContent = 'warning';
+                document.getElementById('toastIconWrap').style.background = 'rgba(0,0,0,0.1)';
             } else {
                 toastEl.classList.add('bg-info');
                 toastIcon.textContent = 'info';
@@ -179,6 +183,9 @@
         @endif
         @if(session('error'))
             document.addEventListener('DOMContentLoaded', () => showToast("{{ session('error') }}", 'error'));
+        @endif
+        @if(session('warning'))
+            document.addEventListener('DOMContentLoaded', () => showToast("{{ session('warning') }}", 'warning'));
         @endif
     </script>
 

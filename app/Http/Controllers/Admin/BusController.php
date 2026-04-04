@@ -52,14 +52,18 @@ class BusController extends Controller
      */
     public function update(BusRequest $request, Bus $bus)
     {
-        $this->busService->updateBus($bus, $request->validated());
-        
-        if (auth()->user()->id_tipo_usuario == 4) {
-            return redirect()->back()->with('success', 'Vehículo actualizado correctamente.');
+        try {
+            $this->busService->updateBus($bus, $request->validated());
+            
+            if (auth()->user()->id_tipo_usuario == 4) {
+                return redirect()->back()->with('success', 'Vehículo actualizado correctamente.');
+            }
+            
+            return redirect()->route('admin.buses.index')
+                ->with('success', 'Registro actualizado correctamente');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
         }
-        
-        return redirect()->route('admin.buses.index')
-            ->with('success', 'Registro actualizado correctamente');
     }
 
     /**

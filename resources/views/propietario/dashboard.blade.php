@@ -572,15 +572,17 @@
                                                         <span class="material-symbols-rounded fs-6">download</span>
                                                     </a>
                                                 @endif
-                                                <button
-                                                    class="btn btn-sm btn-light border p-2 rounded-circle text-{{ $doc->status_color }}"
-                                                    data-bs-toggle="modal" data-bs-target="#modalActualizarDocumento"
-                                                    data-id="{{ $doc->id_documento }}" data-nombre="{{ $doc->nombre }}"
-                                                    data-expedicion="{{ $doc->fecha_expedicion->format('Y-m-d') }}"
-                                                    data-vencimiento="{{ $doc->fecha_vencimiento->format('Y-m-d') }}"
-                                                    title="Actualizar / Renovar">
-                                                    <span class="material-symbols-rounded fs-6">refresh</span>
-                                                </button>
+                                                @if($doc->estado_expiracion != 'VIGENTE')
+                                                    <button
+                                                        class="btn btn-sm btn-light border p-2 rounded-circle text-{{ $doc->status_color }}"
+                                                        data-bs-toggle="modal" data-bs-target="#modalActualizarDocumento"
+                                                        data-id="{{ $doc->id_documento }}" data-nombre="{{ $doc->nombre }}"
+                                                        data-expedicion="{{ $doc->fecha_expedicion->format('Y-m-d') }}"
+                                                        data-vencimiento="{{ $doc->fecha_vencimiento->format('Y-m-d') }}"
+                                                        title="Actualizar / Renovar">
+                                                        <span class="material-symbols-rounded fs-6">refresh</span>
+                                                    </button>
+                                                @endif
                                                 <button
                                                     class="btn btn-sm btn-light border p-2 rounded-circle text-dark btn-historial-docs"
                                                     data-placa="{{ $doc->placa }}"

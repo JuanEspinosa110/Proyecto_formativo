@@ -95,11 +95,18 @@ class AsignacionRequest extends FormRequest
             $proposedStart = $fechaObj->toDateTimeString();
             $proposedEnd = $fechaObj->copy()->addHours(8)->toDateTimeString();
 
-            // 0. Validación de operabilidad del BUS (Documentos Vigentes)
+            // 0. Validación de operabilidad del BUS (Estado + Documentos)
             $busModel = \App\Models\Bus::where('placa', $this->placa)->first();
-            if ($busModel && !$busModel->isOperable()) {
-                $validator->errors()->add('placa', 'Este vehículo no se puede asignar porque no posee todos sus documentos vigentes y aprobados.');
-                return;
+            if ($busModel) {
+                if ($busModel->id_estado != 1) {
+                    $msg = 'Este vehículo no se puede asignar porque está en ' . ($busModel->estado->nombre_estado ?? 'un estado no operativo') . '.';
+                    $validator->errors()->add('placa', $msg);
+                    return;
+                }
+                if (!$busModel->isOperable()) {
+                    $validator->errors()->add('placa', 'Este vehículo no se puede asignar porque no posee todos sus documentos vigentes (SOAT, Tecmomecánica).');
+                    return;
+                }
             }
 
             // 2. Validación de conflictos para el BUS (dentro de la misma empresa)
@@ -132,7 +139,14 @@ class AsignacionRequest extends FormRequest
                 
                 if ($esAdmin) {
                     $validator->errors()->add('doc_us', 'No se puede asignar un viaje a un usuario con rol de Administrador.');
-                    return; // Detener validaciones posteriores para este usuario
+                    return; 
+                }
+
+                // Validación de Licencia de Tránsito/Conducción
+                $conductorModel = \App\Models\Usuario::where('doc_usuario', $this->doc_us)->first();
+                if ($conductorModel && !$conductorModel->hasValidLicense()) {
+                    $validator->errors()->add('doc_us', 'Este conductor no posee una Licencia de Tránsito (Conducción) vigente y aprobada.');
+                    return;
                 }
 
                 $conflictConductor = \App\Models\Viaje::where('doc_us', $this->doc_us)

@@ -338,47 +338,72 @@ class AsignacionController extends Controller
 
             $conductores = Usuario::where('NIT', $nit)
                 ->where('id_estado', 1)
-                ->whereIn('doc_usuario', $licenciasVigentes)
                 ->whereNotIn('id_tipo_usuario', $adminRoleIds)
-                ->whereDoesntHave('viajes', function($q) use ($fechaSoloDia, $proposedStart, $proposedEnd) {
-                    $q->whereIn('id_estado', [1, 5]) // Solo bloquean viajes ACTIVOS o FINALIZADOS
-                      ->where(function($sq) use ($fechaSoloDia, $proposedStart, $proposedEnd) {
-                          $sq->whereDate('fecha', $fechaSoloDia)
-                             ->orWhere(function($ssq) use ($proposedStart, $proposedEnd) {
-                                 $ssq->where('fecha', '<', $proposedEnd)
-                                     ->whereRaw('DATE_ADD(fecha, INTERVAL 8 HOUR) > ?', [$proposedStart]);
-                             });
-                      });
-                })
-                ->get();
+                ->get()
+                ->map(function(\App\Models\Usuario $c) use ($fechaSoloDia, $proposedStart, $proposedEnd) {
+                    $hasLicense = $c->hasValidLicense();
+                    $conflict = $c->viajes()
+                        ->whereIn('id_estado', [1, 5])
+                        ->where(function($q) use ($fechaSoloDia, $proposedStart, $proposedEnd) {
+                            $q->whereDate('fecha', $fechaSoloDia)
+                              ->orWhere(function($sq) use ($proposedStart, $proposedEnd) {
+                                  $sq->where('fecha', '<', $proposedEnd)
+                                      ->whereRaw('DATE_ADD(fecha, INTERVAL 8 HOUR) > ?', [$proposedStart]);
+                              });
+                        })->exists();
 
-            $conductores = $conductores->map(function($c) {
-                return [
-                    'doc_usuario' => $c->doc_usuario,
-                    'nombre_completo' => "{$c->primer_nombre} {$c->primer_apellido} ({$c->doc_usuario})"
-                ];
-            });
+                    $statusLabel = "";
+                    $disabled = false;
+
+                    if (!$hasLicense) {
+                        $statusLabel = " (Licencia vencida/faltante)";
+                        $disabled = true;
+                    } elseif ($conflict) {
+                        $statusLabel = " (Ya asignado)";
+                        $disabled = true;
+                    }
+
+                    return [
+                        'doc_usuario' => $c->doc_usuario,
+                        'nombre_completo' => "{$c->primer_nombre} {$c->primer_apellido} ({$c->doc_usuario}){$statusLabel}",
+                        'disabled' => $disabled
+                    ];
+                });
 
             // 2. Filtrar Buses
             $buses = Bus::where('NIT', $nit)
+                ->with('estado')
                 ->get()
-                ->filter(function(Bus $bus) use ($proposedStart, $proposedEnd) {
-                    if (!$bus->isOperable()) return false;
-                    
+                ->map(function(\App\Models\Bus $bus) use ($proposedStart, $proposedEnd) {
+                    $isOperable = $bus->isOperable();
+                    $inMaintenance = $bus->id_estado != 1;
                     $conflict = Viaje::where('placa', $bus->placa)
                         ->where(function($q) use ($proposedStart, $proposedEnd) {
                             $q->where('fecha', '<', $proposedEnd)
                               ->whereRaw('DATE_ADD(fecha, INTERVAL 8 HOUR) > ?', [$proposedStart]);
                         })
                         ->exists();
-                    
-                    return !$conflict;
-                })
-                ->map(function($b) {
+
+                    $statusLabel = "";
+                    $disabled = false;
+
+                    if ($inMaintenance) {
+                        $estadoNom = $bus->estado->nombre_estado ?? 'No Operativo';
+                        $statusLabel = " ({$estadoNom})";
+                        $disabled = true;
+                    } elseif (!$isOperable) {
+                        $statusLabel = " (Falta de documento)";
+                        $disabled = true;
+                    } elseif ($conflict) {
+                        $statusLabel = " (Ya asignado)";
+                        $disabled = true;
+                    }
+
                     return [
-                        'placa' => $b->placa,
-                        'modelo' => $b->modelo,
-                        'label' => "{$b->placa} - {$b->modelo}"
+                        'placa' => $bus->placa,
+                        'modelo' => $bus->modelo,
+                        'label' => "{$bus->placa} - {$bus->modelo}{$statusLabel}",
+                        'disabled' => $disabled
                     ];
                 })
                 ->values();

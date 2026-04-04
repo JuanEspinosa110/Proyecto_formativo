@@ -136,9 +136,17 @@
                     @forelse($mantenimiento->detalles as $detalle)
                         <div class="list-group-item px-0 py-3">
                             <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1 fw-bold">{{ $detalle->tipoMantenimiento->nombre ?? 'General' }}</h6>
-                            </div>
+                            <h6 class="mb-1 fw-bold">{{ $detalle->tipoMantenimiento->nombre ?? 'General' }}</h6>
                             <p class="mb-1 text-muted">{{ $detalle->descripcion }}</p>
+
+                            @if($detalle->id_reporte)
+                                <div class="mt-1">
+                                    <span class="badge bg-light text-primary border" style="font-size:0.75rem; font-weight:normal;">
+                                        <i class="material-symbols-rounded" style="font-size:0.9rem; vertical-align:middle;">task_alt</i>
+                                        Resolvió Falla #{{ str_pad($detalle->id_reporte, 4, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                </div>
+                            @endif
                             @if($detalle->evidencia_foto)
                                 <div class="mt-2 text-start d-print-none">
                                     <a href="{{ asset('storage/' . $detalle->evidencia_foto) }}" target="_blank" class="d-inline-flex align-items-center gap-1 text-primary small text-decoration-none">

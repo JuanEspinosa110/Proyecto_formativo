@@ -657,6 +657,17 @@
                 document.getElementById('edit_correo').value = data.correo || '';
                 document.getElementById('edit_numero_chasis').value = data.numero_chasis || '';
                 document.getElementById('edit_numero_motor').value = data.numero_motor || '';
+                
+                // Lógica de restricción para Admin (Rol 1)
+                const isUserAdmin = {{ Auth::user()->id_tipo_usuario == 1 ? 'true' : 'false' }};
+                const maintenanceOption = document.querySelector('#edit_id_estado option[value="4"]');
+                if (isUserAdmin && maintenanceOption) {
+                    if (data.id_estado != 4) {
+                        maintenanceOption.style.display = 'none'; // Ocultar si no está ya en ese estado
+                    } else {
+                        maintenanceOption.style.display = 'block'; // Mostrar si ya está en ese estado (para mantenerlo o cambiarlo a Activo)
+                    }
+                }
 
                 const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
                 form.action = '/' + prefix + '/buses/' + data.placa;

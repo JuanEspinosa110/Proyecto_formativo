@@ -44,6 +44,15 @@
         </div>
     </div>
 
+    <!-- Acciones Rápidas (Documentación) -->
+    <div class="d-flex justify-content-between align-items-center mb-3 px-1">
+        <h5 class="mb-0 fw-black text-dark text-uppercase small ls-1">Registros en Observación</h5>
+        <a href="{{ route('empresa.documentos.create') }}" class="btn btn-primary btn-sm rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2">
+            <span class="material-symbols-rounded fs-5">add_circle</span>
+            Subir Nuevo Documento
+        </a>
+    </div>
+
     <!-- Tabla de Documentación -->
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="table-responsive">
@@ -103,8 +112,13 @@
                                             data-estado="{{ $doc->estado_expiracion }}"
                                             data-color="{{ $doc->status_color }}"
                                             data-archivo="{{ asset($doc->archivo) }}">
-                                        Ver Archivo
+                                        Ver Info
                                     </button>
+                                    @if($doc->estado_expiracion != 'VIGENTE')
+                                        <a href="{{ route('empresa.documentos.edit', $doc->id_documento) }}" class="btn btn-sm btn-warning text-dark border-0 shadow-sm rounded-pill px-3 fw-bold">
+                                            Renovar
+                                        </a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

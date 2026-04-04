@@ -45,7 +45,6 @@ class DatabaseSeeder extends Seeder
             MantenimientoSeeder::class,
             ReporteFallasSeeder::class,
             GastosSeeder::class,
-            OperacionHoySeeder::class,
             FixTarjetaAlfanumericaSeeder::class,
         ]);
 

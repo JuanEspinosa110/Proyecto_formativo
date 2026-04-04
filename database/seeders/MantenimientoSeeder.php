@@ -25,7 +25,35 @@ class MantenimientoSeeder extends Seeder
         if ($buses->isEmpty()) return;
 
         foreach ($buses as $bus) {
-            // 2 a 4 mantenimientos por bus
+            // Un 5% de probabilidad de tener un mantenimiento en curso
+            $enMantenimiento = rand(1, 20) === 1;
+
+            if ($enMantenimiento) {
+                $fechaInicio = Carbon::now()->subDays(rand(1, 4));
+                $mantenimientoId = DB::table('mantenimiento')->insertGetId([
+                    'placa' => $bus->placa,
+                    'NIT' => $bus->NIT,
+                    'kilometraje' => $bus->kilometraje,
+                    'fecha_mantenimiento' => $fechaInicio,
+                    'fecha_proximo' => null,
+                    'km_proximo' => null,
+                    'costo_total' => 0,
+                    'id_estado' => 4, // EN MANTENIMIENTO
+                ]);
+
+                DB::table('detalle_mantenimiento')->insert([
+                    'id_mantenimiento' => $mantenimientoId,
+                    'id_tipo_mantenimiento' => rand(1, 2),
+                    'descripcion' => 'Mantenimiento en curso (Seeder)',
+                ]);
+
+                // Actualizar el estado del bus a 4 (EN MANTENIMIENTO)
+                DB::table('bus')->where('placa', $bus->placa)->update(['id_estado' => 4]);
+                
+                continue; // No generar otros mantenimientos para este bus si está en curso
+            }
+
+            // 2 a 4 mantenimientos previos finalizados por bus
             for ($i = 0; $i < rand(2, 4); $i++) {
                 $fecha = $faker->dateTimeBetween('-6 months', '-1 month');
                 $km_actual = round(($bus->kilometraje - rand(1000, 5000)) / 100) * 100;
