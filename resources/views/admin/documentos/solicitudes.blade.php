@@ -28,7 +28,7 @@
     <!-- Filtros -->
     <div class="card border-0 shadow-sm mb-4 rounded-3">
         <div class="card-body p-3">
-            <form method="GET" action="{{ route('empresa.documentos.solicitudes') }}" class="row g-2 align-items-center">
+            <form method="GET" action="{{ route('admin.documentos.solicitudes') }}" class="row g-2 align-items-center">
                 <div class="col-md-5">
                     <input type="text" name="placa" class="form-control bg-light" placeholder="Filtrar por placa..." value="{{ request('placa') }}">
                 </div>
@@ -78,19 +78,22 @@
                         </td>
                         <td class="small">{{ $doc->fecha_vencimiento ? $doc->fecha_vencimiento->format('d/m/Y') : '—' }}</td>
                         <td>
-                            <a href="{{ route('empresa.documentos.download', $doc->id_documento) }}" class="btn btn-sm btn-light border d-inline-flex align-items-center gap-1 text-secondary" title="Descargar / Ver">
+                            <button class="btn btn-sm btn-light border d-inline-flex align-items-center gap-1 text-secondary btn-visor" 
+                                data-url="{{ asset($doc->archivo) }}" 
+                                data-nombre="{{ $doc->tipoDocumento->nombre ?? $doc->nombre }}"
+                                title="Previsualizar">
                                 <span class="material-symbols-rounded fs-5">visibility</span> Ver
-                            </a>
+                            </button>
                         </td>
                         <td class="text-end pe-4">
                             <div class="d-flex justify-content-end gap-2">
-                                <form action="{{ route('empresa.documentos.aprobar', $doc->id_documento) }}" method="POST">
+                                <form action="{{ route('admin.documentos.aprobar', $doc->id_documento) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-success d-flex align-items-center gap-1 fw-semibold py-1 px-2 shadow-sm" onclick="return confirm('¿Aprobar este documento?')">
                                         <span class="material-symbols-rounded fs-6">check</span> Aprobar
                                     </button>
                                 </form>
-                                <form action="{{ route('empresa.documentos.rechazar', $doc->id_documento) }}" method="POST">
+                                <form action="{{ route('admin.documentos.rechazar', $doc->id_documento) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-danger d-flex align-items-center gap-1 fw-semibold py-1 px-2 shadow-sm" onclick="return confirm('¿Rechazar este documento?')">
                                         <span class="material-symbols-rounded fs-6">close</span> Rechazar
@@ -118,3 +121,77 @@
     </div>
 </div>
 @endsection
+
+<!-- Modal Visor de Documentos -->
+<div class="modal fade" id="modalVisorDocumento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pt-4 px-4 bg-dark text-white">
+                <h5 class="modal-title fw-bold" id="visor_titulo">Visualización de Documento</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0 bg-secondary bg-opacity-10" style="height: 70vh;">
+                <iframe id="visor_iframe" class="w-100 h-100 d-none border-0" src=""></iframe>
+                <div id="visor_image_container" class="w-100 h-100 d-none d-flex align-items-center justify-content-center p-3">
+                    <img id="visor_img" src="" class="img-fluid rounded-3 shadow-sm" style="max-height: 100%;">
+                </div>
+                <div id="visor_error" class="w-100 h-100 d-none d-flex flex-column align-items-center justify-content-center text-muted">
+                    <span class="material-symbols-rounded display-1 mb-3">error</span>
+                    <p class="fw-bold">No se puede previsualizar este archivo.</p>
+                    <a id="visor_download" href="#" class="btn btn-primary rounded-pill px-4" download>Descargar Archivo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalVisor = new bootstrap.Modal(document.getElementById('modalVisorDocumento'));
+        const iframe = document.getElementById('visor_iframe');
+        const imgContainer = document.getElementById('visor_image_container');
+        const img = document.getElementById('visor_img');
+        const error = document.getElementById('visor_error');
+        const download = document.getElementById('visor_download');
+        const titulo = document.getElementById('visor_titulo');
+
+        window.mostrarVisor = function(url, nombre) {
+            titulo.innerText = 'Documento: ' + (nombre || 'Ver archivo');
+            iframe.classList.add('d-none');
+            imgContainer.classList.add('d-none');
+            error.classList.add('d-none');
+            iframe.src = '';
+            img.src = '';
+            download.href = url || '#';
+
+            if (!url || url.includes('null') || url === window.location.href) {
+                error.classList.remove('d-none');
+            } else {
+                const cleanUrl = url.split('?')[0];
+                const ext = cleanUrl.split('.').pop().toLowerCase();
+                if (ext === 'pdf') {
+                    iframe.src = url;
+                    iframe.classList.remove('d-none');
+                } else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+                    img.src = url;
+                    imgContainer.classList.remove('d-none');
+                } else {
+                    error.classList.remove('d-none');
+                }
+            }
+            modalVisor.show();
+        };
+
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-visor');
+            if (btn) {
+                e.preventDefault();
+                const url = btn.getAttribute('data-url');
+                const nombre = btn.getAttribute('data-nombre');
+                mostrarVisor(url, nombre);
+            }
+        });
+    });
+</script>
+@endpush
