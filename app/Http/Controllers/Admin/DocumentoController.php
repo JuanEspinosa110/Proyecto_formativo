@@ -261,11 +261,12 @@ class DocumentoController extends Controller
             Documento::create($validated);
 
             if (auth()->user()->id_tipo_usuario == 4) {
-                return redirect()->back()->with('success', 'Documento creado exitosamente.');
+                return redirect()->route('empresa.dashboard', ['tab' => 'documentacion'])
+                    ->with('success', 'Documento creado exitosamente.');
             }
 
             return redirect()->route('admin.documentos.index')
-                ->with('success', '  Documento creado exitosamente');
+                ->with('success', 'Documento creado exitosamente');
         } catch (\Exception $e) {
             Log::error('Error al crear documento: ' . $e->getMessage());
             return redirect()->back()->with('error', '  Error al crear el documento. Intenta de nuevo.');
@@ -348,11 +349,12 @@ class DocumentoController extends Controller
             $documento->update($validated);
 
             if (auth()->user()->id_tipo_usuario == 4) {
-                return redirect()->back()->with('success', 'Documento actualizado correctamente.');
+                return redirect()->route('empresa.dashboard', ['tab' => 'documentacion'])
+                    ->with('success', 'Documento actualizado correctamente.');
             }
 
             return redirect()->route('admin.documentos.index')
-                ->with('success', '  Documento actualizado exitosamente');
+                ->with('success', 'Documento actualizado exitosamente');
         } catch (\Exception $e) {
             Log::error('Error al actualizar documento: ' . $e->getMessage());
             return redirect()->back()->with('error', '  Error al actualizar el documento. Intenta de nuevo.');
@@ -383,11 +385,12 @@ class DocumentoController extends Controller
             $documento->delete();
 
             if (auth()->user()->id_tipo_usuario == 4) {
-                return redirect()->back()->with('success', 'Documento eliminado correctamente.');
+                return redirect()->route('empresa.dashboard', ['tab' => 'documentacion'])
+                    ->with('success', 'Documento eliminado correctamente.');
             }
 
             return redirect()->route('admin.documentos.index')
-                ->with('success', '  Documento eliminado exitosamente');
+                ->with('success', 'Documento eliminado exitosamente');
         } catch (\Exception $e) {
             Log::error('Error al eliminar documento: ' . $e->getMessage());
             return redirect()->back()->with('error', '  Error al eliminar el documento.');

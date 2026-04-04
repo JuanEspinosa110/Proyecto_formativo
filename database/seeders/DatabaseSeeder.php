@@ -42,10 +42,9 @@ class DatabaseSeeder extends Seeder
             VentaViajeSeeder::class,
             NovedadRecorridoSeeder::class,
             TipoMantenimientoSeeder::class,
-            MantenimientoSeeder::class,
             ReporteFallasSeeder::class,
+            MantenimientoSeeder::class,
             GastosSeeder::class,
-            OperacionHoySeeder::class,
             FixTarjetaAlfanumericaSeeder::class,
         ]);
 

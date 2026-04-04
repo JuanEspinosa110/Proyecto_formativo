@@ -63,6 +63,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Bandeja de reportes de fallas
         Route::get('mantenimiento/reportes', [ReporteFallaController::class, 'indexAdmin'])->name('mantenimiento.reportes');
         Route::get('mantenimiento/reportes/{id}/atender', [ReporteFallaController::class, 'attendAdmin'])->name('mantenimiento.reportes.attend');
+        Route::get('mantenimiento/api/reportes-pendientes/{placa}', [ReporteFallaController::class, 'getPendingByBus'])->name('mantenimiento.api.reportes-pendientes');
         // Gestión de mantenimientos
         Route::get('mantenimiento', [MantenimientoController::class, 'indexAdmin'])->name('mantenimiento.index');
         Route::get('mantenimiento/create', [MantenimientoController::class, 'create'])->name('mantenimiento.create');

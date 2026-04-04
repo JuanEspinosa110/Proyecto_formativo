@@ -31,4 +31,9 @@ class ReporteFalla extends Model
     {
         return $this->belongsTo(Estado::class, 'id_estado', 'id_estado');
     }
+
+    public function mantenimientos()
+    {
+        return $this->hasMany(Mantenimiento::class, 'id_reporte', 'id_reporte');
+    }
 }

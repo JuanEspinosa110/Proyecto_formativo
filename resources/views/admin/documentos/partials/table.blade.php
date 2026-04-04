@@ -105,6 +105,14 @@ $routePrefix = Auth::user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
                                 class="btn btn-sm btn-light rounded-pill px-2 fw-bold" title="Descargar">
                                 <span class="material-symbols-rounded fs-5">download</span>
                             </a>
+
+                            @if($documento->estado_expiracion != 'VIGENTE')
+                                <a href="{{ route($routePrefix . '.documentos.edit', $documento->id_documento) }}"
+                                    class="btn btn-sm btn-warning text-dark rounded-pill px-3 fw-bold d-flex align-items-center gap-1" title="Renovar Doc">
+                                    <span class="material-symbols-rounded fs-5">edit_note</span>
+                                    <span class="small">Renovar</span>
+                                </a>
+                            @endif
                         </div>
                     </td>
                 </tr>

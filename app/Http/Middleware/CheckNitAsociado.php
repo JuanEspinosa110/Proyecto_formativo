@@ -44,17 +44,16 @@ class CheckNitAsociado
         }
 
         // 5. Verificar Licencia (Solo para Empresas de Transporte - ID 1)
-        // Buscamos el tipo de empresa asociado al NIT
-        $tipoEmpresa = \Illuminate\Support\Facades\DB::table('empresa')
+        $empresa = \Illuminate\Support\Facades\DB::table('empresa')
             ->where('NIT', $user->NIT)
-            ->value('id_tipo_empresa');
+            ->first();
 
-        if ((int)$tipoEmpresa === 1) {
-            // Buscamos al menos una licencia vigente y no vencida
+        if ($empresa && (int)$empresa->id_tipo_empresa === 1) {
+            // Buscamos al menos una licencia activa (id_estado = 1) y vigente
             $licenciaActiva = \Illuminate\Support\Facades\DB::table('licencias')
                 ->where('NIT', $user->NIT)
-                ->where('id_estado', 1) // VIGENTE/RENOVADA
-                ->where('fecha_vencimiento', '>=', now()->toDateString())
+                ->where('id_estado', 1) // Activa/Vigente
+                ->whereDate('fecha_vencimiento', '>=', now()->toDateString())
                 ->exists();
 
             if (!$licenciaActiva) {

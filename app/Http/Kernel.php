@@ -14,7 +14,7 @@ class Kernel extends HttpKernel
      * @var array<string, class-string|string>
      */
     protected $routeMiddleware = [
-        // ...otros alias...
         'role' => \App\Http\Middleware\CheckRole::class,
+        'CheckNit' => \App\Http\Middleware\CheckNitAsociado::class,
     ];
 }

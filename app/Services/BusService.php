@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BusService
 {
@@ -70,6 +71,13 @@ class BusService
         $oldStatus = $bus->id_estado;
         // La placa no debe actualizarse para evitar conflictos con llaves foráneas (FK en tabla viaje)
         unset($data['placa']);
+
+        // Bloqueo de seguridad: No permitir ACTIVO si hay fallas ALTO pendientes
+        if (isset($data['id_estado']) && (int)$data['id_estado'] === 1) {
+            if ($bus->hasPendingHighLevelFaults()) {
+                throw new \Exception("El vehículo no puede marcarse como ACTIVO porque aún tiene reportes de falla de nivel ALTO pendientes de resolución.");
+            }
+        }
         
         $updated = $bus->update($data);
 
@@ -99,7 +107,10 @@ class BusService
      */
     public function getBusDetails($placa)
     {
-        $bus = Bus::with('estado')->where('placa', $placa)->firstOrFail();
+        $user = Auth::guard('web')->user();
+        $nit = $user->getActiveNit();
+
+        $bus = Bus::with('estado')->where('placa', $placa)->where('NIT', $nit)->firstOrFail();
         
         // Obtener la última asignación (viaje)
         $ultimaAsignacion = \App\Models\Viaje::where('placa', $placa)
@@ -113,6 +124,7 @@ class BusService
             ->get()
             ->map(function($doc) {
                 return [
+                    'id_documento' => $doc->id_documento,
                     'id_tipo_documento' => $doc->id_tipo_documento,
                     'tipo_documento' => $doc->tipoDocumento,
                     'fecha_vencimiento' => $doc->fecha_vencimiento->format('Y-m-d'),
@@ -140,22 +152,23 @@ class BusService
      */
     public function getOwnerData($doc_propietario)
     {
+        $user = Auth::guard('web')->user();
+        $nit = $user->getActiveNit();
+
         return Bus::where('doc_propietario', $doc_propietario)
+            ->where('NIT', $nit)
             ->select('nombre_propietario', 'telefono', 'correo', 'doc_propietario')
             ->first();
     }
 
     /**
-     * Exportar buses a Excel: Eager loading + Filtros + Estilo Premium
+     * Exportar buses: Soporta Excel y PDF con Estilo Premium
      */
-    /**
-     * Exportar buses a Excel: Eager loading + Filtros + Estilo Premium
-     */
-    public function exportExcel(Request $request)
+    public function export(Request $request, $format = 'excel')
     {
         $user = Auth::guard('web')->user();
         $nit = $user->getActiveNit();
-        // Cargar propietario también si está relacionado (doc_propietario)
+        
         $query = Bus::with(['estado', 'empresa', 'propietario'])->where('NIT', $nit);
 
         if ($request->filled('search')) {
@@ -174,6 +187,13 @@ class BusService
 
         $buses = $query->orderBy('placa', 'asc')->get();
 
+        if ($format === 'pdf') {
+            $empresa = \App\Models\Empresa::where('NIT', $nit)->first();
+            $pdf = Pdf::loadView('admin.buses.pdf', compact('buses', 'empresa'));
+            return $pdf->download("Inventario_Flota_{$nit}_" . date('Ymd_His') . ".pdf");
+        }
+
+        // Exportación a EXCEL
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Inventario Flota');
@@ -208,7 +228,7 @@ class BusService
         }
         $sheet->getStyle('A1:G' . ($row - 1))->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
-        $writer = new Xlsx($spreadsheet);
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         $filename = 'Reporte_Flota_' . $nit . '_' . date('Ymd_His') . '.xlsx';
 
         return response()->streamDownload(function() use ($writer) {

@@ -36,7 +36,7 @@ class BusSeeder extends Seeder
 
             $buses = [];
             $modelos = ['Mercedes-Benz', 'Volvo', 'Scania', 'Chevrolet', 'Volkswagen', 'Renault', 'Toyota', 'Hyundai'];
-            $totalBuses = max(8, $propietarios->count()); // Al menos 8 o el total de propietarios
+            $totalBuses = max(10, $propietarios->count()); // Al menos 10 o el total de propietarios
 
             for ($i = 0; $i < $totalBuses; $i++) {
                 // Si aún hay propietarios sin bus, asignar a ellos primero

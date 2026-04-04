@@ -52,14 +52,18 @@ class BusController extends Controller
      */
     public function update(BusRequest $request, Bus $bus)
     {
-        $this->busService->updateBus($bus, $request->validated());
-        
-        if (auth()->user()->id_tipo_usuario == 4) {
-            return redirect()->back()->with('success', 'Vehículo actualizado correctamente.');
+        try {
+            $this->busService->updateBus($bus, $request->validated());
+            
+            if (auth()->user()->id_tipo_usuario == 4) {
+                return redirect()->back()->with('success', 'Vehículo actualizado correctamente.');
+            }
+            
+            return redirect()->route('admin.buses.index')
+                ->with('success', 'Registro actualizado correctamente');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage())->withInput();
         }
-        
-        return redirect()->route('admin.buses.index')
-            ->with('success', 'Registro actualizado correctamente');
     }
 
     /**
@@ -78,11 +82,12 @@ class BusController extends Controller
     }
 
     /**
-     * Exportar a Excel con filtros activos
+     * Exportar a Excel o PDF con filtros activos
      */
     public function export(Request $request)
     {
-        return $this->busService->exportExcel($request);
+        $format = $request->input('format', 'excel');
+        return $this->busService->export($request, $format);
     }
 
     /**
@@ -90,6 +95,15 @@ class BusController extends Controller
      */
     public function getGastos($placa)
     {
+        $user = auth()->user();
+        $nit = $user->NIT ?? null;
+
+        $busExists = Bus::where('placa', $placa)->where('NIT', $nit)->exists();
+
+        if (!$busExists) {
+            return response()->json(['error' => 'Vehículo no encontrado o sin acceso'], 404);
+        }
+
         $gastos = \App\Models\Gasto::where('placa', $placa)->orderBy('fecha', 'desc')->get();
         return response()->json($gastos);
     }
@@ -117,9 +131,12 @@ class BusController extends Controller
      */
     public function historialDocumental($placa)
     {
-        $bus = Bus::where('placa', $placa)->first();
+        $user = auth()->user();
+        $nit = $user->NIT ?? null;
+
+        $bus = Bus::where('placa', $placa)->where('NIT', $nit)->first();
         if (!$bus) {
-            return response()->json(['error' => 'Vehículo no encontrado'], 404);
+            return response()->json(['error' => 'Vehículo no encontrado o sin acceso'], 404);
         }
 
         $documentos = \App\Models\Documento::with('tipoDocumento')

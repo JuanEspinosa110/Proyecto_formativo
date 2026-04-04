@@ -6,9 +6,8 @@
 <div class="sigu-fade">
     <div class="sigu-page-hd">
         <div>
-            <a href="{{ route('admin.mantenimiento.index') }}" class="text-muted small" style="text-decoration:none;">← Volver al historial</a>
-            <h1 class="sigu-page-title mt-1">Enviar Bus al Taller</h1>
-            <p class="sigu-page-sub">El bus quedará en estado "En Mantenimiento" hasta que lo finalice.</p>
+            <h1 class="sigu-page-title">Registrar Mantenimiento</h1>
+            <p class="sigu-page-sub">Envíe un vehículo al taller y registre las tareas a realizar.</p>
         </div>
     </div>
 
@@ -32,14 +31,6 @@
             @csrf
             <input type="hidden" name="origen" value="admin">
 
-            @if(isset($reporte_id) && $reporte_id)
-                <input type="hidden" name="reporte_id" value="{{ $reporte_id }}">
-                <div class="alert alert-info mb-4" style="background:#ebf8ff; color:#2b6cb0; padding:0.75rem 1rem; border-radius:0.5rem; font-size:0.9rem;">
-                    <span class="material-symbols-rounded" style="font-size:1rem; vertical-align:middle;">info</span>
-                    Esta orden de trabajo está vinculada a un reporte de falla. Se marcará como "Atendido" al guardar.
-                </div>
-            @endif
-
             <div class="row mb-4">
                 <div class="col-md-6 mb-3">
                     <label for="placa" class="form-label fw-semibold">Bus (Placa) <span class="text-danger">*</span></label>
@@ -56,7 +47,6 @@
                     </select>
                     @if(isset($placa_predefinida) && $placa_predefinida)
                         <input type="hidden" name="placa" value="{{ $placa_predefinida }}">
-                        <small class="text-muted">Placa vinculada al reporte.</small>
                     @endif
                 </div>
                 <div class="col-md-6 mb-3">
@@ -66,7 +56,7 @@
             </div>
 
             <hr class="mb-4">
-            <h5 class="mb-3">Tareas a realizar</h5>
+            <h5 class="mb-3 fw-bold">Tareas a realizar</h5>
             <div id="detalles-container">
                 <div class="detalle-row mb-3 p-3 rounded" style="background:#f8fafc; border:1px solid #e2e8f0;">
                     <div class="row align-items-end">
@@ -78,16 +68,22 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-4 mb-2">
+                        <div class="col-md-3 mb-2">
                             <label class="form-label small">Descripción</label>
-                            <input type="text" name="detalles[0][descripcion]" class="form-control" placeholder="Ej. Cambio de aceite completo" required>
+                            <input type="text" name="detalles[0][descripcion]" class="form-control" placeholder="Ej. Cambio de aceite" required>
                         </div>
-                        <div class="col-md-4 mb-2">
+                        <div class="col-md-3 mb-2">
+                            <label class="form-label small">¿Vincular Falla?</label>
+                            <select name="detalles[0][id_reporte]" class="form-select form-select-sm reporte-select">
+                                <option value="">-- Ninguna --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 mb-2">
                             <label class="form-label small">Foto (Opcional)</label>
-                            <input type="file" name="detalles[0][evidencia_foto]" class="form-control" accept="image/*">
+                            <input type="file" name="detalles[0][evidencia_foto]" class="form-control form-control-sm" accept="image/*">
                         </div>
                         <div class="col-md-1 mb-2 pb-1 d-flex justify-content-center">
-                            <button type="button" class="btn btn-sm text-muted" disabled title="La primera tarea no se puede eliminar" style="opacity:0.3;">
+                            <button type="button" class="btn btn-sm text-muted" disabled style="opacity:0.3;">
                                 <span class="material-symbols-rounded">delete</span>
                             </button>
                         </div>
@@ -134,26 +130,54 @@
 
 @push('scripts')
 <script>
-let idx = 1;
-const tipos = @json($tipos->map(fn($t) => ['id' => $t->id_tipo_mantenimiento, 'nombre' => $t->nombre]));
-document.getElementById('add-detalle').addEventListener('click', () => {
-    const opts = tipos.map(t => `<option value="${t.id}">${t.nombre}</option>`).join('');
-    const row = document.createElement('div');
-    row.className = 'detalle-row mb-3 p-3 rounded';
-    row.style.cssText = 'background:#f8fafc; border:1px solid #e2e8f0;';
-    row.innerHTML = `
-        <div class="row align-items-end">
+    let idx = 1;
+    let pendingReports = [];
+    const preselectedReportId = @json($reporte_id ?? null);
+    const tipos = @json($tipos->map(fn($t) => ['id' => $t->id_tipo_mantenimiento, 'nombre' => $t->nombre]));
+
+    function updateAllReportSelects() {
+        const selects = document.querySelectorAll('.reporte-select');
+        selects.forEach(select => {
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">-- Ninguna --</option>';
+            pendingReports.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r.id_reporte;
+                const desc = r.descripcion.length > 40 ? r.descripcion.substring(0, 40) + '...' : r.descripcion;
+                opt.textContent = `[${r.nivel}] ${r.fecha} — ${desc}`;
+                select.appendChild(opt);
+            });
+            if (currentValue) select.value = currentValue;
+            else if (preselectedReportId && select.name === 'detalles[0][id_reporte]') {
+                select.value = preselectedReportId;
+            }
+        });
+    }
+
+    document.getElementById('add-detalle').addEventListener('click', () => {
+        const opts = tipos.map(t => `<option value="${t.id}">${t.nombre}</option>`).join('');
+        const row = document.createElement('div');
+        row.className = 'detalle-row mb-3 p-3 rounded';
+        row.style.cssText = 'background:#f8fafc; border:1px solid #e2e8f0;';
+        row.innerHTML = `
+            <div class="row align-items-end">
                 <div class="col-md-3 mb-2">
                     <label class="form-label small">Tipo</label>
                     <select name="detalles[${idx}][id_tipo_mantenimiento]" class="form-select tipo-mantenimiento-select" required>${opts}</select>
                 </div>
-                <div class="col-md-4 mb-2">
+                <div class="col-md-3 mb-2">
                     <label class="form-label small">Descripción</label>
                     <input type="text" name="detalles[${idx}][descripcion]" class="form-control" placeholder="Ej. Revisión de frenos" required>
                 </div>
-                <div class="col-md-4 mb-2">
+                <div class="col-md-3 mb-2">
+                    <label class="form-label small">¿Vincular Falla?</label>
+                    <select name="detalles[${idx}][id_reporte]" class="form-select form-select-sm reporte-select">
+                        <option value="">-- Ninguna --</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
                     <label class="form-label small">Foto (Opcional)</label>
-                    <input type="file" name="detalles[${idx}][evidencia_foto]" class="form-control" accept="image/*">
+                    <input type="file" name="detalles[${idx}][evidencia_foto]" class="form-control form-control-sm" accept="image/*">
                 </div>
                 <div class="col-md-1 mb-2 pb-1 d-flex justify-content-center">
                     <button type="button" class="btn text-danger remove-detalle p-2" title="Eliminar tarea">
@@ -175,42 +199,72 @@ document.getElementById('add-detalle').addEventListener('click', () => {
                     </div>
                 </div>
             </div>`;
-    document.getElementById('detalles-container').appendChild(row);
-    
-    // Ejecutar chequeo una vez agregado
-    togglePreventivoRow(row.querySelector('.tipo-mantenimiento-select'));
-    
-    idx++;
-});
+        document.getElementById('detalles-container').appendChild(row);
+        
+        togglePreventivoRow(row.querySelector('.tipo-mantenimiento-select'));
 
-// Delegación de eventos para el botón eliminar
-document.getElementById('detalles-container').addEventListener('click', e => {
-    const btn = e.target.closest('.remove-detalle');
-    if (btn) btn.closest('.detalle-row').remove();
-});
+        // Poblar el nuevo select
+        const newSelect = row.querySelector('.reporte-select');
+        newSelect.innerHTML = '<option value="">-- Ninguna --</option>';
+        pendingReports.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.id_reporte;
+            const desc = r.descripcion.length > 40 ? r.descripcion.substring(0, 40) + '...' : r.descripcion;
+            opt.textContent = `[${r.nivel}] ${r.fecha} — ${desc}`;
+            newSelect.appendChild(opt);
+        });
+        
+        idx++;
+    });
 
-function togglePreventivoRow(selectElement) {
-    const row = selectElement.closest('.detalle-row');
-    const panel = row.querySelector('.preventivo-panel');
-    if (selectElement.value == "1") {
-        panel.style.display = 'block';
-    } else {
-        panel.style.display = 'none';
-        // Limpiar valores al ocultar
-        row.querySelector('.fecha-input').value = '';
-        row.querySelector('.km-input').value = '';
+    document.getElementById('detalles-container').addEventListener('click', e => {
+        const btn = e.target.closest('.remove-detalle');
+        if (btn) btn.closest('.detalle-row').remove();
+    });
+
+    function togglePreventivoRow(selectElement) {
+        const row = selectElement.closest('.detalle-row');
+        const panel = row.querySelector('.preventivo-panel');
+        if (selectElement.value == "1") {
+            panel.style.display = 'block';
+        } else {
+            panel.style.display = 'none';
+            row.querySelector('.fecha-input').value = '';
+            row.querySelector('.km-input').value = '';
+        }
     }
-}
 
-// Escuchar cambios de tipo de mantenimiento
-document.getElementById('detalles-container').addEventListener('change', e => {
-    if (e.target.classList.contains('tipo-mantenimiento-select')) {
-        togglePreventivoRow(e.target);
+    document.getElementById('detalles-container').addEventListener('change', e => {
+        if (e.target.classList.contains('tipo-mantenimiento-select')) {
+            togglePreventivoRow(e.target);
+        }
+    });
+
+    togglePreventivoRow(document.querySelector('.tipo-mantenimiento-select'));
+
+    // 🔗 Lógica de Vinculación de Reportes (AJAX)
+    const placaSelect = document.getElementById('placa');
+
+    placaSelect.addEventListener('change', function() {
+        const placa = this.value;
+        if (!placa) {
+            pendingReports = [];
+            updateAllReportSelects();
+            return;
+        }
+
+        fetch(`/admin/mantenimiento/api/reportes-pendientes/${placa}`)
+            .then(res => res.json())
+            .then(data => {
+                pendingReports = data;
+                updateAllReportSelects();
+            })
+            .catch(err => console.error('Error fetching reports:', err));
+    });
+
+    if (placaSelect.value) {
+        placaSelect.dispatchEvent(new Event('change'));
     }
-});
-
-// Iniciar visibilidad para la primera fila
-togglePreventivoRow(document.querySelector('.tipo-mantenimiento-select'));
 </script>
 @endpush
 @endsection

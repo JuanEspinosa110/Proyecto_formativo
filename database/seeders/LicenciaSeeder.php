@@ -25,8 +25,20 @@ class LicenciaSeeder extends Seeder
         foreach ($empresas as $index => $empresa) {
             // Seleccionar un plan aleatorio
             $plan = $planes->random();
-            $fecha_inicio = Carbon::now();
-            $fecha_vencimiento = $fecha_inicio->copy()->addMonths($plan->duracion_meses);
+            
+            if ($index === 0) {
+                // 🔴 Generar una licencia VENCIDA por fecha para la primera empresa
+                $fecha_inicio = Carbon::now()->subMonths($plan->duracion_meses + 1);
+                $fecha_vencimiento = Carbon::now()->subDays(5);
+            } elseif ($index === 1) {
+                // 🟡 Generar una licencia POR VENCER (en 10 días)
+                $fecha_inicio = Carbon::now()->subMonths($plan->duracion_meses)->addDays(10);
+                $fecha_vencimiento = Carbon::now()->addDays(10);
+            } else {
+                // 🟢 Generar una licencia VIGENTE normal
+                $fecha_inicio = Carbon::now();
+                $fecha_vencimiento = $fecha_inicio->copy()->addMonths($plan->duracion_meses);
+            }
 
             DB::table('licencias')->insertOrIgnore([
                 'id_licencia' => 'LIC-' . $empresa->NIT . '-' . ($index + 1),
@@ -34,9 +46,9 @@ class LicenciaSeeder extends Seeder
                 'id_plan' => $plan->id_plan,
                 'fecha_inicio' => $fecha_inicio->format('Y-m-d'),
                 'fecha_vencimiento' => $fecha_vencimiento->format('Y-m-d'),
-                'id_estado' => 1,
-                'doc_super_admin' => 1105463369, // Del SuperAdministradorSeeder
-                'fecha_creacion' => Carbon::now(),
+                'id_estado' => 1, // Se crean como "Activas" para probar la auto-expiración
+                'doc_super_admin' => 1105463369,
+                'fecha_creacion' => Carbon::now()->subMonths(1),
             ]);
         }
     }

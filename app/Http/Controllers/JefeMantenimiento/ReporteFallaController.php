@@ -5,6 +5,8 @@ namespace App\Http\Controllers\JefeMantenimiento;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ReporteFalla;
+use App\Models\Bus;
+use Illuminate\Support\Facades\Auth;
 
 class ReporteFallaController extends Controller
 {
@@ -12,7 +14,11 @@ class ReporteFallaController extends Controller
 
     public function index(Request $request)
     {
-        $query = ReporteFalla::with(['bus', 'conductor', 'estado']);
+        $user = Auth::user();
+        $nit = $user->NIT ?? null;
+
+        $query = ReporteFalla::with(['bus', 'conductor', 'estado'])
+            ->whereHas('bus', fn($q) => $q->where('NIT', $nit));
 
         if ($request->filled('fecha_desde')) {
             $query->whereDate('fecha_reporte', '>=', $request->fecha_desde);
@@ -34,7 +40,12 @@ class ReporteFallaController extends Controller
 
     public function attend($id)
     {
-        $reporte = ReporteFalla::findOrFail($id);
+        $user = Auth::user();
+        $nit = $user->NIT ?? null;
+
+        $reporte = ReporteFalla::where('id_reporte', $id)
+            ->whereHas('bus', fn($q) => $q->where('NIT', $nit))
+            ->firstOrFail();
 
         return redirect()->route('jefemantenimiento.create', [
             'placa'      => $reporte->placa,
@@ -47,7 +58,11 @@ class ReporteFallaController extends Controller
 
     public function indexAdmin(Request $request)
     {
-        $query = ReporteFalla::with(['bus', 'conductor', 'estado']);
+        $user = Auth::user();
+        $nit = $user->NIT ?? null;
+
+        $query = ReporteFalla::with(['bus', 'conductor', 'estado'])
+            ->whereHas('bus', fn($q) => $q->where('NIT', $nit));
 
         if ($request->filled('fecha_desde')) {
             $query->whereDate('fecha_reporte', '>=', $request->fecha_desde);
@@ -69,12 +84,39 @@ class ReporteFallaController extends Controller
 
     public function attendAdmin($id)
     {
-        $reporte = ReporteFalla::findOrFail($id);
+        $user = Auth::user();
+        $nit = $user->NIT ?? null;
+
+        $reporte = ReporteFalla::where('id_reporte', $id)
+            ->whereHas('bus', fn($q) => $q->where('NIT', $nit))
+            ->firstOrFail();
 
         return redirect()->route('admin.mantenimiento.create', [
             'placa'      => $reporte->placa,
             'reporte_id' => $reporte->id_reporte,
             'origen'     => 'admin',
         ]);
+    }
+
+    public function getPendingByBus($placa)
+    {
+        $user = Auth::user();
+        $nit = $user->NIT ?? null;
+
+        $reportes = ReporteFalla::where('placa', $placa)
+            ->whereHas('bus', fn($q) => $q->where('NIT', $nit))
+            ->whereIn('id_estado', [1, 6]) // 1: No Atendido, 6: Pendiente
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($r) {
+                return [
+                    'id_reporte' => $r->id_reporte,
+                    'nivel'      => $r->nivel_urgencia,
+                    'descripcion' => $r->descripcion,
+                    'fecha'      => $r->created_at->format('d/m/Y'),
+                ];
+            });
+
+        return response()->json($reportes);
     }
 }

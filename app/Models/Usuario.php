@@ -209,4 +209,38 @@ class Usuario extends Authenticatable
     {
         return $this->estado->nombre_estado ?? 'N/A';
     }
+    /**
+     * Verifica si el conductor está apto para viajar (Activo + Rol Conductor + Licencia Vigente).
+     */
+    public function isAptForTravel()
+    {
+        // 1. Debe estar activo (id_estado = 1)
+        if ($this->id_estado != 1) {
+            return false;
+        }
+
+        // 2. Debe tener rol de conductor (id_tipo_usuario = 3)
+        if ($this->id_tipo_usuario != 3) {
+            return false;
+        }
+
+        // 3. Debe tener licencia vigente (tipo_documento = 3)
+        if (!$this->hasValidLicense()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Verifica si el usuario tiene una licencia de tránsito vigente y aprobada.
+     */
+    public function hasValidLicense()
+    {
+        return Documento::where('doc_usuario', $this->doc_usuario)
+            ->where('id_tipo_documento', 3) // Licencia de Tránsito
+            ->where('id_estado', 1) // Activo/Aprobado
+            ->whereDate('fecha_vencimiento', '>', now())
+            ->exists();
+    }
 }

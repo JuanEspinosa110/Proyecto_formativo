@@ -15,6 +15,7 @@ class DetalleMantenimiento extends Model
         'id_tipo_mantenimiento',
         'descripcion',
         'evidencia_foto',
+        'id_reporte',
     ];
 
     public function mantenimiento()
@@ -25,5 +26,10 @@ class DetalleMantenimiento extends Model
     public function tipoMantenimiento()
     {
         return $this->belongsTo(TipoMantenimiento::class, 'id_tipo_mantenimiento', 'id_tipo_mantenimiento');
+    }
+
+    public function reporte()
+    {
+        return $this->belongsTo(ReporteFalla::class, 'id_reporte', 'id_reporte');
     }
 }

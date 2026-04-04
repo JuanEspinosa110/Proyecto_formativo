@@ -37,17 +37,17 @@ class ReporteFallasSeeder extends Seeder
             'Fuga de aceite detectada',
         ];
 
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 50; $i++) {
             $conductor = $conductores->random();
             $bus = $buses->where('NIT', $conductor->NIT)->first() ?: $buses->random();
 
             DB::table('reportes_fallas')->insert([
                 'doc_usuario' => $conductor->doc_usuario,
                 'placa' => $bus->placa,
-                'created_at' => $faker->dateTimeBetween('-1 month', 'now'),
+                'created_at' => $faker->dateTimeBetween('-2 months', 'now'),
                 'descripcion' => $faker->randomElement($descripciones),
                 'nivel_urgencia' => $faker->randomElement(['Bajo', 'Medio', 'Alto']),
-                'id_estado' => $faker->randomElement([6, 1, 5]), // 6=PENDIENTE, 1=ACTIVO(En proceso), 5=FINALIZADO(Atendido)
+                'id_estado' => $faker->randomElement([6, 6, 6, 1, 5]), // Mayoría PENDIENTE para que MantenimientoSeeder los atienda
             ]);
         }
     }

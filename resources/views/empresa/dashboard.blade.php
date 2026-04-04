@@ -315,10 +315,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         </td>
                         <td class="text-end pe-4">
                             <div class="d-flex justify-content-end gap-2">
-                                <button class="btn btn-sm btn-light border p-1 rounded-circle btn-visor-aux" data-url="${doc.url_archivo}" data-nombre="${doc.tipo_documento.nombre}">
+                                <button class="btn btn-sm btn-light border p-1 rounded-circle btn-visor-aux" data-url="${doc.url_archivo}" data-nombre="${doc.tipo_documento.nombre}" title="Ver Documento">
                                     <span class="material-symbols-rounded fs-6">visibility</span>
                                 </button>
-                                <a href="${doc.url_archivo}" class="btn btn-sm btn-light border p-1 rounded-circle text-primary" download>
+                                ${doc.status_vigencia !== 'VIGENTE' ? `
+                                    <a href="/empresa/documentos/${doc.id_documento}/edit" class="btn btn-sm btn-light border p-1 rounded-circle text-warning" title="Actualizar / Renovar">
+                                        <span class="material-symbols-rounded fs-6">edit_note</span>
+                                    </a>
+                                ` : ''}
+                                <a href="${doc.url_archivo}" class="btn btn-sm btn-light border p-1 rounded-circle text-primary" download title="Descargar">
                                     <span class="material-symbols-rounded fs-6">download</span>
                                 </a>
                             </div>
@@ -695,6 +700,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const opt = document.createElement('option');
                         opt.value = b.placa;
                         opt.textContent = b.label;
+                        if (b.disabled) opt.disabled = true;
                         placaSelect.appendChild(opt);
                     });
                 } else {
@@ -707,6 +713,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const opt = document.createElement('option');
                         opt.value = c.doc_usuario;
                         opt.textContent = c.nombre_completo;
+                        if (c.disabled) opt.disabled = true;
                         condSelect.appendChild(opt);
                     });
                 } else {

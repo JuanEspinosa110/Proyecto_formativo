@@ -100,9 +100,20 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="{{ route('jefemantenimiento.reportes.attend', $reporte->id_reporte) }}" class="btn btn-sm" style="background:var(--p); color:white; border-radius:0.5rem; padding: 0.25rem 0.5rem; text-decoration:none;">
-                                    Atender
-                                </a>
+                                @if($reporte->id_estado == 5)
+                                    <span class="badge bg-light text-success border border-success px-3 py-2 rounded-pill">
+                                        <span class="material-symbols-rounded fs-6 align-middle">task_alt</span> Atendido
+                                    </span>
+                                @elseif($reporte->id_estado == 4)
+                                    <span class="badge bg-light text-info border border-info px-3 py-2 rounded-pill">
+                                        <span class="material-symbols-rounded fs-6 align-middle">engineering</span> En Taller
+                                    </span>
+                                @else
+                                    <a href="{{ route('jefemantenimiento.reportes.attend', $reporte->id_reporte) }}" class="btn btn-sm shadow-sm" 
+                                       style="background:var(--p); color:white; border-radius:0.5rem; padding: 0.4rem 1rem; text-decoration:none; font-weight:600;">
+                                        Atender
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @empty

@@ -10,6 +10,7 @@ use App\Models\Bus;
 use App\Models\TipoMantenimiento;
 use App\Models\ReporteFalla;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -27,13 +28,23 @@ class MantenimientoController extends Controller
 
     public function dashboard()
     {
-        $busesEnTaller      = Bus::where('id_estado', ESTADO_BUS_EN_MANTENIMIENTO)->count();
-        $reportesPendientes = ReporteFalla::whereHas('estado', fn($q) => $q->where('nombre_estado', '!=', 'Atendido'))->count();
-        $trabajosEnCurso    = Mantenimiento::where('id_estado', ESTADO_MANT_EN_TALLER)->count();
-        $trabajosFinalizados= Mantenimiento::where('id_estado', ESTADO_MANT_FINALIZADO)->count();
+        $user = Auth::user();
+        $nit = $user->NIT ?? null;
+
+        if (!$nit) {
+            return redirect()->back()->with('error', 'Usuario sin empresa asociada.');
+        }
+
+        $busesEnTaller      = Bus::where('NIT', $nit)->where('id_estado', ESTADO_BUS_EN_MANTENIMIENTO)->count();
+        $reportesPendientes = ReporteFalla::whereHas('bus', fn($q) => $q->where('NIT', $nit))
+            ->whereHas('estado', fn($q) => $q->where('nombre_estado', '!=', 'Atendido'))
+            ->count();
+        $trabajosEnCurso    = Mantenimiento::where('NIT', $nit)->where('id_estado', ESTADO_MANT_EN_TALLER)->count();
+        $trabajosFinalizados= Mantenimiento::where('NIT', $nit)->where('id_estado', ESTADO_MANT_FINALIZADO)->count();
 
         // Últimos 5 mantenimientos en curso
         $enCurso = Mantenimiento::with(['bus'])
+            ->where('NIT', $nit)
             ->where('id_estado', ESTADO_MANT_EN_TALLER)
             ->orderBy('fecha_mantenimiento', 'desc')
             ->take(5)
@@ -41,21 +52,21 @@ class MantenimientoController extends Controller
 
         // Últimos 5 reportes sin atender
         $reportesRecientes = ReporteFalla::with(['bus', 'conductor'])
+            ->whereHas('bus', fn($q) => $q->where('NIT', $nit))
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
         // Alertas de mantenimiento preventivo (Próximos o Vencidos)
-        // Buscamos mantenimientos finales donde su fecha_proximo o km_proximo estén cerca o vencidos
-        // comparados con el kilometraje actual del bus y la fecha actual.
         $alertasMantenimiento = DB::select("
             SELECT m.id_mantenimiento, m.fecha_proximo, m.km_proximo, b.placa, b.kilometraje as km_actual
             FROM mantenimiento m
             JOIN bus b ON m.placa = b.placa
-            WHERE m.id_mantenimiento = (
+            WHERE b.NIT = ?
+            AND m.id_mantenimiento = (
                 SELECT sub.id_mantenimiento
                 FROM mantenimiento sub
-                WHERE sub.placa = b.placa AND sub.id_estado = 5 -- 5 = FINALIZADO (Mantenimiento completado)
+                WHERE sub.placa = b.placa AND sub.id_estado = 5 
                 ORDER BY sub.fecha_mantenimiento DESC
                 LIMIT 1
             )
@@ -64,8 +75,8 @@ class MantenimientoController extends Controller
                 OR
                 (m.km_proximo IS NOT NULL AND m.km_proximo <= b.kilometraje + 500)
             )
-            AND b.id_estado NOT IN (4, 9) -- Excluir buses en taller o bloqueados
-        ");
+            AND b.id_estado NOT IN (4, 9)
+        ", [$nit]);
 
         return view('jefemantenimiento.dashboard', compact(
             'busesEnTaller',
@@ -83,7 +94,14 @@ class MantenimientoController extends Controller
     /** Vista del Jefe de Mantenimiento */
     public function index(Request $request)
     {
-        $query = Mantenimiento::with(['bus', 'estado']);
+        $user = Auth::user();
+        $nit = $user->NIT ?? null;
+
+        if (!$nit) {
+            return redirect()->back()->with('error', 'Usuario sin empresa asociada.');
+        }
+
+        $query = Mantenimiento::with(['bus', 'estado'])->where('NIT', $nit);
 
         // Aplicar filtros
         if ($request->filled('fecha_desde')) {
@@ -161,7 +179,14 @@ class MantenimientoController extends Controller
     /** Vista del Admin de Empresa */
     public function indexAdmin(Request $request)
     {
-        $query = Mantenimiento::with(['bus', 'estado']);
+        $user = Auth::user();
+        $nit = $user->NIT ?? null;
+
+        if (!$nit) {
+            return redirect()->back()->with('error', 'Usuario sin empresa asociada.');
+        }
+
+        $query = Mantenimiento::with(['bus', 'estado'])->where('NIT', $nit);
 
         // Aplicar filtros
         if ($request->filled('fecha_desde')) {
@@ -241,7 +266,10 @@ class MantenimientoController extends Controller
 
     public function create(Request $request)
     {
-        $buses  = Bus::with('estado')->get();
+        $user = Auth::user();
+        $nit = $user->NIT ?? null;
+
+        $buses  = Bus::where('NIT', $nit)->with('estado')->get();
         $tipos  = TipoMantenimiento::all();
         $placa_predefinida = $request->query('placa');
         $reporte_id        = $request->query('reporte_id');
@@ -288,7 +316,10 @@ class MantenimientoController extends Controller
         try {
             DB::beginTransaction();
 
-            $bus = Bus::where('placa', $request->placa)->firstOrFail();
+            $user = Auth::user();
+            $nit = $user->NIT ?? null;
+
+            $bus = Bus::where('placa', $request->placa)->where('NIT', $nit)->firstOrFail();
 
             // Calcular el 'fecha_proximo' y 'km_proximo' global basado en todos los detalles
             $minFechaProximo = null;
@@ -325,21 +356,21 @@ class MantenimientoController extends Controller
                     $fotoPath = $file->store('mantenimientos', 'public');
                 }
 
-                DetalleMantenimiento::create([
-                    'id_mantenimiento'      => $mantenimiento->id_mantenimiento,
+                $detalleModel = $mantenimiento->detalles()->create([
                     'id_tipo_mantenimiento' => $detalle['id_tipo_mantenimiento'],
                     'descripcion'           => $detalle['descripcion'],
                     'evidencia_foto'        => $fotoPath,
+                    'id_reporte'            => $detalle['id_reporte'] ?? null,
                 ]);
+
+                // Actualizar estado del reporte vinculado si existe
+                if ($detalleModel->id_reporte) {
+                    ReporteFalla::where('id_reporte', $detalleModel->id_reporte)->update(['id_estado' => 4]); // 4 = En Taller
+                }
             }
 
             // *** Cambiar bus a "En Mantenimiento" (id=7) ***
             $bus->update(['id_estado' => ESTADO_BUS_EN_MANTENIMIENTO]);
-
-            // Si viene de un reporte, marcarlo como atendido (4 = En Curso/Taller)
-            if ($request->reporte_id) {
-                ReporteFalla::find($request->reporte_id)?->update(['id_estado' => 4]);
-            }
 
             DB::commit();
 
@@ -359,7 +390,11 @@ class MantenimientoController extends Controller
 
     public function show($id, Request $request)
     {
+        $user = Auth::user();
+        $nit = $user->NIT ?? null;
+
         $mantenimiento = Mantenimiento::with(['bus.estado', 'detalles.tipoMantenimiento', 'estado'])
+            ->where('NIT', $nit)
             ->findOrFail($id);
 
         $origen = $request->query('origen', 'jefe');
@@ -378,11 +413,21 @@ class MantenimientoController extends Controller
 
             $mantenimiento = Mantenimiento::with('bus')->findOrFail($id);
 
-            if ((int)$mantenimiento->id_estado === ESTADO_MANT_FINALIZADO) {
-                return back()->with('error', 'Este mantenimiento ya está finalizado.');
+            $mantenimiento->update(['id_estado' => ESTADO_MANT_FINALIZADO]);
+            
+            // Finalizar TODOS los reportes vinculados en las tareas (detalles)
+            $reporteIds = $mantenimiento->detalles()->whereNotNull('id_reporte')->pluck('id_reporte')->unique();
+            if ($reporteIds->isNotEmpty()) {
+                ReporteFalla::whereIn('id_reporte', $reporteIds)->update(['id_estado' => 5]); // 5 = Finalizado
             }
 
-            $mantenimiento->update(['id_estado' => ESTADO_MANT_FINALIZADO]);
+            // Verificación de seguridad: ¿Tiene otras fallas críticas?
+            if ($mantenimiento->bus?->hasPendingHighLevelFaults()) {
+                DB::commit();
+                return redirect()->route('admin.mantenimiento.index')
+                    ->with('warning', "Tareas completadas, pero el bus {$mantenimiento->placa} PERMANECE en taller por tener otras fallas de nivel ALTO pendientes.");
+            }
+
             $mantenimiento->bus?->update(['id_estado' => ESTADO_BUS_ACTIVO]);
 
             DB::commit();
@@ -404,11 +449,21 @@ class MantenimientoController extends Controller
 
             $mantenimiento = Mantenimiento::with('bus')->findOrFail($id);
 
-            if ((int)$mantenimiento->id_estado === ESTADO_MANT_FINALIZADO) {
-                return back()->with('error', 'Este mantenimiento ya fue aprobado.');
+            $mantenimiento->update(['id_estado' => ESTADO_MANT_FINALIZADO]);
+            
+            // Finalizar TODOS los reportes vinculados en las tareas (detalles)
+            $reporteIds = $mantenimiento->detalles()->whereNotNull('id_reporte')->pluck('id_reporte')->unique();
+            if ($reporteIds->isNotEmpty()) {
+                ReporteFalla::whereIn('id_reporte', $reporteIds)->update(['id_estado' => 5]); // 5 = Finalizado
             }
 
-            $mantenimiento->update(['id_estado' => ESTADO_MANT_FINALIZADO]);
+            // Verificación de seguridad: ¿Tiene otras fallas críticas?
+            if ($mantenimiento->bus?->hasPendingHighLevelFaults()) {
+                DB::commit();
+                return redirect()->route('jefemantenimiento.index')
+                    ->with('warning', "Salida aprobada, pero el bus {$mantenimiento->placa} NO puebe habilitarse aún por fallas de nivel ALTO pendientes.");
+            }
+
             $mantenimiento->bus?->update(['id_estado' => ESTADO_BUS_ACTIVO]);
 
             DB::commit();
@@ -424,7 +479,13 @@ class MantenimientoController extends Controller
 
     public function historialBus($placa)
     {
-        $bus = Bus::with('estado')->where('placa', $placa)->firstOrFail();
+        $user = Auth::user();
+        $nit = $user->NIT ?? null;
+
+        $bus = Bus::with('estado')
+            ->where('placa', $placa)
+            ->where('NIT', $nit)
+            ->firstOrFail();
 
         $mantenimientos = Mantenimiento::with(['detalles.tipoMantenimiento', 'estado'])
             ->where('placa', $placa)

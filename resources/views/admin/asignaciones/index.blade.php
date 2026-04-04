@@ -368,6 +368,7 @@
                         let opt = document.createElement('option');
                         opt.value = b.placa;
                         opt.textContent = b.label;
+                        if (b.disabled) opt.disabled = true;
                         placaSelect.appendChild(opt);
                     });
                 }
@@ -381,6 +382,7 @@
                         let opt = document.createElement('option');
                         opt.value = c.doc_usuario;
                         opt.textContent = c.nombre_completo;
+                        if (c.disabled) opt.disabled = true;
                         condSelect.appendChild(opt);
                     });
                 }
