@@ -22,21 +22,21 @@ class PlanillaController extends Controller
             ->where('id_tipo_usuario', 3) // Conductores
             ->orderBy('primer_nombre')
             ->get();
-        
+
         // Rutas que tienen viajes en esta empresa
-        $rutasList = \App\Models\Ruta::whereHas('viajes', function($q) use ($nit) {
+        $rutasList = \App\Models\Ruta::whereHas('viajes', function ($q) use ($nit) {
             $q->whereHas('bus', fn($sq) => $sq->where('NIT', $nit));
         })->get();
 
         // 2. Query con filtros
         $query = Viaje::with([
-                'bus', 
-                'conductor', 
-                'ruta.barrioOrigen', 
-                'ruta.barrioDestino',
-                'recorridos.novedades'
-            ])
-            ->whereHas('bus', function($q) use ($nit) {
+            'bus',
+            'conductor',
+            'ruta.barrioOrigen',
+            'ruta.barrioDestino',
+            'recorridos.novedades'
+        ])
+            ->whereHas('bus', function ($q) use ($nit) {
                 $q->where('NIT', $nit);
             });
 
@@ -62,10 +62,10 @@ class PlanillaController extends Controller
             ->filter(fn($b) => !$b->isOperable());
 
         return view('controlador-tiempo.planillas.index', compact(
-            'planilla', 
-            'novedades', 
-            'busesList', 
-            'conductoresList', 
+            'planilla',
+            'novedades',
+            'busesList',
+            'conductoresList',
             'rutasList'
         ));
     }
@@ -76,13 +76,13 @@ class PlanillaController extends Controller
         $nit = $user->getActiveNit();
 
         $asig = Viaje::with([
-            'bus', 
-            'conductor', 
-            'ruta.barrioOrigen', 
+            'bus',
+            'conductor',
+            'ruta.barrioOrigen',
             'ruta.barrioDestino'
         ])
-        ->whereHas('bus', fn($q) => $q->where('NIT', $nit))
-        ->findOrFail($id);
+            ->whereHas('bus', fn($q) => $q->where('NIT', $nit))
+            ->findOrFail($id);
 
         $query = \App\Models\Recorrido::with('novedades')
             ->where('id_viaje', $asig->id_viaje);
