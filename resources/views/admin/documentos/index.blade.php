@@ -1,3 +1,5 @@
+@extends('admin.layouts.app')
+
 @php
 $routePrefix = auth()->user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
 @endphp
@@ -189,37 +191,47 @@ $routePrefix = auth()->user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
         const download = document.getElementById('visor_download');
         const titulo = document.getElementById('visor_titulo');
 
-        document.querySelectorAll('.btn-visor').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const url = this.getAttribute('data-url');
-                const nombre = this.getAttribute('data-nombre');
-                
-                titulo.innerText = 'Documento: ' + nombre;
-                
-                // Reset states
-                iframe.classList.add('d-none');
-                imgContainer.classList.add('d-none');
-                error.classList.add('d-none');
-                iframe.src = '';
-                img.src = '';
-                download.href = url;
+        // Función global para mostrar el visor (para ser llamada por delegación o directamente)
+        window.mostrarVisor = function(url, nombre) {
+            titulo.innerText = 'Documento: ' + (nombre || 'Ver archivo');
+            
+            // Reset states
+            iframe.classList.add('d-none');
+            imgContainer.classList.add('d-none');
+            error.classList.add('d-none');
+            iframe.src = '';
+            img.src = '';
+            download.href = url || '#';
 
-                if (!url || url.includes('null')) {
-                    error.classList.remove('d-none');
+            if (!url || url.includes('null') || url === window.location.href) {
+                error.classList.remove('d-none');
+            } else {
+                // Obtener extensión limpiando posibles parámetros de consulta
+                const cleanUrl = url.split('?')[0];
+                const ext = cleanUrl.split('.').pop().toLowerCase();
+                
+                if (ext === 'pdf') {
+                    iframe.src = url;
+                    iframe.classList.remove('d-none');
+                } else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+                    img.src = url;
+                    imgContainer.classList.remove('d-none');
                 } else {
-                    const ext = url.split('.').pop().toLowerCase();
-                    if (ext === 'pdf') {
-                        iframe.src = url;
-                        iframe.classList.remove('d-none');
-                    } else if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
-                        img.src = url;
-                        imgContainer.classList.remove('d-none');
-                    } else {
-                        error.classList.remove('d-none');
-                    }
+                    error.classList.remove('d-none');
                 }
-                modalVisor.show();
-            });
+            }
+            modalVisor.show();
+        };
+
+        // Delegación de eventos para soportar botones cargados por AJAX
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn-visor');
+            if (btn) {
+                e.preventDefault();
+                const url = btn.getAttribute('data-url');
+                const nombre = btn.getAttribute('data-nombre');
+                mostrarVisor(url, nombre);
+            }
         });
     });
 </script>

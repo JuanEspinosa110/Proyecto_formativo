@@ -60,6 +60,11 @@ class Ruta extends Model
         return $this->hasMany(ConcesionRuta::class, 'id_ruta', 'id_ruta');
     }
 
+    public function viajes()
+    {
+        return $this->hasMany(Viaje::class, 'id_ruta', 'id_ruta');
+    }
+
     // Cuenta cuántos buses únicos (placa) tienen asignación activa en esta ruta
     public function getBusesAsignadosCountAttribute()
     {
