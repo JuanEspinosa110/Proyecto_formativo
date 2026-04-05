@@ -269,3 +269,6 @@ Route::prefix('superadmin')
 
 // Webhook de Stripe
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle']);
+
+// Ruta Global para Ciudades (AJAX) - Para evitar errores de carga en todos los paneles
+Route::get('/api/ciudades/{id_departamento}', [\App\Http\Controllers\SuperAdmin\EmpresaController::class, 'getCiudadesByDepartamento'])->name('api.ciudades');

@@ -49,8 +49,8 @@ return [
 
         'uploads' => [
             'driver' => 'local',
-            'root' => public_path(),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/'),
+            'root' => public_path(), // Con el cambio en AppServiceProvider, esto apuntará a la raíz en el hosting
+            'url' => env('APP_URL', 'http://localhost'),
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

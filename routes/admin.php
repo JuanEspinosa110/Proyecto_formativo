@@ -58,6 +58,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('documentos/export', [DocumentoController::class, 'export'])->name('documentos.export');
         Route::post('documentos/{id}/aprobar', [DocumentoController::class, 'aprobar'])->name('documentos.aprobar');
         Route::post('documentos/{id}/rechazar', [DocumentoController::class, 'rechazar'])->name('documentos.rechazar');
+        Route::get('documentos/solicitudes', [DocumentoController::class, 'solicitudes'])->name('documentos.solicitudes');
 
         // ─── Módulo de Mantenimiento (Admin) ──────────────────────────────────
         // Bandeja de reportes de fallas
