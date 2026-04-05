@@ -16,9 +16,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Redefinir la ruta pública para que apunte a la raíz en el hosting
-        // Esto permite que asset() y public_path() funcionen correctamente sin la carpeta /public
-        if (config('app.env') === 'production' || str_contains(request()->getHost(), 'myjob.solutions')) {
+        // Si el archivo index.php está en la raíz, significa que estamos en el hosting
+        // y la raíz es la carpeta pública. Forzamos la ruta pública a base_path().
+        if (file_exists(base_path('index.php'))) {
             $this->app->bind('path.public', function() {
                 return base_path();
             });
