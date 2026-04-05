@@ -6,12 +6,12 @@
     RewriteEngine On
     RewriteBase /clickpasajes/
 
-    # Si se pide algo de imagenes o uploads dentro de clickpasajes, buscarlo en la raiz
-    RewriteRule ^imagenes/(.*)$ imagenes/$1 [L]
-    RewriteRule ^images/(.*)$ images/$1 [L]
-    RewriteRule ^uploads/(.*)$ uploads/$1 [L]
-    RewriteRule ^css/(.*)$ css/$1 [L]
-    RewriteRule ^js/(.*)$ js/$1 [L]
+    # REGLAS PARA ASSETS: Mapear a la raíz física del servidor
+    RewriteRule ^imagenes/(.*)$ /imagenes/$1 [L]
+    RewriteRule ^images/(.*)$ /images/$1 [L]
+    RewriteRule ^uploads/(.*)$ /uploads/$1 [L]
+    RewriteRule ^css/(.*)$ /css/$1 [L]
+    RewriteRule ^js/(.*)$ /js/$1 [L]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

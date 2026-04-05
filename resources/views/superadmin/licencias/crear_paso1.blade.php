@@ -373,7 +373,7 @@
             }
 
             // Obtener ciudades del servidor
-            fetch(`/superadmin/licencias/ciudades/${idDepartamento}`)
+            fetch(`{{ url('') }}/superadmin/licencias/ciudades/${idDepartamento}`)
                 .then(response => response.json())
                 .then(ciudades => {
                     selectCiudad.innerHTML = '<option value="">-- Seleccione Ciudad --</option>';
@@ -409,7 +409,7 @@
             btnVerificar.disabled = true;
             btnVerificar.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-            fetch(`/superadmin/licencias/verificar-nit/${nit}`)
+            fetch(`{{ url('') }}/superadmin/licencias/verificar-nit/${nit}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {

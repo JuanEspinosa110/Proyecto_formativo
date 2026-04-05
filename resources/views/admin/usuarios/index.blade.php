@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const docArchivo = btnVer.getAttribute('data-licencia-archivo');
                         const btnArchivo = document.getElementById('verLicArchivoBtn');
                         if (docArchivo) {
-                            const fileUrl = docArchivo.startsWith('uploads') ? '/' + docArchivo : '/storage/' + docArchivo;
+                            const fileUrl = docArchivo.startsWith('uploads') ? '{{ url("") }}/' + docArchivo : '{{ url("") }}/storage/' + docArchivo;
                             btnArchivo.href = fileUrl;
                             btnArchivo.style.setProperty('display', 'inline-flex', 'important');
                         } else {
@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const form = document.getElementById('formEditarUsuario');
                 if (form) {
                     const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
-                    form.action = '/' + prefix + '/usuarios/' + btnEdit.getAttribute('data-doc');
+                    form.action = '{{ url("") }}/' + prefix + '/usuarios/' + btnEdit.getAttribute('data-doc');
                 }
 
                 const modalEl = document.getElementById('modalEditarUsuario');

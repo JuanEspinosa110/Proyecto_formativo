@@ -410,7 +410,7 @@
                 
                 // Cargar datos completos vía AJAX (incluye asignación)
                 const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
-                const respBus = await fetch(`/${prefix}/buses/${placa}`);
+                const respBus = await fetch(`{{ url('') }}/${prefix}/buses/${placa}`);
                 const fullData = await respBus.json();
                 
                 const data = fullData.bus;
@@ -529,7 +529,7 @@
             
             try {
                 const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
-                const response = await fetch(`/${prefix}/buses/${placa}/historial-documental`);
+                const response = await fetch(`{{ url('') }}/${prefix}/buses/${placa}/historial-documental`);
                 if(!response.ok) throw new Error('Error de red');
                 const data = await response.json();
                 
@@ -670,7 +670,7 @@
                 }
 
                 const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
-                form.action = '/' + prefix + '/buses/' + data.placa;
+                form.action = '{{ url("") }}/' + prefix + '/buses/' + data.placa;
                 sessionStorage.setItem('last_edit_bus_placa', data.placa);
 
                 const modalEl = document.getElementById('modalEditBus');
@@ -685,7 +685,7 @@
                 if (lastPlaca) {
                     const form = document.getElementById('formEditBus');
                     const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
-                    form.action = '/' + prefix + '/buses/' + lastPlaca;
+                    form.action = '{{ url("") }}/' + prefix + '/buses/' + lastPlaca;
                     new bootstrap.Modal(document.getElementById('modalEditBus')).show();
                 }
             @else
@@ -829,7 +829,7 @@
 
                     try {
                         const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
-                        const response = await fetch(`/${prefix}/buses/propietario/${doc}`);
+                        const response = await fetch(`{{ url('') }}/${prefix}/buses/propietario/${doc}`);
                         if (response.ok) {
                             const data = await response.json();
                             if (data) {

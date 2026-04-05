@@ -78,14 +78,15 @@
 
                 // Cargar visor
                 const visor = document.getElementById('visorDocumento');
+                const baseUrl = "{{ asset('storage') }}";
                 if (archivo) {
                     const ext = archivo.split('.').pop().toLowerCase();
                     if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
-                        visor.innerHTML = `<img src="/storage/${archivo}" class="img-fluid rounded-3" style="max-height: 100%; object-fit: contain;">`;
+                        visor.innerHTML = `<img src="${baseUrl}/${archivo}" class="img-fluid rounded-3" style="max-height: 100%; object-fit: contain;">`;
                     } else if (ext === 'pdf') {
-                        visor.innerHTML = `<iframe src="/storage/${archivo}" width="100%" height="100%" class="border-0 rounded-3"></iframe>`;
+                        visor.innerHTML = `<iframe src="${baseUrl}/${archivo}" width="100%" height="100%" class="border-0 rounded-3"></iframe>`;
                     } else {
-                        visor.innerHTML = `<span class="text-muted small">No se puede previsualizar este formato. <a href="/storage/${archivo}" target="_blank" class="text-primary">Ver externo</a></span>`;
+                        visor.innerHTML = `<span class="text-muted small">No se puede previsualizar este formato. <a href="${baseUrl}/${archivo}" target="_blank" class="text-primary">Ver externo</a></span>`;
                     }
                 } else {
                     visor.innerHTML = `<span class="text-muted small">Sin archivo asociado</span>`;

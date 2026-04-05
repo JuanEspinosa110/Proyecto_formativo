@@ -269,7 +269,7 @@
 <script>
 function confirmarEliminacion(nit) {
     const form = document.getElementById('deleteForm');
-    form.action = `/superadmin/empresas/${nit}`;
+    form.action = `{{ url('') }}/superadmin/empresas/${nit}`;
     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     modal.show();
 }

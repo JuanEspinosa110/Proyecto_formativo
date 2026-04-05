@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
     async function handleVerBus(placa) {
         try {
             console.log('Cargando expediente para:', placa);
-            const resp = await fetch(`/empresa/buses/${placa}`);
+            const resp = await fetch(`{{ url('') }}/empresa/buses/${placa}`);
             const fullData = await resp.json();
             
             const data = fullData.bus;
@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalBovedaAux = new bootstrap.Modal(document.getElementById('modalBovedaHistorialAux'));
     async function abrirBovedaAuxiliar(placa) {
         try {
-            const resp = await fetch(`/empresa/buses/${placa}/historial-documental`);
+            const resp = await fetch(`{{ url('') }}/empresa/buses/${placa}/historial-documental`);
             const data = await resp.json();
             
             document.getElementById('boveda_aux_placa').innerText = data.placa;
@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('editCorreo').value = d.correo;
             document.getElementById('editTelefono').value = d.telefono;
             document.getElementById('editEstado').value = d.estado_id || '1';
-            document.getElementById('formEditarUsuario').action = '/empresa/usuarios/' + d.doc;
+            document.getElementById('formEditarUsuario').action = `{{ url('') }}/empresa/usuarios/${d.doc}`;
         }
 
         // Inactivar Viaje (Confirmación)

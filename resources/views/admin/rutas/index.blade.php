@@ -394,7 +394,7 @@
                 await loadBarrios(data.id_ciudad, 'edit_id_barrio_origen', data.id_barrio_origen);
                 await loadBarrios(data.id_ciudad, 'edit_id_barrio_destino', data.id_barrio_destino);
 
-                form.action = `rutas/${data.id_ruta}`; // Ruta relativa
+                form.action = `{{ url('') }}/admin/rutas/${data.id_ruta}`;
                 
                 const modalEl = document.getElementById('modalEditRuta');
                 bootstrap.Modal.getOrCreateInstance(modalEl).show();
@@ -414,8 +414,8 @@
             select.innerHTML = '<option value="">Cargando...</option>';
 
             try {
-                // USAR RUTA RELATIVA para evitar problemas con subcarpetas
-                const response = await fetch(`rutas/barrios/${ciudadId}`);
+                // USAR RUTA DINÁMICA para evitar problemas con subcarpetas
+                const response = await fetch(`{{ url('') }}/admin/rutas/barrios/${ciudadId}`);
                 if (!response.ok) throw new Error('Error en red');
                 const barrios = await response.json();
 

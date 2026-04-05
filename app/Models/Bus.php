@@ -68,12 +68,7 @@ class Bus extends Model
      */
     public function isOperable()
     {
-        // 1. Debe estar en estado ACTIVO (id_estado = 1)
-        if ($this->id_estado != 1) {
-            return false;
-        }
-
-        // 2. Obtener tipos de documento requeridos para Bus (requiere_placa = 1)
+        // 1. Obtener tipos de documento requeridos para Bus (requiere_placa = 1)
         $requiredTypes = TipoDocumento::where('requiere_placa', 1)
             ->where('id_estado', 1) // Activo
             ->pluck('id_tipo_documento');
@@ -82,11 +77,11 @@ class Bus extends Model
             return true; // Si no hay requeridos, es operable por defecto
         }
 
-        // 3. Contar documentos aprobados y vigentes para este bus (por tipo de documento)
+        // 2. Contar documentos aprobados y vigentes para este bus (por tipo de documento)
         $approvedCount = Documento::where('placa', $this->placa)
             ->whereIn('id_tipo_documento', $requiredTypes)
             ->where('id_estado', 1) // 1 = ACTIVO/APROBADO
-            ->where('fecha_vencimiento', '>', now())
+            ->where('fecha_vencimiento', '>=', now()->toDateString())
             ->distinct('id_tipo_documento')
             ->count('id_tipo_documento');
 

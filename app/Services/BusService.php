@@ -77,6 +77,10 @@ class BusService
             if ($bus->hasPendingHighLevelFaults()) {
                 throw new \Exception("El vehículo no puede marcarse como ACTIVO porque aún tiene reportes de falla de nivel ALTO pendientes de resolución.");
             }
+
+            if (!$bus->isOperable()) {
+                throw new \Exception("El vehículo no puede marcarse como ACTIVO porque sus documentos requeridos (SOAT o Técnicomecánica) están vencidos, rechazados o no han sido cargados.");
+            }
         }
         
         $updated = $bus->update($data);

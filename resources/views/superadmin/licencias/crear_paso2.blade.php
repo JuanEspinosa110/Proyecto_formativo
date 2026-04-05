@@ -207,7 +207,7 @@
          */
         async function obtenerDatosPlan(idPlan) {
             try {
-                const response = await fetch(`/superadmin/licencias/plan/${idPlan}`);
+                const response = await fetch(`{{ url('') }}/superadmin/licencias/plan/${idPlan}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

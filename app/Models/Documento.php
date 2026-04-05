@@ -82,6 +82,10 @@ class Documento extends Model
             return 'ARCHIVADO';
         }
 
+        if ($this->id_estado == 10) {
+            return 'RECHAZADO';
+        }
+
         $hoy = now()->startOfDay();
         $vencimiento = $this->fecha_vencimiento->startOfDay();
 
@@ -100,6 +104,7 @@ class Documento extends Model
     {
         return match($this->estado_expiracion) {
             'VENCIDO' => 'danger',
+            'RECHAZADO' => 'danger',
             'PRÓXIMO A VENCER' => 'warning',
             'ARCHIVADO' => 'secondary',
             default => 'success',

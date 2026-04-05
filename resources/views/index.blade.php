@@ -52,7 +52,7 @@
 </nav>
 
 <!-- HERO -->
-<section class="hero-section">
+<section class="hero-section" style="background-image: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.70) 40%, rgba(0,0,0,0.40) 70%, rgba(0,0,0,0.20) 100%), url('{{ asset('imagenes/hero.jpg') }}');">
     <div class="container">
         <div class="row align-items-center">
             <!-- LADO IZQUIERDO: Propuesta de valor -->

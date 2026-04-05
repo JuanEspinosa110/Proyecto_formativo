@@ -384,7 +384,7 @@
         body.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Cargando detalles...</div>';
 
         // Obtener detalles adicionales mediante AJAX
-        fetch(`/superadmin/licencias/${idLicencia}/detalles`)
+        fetch(`{{ url('') }}/superadmin/licencias/${idLicencia}/detalles`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Error al cargar detalles');

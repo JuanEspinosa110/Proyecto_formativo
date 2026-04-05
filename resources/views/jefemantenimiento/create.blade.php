@@ -255,7 +255,7 @@
             return;
         }
 
-        fetch(`/jefemantenimiento/api/reportes-pendientes/${placa}`)
+        fetch(`{{ url('') }}/jefemantenimiento/api/reportes-pendientes/${placa}`)
             .then(res => res.json())
             .then(data => {
                 pendingReports = data;

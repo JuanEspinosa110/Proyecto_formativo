@@ -49,7 +49,7 @@ function cargarDocumentos() {
 function procesarDocumento(id, accion) {
     if(!confirm(`¿Está seguro de ${accion} este documento?`)) return;
 
-    fetch(`/auxiliar/documentos/${id}/${accion}`, {
+    fetch(`{{ url('') }}/auxiliar/documentos/${id}/${accion}`, {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',

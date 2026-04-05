@@ -1429,7 +1429,7 @@
                         const vencimiento = button.getAttribute('data-vencimiento');
 
                         const form = document.getElementById('formActualizarDoc');
-                        form.action = `/propietario/documento/${id}`;
+                        form.action = `{{ url('propietario/documento') }}/${id}`;
 
                         document.getElementById('edit_nombre_display').value = nombre;
                         document.getElementById('edit_expedicion').value = expedicion;
@@ -1444,7 +1444,7 @@
                         const actual = button.getAttribute('data-actual');
 
                         const form = document.getElementById('formKilometraje');
-                        form.action = `/propietario/bus/${placa}/kilometraje`;
+                        form.action = `{{ url('propietario/bus') }}/${placa}/kilometraje`;
 
                         document.getElementById('km_placa_display').value = placa;
                         const input = document.getElementById('km_input');
@@ -1460,7 +1460,7 @@
                     btn.addEventListener('click', async function () {
                         const placa = this.getAttribute('data-placa');
                         try {
-                            const response = await fetch(`/propietario/bus/${placa}/detalles`);
+                            const response = await fetch(`{{ url('propietario/bus') }}/${placa}/detalles`);
                             const data = await response.json();
 
                             // Llenar Info Técnica
@@ -1738,7 +1738,7 @@
                     btn.addEventListener('click', async function () {
                         const id = this.getAttribute('data-id');
                         try {
-                            const response = await fetch(`/propietario/asignacion/${id}/detalle`);
+                            const response = await fetch(`{{ url('propietario/asignacion') }}/${id}/detalle`);
                             const data = await response.json();
 
                             // Llenar Info General
@@ -1795,7 +1795,7 @@
                     btn.addEventListener('click', async function () {
                         const placa = this.getAttribute('data-placa');
                         try {
-                            const response = await fetch(`/propietario/bus/${placa}/historial-documental`);
+                            const response = await fetch(`{{ url('propietario/bus') }}/${placa}/historial-documental`);
                             if (!response.ok) throw new Error('Error en petición');
                             const data = await response.json();
 

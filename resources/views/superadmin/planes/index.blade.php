@@ -232,7 +232,7 @@ function confirmarEliminacion(idPlan, nombrePlan, totalLicencias) {
     const formEliminar = document.getElementById('formEliminar');
     const mensajeEliminar = document.getElementById('mensajeEliminar');
     
-    formEliminar.action = `/superadmin/planes/${idPlan}`;
+    formEliminar.action = `{{ url('') }}/superadmin/planes/${idPlan}`;
     
     if (totalLicencias > 0) {
         mensajeEliminar.innerHTML = `
@@ -259,7 +259,7 @@ function confirmarEliminacion(idPlan, nombrePlan, totalLicencias) {
 function toggleEstado(idPlan) {
     if (!confirm('¿Está seguro de cambiar el estado de este plan?')) return;
     
-    fetch(`/superadmin/planes/${idPlan}/toggle-estado`, {
+    fetch(`{{ url('') }}/superadmin/planes/${idPlan}/toggle-estado`, {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',

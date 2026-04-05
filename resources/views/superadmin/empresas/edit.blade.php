@@ -243,7 +243,7 @@ document.getElementById('id_departamento').addEventListener('change', function()
     ciudadSelect.innerHTML = '<option value="">Cargando ciudades...</option>';
     
     if (departamentoId) {
-        fetch(`/superadmin/empresas/ciudades/${departamentoId}`)
+        fetch(`{{ url('') }}/superadmin/empresas/ciudades/${departamentoId}`)
             .then(response => response.json())
             .then(data => {
                 ciudadSelect.innerHTML = '<option value="">Seleccione una ciudad</option>';

@@ -267,7 +267,7 @@
                 const data = JSON.parse(this.dataset.json);
                 const form = document.getElementById('formEditTipo');
                 
-                form.action = `/superadmin/tipos-documentos/${data.id_tipo_documento}`;
+                form.action = `{{ url('') }}/superadmin/tipos-documentos/${data.id_tipo_documento}`;
                 form.querySelector('[name="nombre"]').value = data.nombre;
                 form.querySelector('[name="descripcion"]').value = data.descripcion || '';
                 form.querySelector('[name="requiere_doc_usuario"]').checked = data.requiere_doc_usuario == 1;
@@ -324,7 +324,7 @@
                 
                 if (confirm(`¿Está seguro que desea eliminar el tipo "${nombre}"? Esta acción no se puede deshacer.`)) {
                     try {
-                        const response = await fetch(`/superadmin/tipos-documentos/${id}`, {
+                        const response = await fetch(`{{ url('') }}/superadmin/tipos-documentos/${id}`, {
                             method: 'DELETE',
                             headers: { 
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
