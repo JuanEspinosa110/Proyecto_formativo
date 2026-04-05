@@ -61,7 +61,7 @@ class SuperAdministradorSeeder extends Seeder
         // Nuevo Super Administrador solicitado
         SuperAdministrador::firstOrCreate(
             [
-                'doc_super_admin' => 78092026
+                'doc_super_admin' => 11000111
             ],
             [
                 'nombre' => 'Cesar Esquivel',
