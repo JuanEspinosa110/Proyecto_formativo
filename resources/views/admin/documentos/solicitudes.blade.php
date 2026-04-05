@@ -11,7 +11,7 @@
             <p class="text-muted small mb-0">Revisa y gestiona los documentos enviados por los propietarios.</p>
         </div>
         <div>
-            <a href="{{ route('empresa.documentos.index') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 fw-semibold">
+            <a href="{{ route(($routePrefix ?? 'empresa') . '.documentos.index') }}" class="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 fw-semibold">
                 <span class="material-symbols-rounded">folder</span>
                 Inventario General
             </a>
@@ -28,7 +28,7 @@
     <!-- Filtros -->
     <div class="card border-0 shadow-sm mb-4 rounded-3">
         <div class="card-body p-3">
-            <form method="GET" action="{{ route('admin.documentos.solicitudes') }}" class="row g-2 align-items-center">
+            <form method="GET" action="{{ url()->current() }}" class="row g-2 align-items-center">
                 <div class="col-md-5">
                     <input type="text" name="placa" class="form-control bg-light" placeholder="Filtrar por placa..." value="{{ request('placa') }}">
                 </div>
@@ -87,13 +87,13 @@
                         </td>
                         <td class="text-end pe-4">
                             <div class="d-flex justify-content-end gap-2">
-                                <form action="{{ route('admin.documentos.aprobar', $doc->id_documento) }}" method="POST">
+                                <form action="{{ route(($routePrefix ?? 'empresa') . '.documentos.aprobar', $doc->id_documento) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-success d-flex align-items-center gap-1 fw-semibold py-1 px-2 shadow-sm" onclick="return confirm('¿Aprobar este documento?')">
                                         <span class="material-symbols-rounded fs-6">check</span> Aprobar
                                     </button>
                                 </form>
-                                <form action="{{ route('admin.documentos.rechazar', $doc->id_documento) }}" method="POST">
+                                <form action="{{ route(($routePrefix ?? 'empresa') . '.documentos.rechazar', $doc->id_documento) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-danger d-flex align-items-center gap-1 fw-semibold py-1 px-2 shadow-sm" onclick="return confirm('¿Rechazar este documento?')">
                                         <span class="material-symbols-rounded fs-6">close</span> Rechazar

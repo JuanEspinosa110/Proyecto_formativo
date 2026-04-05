@@ -179,7 +179,7 @@ class DocumentoController extends Controller
             ->with(['tipoDocumento', 'estado', 'bus', 'usuario']);
 
         // Filtrar solicitudes: Excluir Aprobados (1) y Rechazados (8)
-        $query->whereNotIn('id_estado', [1, 8]);
+        $query->whereNotIn('id_estado', [1, 8, 10]); // Incluimos 10 como rechazado si aplica
 
         if ($request->filled('placa')) {
             $query->where('placa', 'like', '%' . $request->placa . '%');
@@ -192,7 +192,10 @@ class DocumentoController extends Controller
 
         $documentos = $query->orderBy('created_at', 'desc')->paginate(20);
 
-        return view('admin.documentos.solicitudes', compact('documentos', 'empresa'));
+        // Detectar el prefijo dinámicamente para la vista
+        $routePrefix = $request->is('admin/*') ? 'admin' : 'empresa';
+
+        return view('admin.documentos.solicitudes', compact('documentos', 'empresa', 'routePrefix'));
     }
 
     /**
