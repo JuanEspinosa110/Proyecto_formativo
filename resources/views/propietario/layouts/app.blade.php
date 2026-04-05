@@ -145,6 +145,80 @@
             color: #64748b;
             display: block;
         }
+
+        /* Estilos móviles y Offcanvas */
+        @media (max-width: 991.98px) {
+            .sigu-navbar {
+                height: auto;
+                min-height: 64px;
+                padding: 0.75rem 0;
+            }
+            .sigu-navbar-inner {
+                padding: 0 1rem;
+            }
+            .sigu-main {
+                padding: 1.5rem 1rem;
+            }
+            .sigu-user-info {
+                display: none;
+            }
+            .sigu-user-pill {
+                padding: 0.35rem;
+                gap: 0;
+                border: none;
+                background: transparent;
+            }
+            .sigu-user-pill:hover {
+                background: rgba(0,0,0,0.03);
+            }
+            .sigu-user-pill .material-symbols-rounded:last-child {
+                display: none;
+            }
+        }
+
+        .sigu-offcanvas {
+            border-left: none;
+            width: 280px !important;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+        }
+
+        .sigu-offcanvas-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .sigu-offcanvas-body {
+            padding: 1.5rem 1rem;
+        }
+
+        .sigu-mobile-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sigu-mobile-nl {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 0.85rem 1.25rem;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .sigu-mobile-nl:hover, .sigu-mobile-nl.active {
+            background: #5d548e;
+            color: white;
+        }
+
+        .sigu-mobile-nl .material-symbols-rounded {
+            font-size: 1.5rem;
+        }
     </style>
 
     @stack('styles')
@@ -155,6 +229,11 @@
     <header class="sigu-navbar">
         <div class="sigu-navbar-inner">
             <div class="d-flex align-items-center">
+                <!-- Hamburger Toggle (Mobile Only) -->
+                <button class="btn btn-link link-dark d-lg-none p-0 me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav">
+                    <span class="material-symbols-rounded fs-1">menu</span>
+                </button>
+
                 <a href="{{ route('propietario.dashboard') }}"
                     class="sigu-brand text-decoration-none d-flex align-items-center gap-2">
                     <div class="sigu-brand-mark"
@@ -221,7 +300,7 @@
                             <div class="px-3 py-2 mb-1 border-bottom d-md-none">
                                 <span class="fw-bold d-block small">{{ auth()->user()->primer_nombre }}
                                     {{ auth()->user()->primer_apellido }}</span>
-                                <span class="text-muted extra-small">Propietario</span>
+                                <span class="text-muted" style="font-size: 0.65rem;">Propietario</span>
                             </div>
                         <li>
                             <a class="dropdown-item d-flex align-items-center gap-3 py-2 rounded-3"
@@ -250,6 +329,72 @@
             </div>
         </div>
     </header>
+
+    <!-- Offcanvas Mobile Navigation -->
+    <div class="offcanvas offcanvas-start sigu-offcanvas" tabindex="-1" id="offcanvasNav" aria-labelledby="offcanvasNavLabel">
+        <div class="sigu-offcanvas-header d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <div style="background: #5d548e; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-rounded fs-5">person_pin</span>
+                </div>
+                <span class="fw-bold text-dark fs-5">SIGU</span>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="sigu-offcanvas-body">
+            <nav class="sigu-mobile-nav">
+                <a href="{{ route('propietario.dashboard') }}"
+                    class="sigu-mobile-nl {{ request()->routeIs('propietario.dashboard') && !request()->has('section') ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">dashboard</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ route('propietario.dashboard', ['section' => 'vehiculo']) }}"
+                    class="sigu-mobile-nl {{ request()->get('section') == 'vehiculo' ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">directions_bus</span>
+                    <span>Mi Vehículo</span>
+                </a>
+                <a href="{{ route('propietario.dashboard', ['section' => 'asignaciones']) }}"
+                    class="sigu-mobile-nl {{ request()->get('section') == 'asignaciones' ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">assignment</span>
+                    <span>Asignaciones</span>
+                </a>
+                <a href="{{ route('propietario.dashboard', ['section' => 'documentos']) }}"
+                    class="sigu-mobile-nl {{ request()->get('section') == 'documentos' ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">description</span>
+                    <span>Documentos</span>
+                </a>
+                <a href="{{ route('propietario.dashboard', ['section' => 'historial']) }}"
+                    class="sigu-mobile-nl {{ request()->get('section') == 'historial' ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">history</span>
+                    <span>Historial</span>
+                </a>
+                <a href="{{ route('propietario.dashboard', ['section' => 'ganancias']) }}"
+                    class="sigu-mobile-nl {{ request()->get('section') == 'ganancias' ? 'active' : '' }}">
+                    <span class="material-symbols-rounded">payments</span>
+                    <span>Ganancias</span>
+                </a>
+            </nav>
+
+            <div class="mt-5 pt-4 border-top">
+                <div class="d-flex align-items-center gap-3 px-3 mb-4">
+                    <div class="sigu-user-ava" style="width: 44px; height: 44px;">
+                        <span class="material-symbols-rounded fs-4">person</span>
+                    </div>
+                    <div>
+                        <span class="fw-bold d-block text-dark">{{ auth()->user()->primer_nombre }}</span>
+                        <span class="text-muted small">Propietario</span>
+                    </div>
+                </div>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-danger w-100 rounded-pill py-2 fw-bold d-flex align-items-center justify-content-center gap-2">
+                        <span class="material-symbols-rounded fs-5">logout</span>
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <main class="sigu-main">
         @yield('content')
