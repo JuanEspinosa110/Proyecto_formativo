@@ -153,24 +153,30 @@
                 min-height: 64px;
                 padding: 0.75rem 0;
             }
+
             .sigu-navbar-inner {
                 padding: 0 1rem;
             }
+
             .sigu-main {
                 padding: 1.5rem 1rem;
             }
+
             .sigu-user-info {
                 display: none;
             }
+
             .sigu-user-pill {
                 padding: 0.35rem;
                 gap: 0;
                 border: none;
                 background: transparent;
             }
+
             .sigu-user-pill:hover {
-                background: rgba(0,0,0,0.03);
+                background: rgba(0, 0, 0, 0.03);
             }
+
             .sigu-user-pill .material-symbols-rounded:last-child {
                 display: none;
             }
@@ -185,7 +191,7 @@
 
         .sigu-offcanvas-header {
             padding: 1.5rem;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .sigu-offcanvas-body {
@@ -211,7 +217,8 @@
             transition: all 0.2s ease;
         }
 
-        .sigu-mobile-nl:hover, .sigu-mobile-nl.active {
+        .sigu-mobile-nl:hover,
+        .sigu-mobile-nl.active {
             background: #5d548e;
             color: white;
         }
@@ -230,7 +237,8 @@
         <div class="sigu-navbar-inner">
             <div class="d-flex align-items-center">
                 <!-- Hamburger Toggle (Mobile Only) -->
-                <button class="btn btn-link link-dark d-lg-none p-0 me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav">
+                <button class="btn btn-link link-dark d-lg-none p-0 me-3" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasNav">
                     <span class="material-symbols-rounded fs-1">menu</span>
                 </button>
 
@@ -331,10 +339,12 @@
     </header>
 
     <!-- Offcanvas Mobile Navigation -->
-    <div class="offcanvas offcanvas-start sigu-offcanvas" tabindex="-1" id="offcanvasNav" aria-labelledby="offcanvasNavLabel">
+    <div class="offcanvas offcanvas-start sigu-offcanvas" tabindex="-1" id="offcanvasNav"
+        aria-labelledby="offcanvasNavLabel">
         <div class="sigu-offcanvas-header d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-2">
-                <div style="background: #5d548e; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <div
+                    style="background: #5d548e; color: white; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
                     <span class="material-symbols-rounded fs-5">person_pin</span>
                 </div>
                 <span class="fw-bold text-dark fs-5">SIGU</span>
@@ -387,7 +397,8 @@
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="btn btn-danger w-100 rounded-pill py-2 fw-bold d-flex align-items-center justify-content-center gap-2">
+                    <button type="submit"
+                        class="btn btn-danger w-100 rounded-pill py-2 fw-bold d-flex align-items-center justify-content-center gap-2">
                         <span class="material-symbols-rounded fs-5">logout</span>
                         Cerrar sesión
                     </button>
