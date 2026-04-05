@@ -52,37 +52,49 @@
                         <form method="POST" action="{{ route('auxiliar.asignaciones.store') }}" id="formCrearAsignacion">
                             @csrf
                             <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Vehículo (Placa) <span class="text-danger">*</span></label>
-                                    <select name="placa" id="asig_placa" class="form-select form-select-sm" required>
-                                        <option value="" selected disabled>Seleccionar...</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
+                                <!-- 1. Ruta -->
+                                <div class="col-md-12">
                                     <label class="form-label small fw-bold text-muted text-uppercase ls-1">Ruta <span class="text-danger">*</span></label>
                                     <select name="id_ruta" id="asig_ruta" class="form-select form-select-sm" required>
                                         <option value="" selected disabled>Seleccionar...</option>
                                     </select>
                                 </div>
 
-                                <div class="col-md-12">
-                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Conductor <span class="text-danger">*</span></label>
-                                    <select name="doc_us" id="asig_conductor" class="form-select form-select-sm" required>
+                                <!-- 2. Fecha -->
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Fecha <span class="text-danger">*</span></label>
+                                    <input type="date" name="fecha" id="asig_fecha" class="form-control form-control-sm" required min="{{ date('Y-m-d') }}">
+                                </div>
+
+                                <!-- 3. Hora Salida -->
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Hora Salida <span class="text-danger">*</span></label>
+                                    <input type="time" name="hora_salida" id="asig_hora_salida" class="form-control form-control-sm" required>
+                                </div>
+
+                                <!-- 4. Hora Llegada (Estimada) + Botón -->
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Hora Llegada (Est.)</label>
+                                    <div class="d-flex gap-1">
+                                        <input type="time" name="hora_llegada" id="asig_hora_llegada" class="form-control form-control-sm text-muted" readonly disabled>
+                                        <button type="button" id="btn_asig_8h" class="btn btn-outline-primary btn-sm px-2 fw-bold" style="font-size: 0.65rem;">+8H</button>
+                                    </div>
+                                </div>
+
+                                <!-- 5. Vehículo (Placa) -->
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Vehículo (Placa) <span class="text-danger">*</span></label>
+                                    <select name="placa" id="asig_placa" class="form-select form-select-sm" required disabled title="Fije fecha primero">
                                         <option value="" selected disabled>Seleccionar...</option>
                                     </select>
                                 </div>
 
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Fecha <span class="text-danger">*</span></label>
-                                    <input type="date" name="fecha" class="form-control form-control-sm" required min="{{ date('Y-m-d') }}">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Hora Salida <span class="text-danger">*</span></label>
-                                    <input type="time" name="hora_salida" class="form-control form-control-sm" required>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Hora Llegada <span class="text-danger">*</span></label>
-                                    <input type="time" name="hora_llegada" class="form-control form-control-sm" required>
+                                <!-- 6. Conductor -->
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted text-uppercase ls-1">Conductor <span class="text-danger">*</span></label>
+                                    <select name="doc_us" id="asig_conductor" class="form-select form-select-sm" required disabled title="Fije fecha primero">
+                                        <option value="" selected disabled>Seleccionar...</option>
+                                    </select>
                                 </div>
 
                                 <div class="col-12 text-end mt-4">
@@ -114,46 +126,98 @@ function cargarAsignaciones() {
 }
 
 function cargarOpcionesAsignacion() {
+    const fecha = document.getElementById('asig_fecha').value;
+    const hora = document.getElementById('asig_hora_salida').value;
+    const horaLlegadaInput = document.getElementById('asig_hora_llegada');
+    const selectPlaca = document.getElementById('asig_placa');
+    const selectCond = document.getElementById('asig_conductor');
+    const selectRuta = document.getElementById('asig_ruta');
+
+    // Calcular Hora Llegada Estimada (+8h)
+    if (hora) {
+        const [h, m] = hora.split(':');
+        let date = new Date();
+        date.setHours(h, m);
+        date.setHours(date.getHours() + 8);
+        horaLlegadaInput.value = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    }
+
+    // Control de habilitación
+    if (fecha && hora) {
+        selectPlaca.disabled = false;
+        selectCond.disabled = false;
+        selectPlaca.title = "";
+        selectCond.title = "";
+    } else {
+        selectPlaca.disabled = true;
+        selectCond.disabled = true;
+        selectPlaca.title = "Fije fecha y hora primero";
+        selectCond.title = "Fije fecha y hora primero";
+        return;
+    }
+
+    // Mostrar estado de carga
+    selectPlaca.innerHTML = '<option value="" disabled selected>Cargando...</option>';
+    selectCond.innerHTML = '<option value="" disabled selected>Cargando...</option>';
+
+    fetch(`{{ route('empresa.asignaciones.disponibilidad') }}?fecha=${fecha}&hora_salida=${hora}`)
+        .then(r => r.json())
+        .then(data => {
+            selectPlaca.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+            if (data.buses.length === 0) {
+                selectPlaca.innerHTML = '<option value="" disabled>Sin buses disponibles</option>';
+            } else {
+                data.buses.forEach(b => {
+                    let opt = document.createElement('option');
+                    opt.value = b.placa;
+                    opt.textContent = b.label;
+                    selectPlaca.appendChild(opt);
+                });
+            }
+
+            selectCond.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+            if (data.conductores.length === 0) {
+                selectCond.innerHTML = '<option value="" disabled>Sin conductores disponibles</option>';
+            } else {
+                data.conductores.forEach(c => {
+                    let opt = document.createElement('option');
+                    opt.value = c.doc_usuario;
+                    opt.textContent = c.nombre_completo;
+                    selectCond.appendChild(opt);
+                });
+            }
+        });
+}
+
+// Cargar rutas iniciales
+function cargarRutasIniciales() {
+    const selectRuta = document.getElementById('asig_ruta');
     fetch(`{{ route('auxiliar.asignaciones.index') }}?ajax_options=1`)
         .then(r => r.json())
         .then(data => {
-            const selectPlaca = document.getElementById('asig_placa');
-            const selectRuta = document.getElementById('asig_ruta');
-            const selectCond = document.getElementById('asig_conductor');
-
-            // Limpiar
-            selectPlaca.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
             selectRuta.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
-            selectCond.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
-
-            // Llenar Placas
-            data.buses.forEach(b => {
-                let opt = document.createElement('option');
-                opt.value = b.placa;
-                opt.textContent = b.placa;
-                selectPlaca.appendChild(opt);
-            });
-
-            // Llenar Rutas
             data.rutas.forEach(r => {
                 let opt = document.createElement('option');
                 opt.value = r.id_ruta;
                 opt.textContent = r.nombre_ruta;
                 selectRuta.appendChild(opt);
             });
-
-            // Llenar Conductores
-            data.conductores.forEach(c => {
-                let opt = document.createElement('option');
-                opt.value = c.doc_usuario;
-                opt.textContent = `${c.primer_nombre} ${c.primer_apellido} (${c.doc_usuario})`;
-                selectCond.appendChild(opt);
-            });
         });
 }
 
+document.getElementById('asig_fecha').addEventListener('change', cargarOpcionesAsignacion);
+document.getElementById('asig_hora_salida').addEventListener('change', cargarOpcionesAsignacion);
+
+document.getElementById('btn_asig_8h').addEventListener('click', function() {
+    const now = new Date();
+    document.getElementById('asig_fecha').value = now.toISOString().split('T')[0];
+    document.getElementById('asig_hora_salida').value = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    cargarOpcionesAsignacion();
+});
+
 document.getElementById('modalAsignaciones').addEventListener('shown.bs.modal', function() {
     cargarAsignaciones();
+    cargarRutasIniciales();
     cargarOpcionesAsignacion();
 });
 

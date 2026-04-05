@@ -151,7 +151,7 @@ class GestorRecargaController extends Controller
     }
 
     /**
-     * Historial de recargas de esta empresa
+     * Historial de recargas y cambios de titularidad de esta empresa
      */
     public function historial(Request $request)
     {
@@ -160,7 +160,7 @@ class GestorRecargaController extends Controller
             $q->where('NIT', $nit); 
         });
 
-        // Filtros
+        // Filtros de recargas
         if ($request->filled('id_tarjeta')) {
             $query->where('id_tarjeta', 'like', '%' . $request->id_tarjeta . '%');
         }
@@ -173,12 +173,35 @@ class GestorRecargaController extends Controller
 
         $query->orderBy('created_at', 'desc');
 
+        // --- Consulta de cambios de titularidad ---
+        $gestoresNit = Usuario::where('NIT', $nit)->pluck('doc_usuario');
+        $queryTitularidad = \App\Models\TitularidadTarjeta::with(['tarjeta', 'usuario', 'estado'])
+            ->whereIn('doc_usuario', $gestoresNit)
+            ->whereNotNull('motivo_cambio');
+
+        // Filtros de titularidad
+        if ($request->filled('id_tarjeta')) {
+            $queryTitularidad->where('id_tarjeta', 'like', '%' . $request->id_tarjeta . '%');
+        }
+        if ($request->filled('fecha_inicio')) {
+            $queryTitularidad->whereDate('fecha_inicio', '>=', $request->fecha_inicio);
+        }
+        if ($request->filled('fecha_fin')) {
+            $queryTitularidad->whereDate('fecha_inicio', '<=', $request->fecha_fin);
+        }
+
+        $queryTitularidad->orderBy('fecha_inicio', 'desc');
+
         // Exportación Excel (.xls)
         if ($request->has('export') && $request->export === 'excel') {
             $recargas = $query->get();
+            $titularidades = $queryTitularidad->get();
             $filename = "historial_recargas_" . date('Y-m-d_H-i-s') . ".xls";
 
             $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />';
+            
+            // Hoja de recargas
+            $html .= '<h3>Historial de Recargas</h3>';
             $html .= '<table border="1">';
             $html .= '<thead><tr>';
             $html .= '<th style="background-color:#f8f9fa;">ID Recarga</th>';
@@ -199,14 +222,45 @@ class GestorRecargaController extends Controller
             
             $html .= '</tbody></table>';
 
+            // Hoja de cambios de titularidad
+            $html .= '<br><br><h3>Cambios de Titularidad</h3>';
+            $html .= '<table border="1">';
+            $html .= '<thead><tr>';
+            $html .= '<th style="background-color:#e8f4fd;">ID</th>';
+            $html .= '<th style="background-color:#e8f4fd;">Tarjeta</th>';
+            $html .= '<th style="background-color:#e8f4fd;">Usuario</th>';
+            $html .= '<th style="background-color:#e8f4fd;">Estado</th>';
+            $html .= '<th style="background-color:#e8f4fd;">Motivo</th>';
+            $html .= '<th style="background-color:#e8f4fd;">Fecha Inicio</th>';
+            $html .= '<th style="background-color:#e8f4fd;">Fecha Fin</th>';
+            $html .= '</tr></thead>';
+            $html .= '<tbody>';
+
+            foreach ($titularidades as $t) {
+                $nombreUsuario = $t->usuario ? trim($t->usuario->primer_nombre . ' ' . $t->usuario->primer_apellido) : $t->doc_usuario;
+                $estado = $t->estado ? $t->estado->nombre_estado : $t->id_estado;
+                $html .= '<tr>';
+                $html .= '<td>' . $t->id_titularidad_tarjeta . '</td>';
+                $html .= '<td>' . $t->id_tarjeta . '</td>';
+                $html .= '<td>' . $nombreUsuario . '</td>';
+                $html .= '<td>' . $estado . '</td>';
+                $html .= '<td>' . ($t->motivo_cambio ?? '-') . '</td>';
+                $html .= '<td>' . ($t->fecha_inicio ? \Carbon\Carbon::parse($t->fecha_inicio)->format('d/m/Y H:i:s') : '-') . '</td>';
+                $html .= '<td>' . ($t->fecha_fin ? \Carbon\Carbon::parse($t->fecha_fin)->format('d/m/Y H:i:s') : '-') . '</td>';
+                $html .= '</tr>';
+            }
+
+            $html .= '</tbody></table>';
+
             return response($html)
                 ->header('Content-Type', 'application/vnd.ms-excel; charset=utf-8')
                 ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
         }
 
-        $recargas = $query->paginate(15)->appends($request->all());
+        $recargas = $query->paginate(15, ['*'], 'recargas_page')->appends($request->all());
+        $titularidades = $queryTitularidad->paginate(10, ['*'], 'titularidad_page')->appends($request->all());
 
-        return view('empresa-recargas.historial', compact('recargas'));
+        return view('empresa-recargas.historial', compact('recargas', 'titularidades'));
     }
 
     /**

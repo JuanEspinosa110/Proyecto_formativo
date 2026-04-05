@@ -8,7 +8,7 @@ use App\Http\Controllers\ControladorTiempo\PlanillaController;
 
 Route::prefix('controlador-tiempo')
     ->name('controlador-tiempo.')
-    ->middleware(['auth:web', 'role:7'])
+    ->middleware(['auth:web', 'role:7', 'CheckNit'])
     ->group(function () {
 
         // Dashboard principal
@@ -22,6 +22,7 @@ Route::prefix('controlador-tiempo')
 
         // Módulo de Planillas
         Route::get('planillas', [PlanillaController::class, 'index'])->name('planillas.index');
+        Route::get('planillas/{id}', [PlanillaController::class, 'show'])->name('planillas.show');
         Route::post('planillas', [PlanillaController::class, 'store'])->name('planillas.store');
         Route::post('planillas/{id}/novedad', [PlanillaController::class, 'registrarNovedad'])->name('planillas.novedad');
 
@@ -31,5 +32,6 @@ Route::prefix('controlador-tiempo')
             Route::get('/{id}', [App\Http\Controllers\ControladorTiempo\VerificacionController::class, 'show'])->name('show');
             Route::post('/{id}/checkpoint', [App\Http\Controllers\ControladorTiempo\VerificacionController::class, 'registrarCheckpoint'])->name('checkpoint');
             Route::post('/{id}/incidencia', [App\Http\Controllers\ControladorTiempo\VerificacionController::class, 'registrarIncidencia'])->name('incidencia');
+            Route::post('/{id}/falla', [App\Http\Controllers\ControladorTiempo\VerificacionController::class, 'reportarFalla'])->name('falla');
         });
     });

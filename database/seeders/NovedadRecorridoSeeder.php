@@ -13,6 +13,11 @@ class NovedadRecorridoSeeder extends Seeder
      */
     public function run(): void
     {
+        if (DB::table('novedad_recorridos')->exists()) {
+            $this->command->info('NovedadRecorridoSeeder: Los datos ya existen, saltando...');
+            return;
+        }
+
         $faker = Faker::create('es_CO');
 
         // Obtener recorridos recientes

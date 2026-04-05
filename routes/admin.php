@@ -12,7 +12,7 @@ use App\Http\Controllers\JefeMantenimiento\ReporteFallaController;
 
 
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::middleware(['auth:web', 'role:1'])->group(function () {
+    Route::middleware(['auth:web', 'role:1', 'CheckNit'])->group(function () {
         // Dashboard
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
@@ -29,6 +29,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('buses/propietario/{doc_propietario}', [BusController::class, 'getPropietario'])->name('buses.propietario');
 
         // Módulo de Asignaciones
+        Route::get('asignaciones/disponibilidad', [AsignacionController::class, 'getDisponibilidad'])->name('asignaciones.disponibilidad');
         Route::resource('asignaciones', AsignacionController::class)
             ->only(['index', 'create', 'store', 'update', 'destroy']);
 
@@ -62,6 +63,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Bandeja de reportes de fallas
         Route::get('mantenimiento/reportes', [ReporteFallaController::class, 'indexAdmin'])->name('mantenimiento.reportes');
         Route::get('mantenimiento/reportes/{id}/atender', [ReporteFallaController::class, 'attendAdmin'])->name('mantenimiento.reportes.attend');
+        Route::get('mantenimiento/api/reportes-pendientes/{placa}', [ReporteFallaController::class, 'getPendingByBus'])->name('mantenimiento.api.reportes-pendientes');
         // Gestión de mantenimientos
         Route::get('mantenimiento', [MantenimientoController::class, 'indexAdmin'])->name('mantenimiento.index');
         Route::get('mantenimiento/create', [MantenimientoController::class, 'create'])->name('mantenimiento.create');

@@ -9,6 +9,7 @@ use App\Models\Documento;
 use App\Models\ReporteFalla;
 use App\Models\Tarjeta;
 use App\Models\VentaViaje;
+use App\Services\ReporteFallaService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -154,7 +155,7 @@ class ConductorController extends Controller
         ));
     }
 
-    public function reportarFalla(Request $request)
+    public function reportarFalla(Request $request, ReporteFallaService $service)
     {
         $request->validate([
             'placa' => 'required',
@@ -162,38 +163,22 @@ class ConductorController extends Controller
             'nivel_urgencia' => 'nullable|in:Bajo,Medio,Alto'
         ]);
 
-        ReporteFalla::create([
-            'placa' => $request->placa,
-            'doc_usuario' => Auth::guard('web')->id(),
-            'descripcion' => $request->descripcion,
-            'nivel_urgencia' => $request->nivel_urgencia ?? 'Bajo',
-            'id_estado' => 5 // PENDIENTE
-        ]);
-
-        // Cierre automático de turno si hay uno activo
+        $nivel = $request->nivel_urgencia ?? 'Bajo';
         $conductor = Auth::guard('web')->user();
-        $hoy = Carbon::today();
 
-        $asignacionActiva = Viaje::where('doc_us', $conductor->doc_usuario)
-            ->whereIn('id_estado', [1, 4]) // EN_CURSO o PROGRAMADO
-            ->where('placa', $request->placa)
-            ->first();
+        $service->registrarFalla(
+            $request->placa,
+            $conductor->doc_usuario,
+            $request->descripcion,
+            $nivel
+        );
 
-        if ($asignacionActiva) {
-            $asignacionActiva->id_estado = 5; // FINALIZADO
-            $asignacionActiva->save();
-
-            // También finalizar recorrido activo en pista si existe
-            $recorridoActivo = Recorrido::whereHas('viaje', function ($q) use ($conductor) {
-                $q->where('doc_us', $conductor->doc_usuario);
-            })->whereNull('hora_llegada')->first();
-            if ($recorridoActivo) {
-                $recorridoActivo->hora_llegada = Carbon::now();
-                $recorridoActivo->save();
-            }
+        $msg = 'Reporte de falla enviado exitosamente.';
+        if ($nivel === 'Alto') {
+            $msg .= ' Su turno y la operación del bus han sido FINALIZADOS preventivamente debido a la gravedad de la falla.';
         }
 
-        return redirect()->back()->with('success', 'Reporte de falla enviado exitosamente. Su turno ha sido FINALIZADO preventivamente.');
+        return redirect()->back()->with('success', $msg);
     }
 
     // LÓGICA DE JORNADA

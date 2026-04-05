@@ -78,6 +78,12 @@
                     class="sigu-nl {{ request()->routeIs('pasajero.mapa') ? 'active' : '' }}">
                     <span class="material-symbols-rounded">map</span> Mapa
                 </a>
+
+                @if(auth()->user()->id_tipo_usuario != 2)
+                <a href="{{ route(auth()->user()->getDashboardRoute()) }}" class="sigu-nl return-panel ms-lg-auto" style="color:var(--p); font-weight:700;">
+                    <span class="material-symbols-rounded">reply</span> Volver a mi Panel
+                </a>
+                @endif
             </div>
 
             <!-- Perfil dropdown -->
@@ -166,6 +172,16 @@
                 class="sigu-drawer-link {{ request()->routeIs('pasajero.mapa') ? 'active' : '' }}">
                 <span class="material-symbols-rounded">map</span> Mapa de paradas
             </a>
+
+            @if(auth()->user()->id_tipo_usuario != 2)
+            <div style="padding:1rem .75rem; margin-top:.5rem; background:rgba(var(--p-rgb), 0.05); border-radius:.75rem;">
+                <p class="small text-muted mb-2 px-2" style="font-size:11px; text-transform:uppercase; letter-spacing:1px; font-weight:700;">Acceso Especial</p>
+                <a href="{{ route(auth()->user()->getDashboardRoute()) }}" class="sigu-drawer-link" style="color:var(--p); font-weight:700; border:1px solid var(--p);">
+                    <span class="material-symbols-rounded">reply</span> Volver a mi Panel
+                </a>
+            </div>
+            @endif
+
             <hr style="border-color:var(--border);margin:.5rem 0">
             <a href="{{ route('pasajero.perfil.edit') }}"
                 class="sigu-drawer-link {{ request()->routeIs('pasajero.perfil.*') ? 'active' : '' }}">

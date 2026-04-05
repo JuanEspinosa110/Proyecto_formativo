@@ -212,7 +212,7 @@
                         </td>
                         <td>
                             @if($doc->archivo)
-                            <a href="{{ asset('storage/' . $doc->archivo) }}" target="_blank"
+                            <a href="{{ asset($doc->archivo) }}" target="_blank"
                                class="doc-btn doc-btn-view" style="font-size:.76rem;padding:.2rem .5rem">
                                 <span class="material-symbols-rounded" style="font-size:.9rem">open_in_new</span> Ver
                             </a>

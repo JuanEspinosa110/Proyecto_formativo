@@ -13,6 +13,11 @@ class RecargaSeeder extends Seeder
      */
     public function run(): void
     {
+        if (DB::table('recarga')->exists()) {
+            $this->command->info('RecargaSeeder: Los datos ya existen, saltando...');
+            return;
+        }
+
         $faker = Faker::create('es_CO');
 
         // 1. Obtener todas las tarjetas creadas (de PasajeroSeeder)

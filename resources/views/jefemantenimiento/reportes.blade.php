@@ -20,12 +20,45 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow-sm p-4">
         @if(session('success'))
-            <div class="alert alert-success mb-4" style="background:#e6fffa; color:#234e52; padding:1rem; border-radius:0.5rem;">
+            <div class="alert alert-success mt-4 mb-4" style="background:#e6fffa; color:#234e52; padding:1rem; border-radius:0.5rem;">
                 {{ session('success') }}
             </div>
         @endif
+
+    <div class="bg-white rounded-lg shadow-sm p-4 mt-4 mb-4">
+        <form action="{{ route('jefemantenimiento.reportes') }}" method="GET">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Fecha Desde</label>
+                    <input type="date" name="fecha_desde" class="form-control form-control-sm" value="{{ request('fecha_desde') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Fecha Hasta</label>
+                    <input type="date" name="fecha_hasta" class="form-control form-control-sm" value="{{ request('fecha_hasta') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Placa del Bus</label>
+                    <input type="text" name="placa" class="form-control form-control-sm" placeholder="Ej: ABC-123" value="{{ request('placa') }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Estado</label>
+                    <select name="estado" class="form-select form-select-sm">
+                        <option value="">Todos</option>
+                        <option value="1" {{ request('estado') == 1 ? 'selected' : '' }}>No Atendido</option>
+                        <option value="4" {{ request('estado') == 4 ? 'selected' : '' }}>En Taller</option>
+                        <option value="5" {{ request('estado') == 5 ? 'selected' : '' }}>Finalizado</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-3 d-flex gap-2 justify-content-end">
+                <a href="{{ route('jefemantenimiento.reportes') }}" class="btn btn-sm btn-light border">Limpiar</a>
+                <button type="submit" class="btn btn-sm btn-primary">Filtrar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm p-4">
 
         <div class="table-responsive">
             <table class="table sigu-table w-100 table-hover">
@@ -67,9 +100,20 @@
                                 </span>
                             </td>
                             <td>
-                                <a href="{{ route('jefemantenimiento.reportes.attend', $reporte->id_reporte) }}" class="btn btn-sm" style="background:var(--p); color:white; border-radius:0.5rem; padding: 0.25rem 0.5rem; text-decoration:none;">
-                                    Atender
-                                </a>
+                                @if($reporte->id_estado == 5)
+                                    <span class="badge bg-light text-success border border-success px-3 py-2 rounded-pill">
+                                        <span class="material-symbols-rounded fs-6 align-middle">task_alt</span> Atendido
+                                    </span>
+                                @elseif($reporte->id_estado == 4)
+                                    <span class="badge bg-light text-info border border-info px-3 py-2 rounded-pill">
+                                        <span class="material-symbols-rounded fs-6 align-middle">engineering</span> En Taller
+                                    </span>
+                                @else
+                                    <a href="{{ route('jefemantenimiento.reportes.attend', $reporte->id_reporte) }}" class="btn btn-sm shadow-sm" 
+                                       style="background:var(--p); color:white; border-radius:0.5rem; padding: 0.4rem 1rem; text-decoration:none; font-weight:600;">
+                                        Atender
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -82,7 +126,7 @@
         </div>
 
         <div class="mt-4">
-            {{ $reportes->links() }}
+            {{ $reportes->appends(request()->all())->links() }}
         </div>
     </div>
 </div>

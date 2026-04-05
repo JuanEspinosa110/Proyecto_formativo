@@ -8,6 +8,7 @@ use App\Models\Bus;
 use App\Models\Ruta;
 use App\Models\Usuario;
 use App\Models\Estado;
+use App\Models\ConcesionRuta;
 use App\Models\HistorialBus;
 use App\Http\Requests\AsignacionRequest;
 use Illuminate\Http\Request;
@@ -66,9 +67,9 @@ class AsignacionController extends Controller
             });
         }
         
-        // Filtro por Hora (Ej: '06:00')
-        if ($request->filled('hora')) {
-            $query->whereTime('fecha', '=', $request->hora);
+        // Filtro por Fecha (Ej: '2026-03-30')
+        if ($request->filled('fecha')) {
+            $query->whereDate('fecha', '=', $request->fecha);
         }
 
         // Orden ID ASC y paginación
@@ -77,8 +78,21 @@ class AsignacionController extends Controller
             ->withQueryString();
 
         // Datos para los modales
-        $buses = Bus::where('NIT', $nit)->get();
-        $rutas = Ruta::orderBy('id_ruta', 'asc')->get();
+        $buses = Bus::where('NIT', $nit)->get()->filter(fn($b) => $b->isAptForTravel());
+        // Rutas disponibles: Las autorizadas para esta empresa O las que no tienen NINGUNA concesión activa (Públicas)
+        $rutas = Ruta::where(function($query) use ($nit) {
+            $query->whereHas('concesiones', function($q) use ($nit) {
+                $q->where('NIT', '=', (string)$nit)->where('id_estado', 1);
+            })
+            ->orWhereDoesntHave('concesiones', function($q) {
+                $q->where('id_estado', 1);
+            });
+        })
+        ->with(['concesiones' => function($q) {
+            $q->where('id_estado', 1);
+        }])
+        ->orderBy('id_ruta', 'asc')
+        ->get();
         $adminRoleIds = \Illuminate\Support\Facades\DB::table('tipo_usuario')
             ->where('nombre_tipo', 'like', '%admin%')
             ->pluck('id_tipo_usuario');
@@ -90,10 +104,16 @@ class AsignacionController extends Controller
 
         $conductores = Usuario::where('NIT', $nit)
             ->where('id_estado', 1) // ACTIVO
-            ->whereIn('doc_usuario', $licenciasVigentes)
-            ->whereNotIn('id_tipo_usuario', $adminRoleIds)
-            ->get();
+            ->where('id_tipo_usuario', 3) // Conductor
+            ->get()
+            ->filter(fn($u) => $u->isAptForTravel());
         $estados = Estado::whereIn('nombre_estado', ['ACTIVO', 'INACTIVO'])->get();
+
+        if ($request->has('ajax_options')) {
+            return response()->json([
+                'rutas' => $rutas
+            ]);
+        }
 
         if ($request->ajax()) {
             return view('admin.asignaciones.partials.table', compact(
@@ -122,8 +142,21 @@ class AsignacionController extends Controller
         $user = Auth::guard('web')->user();
         $nit = $user->getActiveNit();
 
-        $buses = Bus::where('NIT', $nit)->get();
-        $rutas = Ruta::orderBy('id_ruta', 'asc')->get();
+        $buses = Bus::where('NIT', $nit)->get()->filter(fn($b) => $b->isAptForTravel());
+        // Rutas disponibles: Las autorizadas para esta empresa O las que no tienen NINGUNA concesión activa (Públicas)
+        $rutas = Ruta::where(function($query) use ($nit) {
+            $query->whereHas('concesiones', function($q) use ($nit) {
+                $q->where('NIT', '=', (string)$nit)->where('id_estado', 1);
+            })
+            ->orWhereDoesntHave('concesiones', function($q) {
+                $q->where('id_estado', 1);
+            });
+        })
+        ->with(['concesiones' => function($q) {
+            $q->where('id_estado', 1);
+        }])
+        ->orderBy('id_ruta', 'asc')
+        ->get();
         
         $adminRoleIds = \Illuminate\Support\Facades\DB::table('tipo_usuario')
             ->where('nombre_tipo', 'like', '%admin%')
@@ -136,9 +169,9 @@ class AsignacionController extends Controller
 
         $conductores = Usuario::where('NIT', $nit)
             ->where('id_estado', 1)
-            ->whereIn('doc_usuario', $licenciasVigentes)
-            ->whereNotIn('id_tipo_usuario', $adminRoleIds)
-            ->get();
+            ->where('id_tipo_usuario', 3)
+            ->get()
+            ->filter(fn($u) => $u->isAptForTravel());
 
         $estados = Estado::whereIn('nombre_estado', ['ACTIVO', 'INACTIVO'])->get();
 
@@ -158,6 +191,7 @@ class AsignacionController extends Controller
         } while (Viaje::where('id_viaje', $id)->exists());
 
         $data['id_viaje'] = $id;
+        $data['fecha_asignacion'] = now();
 
         Viaje::create($data);
 
@@ -173,6 +207,10 @@ class AsignacionController extends Controller
             'detalle' => "Nueva asignación. Ruta: " . ($ruta->nombre_ruta ?? $data['id_ruta']) . ". Conductor: " . ($conductor ? ($conductor->primer_nombre . ' ' . $conductor->primer_apellido) : $data['doc_us'])
         ]);
 
+        if (Auth::user()->id_tipo_usuario == 4) { // Auxiliar
+            return redirect()->back()->with('success', 'Asignación creada correctamente');
+        }
+
         return redirect()->route('admin.asignaciones.index')
             ->with('success', 'Registro creado correctamente');
     }
@@ -183,6 +221,12 @@ class AsignacionController extends Controller
     public function update(AsignacionRequest $request, $id_viaje)
     {
         $viaje = Viaje::findOrFail($id_viaje);
+        
+        // No permitir editar si ya está finalizado (ID 5)
+        if ($viaje->id_estado == 5) {
+            return redirect()->route('admin.asignaciones.index')
+                ->with('error', 'No se puede editar una asignación que ya ha sido finalizada.');
+        }
         
         // Registrar en historial
         $oldConductor = $viaje->getOriginal('doc_us');
@@ -216,6 +260,10 @@ class AsignacionController extends Controller
             'detalle' => implode(". ", $detalles) ?: 'Actualización general de datos'
         ]);
 
+        if (Auth::user()->id_tipo_usuario == 4) { // Auxiliar
+            return redirect()->back()->with('success', 'Asignación actualizada correctamente');
+        }
+
         return redirect()->route('admin.asignaciones.index')
             ->with('success', 'Registro actualizado correctamente');
     }
@@ -226,6 +274,12 @@ class AsignacionController extends Controller
     public function destroy($id_viaje)
     {
         $viaje = Viaje::findOrFail($id_viaje);
+
+        // No permitir eliminar si ya está finalizado (ID 5)
+        if ($viaje->id_estado == 5) {
+            return redirect()->route('admin.asignaciones.index')
+                ->with('error', 'No se puede eliminar una asignación que ya ha sido finalizada.');
+        }
         // Registrar en historial antes de borrar
         HistorialBus::create([
             'placa' => $viaje->placa,
@@ -237,7 +291,141 @@ class AsignacionController extends Controller
 
         $viaje->delete();
 
+        if (Auth::user()->id_tipo_usuario == 4) { // Auxiliar
+            return redirect()->back()->with('success', 'Asignación eliminada correctamente');
+        }
+
         return redirect()->route('admin.asignaciones.index')
             ->with('success', 'Registro eliminado correctamente');
+    }
+
+    /**
+     * Consulta disponibilidad de conductores y buses vía AJAX.
+     */
+    public function getDisponibilidad(Request $request)
+    {
+        $user = Auth::guard('web')->user();
+        $nit = $user->getActiveNit();
+        
+        $fecha = $request->fecha;
+        $hora = $request->hora_salida;
+
+        if (!$fecha) {
+            return response()->json(['conductores' => [], 'buses' => []]);
+        }
+
+        try {
+            // Si vienen separados (Modal Auxiliar), los unimos. 
+            // Si viene uno solo con la fecha completa (Create Admin), lo usamos tal cual.
+            $fechaFull = ($hora && !str_contains($fecha, 'T') && !str_contains($fecha, ' ')) 
+                ? "{$fecha} {$hora}" 
+                : $fecha;
+
+            $fechaObj = \Carbon\Carbon::parse($fechaFull);
+            $fechaSoloDia = $fechaObj->toDateString();
+            $proposedStart = $fechaObj->toDateTimeString();
+            $proposedEnd = $fechaObj->copy()->addHours(8)->toDateTimeString();
+
+            // 1. Filtrar Conductores
+            $conductores = Usuario::with('viajes.recorridos')
+                ->where('NIT', $nit)
+                ->where('id_estado', 1) // ACTIVO
+                ->where('id_tipo_usuario', 3) // Conductor
+                ->get()
+                ->filter(function(\App\Models\Usuario $c) use ($fechaSoloDia, $proposedStart, $proposedEnd) {
+                    // Criterio 1: Aptitud base
+                    if (!$c->isAptForTravel()) return false;
+
+                    // Criterio 2: Traslapes temporales con viajes programados (Estado 1)
+                    $conflict = $c->viajes()->where('id_estado', 1)
+                        ->where(function($q) use ($proposedStart, $proposedEnd) {
+                            $q->where('fecha', '<', $proposedEnd)
+                              ->whereRaw('DATE_ADD(fecha, INTERVAL 8 HOUR) > ?', [$proposedStart]);
+                        })->exists();
+                    if ($conflict) return false;
+
+                    // Criterio 3: Safety Hook (Recorrido o Interrupción justificada)
+                    $lastFinished = $c->viajes()->where('id_estado', 5)->orderBy('fecha', 'desc')->first();
+                    if ($lastFinished && !$lastFinished->recorridos()->exists()) {
+                        // Si no tuvo recorrido, revisamos si hubo mantenimiento o falla ese día
+                        $interrupted = \App\Models\Mantenimiento::where('placa', $lastFinished->placa)
+                            ->whereDate('fecha_mantenimiento', \Carbon\Carbon::parse($lastFinished->fecha)->toDateString())
+                            ->exists();
+                        
+                        $fallaCritica = \App\Models\ReporteFalla::where('placa', $lastFinished->placa)
+                            ->where('nivel_urgencia', 'Alto')
+                            ->whereDate('created_at', \Carbon\Carbon::parse($lastFinished->fecha)->toDateString())
+                            ->exists();
+
+                        if (!$interrupted && !$fallaCritica) {
+                            return false; // Bloqueado por "Abandono" de viaje anterior
+                        }
+                    }
+
+                    return true;
+                })
+                ->map(function(\App\Models\Usuario $c) {
+                    return [
+                        'doc_usuario' => $c->doc_usuario,
+                        'nombre_completo' => "{$c->primer_nombre} {$c->primer_apellido} ({$c->doc_usuario})",
+                        'disabled' => false
+                    ];
+                })
+                ->values();
+
+            // 2. Filtrar Buses Aptos
+            $buses = Bus::where('NIT', $nit)
+                ->with(['estado', 'viajes.recorridos'])
+                ->get()
+                ->filter(function(\App\Models\Bus $bus) use ($proposedStart, $proposedEnd) {
+                    // Criterio 1: Aptitud base (Docs + Estado + Fallas Críticas actuales)
+                    if (!$bus->isAptForTravel()) return false;
+
+                    // Criterio 2: Traslapes temporales
+                    $conflict = Viaje::where('placa', $bus->placa)
+                        ->where('id_estado', 1)
+                        ->where(function($q) use ($proposedStart, $proposedEnd) {
+                            $q->where('fecha', '<', $proposedEnd)
+                              ->whereRaw('DATE_ADD(fecha, INTERVAL 8 HOUR) > ?', [$proposedStart]);
+                        })->exists();
+                    if ($conflict) return false;
+
+                    // Criterio 3: Safety Hook (Misma lógica que conductores)
+                    $lastFinished = $bus->viajes()->where('id_estado', 5)->orderBy('fecha', 'desc')->first();
+                    if ($lastFinished && !$lastFinished->recorridos()->exists()) {
+                        $interrupted = \App\Models\Mantenimiento::where('placa', $bus->placa)
+                            ->whereDate('fecha_mantenimiento', \Carbon\Carbon::parse($lastFinished->fecha)->toDateString())
+                            ->exists();
+                        
+                        $fallaCritica = \App\Models\ReporteFalla::where('placa', $bus->placa)
+                            ->where('nivel_urgencia', 'Alto')
+                            ->whereDate('created_at', \Carbon\Carbon::parse($lastFinished->fecha)->toDateString())
+                            ->exists();
+
+                        if (!$interrupted && !$fallaCritica) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                })
+                ->map(function(\App\Models\Bus $bus) {
+                    return [
+                        'placa' => $bus->placa,
+                        'modelo' => $bus->modelo,
+                        'label' => "{$bus->placa} - {$bus->modelo}",
+                        'disabled' => false
+                    ];
+                })
+                ->values();
+
+            return response()->json([
+                'conductores' => $conductores,
+                'buses' => $buses
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
     }
 }

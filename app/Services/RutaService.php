@@ -17,7 +17,20 @@ class RutaService
      */
     public function getRutas(Request $request)
     {
-        $query = Ruta::with(['estado', 'ciudad', 'barrioOrigen', 'barrioDestino']);
+        $nit = Auth::user()->getActiveNit();
+        $query = Ruta::with(['estado', 'ciudad', 'barrioOrigen', 'barrioDestino', 'concesiones' => function($q) {
+            $q->where('id_estado', 1);
+        }]);
+
+        // Filtrar solo por rutas autorizadas para esta empresa O rutas de uso público
+        $query->where(function($q) use ($nit) {
+            $q->whereHas('concesiones', function($sq) use ($nit) {
+                $sq->where('NIT', (string)$nit)->where('id_estado', 1);
+            })
+            ->orWhereDoesntHave('concesiones', function($sq) {
+                $sq->where('id_estado', 1);
+            });
+        });
 
         // Búsqueda por ciudad o barrios
         if ($request->filled('search')) {
@@ -142,7 +155,18 @@ class RutaService
      */
     public function exportExcel(Request $request)
     {
+        $nit = Auth::user()->getActiveNit();
         $query = Ruta::with(['estado', 'ciudad', 'barrioOrigen', 'barrioDestino']);
+
+        // Filtrar solo por rutas autorizadas para esta empresa O rutas de uso público
+        $query->where(function($q) use ($nit) {
+            $q->whereHas('concesiones', function($sq) use ($nit) {
+                $sq->where('NIT', (string)$nit)->where('id_estado', 1);
+            })
+            ->orWhereDoesntHave('concesiones', function($sq) {
+                $sq->where('id_estado', 1);
+            });
+        });
 
         if ($request->filled('search')) {
             $search = $request->search;

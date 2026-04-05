@@ -413,6 +413,72 @@
 
 
 <!-- END OF VIEWS -->
+<!-- Modal Detalle del Turno (Calendario) -->
+<div class="modal fade" id="modalDetalleTurno" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-0 bg-light py-3 px-4">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2 text-dark">
+                    <span class="material-symbols-rounded text-primary">event_note</span>
+                    DETALLES DEL TURNO
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex align-items-center gap-3 mb-4 bg-primary bg-opacity-10 p-3 rounded-4">
+                    <div class="bg-primary text-white p-2 rounded-3 shadow-sm">
+                        <span class="material-symbols-rounded fs-2">directions_bus</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h4 class="fw-black mb-0 text-dark" id="modal-placa">---</h4>
+                            <span class="badge bg-primary text-white x-small fw-bold text-uppercase" id="modal-ruta" style="letter-spacing: 0.5px; padding: 0.5em 1em;">---</span>
+                        </div>
+                        <p class="mb-0 small text-dark fw-bold d-flex align-items-center gap-1 mt-1" id="modal-fecha-texto">
+                            <span class="material-symbols-rounded fs-6">calendar_month</span>
+                            <span>---</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="bg-light p-3 rounded-4 h-100">
+                            <span class="text-muted d-block small fw-bold text-uppercase mb-1">Hora Inicio</span>
+                            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                <span class="material-symbols-rounded text-success fs-5">schedule</span>
+                                <span id="modal-inicio">--:--</span>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-light p-3 rounded-4 h-100">
+                            <span class="text-muted d-block small fw-bold text-uppercase mb-1">Hora Fin Est.</span>
+                            <h5 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
+                                <span class="material-symbols-rounded text-danger fs-5">update</span>
+                                <span id="modal-fin">--:--</span>
+                            </h5>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="bg-light p-3 rounded-4">
+                            <span class="text-muted d-block small fw-bold text-uppercase mb-1">Estado actual</span>
+                            <div id="modal-estado-badge">
+                                <span class="badge bg-secondary rounded-pill px-3 py-2 fw-bold" id="modal-estado">---</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-dark w-100 py-3 rounded-pill fw-bold shadow-sm" data-bs-dismiss="modal">
+                    Entendido, Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal de Validación de Final de Ruta -->
 <div class="modal fade" id="modalFinalizarRuta" tabindex="-1" aria-labelledby="modalFinalizarRutaLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -674,7 +740,30 @@
                 @endforeach
             ],
             eventClick: function(info) {
-                alert('Detalles Turno:\n \n' + info.event.title + '\nRuta Asignada: ' + info.event.extendedProps.ruta + '\nEstado del Turno: ' + info.event.extendedProps.estado + '\nHora de Inicio: ' + info.event.start.toLocaleTimeString() + '\nHora Fin Estimada: ' + info.event.end.toLocaleTimeString());
+                // Rellenar datos en el modal
+                document.getElementById('modal-placa').innerText = info.event.title.split(' - ')[0];
+                document.getElementById('modal-ruta').innerText = info.event.extendedProps.ruta;
+                document.getElementById('modal-inicio').innerText = info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('modal-fin').innerText = info.event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                // Formatear Fecha
+                const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('modal-fecha-texto').querySelector('span:last-child').innerText = info.event.start.toLocaleDateString('es-ES', opcionesFecha);
+
+                const estado = info.event.extendedProps.estado;
+                const badge = document.getElementById('modal-estado');
+                badge.innerText = estado;
+                
+                // Color dinámico según estado
+                if (estado === 'ACTIVO' || estado === 'EN SERVICIO') {
+                    badge.className = 'badge bg-success rounded-pill px-3 py-2 fw-bold';
+                } else {
+                    badge.className = 'badge bg-secondary rounded-pill px-3 py-2 fw-bold';
+                }
+
+                // Mostrar el modal
+                var myModal = new bootstrap.Modal(document.getElementById('modalDetalleTurno'));
+                myModal.show();
             }
         });
         calendar.render();

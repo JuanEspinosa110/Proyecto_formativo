@@ -110,43 +110,122 @@ class ReporteController extends Controller
             $sheet->setCellValue('B' . $row, $r->placa);
             $sheet->setCellValue('C' . $row, $r->ruta->nombre_ruta ?? $r->id_ruta);
             $sheet->setCellValue('D' . $row, $r->conductor ? ($r->conductor->primer_nombre . ' ' . $r->conductor->primer_apellido) : 'N/A');
-            $sheet->setCellValue('E' . $row, $r->hora_salida);
-            $sheet->setCellValue('F' . $row, $r->hora_llegada);
+            $salida = $r->fecha_asignacion ? \Carbon\Carbon::parse($r->fecha_asignacion)->format('d/m/Y h:i A') : 'N/A';
+            $llegada = $r->fecha_asignacion ? \Carbon\Carbon::parse($r->fecha_asignacion)->addHours(8)->format('d/m/Y h:i A') : 'N/A';
+            
+            $sheet->setCellValue('E' . $row, $salida);
+            $sheet->setCellValue('F' . $row, $llegada);
             $row++;
         }
 
-        $this->formatExcelReport($sheet, 'Reporte de Recorridos', $headers, count($recorridos));
+        $this->formatExcelReport($sheet, 'Itinerario de Viajes', $headers, count($recorridos));
 
         return $this->downloadExcel($spreadsheet, 'Reporte_Recorridos');
     }
 
     private function exportDocumentos($nit, $format)
     {
-        $documentos = Documento::where('NIT', $nit)->with(['tipoDocumento', 'estado'])->get();
+        $documentos = Documento::where('NIT', $nit)
+            ->with(['tipoDocumento', 'estado', 'usuario.tipoUsuario'])
+            ->get();
+
+        $documentosBus = $documentos->whereNotNull('placa');
+        $documentosUser = $documentos->whereNotNull('doc_usuario')->whereNull('placa');
 
         if ($format === 'pdf') {
-            $pdf = Pdf::loadView('auxiliar.reportes.pdf_documentos', compact('documentos'));
+            $empresa = \App\Models\Empresa::where('NIT', $nit)->first();
+            $pdf = Pdf::loadView('auxiliar.reportes.pdf_documentos', compact('documentosBus', 'documentosUser', 'empresa'));
             return $pdf->download('reporte_documentos.pdf');
         }
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Documentos');
+        $sheet->setTitle('Estado Documental');
 
-        $headers = ['PLACA', 'TIPO', 'NOMBRE', 'VENCIMIENTO', 'ESTADO'];
+        // --- SECCIÓN 1: DOCUMENTOS DE VEHÍCULOS ---
+        $headersBus = ['PLACA', 'TIPO', 'DOCUMENTO', 'NOMBRE', 'VENCIMIENTO', 'ESTADO'];
         $row = 5;
-        foreach ($documentos as $d) {
+        
+        // Título de sección (Opcional, pero ayuda a la claridad)
+        $sheet->setCellValue('A4', 'DOCUMENTACIÓN DE VEHÍCULOS (FLOTA)');
+        $sheet->getStyle('A4')->getFont()->setBold(true)->setSize(12);
+
+        $rowStartBus = 6;
+        $row = $rowStartBus;
+        foreach ($documentosBus as $d) {
             $sheet->setCellValue('A' . $row, $d->placa);
             $sheet->setCellValue('B' . $row, $d->tipoDocumento->nombre ?? 'N/A');
-            $sheet->setCellValue('C' . $row, $d->nombre);
-            $sheet->setCellValue('D' . $row, $d->fecha_vencimiento);
-            $sheet->setCellValue('E' . $row, $d->estado->nombre_estado ?? 'N/A');
+            $sheet->setCellValue('C' . $row, $d->id_documento);
+            $sheet->setCellValue('D' . $row, $d->nombre);
+            $sheet->setCellValue('E' . $row, $d->fecha_vencimiento ? \Carbon\Carbon::parse($d->fecha_vencimiento)->format('Y-m-d') : 'N/A');
+            $sheet->setCellValue('F' . $row, $d->estado->nombre_estado ?? 'N/A');
+            $row++;
+        }
+        
+        $this->formatExcelReport($sheet, 'Estado Documental - Flota', $headersBus, count($documentosBus), 5);
+
+        // --- SECCIÓN 2: DOCUMENTOS DE PERSONAL ---
+        $rowPersonalTitle = $row + 2;
+        $rowHeaderPersonal = $row + 3;
+        $rowStartPersonal = $row + 4;
+        
+        $headersUser = ['DOCUMENTO', 'NOMBRE', 'ROL', 'TIPO DOC', 'VENCIMIENTO', 'ESTADO'];
+        
+        $sheet->setCellValue('A' . $rowPersonalTitle, 'DOCUMENTACIÓN DE PERSONAL (CONDUCTORES/PROPIETARIOS)');
+        $sheet->getStyle('A' . $rowPersonalTitle)->getFont()->setBold(true)->setSize(12);
+
+        $row = $rowStartPersonal;
+        foreach ($documentosUser as $d) {
+            $sheet->setCellValue('A' . $row, $d->doc_usuario);
+            $sheet->setCellValue('B' . $row, $d->usuario ? ($d->usuario->primer_nombre . ' ' . $d->usuario->primer_apellido) : $d->nombre);
+            $sheet->setCellValue('C' . $row, $d->usuario->tipoUsuario->nombre_tipo ?? 'N/A');
+            $sheet->setCellValue('D' . $row, $d->tipoDocumento->nombre ?? 'N/A');
+            $sheet->setCellValue('E' . $row, $d->fecha_vencimiento ? \Carbon\Carbon::parse($d->fecha_vencimiento)->format('Y-m-d') : 'N/A');
+            $sheet->setCellValue('F' . $row, $d->estado->nombre_estado ?? 'N/A');
             $row++;
         }
 
-        $this->formatExcelReport($sheet, 'Reporte de Documentos', $headers, count($documentos));
+        $this->formatExcelSubSection($sheet, $headersUser, count($documentosUser), $rowHeaderPersonal);
 
-        return $this->downloadExcel($spreadsheet, 'Reporte_Documentos');
+        return $this->downloadExcel($spreadsheet, 'Reporte_Documental');
+    }
+
+    /**
+     * Versión adaptada de formatExcelReport para subsecciones en la misma hoja
+     */
+    private function formatExcelSubSection($sheet, $headers, $dataCount, $headerRow)
+    {
+        $lastColumn = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($headers));
+        
+        // Headers (Fila especificada)
+        $sheet->fromArray($headers, NULL, 'A' . $headerRow);
+        $headerRange = "A{$headerRow}:{$lastColumn}{$headerRow}";
+        $sheet->getStyle($headerRange)->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '1E3799'] // Azul institucional
+            ]
+        ]);
+
+        // Bordes y Zebra Striping
+        $lastRow = $headerRow + $dataCount;
+        if ($dataCount > 0) {
+            $sheet->getStyle("A{$headerRow}:{$lastColumn}{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+
+            for ($i = $headerRow + 1; $i <= $lastRow; $i++) {
+                if ($i % 2 == 0) {
+                    $sheet->getStyle("A{$i}:{$lastColumn}{$i}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('F2F2F2');
+                }
+            }
+        }
+
+        // Autoajuste de columnas
+        foreach (range(1, count($headers)) as $index) {
+            $col = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($index);
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
     }
 
     private function exportFallas($nit, Request $request, $format)
@@ -187,7 +266,7 @@ class ReporteController extends Controller
         return $this->downloadExcel($spreadsheet, 'Reporte_Fallas');
     }
 
-    private function formatExcelReport($sheet, $title, $headers, $dataCount)
+    private function formatExcelReport($sheet, $title, $headers, $dataCount, $startRow = 4)
     {
         $lastColumn = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($headers));
         
@@ -203,24 +282,24 @@ class ReporteController extends Controller
         $sheet->getStyle('A2')->getFont()->setItalic(true)->setSize(10);
         $sheet->getStyle('A2')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-        // 3. Headers (Fila 4)
-        $sheet->fromArray($headers, NULL, 'A4');
-        $headerRange = "A4:{$lastColumn}4";
+        // 3. Headers (Fila especificada)
+        $sheet->fromArray($headers, NULL, 'A' . $startRow);
+        $headerRange = "A{$startRow}:{$lastColumn}{$startRow}";
         $sheet->getStyle($headerRange)->applyFromArray([
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
             'fill' => [
                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                'startColor' => ['rgb' => '5E17EB'] // Púrpura institucional razonable
+                'startColor' => ['rgb' => '5E17EB'] 
             ]
         ]);
 
-        // 4. Bordes y Zebra Striping (Fila 5 en adelante)
-        $lastRow = 4 + $dataCount;
+        // 4. Bordes y Zebra Striping
+        $lastRow = $startRow + $dataCount;
         if ($dataCount > 0) {
-            $sheet->getStyle("A4:{$lastColumn}{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            $sheet->getStyle("A{$startRow}:{$lastColumn}{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
 
-            for ($i = 5; $i <= $lastRow; $i++) {
+            for ($i = $startRow + 1; $i <= $lastRow; $i++) {
                 if ($i % 2 == 0) {
                     $sheet->getStyle("A{$i}:{$lastColumn}{$i}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('F2F2F2');
                 }

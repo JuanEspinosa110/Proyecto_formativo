@@ -13,7 +13,8 @@
     <link rel="stylesheet" href="{{ asset('css/sigu-core.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     <link rel="stylesheet" href="{{ asset('css/jefemantenimiento.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/validacion.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/validaciones.css') }}">
+
 
     @stack('styles')
 </head>
@@ -53,6 +54,12 @@
                    class="sigu-sb-link {{ request()->routeIs('jefemantenimiento.index*') || request()->routeIs('jefemantenimiento.create') || request()->routeIs('jefemantenimiento.show') ? 'active' : '' }}">
                     <span class="sb-ico"><span class="material-symbols-rounded">engineering</span></span>
                     <span>Historial / Taller</span>
+                </a>
+                <div class="sigu-sb-divider"></div>
+                <a href="{{ route('pasajero.dashboard') }}"
+                   class="sigu-sb-link {{ request()->routeIs('pasajero.*') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">credit_card</span></span>
+                    <span>Mi Tarjeta</span>
                 </a>
 
             </nav>
@@ -111,6 +118,10 @@
             } else if (type === 'error') {
                 toastEl.classList.add('bg-danger');
                 toastIcon.textContent = 'error';
+            } else if (type === 'warning') {
+                toastEl.classList.add('bg-warning', 'text-dark');
+                toastIcon.textContent = 'warning';
+                document.getElementById('toastIconWrap').style.background = 'rgba(0,0,0,0.1)';
             } else {
                 toastEl.classList.add('bg-info');
                 toastIcon.textContent = 'info';
@@ -125,6 +136,9 @@
         @endif
         @if(session('error'))
         document.addEventListener('DOMContentLoaded', () => showToast("{{ session('error') }}", 'error'));
+        @endif
+        @if(session('warning'))
+        document.addEventListener('DOMContentLoaded', () => showToast("{{ session('warning') }}", 'warning'));
         @endif
     </script>
 

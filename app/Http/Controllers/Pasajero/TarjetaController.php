@@ -79,15 +79,28 @@ class TarjetaController extends Controller
                 ->withInput();
         }
 
+        if ($tarjeta->id_estado == 3) {
+            return back()
+                ->withErrors(['codigo_tarjeta' => 'Esta tarjeta ya no está operativa.'])
+                ->withInput();
+        }
+
+        // En el nuevo esquema, no comprobamos tarjeta->doc_usuario sino TitularidadTarjeta
+
+        if ($tarjeta->id_estado != 2) {
+            return back()
+                ->withErrors(['codigo_tarjeta' => 'La tarjeta no está disponible para ser vinculada.'])
+                ->withInput();
+        }
+
         // Verificar que no esté ya asignada a otro usuario activo
         $yaAsignada = TitularidadTarjeta::where('id_tarjeta', $tarjeta->id_tarjeta)
             ->where('id_estado', 1)
-            ->where('doc_usuario', '!=', $user->doc_usuario)
             ->exists();
 
         if ($yaAsignada) {
             return back()
-                ->withErrors(['codigo_tarjeta' => 'Esta tarjeta ya está vinculada a otro usuario activo.'])
+                ->withErrors(['codigo_tarjeta' => 'Esta tarjeta ya está vinculada a un usuario.'])
                 ->withInput();
         }
 
@@ -99,6 +112,11 @@ class TarjetaController extends Controller
             'fecha_fin' => null,
             'id_estado' => 1,
             'motivo_cambio' => 'Registro inicial por el pasajero',
+        ]);
+
+        // Aseguramos de que el plástico quede activo
+        $tarjeta->update([
+            'id_estado' => 1
         ]);
 
         return redirect()->route('pasajero.dashboard')
@@ -160,17 +178,36 @@ class TarjetaController extends Controller
         $viajesQuery = VentaViaje::with(['viaje.ruta.barrioOrigen', 'viaje.ruta.barrioDestino'])
             ->where('id_tarjeta', $tarjeta->id_tarjeta);
 
+        $now = Carbon::now();
+        $mesActual = $now->month;
+        $anioActual = $now->year;
+
+        $lastMonth = (clone $now)->subMonth();
+        $mesPasado = $lastMonth->month;
+        $anioPasado = $lastMonth->year;
+
         $viajesMes = (clone $viajesQuery)
-            ->whereMonth('fecha', Carbon::now()->month)
-            ->whereYear('fecha', Carbon::now()->year)
+            ->whereMonth('fecha', $mesActual)
+            ->whereYear('fecha', $anioActual)
             ->get();
 
-        // Calculate total spent in the month using real data from the database
         $totalGastadoMes = $viajesMes->sum('valor');
+
+        $viajesMesAnterior = (clone $viajesQuery)
+            ->whereMonth('fecha', $mesPasado)
+            ->whereYear('fecha', $anioPasado)
+            ->get();
+
+        $totalGastadoMesAnterior = $viajesMesAnterior->sum('valor');
+        $conteoViajesMesAnterior = $viajesMesAnterior->count();
 
         $viajes = $viajesQuery->orderBy('fecha', 'desc')->take(3)->get();
 
-        return view('pasajero.saldo.index', compact('tarjeta', 'titularidad', 'recargas', 'totalRecargado', 'viajes', 'viajesMes', 'totalGastadoMes'));
+        return view('pasajero.saldo.index', compact(
+            'tarjeta', 'titularidad', 'recargas', 'totalRecargado',
+            'viajes', 'viajesMes', 'totalGastadoMes',
+            'totalGastadoMesAnterior', 'conteoViajesMesAnterior'
+        ));
     }
 
     /**
@@ -205,14 +242,16 @@ class TarjetaController extends Controller
             return back()->withErrors(['codigo_tarjeta_nueva' => 'No encontramos una tarjeta con ese código.'])->withInput();
         }
 
-        // Verificar que la tarjeta nueva esté activa (id_estado == 1)
-        if ($nuevaTarjeta->id_estado != 1) {
-            return back()->withErrors(['codigo_tarjeta_nueva' => 'Esta tarjeta no se encuentra activa.'])->withInput();
+        if ($nuevaTarjeta->id_estado == 3) {
+            return back()->withErrors(['codigo_tarjeta_nueva' => 'Esta tarjeta ya no está operativa.'])->withInput();
         }
 
         // Verificar que no esté asignada a ningún usuario en la tabla Tarjeta
-        if (!empty($nuevaTarjeta->doc_usuario)) {
-            return back()->withErrors(['codigo_tarjeta_nueva' => 'Esta tarjeta ya está asignada a un usuario.'])->withInput();
+        // En el nuevo esquema, no comprobamos tarjeta->doc_usuario sino TitularidadTarjeta
+
+        // Verificar que la tarjeta nueva esté activa (id_estado == 1)
+        if ($nuevaTarjeta->id_estado != 2) {
+            return back()->withErrors(['codigo_tarjeta_nueva' => 'Esta tarjeta no se encuentra disponible para asignación.'])->withInput();
         }
 
         // Verificar que no esté ya asignada a otro usuario activo en TitularidadTarjeta
@@ -268,8 +307,7 @@ class TarjetaController extends Controller
             DB::commit();
 
             return redirect()->route('pasajero.dashboard')->with('success', '¡Tarjeta cambiada exitosamente! Tu tarjeta anterior ha sido inactivada.');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Ocurrió un error al procesar el cambio: ' . $e->getMessage());
         }
@@ -354,8 +392,7 @@ class TarjetaController extends Controller
 
             DB::commit();
             return redirect()->route('pasajero.dashboard')->with('success', '¡Traspaso autorizado y tarjeta cambiada exitosamente!');
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Ocurrió un error al procesar el traspaso: ' . $e->getMessage());
         }
@@ -375,8 +412,8 @@ class TarjetaController extends Controller
             'id_estado' => 2 // Inactiva
         ]);
 
-        // 2. Inactivar plástico tarjeta antigua
-        $tarjetaAntigua->update(['id_estado' => 2]);
+        // 2. Inactivar plástico tarjeta antigua (Pasa a estado 3 - Suspendida)
+        $tarjetaAntigua->update(['id_estado' => 3]);
 
         // 3. Crear nueva titularidad
         TitularidadTarjeta::create([
@@ -388,10 +425,9 @@ class TarjetaController extends Controller
             'motivo_cambio' => $motivo,
         ]);
 
-        // 4. Activar plástico tarjeta nueva y asignar documento
+        // 4. Activar plástico tarjeta nueva
         $tarjetaNueva->update([
-            'id_estado' => 1,
-            'doc_usuario' => $user->doc_usuario
+            'id_estado' => 1
         ]);
 
         // 5. Traspaso de saldo (Historial de Recargas + Actualización de campo)
@@ -400,8 +436,8 @@ class TarjetaController extends Controller
 
             // Generar un ID de recarga específico para traspasos (iniciando con 99 para identificar traspaso)
             $baseId = '99' . time();
-            $idRecargaNegativa = (int)($baseId . '1');
-            $idRecargaPositiva = (int)($baseId . '2');
+            $idRecargaNegativa = (int) ($baseId . '1');
+            $idRecargaPositiva = (int) ($baseId . '2');
 
             // Restar en tarjeta vieja (Historial negativo)
             Recarga::create([
@@ -445,25 +481,33 @@ class TarjetaController extends Controller
      */
     public function procesarRecarga(Request $request)
     {
+        $allowedAmounts = [5000, 10000, 20000, 30000, 50000, 100000, 200000, 300000];
+
         $request->validate([
             'id_tarjeta' => 'required|string|exists:tarjeta,id_tarjeta',
-            'monto' => 'required|numeric|min:1000',
+            'monto' => 'required|numeric|in:' . implode(',', $allowedAmounts),
+        ], [
+            'monto.required' => 'Debes seleccionar un monto para recargar.',
+            'monto.numeric'  => 'El monto debe ser un valor numérico.',
+            'monto.in'       => 'El monto seleccionado no es válido. Por favor, elige una de las opciones sugeridas.',
         ]);
 
         \Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
 
         $session = \Stripe\Checkout\Session::create([
             'payment_method_types' => ['card'],
-            'line_items' => [[
-                'price_data' => [
-                    'currency' => 'cop',
-                    'product_data' => [
-                        'name' => 'Recarga Tarjeta SIGU',
+            'line_items' => [
+                [
+                    'price_data' => [
+                        'currency' => 'cop',
+                        'product_data' => [
+                            'name' => 'Recarga Tarjeta SIGU',
+                        ],
+                        'unit_amount' => $request->monto * 100, // Stripe usa centavos
                     ],
-                    'unit_amount' => $request->monto * 100, // Stripe usa centavos
-                ],
-                'quantity' => 1,
-            ]],
+                    'quantity' => 1,
+                ]
+            ],
             'mode' => 'payment',
             'success_url' => route('pasajero.saldo') . '?success=1',
             'cancel_url' => route('pasajero.saldo') . '?cancel=1',

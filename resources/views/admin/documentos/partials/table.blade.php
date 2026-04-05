@@ -21,18 +21,35 @@ $routePrefix = Auth::user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
                 <tr>
                     <td class="ps-4">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-3">
-                                <span class="material-symbols-rounded">directions_bus</span>
-                            </div>
-                            <div>
-                                <strong class="d-block text-dark fs-6">{{ $documento->placa }}</strong>
-                                <small class="text-muted">{{ $documento->nombre }}</small>
-                            </div>
+                            @if($documento->placa)
+                                <div class="bg-dark text-white p-2 rounded-3">
+                                    <span class="material-symbols-rounded">directions_bus</span>
+                                </div>
+                                <div>
+                                    <strong class="d-block text-dark fs-6">{{ $documento->placa }}</strong>
+                                    <small class="text-muted text-truncate d-inline-block" style="max-width: 150px;">{{ $documento->nombre }}</small>
+                                </div>
+                            @else
+                                <div class="bg-dark text-white p-2 rounded-3">
+                                    <span class="material-symbols-rounded">person</span>
+                                </div>
+                                <div>
+                                    <strong class="d-block text-dark fs-6 text-uppercase">Personal</strong>
+                                    <small class="text-muted text-truncate d-inline-block" style="max-width: 150px;">{{ $documento->nombre }}</small>
+                                </div>
+                            @endif
                         </div>
                     </td>
                     <td>
-                        <div class="text-dark fw-medium small">{{ $documento->bus->nombre_propietario ?? 'No asignado' }}</div>
-                        <small class="text-muted">ID: {{ $documento->bus->doc_propietario ?? '---' }}</small>
+                        @if($documento->placa)
+                            <div class="text-dark fw-medium small">{{ $documento->bus->nombre_propietario ?? 'No asignado' }}</div>
+                            <small class="text-muted">ID: {{ $documento->bus->doc_propietario ?? '---' }}</small>
+                        @else
+                            <div class="text-dark fw-medium small">
+                                {{ $documento->usuario->primer_nombre ?? 'N/A' }} {{ $documento->usuario->primer_apellido ?? '' }}
+                            </div>
+                            <small class="text-muted">CC: {{ $documento->doc_usuario ?? '---' }}</small>
+                        @endif
                     </td>
                     <td>
                         <span class="badge bg-light text-dark border fw-medium px-3 rounded-pill">
@@ -63,7 +80,7 @@ $routePrefix = Auth::user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
                             <button class="btn btn-sm btn-primary rounded-pill px-2 fw-bold btn-visor" 
-                                data-url="{{ asset('storage/' . $documento->archivo) }}" 
+                                data-url="{{ asset($documento->archivo) }}" 
                                 data-nombre="{{ $documento->nombre }}"
                                 title="Previsualizar">
                                 <span class="material-symbols-rounded fs-5">visibility</span>
@@ -88,6 +105,14 @@ $routePrefix = Auth::user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
                                 class="btn btn-sm btn-light rounded-pill px-2 fw-bold" title="Descargar">
                                 <span class="material-symbols-rounded fs-5">download</span>
                             </a>
+
+                            @if($documento->estado_expiracion != 'VIGENTE')
+                                <a href="{{ route($routePrefix . '.documentos.edit', $documento->id_documento) }}"
+                                    class="btn btn-sm btn-warning text-dark rounded-pill px-3 fw-bold d-flex align-items-center gap-1" title="Renovar Doc">
+                                    <span class="material-symbols-rounded fs-5">edit_note</span>
+                                    <span class="small">Renovar</span>
+                                </a>
+                            @endif
                         </div>
                     </td>
                 </tr>

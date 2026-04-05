@@ -59,11 +59,12 @@ class Usuario extends Authenticatable
             // Mapeo de Rol (string de validación a ID real de base de datos)
             if (isset($usuario->rol)) {
                 $usuario->id_tipo_usuario = match ($usuario->rol) {
-                    'admin'              => 1,
-                    'operador'           => 4,
-                    'usuario'            => 3,
-                    'controlador_tiempo' => 8,
-                    default              => 1
+                    'admin' => 1,
+                    'operador' => 4,
+                    'usuario' => 3,
+                    'coordinador_bus' => 7,
+                    'gestor_recargas' => 8,
+                    default => 1
                 };
             }
 
@@ -125,5 +126,121 @@ class Usuario extends Authenticatable
     {
         // Retorna el valor de la columna NIT de la tabla usuario
         return $this->NIT;
+    }
+
+    /**
+     * Determina si el usuario tiene un rol específico o acceso por jerarquía.
+     */
+    public function hasRole($role): bool
+    {
+        $roleMap = [
+            'admin' => 1,
+            'pasajero' => 2,
+            'conductor' => 3,
+            'auxiliar' => 4,
+            'propietario' => 5,
+            'gestor_setp' => 6,
+            'coordinador_bus' => 7,
+            'gestor_recargas' => [8, 10], // Acepta ambos: gestor y admin recargas
+            'admin_recargas' => 10,
+            'jefe_mantenimiento' => 9,
+        ];
+
+        if (is_numeric($role)) {
+            $targetIds = [(int) $role];
+        } elseif (isset($roleMap[$role])) {
+            $targetIds = (array) $roleMap[$role];
+        } else {
+            return false;
+        }
+
+        // El usuario tiene alguno de los roles aceptados
+        if (in_array((int) $this->id_tipo_usuario, $targetIds, true)) {
+            return true;
+        }
+
+        // Lógica de herencia: Cualquier usuario autenticado tiene acceso a "pasajero" (ID 2)
+        if (in_array(2, $targetIds, true)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Obtiene el nombre de la ruta del dashboard principal según el rol.
+     */
+    public function getDashboardRoute(): string
+    {
+        return match ((int) $this->id_tipo_usuario) {
+            1 => 'admin.dashboard',
+            3 => 'conductor.dashboard',
+            4 => 'empresa.dashboard',
+            5 => 'propietario.dashboard',
+            6 => 'gestor-setp.dashboard',
+            7 => 'controlador-tiempo.dashboard',
+            8 => 'gestor-recargas.dashboard',
+            9 => 'jefemantenimiento.dashboard',
+            10 => 'gestor-recargas.dashboard',
+            default => 'pasajero.dashboard',
+        };
+    }
+
+    /**
+     * Relación con los viajes (asignaciones) del conductor
+     */
+    public function viajes()
+    {
+        return $this->hasMany(Viaje::class, 'doc_us', 'doc_usuario');
+    }
+
+    /**
+     * Accessor para compatibilidad con vistas que esperan nombre_tipo directamente.
+     */
+    public function getNombreTipoAttribute()
+    {
+        return $this->tipoUsuario->nombre_tipo ?? 'N/A';
+    }
+
+    /**
+     * Accessor para compatibilidad con vistas que esperan nombre_estado directamente.
+     */
+    public function getNombreEstadoAttribute()
+    {
+        return $this->estado->nombre_estado ?? 'N/A';
+    }
+    /**
+     * Verifica si el conductor está apto para viajar (Activo + Rol Conductor + Licencia Vigente).
+     */
+    public function isAptForTravel()
+    {
+        // 1. Debe estar activo (id_estado = 1)
+        if ($this->id_estado != 1) {
+            return false;
+        }
+
+        // 2. Debe tener rol de conductor (id_tipo_usuario = 3)
+        if ($this->id_tipo_usuario != 3) {
+            return false;
+        }
+
+        // 3. Debe tener licencia vigente (tipo_documento = 3)
+        if (!$this->hasValidLicense()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Verifica si el usuario tiene una licencia de tránsito vigente y aprobada.
+     */
+    public function hasValidLicense()
+    {
+        return Documento::where('doc_usuario', $this->doc_usuario)
+            ->where('id_tipo_documento', 3) // Licencia de Tránsito
+            ->where('id_estado', 1) // Activo/Aprobado
+            ->whereDate('fecha_vencimiento', '>', now())
+            ->exists();
     }
 }

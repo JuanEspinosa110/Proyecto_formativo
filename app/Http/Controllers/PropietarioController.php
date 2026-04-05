@@ -66,47 +66,77 @@ class PropietarioController extends Controller
                 $q->whereIn('placa', $busIds);
             })->count();
             
-            // Filtro por Mes para Ganancias
+            // Filtro por Mes para Ganancias (Captura inicial)
             $mesFiltro = $request->query('mes_seleccionado'); 
-            if ($mesFiltro) {
-                $ingresosTotales = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
-                    $q->whereIn('placa', $busIds);
-                })->where('fecha', 'like', $mesFiltro . '%')->sum('valor');
-            } else {
-                $ingresosTotales = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
-                    $q->whereIn('placa', $busIds);
-                })->sum('valor');
-            }
+            $mesBase = $mesFiltro ?: \Carbon\Carbon::now()->format('Y-m');
+
+            // 1. Ingresos Totales del Mes Seleccionado
+            $parts = explode('-', $mesBase);
+            $year = $parts[0];
+            $month = $parts[1];
+
+            $ingresosTotales = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
+                $q->whereIn('placa', $busIds);
+            })->whereYear('fecha', $year)->whereMonth('fecha', $month)->sum('valor');
 
             $hoy = \Carbon\Carbon::today();
             $semana = \Carbon\Carbon::now()->startOfWeek();
-            $mes = \Carbon\Carbon::now()->startOfMonth();
 
+            // 2. Cálculo de tarjetas resumen
             $gananciasHoy = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
                 $q->whereIn('placa', $busIds);
             })->whereDate('fecha', $hoy)->sum('valor');
+            
             $gananciasSemana = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
                 $q->whereIn('placa', $busIds);
             })->where('fecha', '>=', $semana)->sum('valor');
-            $gananciasMes = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
-                $q->whereIn('placa', $busIds);
-            })->where('fecha', '>=', $mes)->sum('valor');
+            
+            // Si hay un mes seleccionado diferente al actual, 'gananciasMes' mostrará ese mes.
+            $gananciasMes = $ingresosTotales;
 
-            // 3. Ingresos individuales por bus (Nuevo)
+            // 3. Ingresos individuales por bus (Filtrados por los 3 periodos: Hoy, Semana, Mes)
             $viajesTotalesBus = \App\Models\Viaje::whereIn('placa', $busIds)
-                ->withCount('ventas as total_pasajeros')
-                ->withSum('ventas as total_ingresos', 'valor')
+                // Mes Actual (o seleccionado)
+                ->withCount(['ventas as count_mes' => function($q) use ($year, $month) {
+                    $q->whereYear('fecha', $year)->whereMonth('fecha', $month);
+                }])
+                ->withSum(['ventas as sum_mes' => function($q) use ($year, $month) {
+                    $q->whereYear('fecha', $year)->whereMonth('fecha', $month);
+                }], 'valor')
+                // Hoy
+                ->withCount(['ventas as count_hoy' => function($q) use ($hoy) {
+                    $q->whereDate('fecha', $hoy);
+                }])
+                ->withSum(['ventas as sum_hoy' => function($q) use ($hoy) {
+                    $q->whereDate('fecha', $hoy);
+                }], 'valor')
+                // Semana
+                ->withCount(['ventas as count_semana' => function($q) use ($semana) {
+                    $q->where('fecha', '>=', $semana);
+                }])
+                ->withSum(['ventas as sum_semana' => function($q) use ($semana) {
+                    $q->where('fecha', '>=', $semana);
+                }], 'valor')
                 ->get();
                 
             $ingresosPorBus = $viajesTotalesBus->groupBy('placa')->map(function ($viajes, $placa) {
+                $mesIngresos = $viajes->sum('sum_mes') ?? 0;
+                $mesPasajeros = $viajes->sum('count_mes') ?? 0;
+                
                 return (object)[
                     'placa' => $placa,
-                    'total_ingresos' => $viajes->sum('total_ingresos') ?? 0,
-                    'total_pasajeros' => $viajes->sum('total_pasajeros') ?? 0
+                    'mes_ingresos' => $mesIngresos,
+                    'mes_pasajeros' => $mesPasajeros,
+                    'total_ingresos' => $mesIngresos, // Alias para compatibilidad con la vista
+                    'total_pasajeros' => $mesPasajeros, // Alias para compatibilidad con la vista
+                    'hoy_ingresos' => $viajes->sum('sum_hoy') ?? 0,
+                    'hoy_pasajeros' => $viajes->sum('count_hoy') ?? 0,
+                    'semana_ingresos' => $viajes->sum('sum_semana') ?? 0,
+                    'semana_pasajeros' => $viajes->sum('count_semana') ?? 0,
                 ];
             })->values();
 
-            // 1. Filtros Independientes
+            // 4. Filtros Independientes para Asignaciones
             if ($request->filled('fecha')) {
                 $queryAsignaciones->whereDate('fecha', $request->fecha);
             }
@@ -132,7 +162,7 @@ class PropietarioController extends Controller
                     });
                 });
             }
-            // 2. Lógica de Filtro por Hora (Dentro del turno de 8h)
+            // 5. Lógica de Filtro por Hora (Dentro del turno de 8h)
             if ($request->filled('horario')) {
                 $searchTime = $request->horario;
                 $queryAsignaciones->whereRaw("
@@ -150,18 +180,27 @@ class PropietarioController extends Controller
             $queryAsignaciones->whereRaw('1 = 0');
         }
 
-        // 3. Separación de Asignaciones (Simples) y Historial (Filtrado)
-        // Las asignaciones recientes para el módulo de "Asignaciones"
+        // 6. Separación de Asignaciones (Simples) y Historial (Filtrado)
         $asignacionesRecientes = $queryAsignaciones->orderBy('fecha', 'desc')->paginate(5, ['*'], 'page_rec');
-
-        // El historial filtrado para el módulo de "Historial"
         $historialAsignaciones = $queryAsignaciones->orderBy('fecha', 'desc')->paginate(5, ['*'], 'page_hist');
 
-        // Asignaciones para el módulo de "Ganancias" (mismo filtro base que historial pero tal vez sin los filtros de búsqueda si se prefiere, o siguiendo la lógica de la sección)
-        // El requerimiento pide paginación en Ganancias también.
-        $asignacionesGanancias = Viaje::with(['ruta', 'conductor', 'ventas'])
-            ->whereIn('placa', $busIds)
-            ->orderBy('fecha', 'desc')
+        // Asignaciones para el módulo de "Ganancias" (Filtradas por el mes seleccionado)
+        $queryGanancias = Viaje::with(['ruta', 'conductor', 'ventas'])
+            ->whereIn('placa', $busIds);
+        
+        if ($mesFiltro) {
+             $queryGanancias->whereYear('fecha', $year)->whereMonth('fecha', $month);
+        }
+
+        // Si es AJAX y viene periodo, sobreescribimos filtros de tiempo
+        if ($request->ajax() && $request->filled('periodo')) {
+            $periodo = $request->periodo;
+            if ($periodo == 'hoy') $queryGanancias->whereDate('fecha', $hoy);
+            elseif ($periodo == 'semana') $queryGanancias->where('fecha', '>=', $semana);
+            elseif ($periodo == 'mes') $queryGanancias->whereYear('fecha', $year)->whereMonth('fecha', $month);
+        }
+
+        $asignacionesGanancias = $queryGanancias->orderBy('fecha', 'desc')
             ->paginate(5, ['*'], 'page_gan');
         
         $busesPaginated = Bus::with('estado')->where('doc_propietario', $user->doc_usuario)->paginate(5, ['*'], 'page_bus');
@@ -188,6 +227,13 @@ class PropietarioController extends Controller
         }
         $conteoVencidos = collect($documentosAlerta)->filter(fn($d) => $d->estado_expiracion === 'VENCIDO')->count();
         $conteoProximos = collect($documentosAlerta)->filter(fn($d) => $d->estado_expiracion === 'PRÓXIMO A VENCER')->count();
+
+        // Respuesta para AJAX (Paginación sin recarga)
+        if ($request->ajax()) {
+            if ($request->query('section') === 'ganancias') {
+                return view('propietario.partials.ganancias_table', compact('asignacionesGanancias', 'precioPasaje'))->render();
+            }
+        }
 
         return view('propietario.dashboard', compact(
             'buses', 
@@ -283,8 +329,8 @@ class PropietarioController extends Controller
                         ->where('id_estado', 1)
                         ->update(['id_estado' => 11]); // 11 = Archivado
 
-                // Almacenar el archivo en storage/app/public/documentos
-                $path = $request->file('archivo')->store('documentos', 'public');
+                // Almacenar el archivo en public/uploads/documentos
+                $path = $request->file('archivo')->store('uploads/documentos', 'uploads');
 
                 if ($path) {
                     $tipoDoc = TipoDocumento::find($request->id_tipo_documento);
@@ -365,8 +411,8 @@ class PropietarioController extends Controller
                     Storage::disk('public')->delete($documento->archivo);
                 }
 
-                // Guardar usando el método store estándar sugerido
-                $ruta = $request->file('archivo')->store('documentos', 'public');
+                // Guardar usando el método store estándar en la carpeta pública
+                $ruta = $request->file('archivo')->store('uploads/documentos', 'uploads');
                 
                 if ($ruta) {
                     $data['archivo'] = $ruta;
@@ -414,7 +460,7 @@ class PropietarioController extends Controller
                     'created_at' => $doc->created_at->format('Y-m-d H:i:s'),
                     'status_vigencia' => $doc->estado_expiracion,
                     'status_color' => $doc->status_color,
-                    'url_archivo' => $doc->archivo ? asset('storage/' . $doc->archivo) : null
+                    'url_archivo' => $doc->archivo ? asset($doc->archivo) : null
                 ];
             });
 
@@ -457,7 +503,7 @@ class PropietarioController extends Controller
                     'status_vigencia' => $doc->estado_expiracion,
                     'status_color' => $doc->status_color,
                     'es_archivado' => $doc->id_estado == 11,
-                    'url_archivo' => $doc->archivo ? asset('storage/' . $doc->archivo) : null
+                    'url_archivo' => $doc->archivo ? asset($doc->archivo) : null
                 ];
             });
 
@@ -501,14 +547,13 @@ class PropietarioController extends Controller
             ->get();
 
         // Totales referenciando tarjetas/ventas directamente a LA ASIGNACIÓN (Viaje), NO por recorrido
-        $totalPasajeros = \App\Models\VentaViaje::where('id_viaje', $asignacion->id_viaje)->count();
-        $totalIngresos = \App\Models\VentaViaje::where('id_viaje', $asignacion->id_viaje)->sum('valor');
+        // Totales referenciando tarjetas/ventas directamente a LA ASIGNACIÓN (Viaje)
+        $ventasViaje = \App\Models\VentaViaje::where('id_viaje', $asignacion->id_viaje)->get();
+        $totalPasajeros = $ventasViaje->count();
+        $totalIngresos = $ventasViaje->sum('valor');
         
         // Contar trayectos
         // Trayecto Origen -> Destino vs Destino -> Origen
-        // Asumimos que el trayecto se puede identificar por la ruta o algún campo.
-        // Como no hay un campo explícito de "sentido" en Recorrido, vamos a simularlo 
-        // o ver si hay algo en la ruta.
         $ruta = $asignacion->ruta;
         $totalOrigenDestino = 0;
         $totalDestinoOrigen = 0;
@@ -535,18 +580,40 @@ class PropietarioController extends Controller
                 'fin' => $horaFin->format('H:i'),
                 'fecha' => $horaInicio->format('d/m/Y')
             ],
-            'recorridos' => $recorridos->map(function($r, $index) use ($ruta) {
-                $esRegreso = ($r->sentido == 'VUELTA');
+            'recorridos' => $recorridos->map(function($r, $index) use ($ruta, $recorridos, $ventasViaje) {
+                // Sentido del recorrido (ida o vuelta)
+                $esIda = ($index % 2 == 0);
+                
+                $horaSalida = \Carbon\Carbon::parse($r->hora_salida);
+                
+                // Si no tiene hora_llegada, el torniquete asume los pasajes hasta el inicio del siguiente recorrido, o hasta el final del turno
+                $horaLlegada = $r->hora_llegada ? \Carbon\Carbon::parse($r->hora_llegada) : null;
+                if (!$horaLlegada && isset($recorridos[$index + 1])) {
+                    $horaLlegada = \Carbon\Carbon::parse($recorridos[$index + 1]->hora_salida);
+                }
+                
+                // Filtrar ventas por el rango de tiempo de este recorrido
+                $ventasRecorrido = $ventasViaje->filter(function($venta) use ($horaSalida, $horaLlegada) {
+                    $fechaVenta = \Carbon\Carbon::parse($venta->fecha);
+                    if ($horaLlegada) {
+                        return $fechaVenta->between($horaSalida, $horaLlegada);
+                    }
+                    return $fechaVenta->greaterThanOrEqualTo($horaSalida);
+                });
+                
+                $pasajerosRec = $ventasRecorrido->count();
+                $ingresosRec = $ventasRecorrido->sum('valor');
+
                 return [
-                    'trayecto' => $esRegreso 
+                    'trayecto' => !$esIda 
                         ? ($ruta->barrioDestino->nombre ?? 'Destino') . ' → ' . ($ruta->barrioOrigen->nombre ?? 'Origen')
                         : ($ruta->barrioOrigen->nombre ?? 'Origen') . ' → ' . ($ruta->barrioDestino->nombre ?? 'Destino'),
-                    'hora_salida' => \Carbon\Carbon::parse($r->hora_salida)->format('H:i'),
+                    'hora_salida' => $horaSalida->format('H:i'),
                     'hora_llegada' => $r->hora_llegada ? \Carbon\Carbon::parse($r->hora_llegada)->format('H:i') : 'En curso',
-                    'cantidad_pasajeros' => 'N/A (Ver Turno)',
-                    'ingresos' => 0,
+                    'cantidad_pasajeros' => $pasajerosRec,
+                    'ingresos' => $ingresosRec,
                     'evidencia' => $r->foto_torniquete ? asset('storage/' . $r->foto_torniquete) : null,
-                    'es_regreso' => $esRegreso
+                    'es_regreso' => !$esIda
                 ];
             }),
             'resumen' => [

@@ -191,6 +191,7 @@
                         <span class="material-symbols-rounded text-primary">analytics</span>
                     </div>
                     Expediente del Vehículo: <span id="view_bus_placa" class="text-primary">---</span>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill fw-bold ms-auto" id="view_bus_modelo">---</span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -320,20 +321,6 @@
                                         <!-- Documentos via AJAX -->
                                     </tbody>
                                 </table>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-lg-4">
-                        <div class="card border-0 shadow-sm rounded-4 h-100">
-                            <div class="card-body p-4">
-                                <h6 class="fw-bold text-danger text-uppercase mb-4 d-flex align-items-center gap-2">
-                                    <span class="material-symbols-rounded fs-5">receipt_long</span>
-                                    Gastos Propietario
-                                </h6>
-                                <div id="view_bus_gastos_container" class="bg-light rounded-4 p-2 border overflow-auto" style="max-height: 250px;">
-                                    <!-- Gastos via AJAX -->
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -527,34 +514,7 @@
                     viewEst.classList.add('bg-warning-subtle', 'text-warning', 'border', 'border-warning-subtle');
                 }
 
-                // Gastos
-                const gContainer = document.getElementById('view_bus_gastos_container');
-                gContainer.innerHTML = '<div class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
-                
-                try {
-                    const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
-                    const respG = await fetch(`/${prefix}/buses/${data.placa}/gastos`);
-                    const gastos = await respG.json();
-                    
-                    if (gastos.length === 0) {
-                        gContainer.innerHTML = '<div class="text-center py-3 text-muted x-small">No hay gastos registrados.</div>';
-                    } else {
-                        let html = '<table class="table table-sm table-borderless mb-0"><tbody>';
-                        gastos.forEach(g => {
-                            html += `
-                                <tr class="border-bottom x-small">
-                                    <td class="text-muted">${new Date(g.fecha).toLocaleDateString()}</td>
-                                    <td class="fw-bold">${g.tipo_gasto}</td>
-                                    <td class="text-end text-danger fw-bold">-$${Number(g.valor).toLocaleString()}</td>
-                                </tr>
-                            `;
-                        });
-                        html += '</tbody></table>';
-                        gContainer.innerHTML = html;
-                    }
-                } catch (e) {
-                    gContainer.innerHTML = '<div class="text-center py-3 text-danger x-small">Error.</div>';
-                }
+
 
             } catch (err) { console.error('Ver Bus Error:', err); }
         }
@@ -697,6 +657,17 @@
                 document.getElementById('edit_correo').value = data.correo || '';
                 document.getElementById('edit_numero_chasis').value = data.numero_chasis || '';
                 document.getElementById('edit_numero_motor').value = data.numero_motor || '';
+                
+                // Lógica de restricción para Admin (Rol 1)
+                const isUserAdmin = {{ Auth::user()->id_tipo_usuario == 1 ? 'true' : 'false' }};
+                const maintenanceOption = document.querySelector('#edit_id_estado option[value="4"]');
+                if (isUserAdmin && maintenanceOption) {
+                    if (data.id_estado != 4) {
+                        maintenanceOption.style.display = 'none'; // Ocultar si no está ya en ese estado
+                    } else {
+                        maintenanceOption.style.display = 'block'; // Mostrar si ya está en ese estado (para mantenerlo o cambiarlo a Activo)
+                    }
+                }
 
                 const prefix = '{{ Auth::user()->id_tipo_usuario == 1 ? "admin" : "empresa" }}';
                 form.action = '/' + prefix + '/buses/' + data.placa;

@@ -778,97 +778,97 @@ class UsuarioEmpresaSeeder extends Seeder
 
         // Empresa 1: TRANSPORTE TEST SAS (900123456)
         DB::table('usuario')->insertOrIgnore([
-            ['doc_usuario' => 3000000001, 'NIT' => 900123456, 'primer_nombre' => 'RICARDO', 'primer_apellido' => 'MORALES', 'correo' => 'rmorales@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 
-            ['doc_usuario' => 3000000002, 'NIT' => 900123456, 'primer_nombre' => 'SANDRA', 'primer_apellido' => 'MILENA', 'correo' => 'smilena@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 
-            ['doc_usuario' => 3000000003, 'NIT' => 900123456, 'primer_nombre' => 'CARLOS', 'primer_apellido' => 'EDUARDO', 'correo' => 'ceduardo@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 
-            ['doc_usuario' => 3000000004, 'NIT' => 900123456, 'primer_nombre' => 'MARTA', 'primer_apellido' => 'CECILIA', 'correo' => 'mcecilia@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 
-            ['doc_usuario' => 3000000005, 'NIT' => 900123456, 'primer_nombre' => 'LUIS', 'primer_apellido' => 'ALBERTO', 'correo' => 'lalberto@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3000000006, 'NIT' => 900123456, 'primer_nombre' => 'ANDREA', 'primer_apellido' => 'PAOLA', 'correo' => 'apaola@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3000000007, 'NIT' => 900123456, 'primer_nombre' => 'JORGE', 'primer_apellido' => 'ANDRES', 'correo' => 'jandres@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3000000008, 'NIT' => 900123456, 'primer_nombre' => 'GLORIA', 'primer_apellido' => 'ISABEL', 'correo' => 'gisabel@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3000000009, 'NIT' => 900123456, 'primer_nombre' => 'DIEGO', 'primer_apellido' => 'ARMANDO', 'correo' => 'darmando@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3000000010, 'NIT' => 900123456, 'primer_nombre' => 'JULIA', 'primer_apellido' => 'ESTHER', 'correo' => 'jesther@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3000000011, 'NIT' => 900123456, 'primer_nombre' => 'OSCAR', 'primer_apellido' => 'JAVIER', 'correo' => 'ojavier@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3000000012, 'NIT' => 900123456, 'primer_nombre' => 'SONIA', 'primer_apellido' => 'PATRICIA', 'correo' => 'spatricia@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3000000013, 'NIT' => 900123456, 'primer_nombre' => 'MARIO', 'primer_apellido' => 'AUGUSTO', 'correo' => 'maugusto@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3000000014, 'NIT' => 900123456, 'primer_nombre' => 'BEATRIZ', 'primer_apellido' => 'ADRIANA', 'correo' => 'badriana@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3000000015, 'NIT' => 900123456, 'primer_nombre' => 'HECTOR', 'primer_apellido' => 'FABIO', 'correo' => 'hfabio@conductor.test.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3000000001, 'NIT' => 900123456, 'primer_nombre' => 'RICARDO', 'primer_apellido' => 'MORALES', 'correo' => 'rmorales@conductor.test.com', 'telefono' => '3000000001', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO
+            ['doc_usuario' => 3000000002, 'NIT' => 900123456, 'primer_nombre' => 'SANDRA', 'primer_apellido' => 'MILENA', 'correo' => 'smilena@conductor.test.com', 'telefono' => '3000000002', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO
+            ['doc_usuario' => 3000000003, 'NIT' => 900123456, 'primer_nombre' => 'CARLOS', 'primer_apellido' => 'EDUARDO', 'correo' => 'ceduardo@conductor.test.com', 'telefono' => '3000000003', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO
+            ['doc_usuario' => 3000000004, 'NIT' => 900123456, 'primer_nombre' => 'MARTA', 'primer_apellido' => 'CECILIA', 'correo' => 'mcecilia@conductor.test.com', 'telefono' => '3000000004', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO
+            ['doc_usuario' => 3000000005, 'NIT' => 900123456, 'primer_nombre' => 'LUIS', 'primer_apellido' => 'ALBERTO', 'correo' => 'lalberto@conductor.test.com', 'telefono' => '3000000005', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3000000006, 'NIT' => 900123456, 'primer_nombre' => 'ANDREA', 'primer_apellido' => 'PAOLA', 'correo' => 'apaola@conductor.test.com', 'telefono' => '3000000006', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3000000007, 'NIT' => 900123456, 'primer_nombre' => 'JORGE', 'primer_apellido' => 'ANDRES', 'correo' => 'jandres@conductor.test.com', 'telefono' => '3000000007', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3000000008, 'NIT' => 900123456, 'primer_nombre' => 'GLORIA', 'primer_apellido' => 'ISABEL', 'correo' => 'gisabel@conductor.test.com', 'telefono' => '3000000008', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3000000009, 'NIT' => 900123456, 'primer_nombre' => 'DIEGO', 'primer_apellido' => 'ARMANDO', 'correo' => 'darmando@conductor.test.com', 'telefono' => '3000000009', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3000000010, 'NIT' => 900123456, 'primer_nombre' => 'JULIA', 'primer_apellido' => 'ESTHER', 'correo' => 'jesther@conductor.test.com', 'telefono' => '3000000010', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3000000011, 'NIT' => 900123456, 'primer_nombre' => 'OSCAR', 'primer_apellido' => 'JAVIER', 'correo' => 'ojavier@conductor.test.com', 'telefono' => '3000000011', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3000000012, 'NIT' => 900123456, 'primer_nombre' => 'SONIA', 'primer_apellido' => 'PATRICIA', 'correo' => 'spatricia@conductor.test.com', 'telefono' => '3000000012', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3000000013, 'NIT' => 900123456, 'primer_nombre' => 'MARIO', 'primer_apellido' => 'AUGUSTO', 'correo' => 'maugusto@conductor.test.com', 'telefono' => '3000000013', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3000000014, 'NIT' => 900123456, 'primer_nombre' => 'BEATRIZ', 'primer_apellido' => 'ADRIANA', 'correo' => 'badriana@conductor.test.com', 'telefono' => '3000000014', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3000000015, 'NIT' => 900123456, 'primer_nombre' => 'HECTOR', 'primer_apellido' => 'FABIO', 'correo' => 'hfabio@conductor.test.com', 'telefono' => '3000000015', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
         ]);
 
         // Empresa 2: EXPRESO IBAGUÉ S.A. (900111222)
         DB::table('usuario')->insertOrIgnore([
-            ['doc_usuario' => 3100111001, 'NIT' => 900111222, 'primer_nombre' => 'ADRIANA', 'primer_apellido' => 'GARCIA', 'correo' => 'agarcia@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 5
-            ['doc_usuario' => 3100111002, 'NIT' => 900111222, 'primer_nombre' => 'FELIPE', 'primer_apellido' => 'PINZON', 'correo' => 'fpinzon@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 6
-            ['doc_usuario' => 3100111003, 'NIT' => 900111222, 'primer_nombre' => 'LUISA', 'primer_apellido' => 'FERNANDA', 'correo' => 'lfernanda@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 7
-            ['doc_usuario' => 3100111004, 'NIT' => 900111222, 'primer_nombre' => 'ESTEBAN', 'primer_apellido' => 'DORANTE', 'correo' => 'edorante@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 8
-            ['doc_usuario' => 3100111005, 'NIT' => 900111222, 'primer_nombre' => 'CAROLINA', 'primer_apellido' => 'HERRERA', 'correo' => 'cherrera@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100111006, 'NIT' => 900111222, 'primer_nombre' => 'GERMAN', 'primer_apellido' => 'CASTRO', 'correo' => 'gcastro@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100111007, 'NIT' => 900111222, 'primer_nombre' => 'MONICA', 'primer_apellido' => 'RIVEROS', 'correo' => 'mriveros@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100111008, 'NIT' => 900111222, 'primer_nombre' => 'JAVIER', 'primer_apellido' => 'SOLANO', 'correo' => 'jsolano@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100111009, 'NIT' => 900111222, 'primer_nombre' => 'PATRICIA', 'primer_apellido' => 'CORREA', 'correo' => 'pcorrea@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100111010, 'NIT' => 900111222, 'primer_nombre' => 'RAFAEL', 'primer_apellido' => 'URIBE', 'correo' => 'ruribe@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100111011, 'NIT' => 900111222, 'primer_nombre' => 'ELENA', 'primer_apellido' => 'REYES', 'correo' => 'ereyes@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100111012, 'NIT' => 900111222, 'primer_nombre' => 'SANTIAGO', 'primer_apellido' => 'ALVAREZ', 'correo' => 'salvarez@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100111013, 'NIT' => 900111222, 'primer_nombre' => 'LOLA', 'primer_apellido' => 'MORA', 'correo' => 'lmora@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100111014, 'NIT' => 900111222, 'primer_nombre' => 'WILSON', 'primer_apellido' => 'GOMEZ', 'correo' => 'wgomez@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100111015, 'NIT' => 900111222, 'primer_nombre' => 'OLGA', 'primer_apellido' => 'SANTOS', 'correo' => 'osantos@conductor.expresoibague.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100111001, 'NIT' => 900111222, 'primer_nombre' => 'ADRIANA', 'primer_apellido' => 'GARCIA', 'correo' => 'agarcia@conductor.expresoibague.com', 'telefono' => '3100111001', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 5
+            ['doc_usuario' => 3100111002, 'NIT' => 900111222, 'primer_nombre' => 'FELIPE', 'primer_apellido' => 'PINZON', 'correo' => 'fpinzon@conductor.expresoibague.com', 'telefono' => '3100111002', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 6
+            ['doc_usuario' => 3100111003, 'NIT' => 900111222, 'primer_nombre' => 'LUISA', 'primer_apellido' => 'FERNANDA', 'correo' => 'lfernanda@conductor.expresoibague.com', 'telefono' => '3100111003', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 7
+            ['doc_usuario' => 3100111004, 'NIT' => 900111222, 'primer_nombre' => 'ESTEBAN', 'primer_apellido' => 'DORANTE', 'correo' => 'edorante@conductor.expresoibague.com', 'telefono' => '3100111004', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 8
+            ['doc_usuario' => 3100111005, 'NIT' => 900111222, 'primer_nombre' => 'CAROLINA', 'primer_apellido' => 'HERRERA', 'correo' => 'cherrera@conductor.expresoibague.com', 'telefono' => '3100111005', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100111006, 'NIT' => 900111222, 'primer_nombre' => 'GERMAN', 'primer_apellido' => 'CASTRO', 'correo' => 'gcastro@conductor.expresoibague.com', 'telefono' => '3100111006', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100111007, 'NIT' => 900111222, 'primer_nombre' => 'MONICA', 'primer_apellido' => 'RIVEROS', 'correo' => 'mriveros@conductor.expresoibague.com', 'telefono' => '3100111007', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100111008, 'NIT' => 900111222, 'primer_nombre' => 'JAVIER', 'primer_apellido' => 'SOLANO', 'correo' => 'jsolano@conductor.expresoibague.com', 'telefono' => '3100111008', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100111009, 'NIT' => 900111222, 'primer_nombre' => 'PATRICIA', 'primer_apellido' => 'CORREA', 'correo' => 'pcorrea@conductor.expresoibague.com', 'telefono' => '3100111009', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100111010, 'NIT' => 900111222, 'primer_nombre' => 'RAFAEL', 'primer_apellido' => 'URIBE', 'correo' => 'ruribe@conductor.expresoibague.com', 'telefono' => '3100111010', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100111011, 'NIT' => 900111222, 'primer_nombre' => 'ELENA', 'primer_apellido' => 'REYES', 'correo' => 'ereyes@conductor.expresoibague.com', 'telefono' => '3100111011', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100111012, 'NIT' => 900111222, 'primer_nombre' => 'SANTIAGO', 'primer_apellido' => 'ALVAREZ', 'correo' => 'salvarez@conductor.expresoibague.com', 'telefono' => '3100111012', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100111013, 'NIT' => 900111222, 'primer_nombre' => 'LOLA', 'primer_apellido' => 'MORA', 'correo' => 'lmora@conductor.expresoibague.com', 'telefono' => '3100111013', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100111014, 'NIT' => 900111222, 'primer_nombre' => 'WILSON', 'primer_apellido' => 'GOMEZ', 'correo' => 'wgomez@conductor.expresoibague.com', 'telefono' => '3100111014', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100111015, 'NIT' => 900111222, 'primer_nombre' => 'OLGA', 'primer_apellido' => 'SANTOS', 'correo' => 'osantos@conductor.expresoibague.com', 'telefono' => '3100111015', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
         ]);
 
         // Empresa 3: COTRAUTOL S.A.S. (900333444)
         DB::table('usuario')->insertOrIgnore([
-            ['doc_usuario' => 3100333001, 'NIT' => 900333444, 'primer_nombre' => 'GUSTAVO', 'primer_apellido' => 'ADOLFO', 'correo' => 'gadolfo@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 9
-            ['doc_usuario' => 3100333002, 'NIT' => 900333444, 'primer_nombre' => 'YOLANDA', 'primer_apellido' => 'RUIZ', 'correo' => 'yruiz@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 10
-            ['doc_usuario' => 3100333003, 'NIT' => 900333444, 'primer_nombre' => 'RAMIRO', 'primer_apellido' => 'CALDERON', 'correo' => 'rcalderon@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 11
-            ['doc_usuario' => 3100333004, 'NIT' => 900333444, 'primer_nombre' => 'CECILIA', 'primer_apellido' => 'RODRIGUEZ', 'correo' => 'crodriguez@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 12
-            ['doc_usuario' => 3100333005, 'NIT' => 900333444, 'primer_nombre' => 'BENJAMIN', 'primer_apellido' => 'FRANKLIN', 'correo' => 'bfranklin@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100333006, 'NIT' => 900333444, 'primer_nombre' => 'IRENE', 'primer_apellido' => 'VALLEJO', 'correo' => 'ivallejo@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100333007, 'NIT' => 900333444, 'primer_nombre' => 'ORLANDO', 'primer_apellido' => 'DUQUE', 'correo' => 'oduque@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100333008, 'NIT' => 900333444, 'primer_nombre' => 'SILVIA', 'primer_apellido' => 'GIRALDO', 'correo' => 'sgiraldo@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100333009, 'NIT' => 900333444, 'primer_nombre' => 'RAUL', 'primer_apellido' => 'MOLANO', 'correo' => 'rmolano@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100333010, 'NIT' => 900333444, 'primer_nombre' => 'ISABEL', 'primer_apellido' => 'PANTOJA', 'correo' => 'ipantoja@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100333011, 'NIT' => 900333444, 'primer_nombre' => 'EMILIO', 'primer_apellido' => 'ESTEFAN', 'correo' => 'eestefan@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100333012, 'NIT' => 900333444, 'primer_nombre' => 'REBECA', 'primer_apellido' => 'LINARES', 'correo' => 'rlinares@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100333013, 'NIT' => 900333444, 'primer_nombre' => 'PABLO', 'primer_apellido' => 'EMILIO', 'correo' => 'pemilio@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100333014, 'NIT' => 900333444, 'primer_nombre' => 'VIVIANA', 'primer_apellido' => 'MARTINEZ', 'correo' => 'vmartinez@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100333015, 'NIT' => 900333444, 'primer_nombre' => 'ESTHER', 'primer_apellido' => 'CITA', 'correo' => 'ecita@conductor.cotrautol.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100333001, 'NIT' => 900333444, 'primer_nombre' => 'GUSTAVO', 'primer_apellido' => 'ADOLFO', 'correo' => 'gadolfo@conductor.cotrautol.com', 'telefono' => '3100333001', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 9
+            ['doc_usuario' => 3100333002, 'NIT' => 900333444, 'primer_nombre' => 'YOLANDA', 'primer_apellido' => 'RUIZ', 'correo' => 'yruiz@conductor.cotrautol.com', 'telefono' => '3100333002', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 10
+            ['doc_usuario' => 3100333003, 'NIT' => 900333444, 'primer_nombre' => 'RAMIRO', 'primer_apellido' => 'CALDERON', 'correo' => 'rcalderon@conductor.cotrautol.com', 'telefono' => '3100333003', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 11
+            ['doc_usuario' => 3100333004, 'NIT' => 900333444, 'primer_nombre' => 'CECILIA', 'primer_apellido' => 'RODRIGUEZ', 'correo' => 'crodriguez@conductor.cotrautol.com', 'telefono' => '3100333004', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 12
+            ['doc_usuario' => 3100333005, 'NIT' => 900333444, 'primer_nombre' => 'BENJAMIN', 'primer_apellido' => 'FRANKLIN', 'correo' => 'bfranklin@conductor.cotrautol.com', 'telefono' => '3100333005', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100333006, 'NIT' => 900333444, 'primer_nombre' => 'IRENE', 'primer_apellido' => 'VALLEJO', 'correo' => 'ivallejo@conductor.cotrautol.com', 'telefono' => '3100333006', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100333007, 'NIT' => 900333444, 'primer_nombre' => 'ORLANDO', 'primer_apellido' => 'DUQUE', 'correo' => 'oduque@conductor.cotrautol.com', 'telefono' => '3100333007', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100333008, 'NIT' => 900333444, 'primer_nombre' => 'SILVIA', 'primer_apellido' => 'GIRALDO', 'correo' => 'sgiraldo@conductor.cotrautol.com', 'telefono' => '3100333008', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100333009, 'NIT' => 900333444, 'primer_nombre' => 'RAUL', 'primer_apellido' => 'MOLANO', 'correo' => 'rmolano@conductor.cotrautol.com', 'telefono' => '3100333009', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100333010, 'NIT' => 900333444, 'primer_nombre' => 'ISABEL', 'primer_apellido' => 'PANTOJA', 'correo' => 'ipantoja@conductor.cotrautol.com', 'telefono' => '3100333010', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100333011, 'NIT' => 900333444, 'primer_nombre' => 'EMILIO', 'primer_apellido' => 'ESTEFAN', 'correo' => 'eestefan@conductor.cotrautol.com', 'telefono' => '3100333011', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100333012, 'NIT' => 900333444, 'primer_nombre' => 'REBECA', 'primer_apellido' => 'LINARES', 'correo' => 'rlinares@conductor.cotrautol.com', 'telefono' => '3100333012', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100333013, 'NIT' => 900333444, 'primer_nombre' => 'PABLO', 'primer_apellido' => 'EMILIO', 'correo' => 'pemilio@conductor.cotrautol.com', 'telefono' => '3100333013', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100333014, 'NIT' => 900333444, 'primer_nombre' => 'VIVIANA', 'primer_apellido' => 'MARTINEZ', 'correo' => 'vmartinez@conductor.cotrautol.com', 'telefono' => '3100333014', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100333015, 'NIT' => 900333444, 'primer_nombre' => 'ESTHER', 'primer_apellido' => 'CITA', 'correo' => 'ecita@conductor.cotrautol.com', 'telefono' => '3100333015', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
         ]);
 
         // Empresa 4: TRANSPORTES LA IBAGUEREÑA S.A.S. (900555666)
         DB::table('usuario')->insertOrIgnore([
-            ['doc_usuario' => 3100555001, 'NIT' => 900555666, 'primer_nombre' => 'ALVARO', 'primer_apellido' => 'URIBE', 'correo' => 'auribe@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 13
-            ['doc_usuario' => 3100555002, 'NIT' => 900555666, 'primer_nombre' => 'JUAN', 'primer_apellido' => 'MANUEL', 'correo' => 'jmanuel@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 14
-            ['doc_usuario' => 3100555003, 'NIT' => 900555666, 'primer_nombre' => 'IVAN', 'primer_apellido' => 'DUQUE', 'correo' => 'iduque@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 15
-            ['doc_usuario' => 3100555004, 'NIT' => 900555666, 'primer_nombre' => 'MIGUEL', 'primer_apellido' => 'VARGAS', 'correo' => 'mvargas@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100555005, 'NIT' => 900555666, 'primer_nombre' => 'LEONOR', 'primer_apellido' => 'SANTANA', 'correo' => 'lsantana@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100555006, 'NIT' => 900555666, 'primer_nombre' => 'PEDRO', 'primer_apellido' => 'PARAMO', 'correo' => 'pparamo@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100555007, 'NIT' => 900555666, 'primer_nombre' => 'INES', 'primer_apellido' => 'DUARTE', 'correo' => 'iduarte@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100555008, 'NIT' => 900555666, 'primer_nombre' => 'TITO', 'primer_apellido' => 'PUENTE', 'correo' => 'tpuente@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100555009, 'NIT' => 900555666, 'primer_nombre' => 'CELIA', 'primer_apellido' => 'CRUZ', 'correo' => 'ccruz@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100555010, 'NIT' => 900555666, 'primer_nombre' => 'RUBEN', 'primer_apellido' => 'BLADES', 'correo' => 'rblades@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100555011, 'NIT' => 900555666, 'primer_nombre' => 'JUAN', 'primer_apellido' => 'GABRIEL', 'correo' => 'jgabriel@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100555012, 'NIT' => 900555666, 'primer_nombre' => 'ROBERTO', 'primer_apellido' => 'CARLOS', 'correo' => 'rcarlos@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100555013, 'NIT' => 900555666, 'primer_nombre' => 'ANA', 'primer_apellido' => 'GABRIEL', 'correo' => 'agabriel@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100555014, 'NIT' => 900555666, 'primer_nombre' => 'MIGUEL', 'primer_apellido' => 'BOSE', 'correo' => 'mbose@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100555015, 'NIT' => 900555666, 'primer_nombre' => 'SHAKIRA', 'primer_apellido' => 'MEBARAK', 'correo' => 'shakira@conductor.laibaguereña.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100555001, 'NIT' => 900555666, 'primer_nombre' => 'ALVARO', 'primer_apellido' => 'URIBE', 'correo' => 'auribe@conductor.laibaguereña.com', 'telefono' => '3100555001', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 13
+            ['doc_usuario' => 3100555002, 'NIT' => 900555666, 'primer_nombre' => 'JUAN', 'primer_apellido' => 'MANUEL', 'correo' => 'jmanuel@conductor.laibaguereña.com', 'telefono' => '3100555002', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 14
+            ['doc_usuario' => 3100555003, 'NIT' => 900555666, 'primer_nombre' => 'IVAN', 'primer_apellido' => 'DUQUE', 'correo' => 'iduque@conductor.laibaguereña.com', 'telefono' => '3100555003', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 15
+            ['doc_usuario' => 3100555004, 'NIT' => 900555666, 'primer_nombre' => 'MIGUEL', 'primer_apellido' => 'VARGAS', 'correo' => 'mvargas@conductor.laibaguereña.com', 'telefono' => '3100555004', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100555005, 'NIT' => 900555666, 'primer_nombre' => 'LEONOR', 'primer_apellido' => 'SANTANA', 'correo' => 'lsantana@conductor.laibaguereña.com', 'telefono' => '3100555005', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100555006, 'NIT' => 900555666, 'primer_nombre' => 'PEDRO', 'primer_apellido' => 'PARAMO', 'correo' => 'pparamo@conductor.laibaguereña.com', 'telefono' => '3100555006', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100555007, 'NIT' => 900555666, 'primer_nombre' => 'INES', 'primer_apellido' => 'DUARTE', 'correo' => 'iduarte@conductor.laibaguereña.com', 'telefono' => '3100555007', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100555008, 'NIT' => 900555666, 'primer_nombre' => 'TITO', 'primer_apellido' => 'PUENTE', 'correo' => 'tpuente@conductor.laibaguereña.com', 'telefono' => '3100555008', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100555009, 'NIT' => 900555666, 'primer_nombre' => 'CELIA', 'primer_apellido' => 'CRUZ', 'correo' => 'ccruz@conductor.laibaguereña.com', 'telefono' => '3100555009', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100555010, 'NIT' => 900555666, 'primer_nombre' => 'RUBEN', 'primer_apellido' => 'BLADES', 'correo' => 'rblades@conductor.laibaguereña.com', 'telefono' => '3100555010', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100555011, 'NIT' => 900555666, 'primer_nombre' => 'JUAN', 'primer_apellido' => 'GABRIEL', 'correo' => 'jgabriel@conductor.laibaguereña.com', 'telefono' => '3100555011', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100555012, 'NIT' => 900555666, 'primer_nombre' => 'ROBERTO', 'primer_apellido' => 'CARLOS', 'correo' => 'rcarlos@conductor.laibaguereña.com', 'telefono' => '3100555012', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100555013, 'NIT' => 900555666, 'primer_nombre' => 'ANA', 'primer_apellido' => 'GABRIEL', 'correo' => 'agabriel@conductor.laibaguereña.com', 'telefono' => '3100555013', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100555014, 'NIT' => 900555666, 'primer_nombre' => 'MIGUEL', 'primer_apellido' => 'BOSE', 'correo' => 'mbose@conductor.laibaguereña.com', 'telefono' => '3100555014', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100555015, 'NIT' => 900555666, 'primer_nombre' => 'SHAKIRA', 'primer_apellido' => 'MEBARAK', 'correo' => 'shakira@conductor.laibaguereña.com', 'telefono' => '3100555015', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
         ]);
 
         // Empresa 5: EXPRESO PURIFICACIÓN S.A. (900777888)
         DB::table('usuario')->insertOrIgnore([
-            ['doc_usuario' => 3100777001, 'NIT' => 900777888, 'primer_nombre' => 'CARLOS', 'primer_apellido' => 'VIVES', 'correo' => 'cvives@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 16
-            ['doc_usuario' => 3100777002, 'NIT' => 900777888, 'primer_nombre' => 'JUANES', 'primer_apellido' => 'ARISTIZABAL', 'correo' => 'juanes@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 17
-            ['doc_usuario' => 3100777003, 'NIT' => 900777888, 'primer_nombre' => 'JBALVIN', 'primer_apellido' => 'OSORIO', 'correo' => 'jbalvin@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 18
-            ['doc_usuario' => 3100777004, 'NIT' => 900777888, 'primer_nombre' => 'MALUMA', 'primer_apellido' => 'LONDOÑO', 'correo' => 'maluma@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100777005, 'NIT' => 900777888, 'primer_nombre' => 'GREEICY', 'primer_apellido' => 'RENDON', 'correo' => 'greeicy@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100777006, 'NIT' => 900777888, 'primer_nombre' => 'MIKE', 'primer_apellido' => 'BAHIA', 'correo' => 'mike@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100777007, 'NIT' => 900777888, 'primer_nombre' => 'KAROLG', 'primer_apellido' => 'GIRALDO', 'correo' => 'karolg@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100777008, 'NIT' => 900777888, 'primer_nombre' => 'FEID', 'primer_apellido' => 'VILLADA', 'correo' => 'feid@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100777009, 'NIT' => 900777888, 'primer_nombre' => 'BLESSD', 'primer_apellido' => 'CASTRILLON', 'correo' => 'blessd@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100777010, 'NIT' => 900777888, 'primer_nombre' => 'RYAN', 'primer_apellido' => 'CASTRO', 'correo' => 'ryan@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100777011, 'NIT' => 900777888, 'primer_nombre' => 'ANDY', 'primer_apellido' => 'RIVERA', 'correo' => 'andy@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100777012, 'NIT' => 900777888, 'primer_nombre' => 'JHONNY', 'primer_apellido' => 'RIVERA', 'correo' => 'jhonny@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100777013, 'NIT' => 900777888, 'primer_nombre' => 'ARELYS', 'primer_apellido' => 'HENAO', 'correo' => 'arelys@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100777014, 'NIT' => 900777888, 'primer_nombre' => 'FRANCY', 'primer_apellido' => 'DUARTE', 'correo' => 'francy@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
-            ['doc_usuario' => 3100777015, 'NIT' => 900777888, 'primer_nombre' => 'PAOLA', 'primer_apellido' => 'JARA', 'correo' => 'pjara@conductor.expresopurificacion.com', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100777001, 'NIT' => 900777888, 'primer_nombre' => 'CARLOS', 'primer_apellido' => 'VIVES', 'correo' => 'cvives@conductor.expresopurificacion.com', 'telefono' => '3100777001', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 16
+            ['doc_usuario' => 3100777002, 'NIT' => 900777888, 'primer_nombre' => 'JUANES', 'primer_apellido' => 'ARISTIZABAL', 'correo' => 'juanes@conductor.expresopurificacion.com', 'telefono' => '3100777002', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 17
+            ['doc_usuario' => 3100777003, 'NIT' => 900777888, 'primer_nombre' => 'JBALVIN', 'primer_apellido' => 'OSORIO', 'correo' => 'jbalvin@conductor.expresopurificacion.com', 'telefono' => '3100777003', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 2, 'password' => Hash::make('Conductor123*')], // INACTIVO 18
+            ['doc_usuario' => 3100777004, 'NIT' => 900777888, 'primer_nombre' => 'MALUMA', 'primer_apellido' => 'LONDOÑO', 'correo' => 'maluma@conductor.expresopurificacion.com', 'telefono' => '3100777004', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100777005, 'NIT' => 900777888, 'primer_nombre' => 'GREEICY', 'primer_apellido' => 'RENDON', 'correo' => 'greeicy@conductor.expresopurificacion.com', 'telefono' => '3100777005', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100777006, 'NIT' => 900777888, 'primer_nombre' => 'MIKE', 'primer_apellido' => 'BAHIA', 'correo' => 'mike@conductor.expresopurificacion.com', 'telefono' => '3100777006', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100777007, 'NIT' => 900777888, 'primer_nombre' => 'KAROLG', 'primer_apellido' => 'GIRALDO', 'correo' => 'karolg@conductor.expresopurificacion.com', 'telefono' => '3100777007', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100777008, 'NIT' => 900777888, 'primer_nombre' => 'FEID', 'primer_apellido' => 'VILLADA', 'correo' => 'feid@conductor.expresopurificacion.com', 'telefono' => '3100777008', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100777009, 'NIT' => 900777888, 'primer_nombre' => 'BLESSD', 'primer_apellido' => 'CASTRILLON', 'correo' => 'blessd@conductor.expresopurificacion.com', 'telefono' => '3100777009', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100777010, 'NIT' => 900777888, 'primer_nombre' => 'RYAN', 'primer_apellido' => 'CASTRO', 'correo' => 'ryan@conductor.expresopurificacion.com', 'telefono' => '3100777010', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100777011, 'NIT' => 900777888, 'primer_nombre' => 'ANDY', 'primer_apellido' => 'RIVERA', 'correo' => 'andy@conductor.expresopurificacion.com', 'telefono' => '3100777011', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100777012, 'NIT' => 900777888, 'primer_nombre' => 'JHONNY', 'primer_apellido' => 'RIVERA', 'correo' => 'jhonny@conductor.expresopurificacion.com', 'telefono' => '3100777012', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100777013, 'NIT' => 900777888, 'primer_nombre' => 'ARELYS', 'primer_apellido' => 'HENAO', 'correo' => 'arelys@conductor.expresopurificacion.com', 'telefono' => '3100777013', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100777014, 'NIT' => 900777888, 'primer_nombre' => 'FRANCY', 'primer_apellido' => 'DUARTE', 'correo' => 'francy@conductor.expresopurificacion.com', 'telefono' => '3100777014', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
+            ['doc_usuario' => 3100777015, 'NIT' => 900777888, 'primer_nombre' => 'PAOLA', 'primer_apellido' => 'JARA', 'correo' => 'pjara@conductor.expresopurificacion.com', 'telefono' => '3100777015', 'id_tipo_usuario' => 3, 'id_ciudad' => '730001', 'id_estado' => 1, 'password' => Hash::make('Conductor123*')],
         ]);
 
 
@@ -988,6 +988,74 @@ class UsuarioEmpresaSeeder extends Seeder
             DB::table('usuario')->insertOrIgnore($dataCoord);
         }
 
+        // --- ADMIN RECARGAS (id_tipo_usuario = 10) - EMPRESA DE RECARGA (NIT 800222333) ---
+        DB::table('usuario')->insertOrIgnore([
+            [
+                'doc_usuario'     => 8002223011,
+                'NIT'             => 800222333, // SUPERGIROS GANA GANA (EMPRESA DE RECARGA)
+                'primer_nombre'   => 'CARLOS',
+                'segundo_nombre'  => 'ANDRES',
+                'primer_apellido' => 'MENDOZA',
+                'segundo_apellido'=> 'RIOS',
+                'correo'          => 'cmendoza@supergiros.com',
+                'password'        => Hash::make('AdminRecargas123*'),
+                'telefono'        => '3001110001',
+                'fecha_nacimiento'=> '1982-04-15',
+                'foto_usuario'    => null,
+                'id_tipo_usuario' => 10, // ADMIN RECARGAS
+                'id_ciudad'       => '730001',
+                'id_estado'       => 1
+            ],
+            [
+                'doc_usuario'     => 8002223012,
+                'NIT'             => 800222333,
+                'primer_nombre'   => 'LUCIA',
+                'segundo_nombre'  => 'MARCELA',
+                'primer_apellido' => 'TORRES',
+                'segundo_apellido'=> 'VARGAS',
+                'correo'          => 'ltorres@supergiros.com',
+                'password'        => Hash::make('AdminRecargas123*'),
+                'telefono'        => '3001110002',
+                'fecha_nacimiento'=> '1987-09-22',
+                'foto_usuario'    => null,
+                'id_tipo_usuario' => 10, // ADMIN RECARGAS
+                'id_ciudad'       => '730001',
+                'id_estado'       => 1
+            ],
+            [
+                'doc_usuario'     => 8002223013,
+                'NIT'             => 800222333,
+                'primer_nombre'   => 'FELIX',
+                'segundo_nombre'  => 'ERNESTO',
+                'primer_apellido' => 'GUERRERO',
+                'segundo_apellido'=> 'SALCEDO',
+                'correo'          => 'fguerrero@supergiros.com',
+                'password'        => Hash::make('AdminRecargas123*'),
+                'telefono'        => '3001110003',
+                'fecha_nacimiento'=> '1979-12-08',
+                'foto_usuario'    => null,
+                'id_tipo_usuario' => 10, // ADMIN RECARGAS
+                'id_ciudad'       => '730001',
+                'id_estado'       => 1
+            ],
+            [
+                'doc_usuario'     => 8002223014,
+                'NIT'             => 800222333,
+                'primer_nombre'   => 'PAOLA',
+                'segundo_nombre'  => 'VIVIANA',
+                'primer_apellido' => 'CASTILLO',
+                'segundo_apellido'=> 'BEDOYA',
+                'correo'          => 'pcastillo@supergiros.com',
+                'password'        => Hash::make('AdminRecargas123*'),
+                'telefono'        => '3001110004',
+                'fecha_nacimiento'=> '1991-06-30',
+                'foto_usuario'    => null,
+                'id_tipo_usuario' => 10, // ADMIN RECARGAS
+                'id_ciudad'       => '730001',
+                'id_estado'       => 2 // INACTIVO
+            ],
+        ]);
+
         // --- GESTOR DE RECARGAS (doc_usuario inicia en 8) ---
         $dataGestores = [];
         $nombresGestor = [
@@ -1048,6 +1116,27 @@ class UsuarioEmpresaSeeder extends Seeder
         }
         DB::table('usuario')->insertOrIgnore($dataSetp);
 
+
+        // --- ADMIN RECARGAS (nuevo rol 10) ---
+        info('Intentando insertar ADMIN RECARGAS en el seeder');
+        DB::table('usuario')->insertOrIgnore([
+        [
+        'doc_usuario' => 8002223010,
+        'NIT' => 800222333,
+        'primer_nombre' => 'ADMIN',
+        'segundo_nombre' => 'RECARGAS',
+        'primer_apellido' => 'SUPERGIROS',
+        'segundo_apellido' => 'GANA',
+        'correo' => 'adminrecargas@pagatodo.com',
+        'password' => Hash::make('AdminRecargas123*'),
+        'telefono' => '3009999999',
+        'fecha_nacimiento' => '1980-01-01',
+        'foto_usuario' => null,
+        'id_tipo_usuario' => 10, // ADMIN RECARGAS
+        'id_ciudad' => '730001',
+        'id_estado' => 1
+        ]
+            ]);
     }
 
 

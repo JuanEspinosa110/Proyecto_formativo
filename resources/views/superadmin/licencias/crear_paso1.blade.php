@@ -77,7 +77,7 @@
                                 id="nitInput"
                                 name="NIT"
                                 class="form-control sa-licencia-input @error('NIT') is-invalid @enderror"
-                                value="{{ old('NIT') }}"
+                                value="{{ old('NIT', $nit ?? '') }}"
                                 placeholder="900123456"
                                 required
                                 maxlength="15">
@@ -182,8 +182,40 @@
             </div>
         </div>
 
+        <!-- Bloque Administrador Detectado (Carga dinámicamente) -->
+        <div id="adminDetectadoCard" class="card sa-licencia-card mb-4 d-none border-success">
+            <div class="card-header bg-success bg-opacity-10 py-3">
+                <h5 class="mb-0 text-success fw-normal">
+                    ✓ Administrador de Empresa Detectado
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-user-tie fa-2x text-success"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-4">
+                        <h5 id="adminNombreDisplay" class="mb-1 fw-bold text-dark">Nombre del Administrador</h5>
+                        <p id="adminCorreoDisplay" class="text-muted mb-0 fs-6">correo@ejemplo.com</p>
+                    </div>
+                    <div class="ms-auto">
+                        <span class="badge bg-success px-3 py-2">Usuario Activo</span>
+                    </div>
+                </div>
+                <div class="mt-3 p-2 bg-light rounded border-start border-4 border-success">
+                    <p class="small text-dark mb-0">
+                        <i class="fas fa-info-circle me-1 text-success"></i>
+                        La empresa ya cuenta con un administrador del sistema. No es necesario crear uno nuevo para esta licencia.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <!-- Usuario Administrador -->
-        <div class="card sa-licencia-card mb-4">
+        <div id="seccionAdminNuevo">
+            <div class="card sa-licencia-card mb-4">
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0">
                     <i class="fas fa-user-shield me-2 text-primary"></i>
@@ -292,6 +324,7 @@
                 </div>
             </div>
         </div>
+    </div>
 
         <!-- Botones de navegación -->
         <div class="d-flex justify-content-between">
@@ -315,6 +348,13 @@
         const formPaso1 = document.getElementById('formPaso1');
         const selectDepartamento = document.getElementById('id_departamento');
         const selectCiudad = document.getElementById('id_ciudad');
+        
+        // Auto-verificar si viene NIT
+        if (nitInput.value) {
+            setTimeout(() => {
+                btnVerificar.click();
+            }, 500);
+        }
 
         // ========================
         // EVENTO: Al cambiar departamento, cargar ciudades
@@ -380,6 +420,34 @@
                         showAlert('success', '✓ Empresa encontrada. Datos de ubicación vinculados.');
                         llenarFormulario(data.datos);
                         formPaso1.querySelector('button[type="submit"]').disabled = false;
+
+                        // Lógica para administrador existente
+                        const adminCard = document.getElementById('adminDetectadoCard');
+                        const adminSeccion = document.getElementById('seccionAdminNuevo');
+                        
+                        if (data.admin_existente) {
+                            adminCard.classList.remove('d-none');
+                            adminSeccion.classList.add('d-none');
+                            document.getElementById('adminNombreDisplay').textContent = data.nombre_admin;
+                            document.getElementById('adminCorreoDisplay').textContent = data.correo_admin;
+                            
+                            // Deshabilitar inputs de la sección oculta para omitir validaciones
+                            adminSeccion.querySelectorAll('input').forEach(input => {
+                                input.disabled = true;
+                                input.removeAttribute('required');
+                            });
+                        } else {
+                            adminCard.classList.add('d-none');
+                            adminSeccion.classList.remove('d-none');
+                            
+                            // Habilitar y restaurar obligatoriedad
+                            adminSeccion.querySelectorAll('input').forEach(input => {
+                                input.disabled = false;
+                                if (input.id !== 'segundo_nombre_admin' && input.id !== 'segundo_apellido_admin' && input.id !== 'telefono_admin') {
+                                    input.setAttribute('required', 'required');
+                                }
+                            });
+                        }
                     } else {
                         showAlert('danger', 'El NIT ingresado no existe en el sistema. Debe registrar la empresa primero.');
                         limpiarFormulario();
@@ -468,6 +536,15 @@
             selectCiudad.value = '';
             selectCiudad.innerHTML = '<option value="">-- Primero seleccione Departamento --</option>';
             selectCiudad.disabled = true;
+
+            // Resetear sección de admin
+            document.getElementById('adminDetectadoCard').classList.add('d-none');
+            const adminSeccion = document.getElementById('seccionAdminNuevo');
+            adminSeccion.classList.remove('d-none');
+            adminSeccion.querySelectorAll('input').forEach(input => {
+                input.disabled = false;
+                input.value = '';
+            });
         }
     });
 </script>

@@ -10,6 +10,8 @@ use App\Http\Requests\StoreUsuarioRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\Usuario;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NuevoUsuarioCreado;
 
 class UsuarioController extends Controller
 {
@@ -26,7 +28,7 @@ class UsuarioController extends Controller
         }
 
         $roles = DB::table('tipo_usuario')
-            ->whereIn('id_tipo_usuario', [1, 3, 4, 5, 7, 8]) // Solo roles de empresa
+            ->whereIn('id_tipo_usuario', [1, 3, 4, 5, 7]) // Solo roles de empresa (Coordinador Bus 7)
             ->orderBy('id_tipo_usuario')
             ->when($user->id_tipo_usuario != 1, function ($q) {
                 $q->where(function($sub) {
@@ -41,6 +43,7 @@ class UsuarioController extends Controller
             ->leftJoin('ciudad', 'usuario.id_ciudad', '=', 'ciudad.id_ciudad')
             ->leftJoin('tipo_usuario', 'usuario.id_tipo_usuario', '=', 'tipo_usuario.id_tipo_usuario')
             ->where('usuario.NIT', $nit)
+            ->where('usuario.id_tipo_usuario', '!=', 8) // El admin no debe manejar este rol
             ->select('usuario.*', 'estado.nombre_estado', 'ciudad.nombre_city', 'tipo_usuario.nombre_tipo');
 
         if ($user->id_tipo_usuario != 1) {
@@ -159,11 +162,23 @@ class UsuarioController extends Controller
 
             Usuario::create($data);
 
+            // Enviar correo de notificación al nuevo usuario
+            try {
+                Mail::to($request->correo)->send(new NuevoUsuarioCreado(
+                    $request->primer_nombre . ' ' . $request->primer_apellido,
+                    $request->doc_usuario,
+                    $passwordGenerada,
+                    Auth::user()->NIT
+                ));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error enviando correo de bienvenida: ' . $e->getMessage());
+            }
+
             // Si es conductor, crear el documento
             if ($esConductor && $request->hasFile('archivo_licencia')) {
                 // Cálculo de vigencia en Backend (Precalculado arriba)
 
-                $pathLicencia = $request->file('archivo_licencia')->store('documentos', 'public');
+                $pathLicencia = $request->file('archivo_licencia')->store('uploads/documentos', 'uploads');
                 \App\Models\Documento::create([
                     'nombre' => 'LICENCIA CONDUCCION',
                     'archivo' => $pathLicencia,
@@ -263,7 +278,7 @@ class UsuarioController extends Controller
                 if ($docLicencia && $docLicencia->archivo) {
                     \Illuminate\Support\Facades\Storage::disk('public')->delete($docLicencia->archivo);
                 }
-                $docData['archivo'] = $request->file('archivo_licencia')->store('documentos', 'public');
+                $docData['archivo'] = $request->file('archivo_licencia')->store('uploads/documentos', 'uploads');
             }
 
             if ($docLicencia) {
@@ -286,6 +301,74 @@ class UsuarioController extends Controller
             return redirect('/login')->with('error', 'Tu cuenta ha sido inactivada o bloqueada.');
         }
 
+        if (auth()->user()->id_tipo_usuario == 4) {
+            return redirect()->back()->with('success', 'Usuario actualizado correctamente.');
+        }
+
         return redirect()->route('admin.usuarios.index')->with('success', 'Registro actualizado correctamente');
+    }
+
+    /**
+     * Exportar Usuarios (Conductores/Propietarios) a Excel o PDF.
+     */
+    public function export(Request $request)
+    {
+        $user = Auth::guard('web')->user();
+        $nit = $user->getActiveNit();
+        $format = $request->query('format', 'excel');
+
+        $usuarios = Usuario::with(['tipoUsuario', 'estado'])
+            ->where('NIT', $nit)
+            ->whereIn('id_tipo_usuario', [3, 4, 5, 7])
+            ->orderBy('primer_nombre', 'asc')
+            ->get();
+
+        $empresa = \App\Models\Empresa::where('NIT', $nit)->first();
+
+        if ($format === 'pdf') {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.usuarios.pdf', compact('usuarios', 'empresa'));
+            return $pdf->download("Informe_Personal_{$nit}.pdf");
+        }
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Personal ' . ($empresa ? $empresa->nombre_empresa : 'Empresa'));
+
+        $headers = ['Doc. Usuario', 'Primer Nombre', 'Segundo Nombre', 'Primer Apellido', 'Segundo Apellido', 'Correo', 'Teléfono', 'Rol', 'Estado'];
+        $cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+
+        foreach ($cols as $idx => $col) {
+            $sheet->setCellValue($col . '1', $headers[$idx]);
+            $sheet->getStyle($col . '1')->getFont()->setBold(true);
+            $sheet->getStyle($col . '1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFD3D3D3');
+        }
+
+        $row = 2;
+        foreach ($usuarios as $u) {
+            $sheet->setCellValue('A' . $row, $u->doc_usuario);
+            $sheet->setCellValue('B' . $row, $u->primer_nombre);
+            $sheet->setCellValue('C' . $row, $u->segundo_nombre);
+            $sheet->setCellValue('D' . $row, $u->primer_apellido);
+            $sheet->setCellValue('E' . $row, $u->segundo_apellido);
+            $sheet->setCellValue('F' . $row, $u->correo);
+            $sheet->setCellValue('G' . $row, $u->telefono);
+            $sheet->setCellValue('H' . $row, $u->tipoUsuario->nombre_tipo ?? 'N/A');
+            $sheet->setCellValue('I' . $row, $u->estado->nombre_estado ?? 'N/A');
+            $row++;
+        }
+
+        foreach ($cols as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $filename = "Reporte_Personal_{$nit}_" . date('Ymd_His') . ".xlsx";
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        header('Cache-Control: max-age=0');
+        
+        $writer->save('php://output');
+        exit;
     }
 }

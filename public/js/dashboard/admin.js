@@ -4,6 +4,8 @@
 
   // Chart instances
   let donutChart = null;
+  let busesChart = null;
+  let viajesChart = null;
   const sparkCharts = [];
 
   function numberFormat(n) { return (n === null || n === undefined) ? '—' : String(n); }
@@ -151,7 +153,12 @@
     });
     const labels = Object.keys(estados);
     const values = Object.values(estados);
-    new Chart(ctx.getContext('2d'), {
+
+    if (busesChart) {
+      busesChart.destroy();
+    }
+
+    busesChart = new Chart(ctx.getContext('2d'), {
       type: 'bar',
       data: {
         labels: labels,
@@ -176,7 +183,12 @@
     });
     const labels = Object.keys(rutas);
     const values = Object.values(rutas);
-    new Chart(ctx.getContext('2d'), {
+
+    if (viajesChart) {
+      viajesChart.destroy();
+    }
+
+    viajesChart = new Chart(ctx.getContext('2d'), {
       type: 'line',
       data: {
         labels: labels,

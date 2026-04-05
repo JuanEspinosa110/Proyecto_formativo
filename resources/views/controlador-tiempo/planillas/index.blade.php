@@ -51,16 +51,71 @@
     </div>
     @endif
 
+    {{-- ─── Filtros de búsqueda ───────────────────────────────────── --}}
+    <div class="bg-white rounded-3 shadow-sm p-4 mb-4">
+        <form action="{{ route('controlador-tiempo.planillas.index') }}" method="GET" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted">Bus / Placa</label>
+                <select name="placa" class="form-select border-0 bg-light shadow-none">
+                    <option value="">Todos los buses</option>
+                    @foreach($busesList as $b)
+                        <option value="{{ $b->placa }}" {{ request('placa') == $b->placa ? 'selected' : '' }}>
+                            {{ $b->placa }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted">Conductor</label>
+                <select name="doc_usuario" class="form-select border-0 bg-light shadow-none">
+                    <option value="">Todos los conductores</option>
+                    @foreach($conductoresList as $c)
+                        <option value="{{ $c->doc_usuario }}" {{ request('doc_usuario') == $c->doc_usuario ? 'selected' : '' }}>
+                            {{ $c->primer_nombre }} {{ $c->primer_apellido }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold text-muted">Ruta</label>
+                <select name="id_ruta" class="form-select border-0 bg-light shadow-none">
+                    <option value="">Todas las rutas</option>
+                    @foreach($rutasList as $r)
+                        <option value="{{ $r->id_ruta }}" {{ request('id_ruta') == $r->id_ruta ? 'selected' : '' }}>
+                            {{ $r->codigo_ruta ?? ('Ruta '.$r->id_ruta) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold text-muted">Día (Fecha)</label>
+                <input type="date" name="fecha" value="{{ request('fecha') }}" class="form-control border-0 bg-light shadow-none">
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-dark w-100 fw-bold">Filtrar</button>
+                <a href="{{ route('controlador-tiempo.planillas.index') }}" class="btn btn-light border bg-white px-3" title="Limpiar">
+                    <span class="material-symbols-rounded align-middle">restart_alt</span>
+                </a>
+            </div>
+        </form>
+    </div>
+
     {{-- ─── Planilla del día ─────────────────────────────────────── --}}
     <div class="bg-white rounded-3 shadow-sm overflow-hidden">
         <div class="d-flex align-items-center justify-content-between p-4 pb-3">
             <div>
-                <h6 class="fw-bold mb-0">Planilla de Despacho del Día</h6>
-                <span class="text-muted small">{{ now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</span>
+                <h6 class="fw-bold mb-0">Planilla de Despacho</h6>
+                <span class="text-muted small">
+                    @if(request('fecha'))
+                        Filtrado por: {{ \Carbon\Carbon::parse(request('fecha'))->locale('es')->isoFormat('D [de] MMM, YYYY') }}
+                    @else
+                        {{ now()->locale('es')->isoFormat('dddd, D [de] MMMM [de] YYYY') }}
+                    @endif
+                </span>
             </div>
             <div class="d-flex gap-2">
                 <span class="badge" style="background:var(--ct-accent-light); color:var(--ct-accent); border:1px solid var(--ct-accent-mid); border-radius:999px; padding:0.3em 0.9em; font-size:0.8rem; font-weight:600;">
-                    {{ $planilla->total() }} turnos
+                    {{ $planilla->total() }} turnos encontrados
                 </span>
             </div>
         </div>
@@ -73,8 +128,8 @@
                         <th class="py-3">Bus / Placa</th>
                         <th class="py-3">Conductor</th>
                         <th class="py-3">Ruta</th>
-                        <th class="py-3">Tipo</th>
-                        <th class="py-3 text-center">Novedad</th>
+                        <th class="py-3">Fecha</th>
+                        <th class="py-3 text-center">Novedad / Detalle</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -94,16 +149,19 @@
                                 @endif
                             </td>
                             <td>
-                                <span class="small">
-                                    {{ $asig->ruta->barrioOrigen->nombre ?? '—' }}
-                                    <span class="text-muted">→</span>
-                                    {{ $asig->ruta->barrioDestino->nombre ?? '—' }}
-                                </span>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold text-primary small">Ruta #{{ $asig->ruta->codigo_ruta ?? $asig->ruta->id_ruta }}</span>
+                                    <span class="text-muted" style="font-size: 0.75rem;">
+                                        {{ $asig->ruta->barrioOrigen->nombre ?? '—' }}
+                                        <span class="opacity-50">→</span>
+                                        {{ $asig->ruta->barrioDestino->nombre ?? '—' }}
+                                    </span>
+                                </div>
                             </td>
                             <td>
-                                <span class="badge bg-light text-dark border px-2 small" style="font-weight:600;">
-                                    {{ $asig->tipoAsignacion->nombre_tipo ?? 'N/A' }}
-                                </span>
+                                <div class="small fw-semibold text-dark">
+                                    {{ \Carbon\Carbon::parse($asig->fecha)->format('d/m/Y') }}
+                                </div>
                             </td>
                             <td class="text-center">
                                 @php
@@ -111,8 +169,7 @@
                                     $checkpoints = $allNovedades->where('tipo', 'CHECKPOINT')->count();
                                     $incidencias = $allNovedades->where('tipo', 'INCIDENCIA')->count();
                                 @endphp
-                                <button type="button" class="btn btn-link p-0 text-decoration-none" 
-                                        data-bs-toggle="modal" data-bs-target="#modalHistorial{{ $asig->id_viaje }}">
+                                <a href="{{ route('controlador-tiempo.planillas.show', $asig->id_viaje) }}" class="text-decoration-none">
                                     <div class="d-flex justify-content-center gap-2">
                                         <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25" title="Checkpoints">
                                             <span class="material-symbols-rounded align-middle fs-6">beenhere</span> {{ $checkpoints }}
@@ -121,126 +178,14 @@
                                             <span class="material-symbols-rounded align-middle fs-6">warning</span> {{ $incidencias }}
                                         </span>
                                     </div>
-                                </button>
-
-                                <!-- Modal de Historial (Timeline) -->
-                                <div class="modal fade" id="modalHistorial{{ $asig->id_viaje }}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden pt-2">
-                                            <div class="modal-header border-0 pb-0">
-                                                <h5 class="modal-title fw-bold text-dark px-3 mt-2">Actividad de Operación</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                            </div>
-                                            <div class="modal-body p-4 pt-2 text-start">
-                                                <div class="mb-4 px-2">
-                                                    <span class="text-muted small fw-bold text-uppercase">Bus: {{ $asig->placa }} • Conductor: {{ $asig->usuario->primer_nombre ?? 'N/A' }}</span>
-                                                </div>
-
-                                                <div class="ct-timeline">
-                                                    @forelse($asig->recorridos->sortByDesc('hora_salida') as $rec)
-                                                        @php
-                                                            // Unificar todos los eventos de este recorrido para ordenarlos por fecha
-                                                            $eventos = collect();
-                                                            
-                                                            // Inicio
-                                                            if ($rec->hora_salida) {
-                                                                $eventos->push([
-                                                                    'hora' => $rec->hora_salida,
-                                                                    'tipo' => 'INICIO',
-                                                                    'titulo' => 'Inicio de Recorrido',
-                                                                    'desc' => 'Vehículo salió de terminal.'
-                                                                ]);
-                                                            }
-                                                            
-                                                            // Novedades (Checkpoints e Incidencias)
-                                                            foreach($rec->novedades as $nov) {
-                                                                $eventos->push([
-                                                                    'hora' => $nov->created_at,
-                                                                    'tipo' => $nov->tipo,
-                                                                    'titulo' => $nov->tipo == 'CHECKPOINT' ? 'Control Validado' : 'Incidencia Reportada',
-                                                                    'desc' => $nov->descripcion
-                                                                ]);
-                                                            }
-                                                            
-                                                            // Fin
-                                                            if ($rec->hora_llegada) {
-                                                                $eventos->push([
-                                                                    'hora' => $rec->hora_llegada,
-                                                                    'tipo' => 'FIN',
-                                                                    'titulo' => 'Llegada a Destino',
-                                                                    'desc' => 'Recorrido finalizado exitosamente.'
-                                                                ]);
-                                                            }
-                                                            
-                                                            $eventos = $eventos->sortBy('hora');
-                                                        @endphp
-
-                                                        <div class="mb-4">
-                                                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                                                <span class="badge bg-light text-dark border-start border-3 border-primary rounded-0 small fw-bold">
-                                                                    RECORRIDO #{{ $rec->id_recorrido }}
-                                                                </span>
-                                                                <span class="text-muted" style="font-size: 0.75rem; font-weight: 600;">
-                                                                    {{ \Carbon\Carbon::parse($rec->hora_salida)->format('d/m/Y') }}
-                                                                </span>
-                                                            </div>
-                                                            <div class="small text-muted mb-3 ps-1" style="font-size: 0.8rem;">
-                                                                <span class="material-symbols-rounded align-middle fs-6">schedule</span>
-                                                                Salida: {{ \Carbon\Carbon::parse($rec->hora_salida)->format('h:i A') }} 
-                                                                • 
-                                                                Llegada: {{ $rec->hora_llegada ? \Carbon\Carbon::parse($rec->hora_llegada)->format('h:i A') : 'En curso' }}
-                                                            </div>
-                                                            @foreach($eventos as $evento)
-                                                                <div class="d-flex gap-3 mb-3">
-                                                                    <div class="text-muted small pt-1 fw-bold" style="min-width: 65px;">
-                                                                        {{ \Carbon\Carbon::parse($evento['hora'])->format('h:i A') }}
-                                                                    </div>
-                                                                    <div class="border-start border-2 border-light ps-3 position-relative">
-                                                                        @php
-                                                                            $icon = match($evento['tipo']) {
-                                                                                'INICIO' => 'play_circle',
-                                                                                'CHECKPOINT' => 'check_circle',
-                                                                                'INCIDENCIA' => 'report',
-                                                                                'FIN' => 'stop_circle',
-                                                                                default => 'info'
-                                                                            };
-                                                                            $color = match($evento['tipo']) {
-                                                                                'INICIO' => 'primary',
-                                                                                'CHECKPOINT' => 'success',
-                                                                                'INCIDENCIA' => 'danger',
-                                                                                'FIN' => 'dark',
-                                                                                default => 'secondary'
-                                                                            };
-                                                                        @endphp
-                                                                        <span class="material-symbols-rounded fs-5 text-{{ $color }} position-absolute" 
-                                                                              style="left:-14px; top:0; background:white;">{{ $icon }}</span>
-                                                                        <div class="fw-bold text-{{ $color }} small text-uppercase">{{ $evento['titulo'] }}</div>
-                                                                        <div class="small text-muted">{{ $evento['desc'] }}</div>
-                                                                    </div>
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-                                                        <hr class="my-3 opacity-25">
-                                                    @empty
-                                                        <div class="text-center py-4 text-muted small">
-                                                            No hay actividad de recorridos registrada aún.
-                                                        </div>
-                                                    @endforelse
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer border-0 pb-4">
-                                                <button type="button" class="btn btn-dark w-100 rounded-pill fw-bold" data-bs-dismiss="modal">Cerrar Historial</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="6" class="text-center text-muted py-5">
                                 <span class="material-symbols-rounded d-block mb-2" style="font-size:2.5rem;">assignment</span>
-                                No hay turnos asignados para generar la planilla.
+                                No se encontraron turnos con los filtros aplicados.
                             </td>
                         </tr>
                     @endforelse

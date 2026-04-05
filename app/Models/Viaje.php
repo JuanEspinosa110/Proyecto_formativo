@@ -69,6 +69,22 @@ class Viaje extends Model
     }
 
     /**
+     * Alias para conductor para compatibilidad con las vistas de Planilla
+     */
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class, 'doc_us', 'doc_usuario');
+    }
+
+    /**
+     * Atributo virtual para obtener la fecha de fin (8 horas después del inicio)
+     */
+    public function getFechaFinAttribute()
+    {
+        return $this->fecha ? \Carbon\Carbon::parse($this->fecha)->addHours(8) : null;
+    }
+
+    /**
      * Relación con el Estado.
      */
     public function estado()
@@ -82,5 +98,13 @@ class Viaje extends Model
     public function ventas()
     {
         return $this->hasMany(VentaViaje::class, 'id_viaje', 'id_viaje');
+    }
+
+    /**
+     * Relación con los recorridos del viaje.
+     */
+    public function recorridos()
+    {
+        return $this->hasMany(Recorrido::class, 'id_viaje', 'id_viaje');
     }
 }

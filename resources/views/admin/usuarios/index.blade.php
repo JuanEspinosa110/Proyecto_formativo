@@ -347,7 +347,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 const foto = btnVer.getAttribute('data-foto');
                 const fotoCont = document.getElementById('verFotoContainer');
                 if (foto && foto !== 'null' && foto !== '') {
-                    fotoCont.innerHTML = `<img src="/storage/${foto}" class="rounded-circle shadow-sm" style="width: 80px; height: 80px; object-fit: cover;" alt="Foto">`;
+                    // Check if path is already absolute or starts with uploads
+                    const fotoUrl = foto.startsWith('http') ? foto : (foto.startsWith('uploads') ? '/' + foto : '/storage/' + foto);
+                    fotoCont.innerHTML = `<img src="${fotoUrl}" class="rounded-circle shadow-sm" style="width: 80px; height: 80px; object-fit: cover;" alt="Foto">`;
                 } else {
                     fotoCont.innerHTML = `<div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
                                             <span class="material-symbols-rounded fs-1">person</span>
@@ -396,7 +398,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         const docArchivo = btnVer.getAttribute('data-licencia-archivo');
                         const btnArchivo = document.getElementById('verLicArchivoBtn');
                         if (docArchivo) {
-                            btnArchivo.href = '/storage/' + docArchivo;
+                            const fileUrl = docArchivo.startsWith('uploads') ? '/' + docArchivo : '/storage/' + docArchivo;
+                            btnArchivo.href = fileUrl;
                             btnArchivo.style.setProperty('display', 'inline-flex', 'important');
                         } else {
                             btnArchivo.href = '#';

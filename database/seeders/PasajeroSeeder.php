@@ -14,11 +14,16 @@ class PasajeroSeeder extends Seeder
      */
     public function run(): void
     {
+        if (DB::table('usuario')->where('id_tipo_usuario', 2)->exists()) {
+            $this->command->info('PasajeroSeeder: Los datos ya existen, saltando...');
+            return;
+        }
+
         $faker = Faker::create('es_CO');
 
         for ($i = 0; $i < 10; $i++) {
             $doc_usuario = $faker->unique()->numberBetween(1000000000, 1999999999);
-            $id_tarjeta = 'SIGU-' . $faker->unique()->numberBetween(10000000, 99999999);
+            $id_tarjeta = strtoupper(\Illuminate\Support\Str::random(12));
 
             // 1. Crear Usuario (Pasajero)
             DB::table('usuario')->insert([
@@ -38,9 +43,8 @@ class PasajeroSeeder extends Seeder
             // 2. Crear Tarjeta
             DB::table('tarjeta')->insert([
                 'id_tarjeta' => $id_tarjeta,
-                'doc_usuario' => $doc_usuario,
-                'saldo' => $faker->randomFloat(2, 2000, 50000),
-                'codigo_tarjeta' => 'UID-' . strtoupper($faker->bothify('??##??##')),
+                'saldo' => 0, // El saldo real se calcula al final con recargas y pasajes
+                'codigo_tarjeta' => $faker->unique()->numerify('###############'),
                 'id_estado' => 1, // Activo
             ]);
 
@@ -50,6 +54,18 @@ class PasajeroSeeder extends Seeder
                 'doc_usuario' => $doc_usuario,
                 'fecha_inicio' => now()->format('Y-m-d'),
                 'id_estado' => 1, // Activo
+            ]);
+        }
+
+        // 4. Crear Tarjetas sin asociar (Estado 2, doc_usuario = null, sin titularidad)
+        for ($i = 0; $i < 10; $i++) {
+            $id_tarjeta_nueva = strtoupper(\Illuminate\Support\Str::random(12));
+
+            DB::table('tarjeta')->insert([
+                'id_tarjeta' => $id_tarjeta_nueva,
+                'saldo' => 0,
+                'codigo_tarjeta' => $faker->unique()->numerify('###############'),
+                'id_estado' => 2, // Inactiva / Lista para ser asignada
             ]);
         }
     }

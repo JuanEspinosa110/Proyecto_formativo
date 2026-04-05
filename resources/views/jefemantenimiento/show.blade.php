@@ -58,7 +58,7 @@
                 Volver
             </a>
 
-            @if((int)$mantenimiento->id_estado === 7)
+            @if((int)$mantenimiento->id_estado === 4)
             {{-- Aprobar Salida: relleno naranja (acción principal) --}}
             <form id="formAprobar" action="{{ route('jefemantenimiento.aprobar-salida', $mantenimiento->id_mantenimiento) }}" method="POST">
                 @csrf
@@ -102,7 +102,7 @@
                     <label class="small text-muted d-block">Estado</label>
                     @if((int)$mantenimiento->id_estado === 4)
                         <span class="badge bg-warning text-dark">En Taller</span>
-                    @elseif((int)$mantenimiento->id_estado === 7)
+                    @elseif((int)$mantenimiento->id_estado === 5)
                         <span class="badge bg-success">Finalizado</span>
                     @else
                         <span class="badge bg-secondary">{{ $mantenimiento->estado->nombre_estado ?? 'Desconocido' }}</span>
@@ -119,6 +119,15 @@
                         <div class="list-group-item px-0 py-3">
                             <h6 class="mb-1 fw-bold">{{ $detalle->tipoMantenimiento->nombre ?? 'General' }}</h6>
                             <p class="mb-1 text-muted">{{ $detalle->descripcion }}</p>
+
+                            @if($detalle->id_reporte)
+                                <div class="mt-1">
+                                    <span class="badge bg-light text-primary border" style="font-size:0.75rem; font-weight:normal;">
+                                        <i class="material-symbols-rounded" style="font-size:0.9rem; vertical-align:middle;">task_alt</i>
+                                        Resolvió Falla #{{ str_pad($detalle->id_reporte, 4, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                </div>
+                            @endif
                             @if($detalle->evidencia_foto)
                                 <div class="mt-2 text-start d-print-none">
                                     <a href="{{ asset('storage/' . $detalle->evidencia_foto) }}" target="_blank" class="d-inline-flex align-items-center gap-1 text-primary small text-decoration-none">

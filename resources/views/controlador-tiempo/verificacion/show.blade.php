@@ -100,9 +100,14 @@
                             </button>
                         </form>
                         
+                        <button type="button" class="btn btn-outline-warning px-4 py-2 rounded-pill fw-bold d-flex align-items-center gap-2" 
+                                data-bs-toggle="modal" data-bs-target="#modalFallaMecanica">
+                            <span class="material-symbols-rounded">build</span> Reportar Falla Mecánica
+                        </button>
+
                         <button type="button" class="btn btn-outline-danger px-4 py-2 rounded-pill fw-bold d-flex align-items-center gap-2" 
                                 data-bs-toggle="modal" data-bs-target="#modalNovedad">
-                            <span class="material-symbols-rounded">warning</span> Reportar Novedad en Pista
+                            <span class="material-symbols-rounded">warning</span> Novedad en Pista
                         </button>
                     </div>
                 </div>
@@ -143,6 +148,45 @@
                 <div class="modal-footer border-0 pb-4">
                     <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Enviar Reporte</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Reportar Falla Mecánica -->
+<div class="modal fade" id="modalFallaMecanica" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-warning text-dark border-0 py-3">
+                <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded">build</span> Reportar Falla Mecánica
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('controlador-tiempo.verificacion.falla', $recorrido->id_recorrido) }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-4">Use este formulario si el vehículo presenta averías que comprometen la operación.</p>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">Nivel de Urgencia</label>
+                        <select name="nivel_urgencia" class="form-select border-0 bg-light rounded-3" required>
+                            <option value="Bajo">Bajo (Solo registro)</option>
+                            <option value="Medio">Medio (Solo registro)</option>
+                            <option value="Alto">Alto (Finaliza viaje y bloquea bus)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small">Descripción de la Falla</label>
+                        <textarea name="descripcion" class="form-control border-0 bg-light rounded-3" rows="4" 
+                                  placeholder="Detalle el problema mecánico..." required minlength="5"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pb-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning rounded-pill px-4 fw-bold text-dark shadow-sm">Reportar Falla</button>
                 </div>
             </form>
         </div>

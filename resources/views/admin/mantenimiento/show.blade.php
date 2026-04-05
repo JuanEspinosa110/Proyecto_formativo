@@ -78,7 +78,7 @@
             </a>
             @endif
 
-            @if((int)$mantenimiento->id_estado === 7)
+            @if((int)$mantenimiento->id_estado === 4)
             {{-- Finalizar: acción principal, verde relleno --}}
             <form id="formFinalizar" action="{{ route('admin.mantenimiento.finalizar', $mantenimiento->id_mantenimiento) }}" method="POST">
                 @csrf
@@ -104,7 +104,7 @@
                 <h6 class="text-uppercase small fw-bold text-muted mb-3">Bus</h6>
                 <h3 class="mb-0">{{ $mantenimiento->placa }}</h3>
                 <p class="text-muted mb-3">{{ $mantenimiento->bus->modelo ?? '—' }}</p>
-                <span class="badge @if((int)$mantenimiento->bus?->id_estado === 7) bg-warning text-dark @else bg-success @endif">
+                <span class="badge @if((int)$mantenimiento->bus?->id_estado === 4) bg-warning text-dark @else bg-success @endif">
                     {{ $mantenimiento->bus?->estado?->nombre_estado ?? 'Sin estado' }}
                 </span>
                 <hr class="my-3">
@@ -122,7 +122,7 @@
                 </div>
                 <div>
                     <label class="small text-muted d-block">Estado del registro</label>
-                    @if((int)$mantenimiento->id_estado === 7)
+                    @if((int)$mantenimiento->id_estado === 4)
                         <span class="badge bg-warning text-dark">En Taller</span>
                     @else
                         <span class="badge bg-success">Finalizado</span>
@@ -136,9 +136,17 @@
                     @forelse($mantenimiento->detalles as $detalle)
                         <div class="list-group-item px-0 py-3">
                             <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1 fw-bold">{{ $detalle->tipoMantenimiento->nombre ?? 'General' }}</h6>
-                            </div>
+                            <h6 class="mb-1 fw-bold">{{ $detalle->tipoMantenimiento->nombre ?? 'General' }}</h6>
                             <p class="mb-1 text-muted">{{ $detalle->descripcion }}</p>
+
+                            @if($detalle->id_reporte)
+                                <div class="mt-1">
+                                    <span class="badge bg-light text-primary border" style="font-size:0.75rem; font-weight:normal;">
+                                        <i class="material-symbols-rounded" style="font-size:0.9rem; vertical-align:middle;">task_alt</i>
+                                        Resolvió Falla #{{ str_pad($detalle->id_reporte, 4, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                </div>
+                            @endif
                             @if($detalle->evidencia_foto)
                                 <div class="mt-2 text-start d-print-none">
                                     <a href="{{ asset('storage/' . $detalle->evidencia_foto) }}" target="_blank" class="d-inline-flex align-items-center gap-1 text-primary small text-decoration-none">
@@ -191,7 +199,7 @@
             <tr>
                 <td style="padding:6px 0; font-weight:bold; color:#555; font-size:9pt;">ESTADO</td>
                 <td style="padding:6px 8px;">
-                    @if((int)$mantenimiento->id_estado === 7) En Taller @else Finalizado @endif
+                    @if((int)$mantenimiento->id_estado === 4) En Taller @else Finalizado @endif
                 </td>
                 <td style="padding:6px 0; font-weight:bold; color:#555; font-size:9pt;">COSTO TOTAL</td>
                 <td style="padding:6px 8px; font-weight:bold; font-size:12pt;">${{ number_format($mantenimiento->costo_total, 0, ',', '.') }}</td>

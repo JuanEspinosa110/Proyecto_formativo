@@ -2,19 +2,37 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GestorRecargas\GestorRecargaController;
+use App\Http\Controllers\GestorRecargas\TitularidadTarjetaController;
 
-// Rol ID 8 = GESTOR DE RECARGAS
-Route::middleware(['auth:web', 'role:8'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
+// ----------------------------------------------------------------------
+// 1. Módulos COMPARTIDOS para Admin (10) y Gestor (8)
+// ----------------------------------------------------------------------
+Route::middleware(['auth:web', 'role:gestor_recargas', 'CheckNit'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
     Route::get('/dashboard', [GestorRecargaController::class, 'dashboard'])->name('dashboard');
-    
-    // Recargas
+    Route::get('/historial', [GestorRecargaController::class, 'historial'])->name('historial');
+});
+
+// ----------------------------------------------------------------------
+// 2. Módulos EXCLUSIVOS para Gestor de Recargas (solo rol 8)
+// ----------------------------------------------------------------------
+Route::middleware(['auth:web', 'role:8', 'CheckNit'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
     Route::get('/recargar', [GestorRecargaController::class, 'createRecarga'])->name('recargar');
     Route::get('/recargar/consultar', [GestorRecargaController::class, 'consultarTarjeta'])->name('recargar.consultar');
     Route::post('/recargar', [GestorRecargaController::class, 'storeRecarga'])->name('recargar.store');
     
-    // Historial
-    Route::get('/historial', [GestorRecargaController::class, 'historial'])->name('historial');
-    
+    // Titularidad de tarjeta
+    Route::get('/titularidad', [TitularidadTarjetaController::class, 'index'])->name('titularidad');
+    Route::post('/titularidad/buscar-usuario', [TitularidadTarjetaController::class, 'buscarUsuario'])->name('titularidad.buscar');
+    Route::post('/titularidad/enviar-codigo', [TitularidadTarjetaController::class, 'enviarCodigo'])->name('titularidad.enviar-codigo');
+    Route::post('/titularidad/consultar-cooldown', [TitularidadTarjetaController::class, 'consultarCooldown'])->name('titularidad.consultar-cooldown');
+    Route::post('/titularidad/cambiar', [TitularidadTarjetaController::class, 'cambiarTarjeta'])->name('titularidad.cambiar');
+    Route::post('/titularidad/resetear-cooldown', [TitularidadTarjetaController::class, 'resetearCooldown'])->name('gestor-recargas.titularidad.resetear-cooldown');
+});
+
+// ----------------------------------------------------------------------
+// 3. Módulos EXCLUSIVOS para Admin de Recargas (solo rol 10)
+// ----------------------------------------------------------------------
+Route::middleware(['auth:web', 'role:admin_recargas', 'CheckNit'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
     // Gestión de usuarios de la propia empresa
     Route::get('/usuarios', [GestorRecargaController::class, 'usuariosIndex'])->name('usuarios.index');
     Route::get('/usuarios/crear', [GestorRecargaController::class, 'usuariosCreate'])->name('usuarios.create');

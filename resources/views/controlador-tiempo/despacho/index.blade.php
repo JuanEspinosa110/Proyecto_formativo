@@ -12,7 +12,7 @@
 
     {{-- ─── Resumen rápido ───────────────────────────────────────── --}}
     <div class="row g-3 mt-2 mb-3">
-        <div class="col-6 col-md-4">
+        <div class="col-6">
             <div class="bg-white rounded-3 shadow-sm p-3 ct-kpi d-flex align-items-center gap-3">
                 <span class="material-symbols-rounded fs-2 ct-kpi-icon">directions_bus</span>
                 <div>
@@ -21,16 +21,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-4">
-            <div class="bg-white rounded-3 shadow-sm p-3 ct-kpi d-flex align-items-center gap-3">
-                <span class="material-symbols-rounded fs-2 ct-kpi-icon">alt_route</span>
-                <div>
-                    <div class="fs-3 fw-bold lh-1">{{ $rutas->count() }}</div>
-                    <div class="text-muted small">Rutas activas</div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4">
+        <div class="col-6">
             <div class="bg-white rounded-3 shadow-sm p-3 ct-kpi d-flex align-items-center gap-3">
                 <span class="material-symbols-rounded fs-2 ct-kpi-icon">assignment_ind</span>
                 <div>
@@ -54,32 +45,35 @@
             <form action="{{ route('controlador-tiempo.despacho.index') }}" method="GET" class="row g-2">
                 <div class="col-md-2">
                     <div class="input-group input-group-sm">
+                        <span class="input-group-text border-0 bg-white shadow-sm"><span class="material-symbols-rounded fs-6">calendar_today</span></span>
+                        <input type="date" name="fecha" value="{{ $fechaFiltro }}" class="form-control border-0 shadow-sm">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="input-group input-group-sm">
                         <span class="input-group-text border-0 bg-white shadow-sm"><span class="material-symbols-rounded fs-6">search</span></span>
                         <input type="text" name="placa" value="{{ request('placa') }}" class="form-control border-0 shadow-sm" placeholder="Bus / Placa...">
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text border-0 bg-white shadow-sm"><span class="material-symbols-rounded fs-6">alt_route</span></span>
-                        <input type="number" name="ruta_id" value="{{ request('ruta_id') }}" class="form-control border-0 shadow-sm" placeholder="ID Ruta...">
-                    </div>
+                    <select name="ruta_id" class="form-select form-select-sm border-0 shadow-sm">
+                        <option value="">Todas las rutas</option>
+                        @foreach($rutas as $r)
+                            <option value="{{ $r->id_ruta }}" {{ request('ruta_id') == $r->id_ruta ? 'selected' : '' }}>Ruta {{ $r->id_ruta }}</option>
+                        @endforeach
+                    </select>
                 </div>
-                <div class="col-md-3">
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text border-0 bg-white shadow-sm"><span class="material-symbols-rounded fs-6">person</span></span>
-                        <input type="number" name="doc_usuario" value="{{ request('doc_usuario') }}" class="form-control border-0 shadow-sm" placeholder="Doc. Conductor...">
-                    </div>
-                </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <select name="estado" class="form-select form-select-sm border-0 shadow-sm">
                         <option value="">Todos los estados</option>
+                        <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Programados</option>
                         <option value="iniciado" {{ request('estado') == 'iniciado' ? 'selected' : '' }}>En Recorrido</option>
-                        <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendientes</option>
+                        <option value="finalizado" {{ request('estado') == 'finalizado' ? 'selected' : '' }}>Finalizados</option>
                     </select>
                 </div>
                 <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-ct btn-sm w-100 shadow-sm">Filtro</button>
-                    @if(request()->anyFilled(['placa', 'ruta_id', 'doc_usuario', 'estado']))
+                    @if(request()->anyFilled(['placa', 'ruta_id', 'doc_usuario', 'estado', 'fecha']))
                         <a href="{{ route('controlador-tiempo.despacho.index') }}" class="btn btn-light btn-sm shadow-sm">
                             <span class="material-symbols-rounded fs-6 align-middle">close</span>
                         </a>
@@ -95,22 +89,36 @@
                         <th class="ps-4 py-3">Bus / Placa</th>
                         <th class="py-3">Conductor</th>
                         <th class="py-3 text-center">Ruta ID</th>
+                        <th class="py-3 text-center">Vigencia (Inicio/Fin)</th>
                         <th class="py-3 text-center">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($asignaciones as $asig)
-                        <tr class="border-top">
+                        @php
+                            $fechaViaje = \Carbon\Carbon::parse($asig->fecha);
+                            $esHoy = $fechaViaje->isToday();
+                            $enRecorrido = $asig->recorridos->isNotEmpty() && $asig->id_estado != 5;
+                            $finalizado = $asig->id_estado == 5;
+                        @endphp
+                        <tr class="border-top {{ $enRecorrido ? 'bg-primary bg-opacity-10' : '' }}">
                             <td class="ps-4">
-                                <span class="fw-bold text-dark">{{ $asig->placa ?? $asig->bus->placa ?? '—' }}</span>
-                                <div class="text-muted small">{{ $asig->bus->modelo ?? '' }}</div>
+                                <div class="d-flex align-items-center gap-2">
+                                    @if($enRecorrido)
+                                        <span class="position-absolute start-0 h-100 bg-primary" style="width:4px;"></span>
+                                    @endif
+                                    <div>
+                                        <span class="fw-bold text-dark">{{ $asig->placa ?? '—' }}</span>
+                                        <div class="text-muted small">{{ $asig->bus->modelo ?? '' }}</div>
+                                    </div>
+                                </div>
                             </td>
                             <td>
-                                @if($asig->usuario)
-                                    <span class="fw-semibold">{{ $asig->usuario->primer_nombre }} {{ $asig->usuario->primer_apellido }}</span>
-                                    <div class="text-muted small">Doc: {{ $asig->usuario->doc_usuario }}</div>
+                                @if($asig->conductor)
+                                    <span class="fw-semibold">{{ $asig->conductor->primer_nombre }} {{ $asig->conductor->primer_apellido }}</span>
+                                    <div class="text-muted small">Doc: {{ $asig->conductor->doc_usuario }}</div>
                                 @else
-                                    <span class="text-muted">Sin conductor</span>
+                                    <span class="text-muted">Sin asignar</span>
                                 @endif
                             </td>
                             <td class="text-center">
@@ -124,9 +132,24 @@
                                 </div>
                             </td>
                             <td class="text-center">
-                                <span class="badge" style="background:var(--ct-accent-light); color:var(--ct-accent); border:1px solid var(--ct-accent-mid); border-radius:999px; padding:0.25em 0.8em; font-size:0.78rem; font-weight:600;">
-                                    {{ $asig->recorridos->isNotEmpty() ? 'EN CURSO' : 'PENDIENTE' }}
-                                </span>
+                                <div class="small fw-bold {{ $esHoy ? 'text-primary' : 'text-muted' }}">
+                                    {{ $fechaViaje->format('d/m/Y') }}
+                                </div>
+                                <div class="small fw-bold text-dark mt-1" style="font-size: 0.9rem;">
+                                    {{ $fechaViaje->format('h:i A') }}
+                                </div>
+                                @if($esHoy)
+                                    <span class="badge bg-primary-subtle text-primary border-primary-subtle px-2 mt-1" style="font-size: 0.6rem;">HOY</span>
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                @if($finalizado)
+                                    <span class="badge" style="background:#e5f6ee; color:#2a9e6a; border:1px solid #c6e9d9; border-radius:999px; padding:0.25em 0.8em; font-size:0.78rem; font-weight:600;">FINALIZADO</span>
+                                @elseif($enRecorrido)
+                                    <span class="badge" style="background:var(--ct-accent-light); color:var(--ct-accent); border:1px solid var(--ct-accent-mid); border-radius:999px; padding:0.25em 0.8em; font-size:0.78rem; font-weight:600;">EN RECORRIDO</span>
+                                @else
+                                    <span class="badge" style="background:#fef4dc; color:#c97b0c; border:1px solid #f9e6b3; border-radius:999px; padding:0.25em 0.8em; font-size:0.78rem; font-weight:600;">PROGRAMADO</span>
+                                @endif
                             </td>
                         </tr>
                     @empty

@@ -16,19 +16,26 @@ class DashboardController extends Controller
 
         // Buses activos de la empresa del controlador
         $totalBuses     = Bus::where('NIT', $user->NIT)->count();
-        $busesEnRuta    = Bus::where('NIT', $user->NIT)->where('id_estado', 1)->count();
-        $busesInactivos = Bus::where('NIT', $user->NIT)->where('id_estado', '!=', 1)->count();
+        
+        // Buses que tienen viajes programados o en curso para HOY
+        $busesEnRuta = Bus::where('NIT', $user->NIT)
+            ->whereHas('viajes', function($q) {
+                $q->whereDate('fecha', \Carbon\Carbon::today());
+            })
+            ->count();
 
-        $asignaciones = Asignacion::with(['bus', 'usuario', 'ruta'])
+        $busesInactivos = Bus::where('NIT', $user->NIT)
+            ->whereDoesntHave('viajes', function($q) {
+                $q->whereDate('fecha', \Carbon\Carbon::today());
+            })
+            ->count();
+
+        $asignaciones = \App\Models\Viaje::with(['bus', 'conductor', 'ruta.barrioOrigen', 'ruta.barrioDestino'])
             ->whereHas('bus', fn($q) => $q->where('NIT', $user->NIT))
-            ->orderBy('id_asignacion', 'desc')
+            ->orderBy('id_viaje', 'desc')
             ->take(10)
             ->get();
 
-        // Rutas de la empresa (basadas en buses asignados)
-        $rutasActivas = Ruta::whereHas('asignaciones.bus', fn($q) => $q->where('NIT', $user->NIT))
-            ->with(['barrioOrigen', 'barrioDestino'])
-            ->count();
 
         // ─── LÓGICA DE FRECUENCIAS ───
         $rutasDetalle = Ruta::whereHas('asignaciones.bus', fn($q) => $q->where('NIT', $user->NIT))
@@ -36,16 +43,19 @@ class DashboardController extends Controller
             ->get();
 
         foreach ($rutasDetalle as $ruta) {
-            $ultimoRecorrido = \App\Models\Recorrido::where('id_ruta', $ruta->id_ruta)
+            $ultimoRecorrido = \App\Models\Recorrido::with('viaje')
+                ->whereHas('viaje', function($q) use ($ruta) {
+                    $q->where('id_ruta', $ruta->id_ruta);
+                })
                 ->whereDate('hora_salida', \Carbon\Carbon::today())
                 ->orderBy('hora_salida', 'desc')
                 ->first();
 
             if ($ultimoRecorrido) {
-                $ruta->minutos_desde_salida = \Carbon\Carbon::parse($ultimoRecorrido->hora_salida)->diffInMinutes(\Carbon\Carbon::now());
-                $ruta->ultimo_bus = $ultimoRecorrido->placa;
+                $ruta->hora_salida = \Carbon\Carbon::parse($ultimoRecorrido->hora_salida);
+                $ruta->ultimo_bus = $ultimoRecorrido->viaje->placa ?? null;
             } else {
-                $ruta->minutos_desde_salida = null;
+                $ruta->hora_salida = null;
                 $ruta->ultimo_bus = null;
             }
         }
@@ -55,7 +65,6 @@ class DashboardController extends Controller
             'busesEnRuta',
             'busesInactivos',
             'asignaciones',
-            'rutasActivas',
             'rutasDetalle'
         ));
     }

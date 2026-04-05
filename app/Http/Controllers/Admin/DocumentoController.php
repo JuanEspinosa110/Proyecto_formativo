@@ -126,8 +126,7 @@ class DocumentoController extends Controller
         }
 
         $query = Documento::where('NIT', $empresa->NIT)
-            ->with(['tipoDocumento', 'estado', 'bus'])
-            ->whereNotNull('placa'); // Centrarse en documentos de vehículos
+            ->with(['tipoDocumento', 'estado', 'bus', 'usuario']);
 
         // Filtros
         if ($request->filled('tipo')) {
@@ -177,8 +176,7 @@ class DocumentoController extends Controller
         }
 
         $query = Documento::where('NIT', $empresa->NIT)
-            ->with(['tipoDocumento', 'estado', 'bus'])
-            ->whereNotNull('placa');
+            ->with(['tipoDocumento', 'estado', 'bus', 'usuario']);
 
         // Filtrar solicitudes: Excluir Aprobados (1) y Rechazados (8)
         $query->whereNotIn('id_estado', [1, 8]);
@@ -247,7 +245,7 @@ class DocumentoController extends Controller
                     return redirect()->back()->with('error', '  El archivo no pudo ser validado correctamente.');
                 }
 
-                $ruta = $archivo->store('documentos', 'public');
+                $ruta = $archivo->store('uploads/documentos', 'uploads');
 
                 if (!$ruta) {
                     return redirect()->back()->with('error', '  Error al guardar el archivo. Intenta de nuevo.');
@@ -262,8 +260,13 @@ class DocumentoController extends Controller
             // Crear documento
             Documento::create($validated);
 
+            if (auth()->user()->id_tipo_usuario == 4) {
+                return redirect()->route('empresa.dashboard', ['tab' => 'documentacion'])
+                    ->with('success', 'Documento creado exitosamente.');
+            }
+
             return redirect()->route('admin.documentos.index')
-                ->with('success', '  Documento creado exitosamente');
+                ->with('success', 'Documento creado exitosamente');
         } catch (\Exception $e) {
             Log::error('Error al crear documento: ' . $e->getMessage());
             return redirect()->back()->with('error', '  Error al crear el documento. Intenta de nuevo.');
@@ -329,11 +332,11 @@ class DocumentoController extends Controller
                 }
 
                 // Eliminar archivo anterior
-                if ($documento->archivo && Storage::disk('public')->exists($documento->archivo)) {
-                    Storage::disk('public')->delete($documento->archivo);
+                if ($documento->archivo && Storage::disk('uploads')->exists($documento->archivo)) {
+                    Storage::disk('uploads')->delete($documento->archivo);
                 }
 
-                $ruta = $archivo->store('documentos', 'public');
+                $ruta = $archivo->store('uploads/documentos', 'uploads');
 
                 if (!$ruta) {
                     return redirect()->back()->with('error', '  Error al guardar el archivo. Intenta de nuevo.');
@@ -345,8 +348,13 @@ class DocumentoController extends Controller
             // Actualizar documento
             $documento->update($validated);
 
+            if (auth()->user()->id_tipo_usuario == 4) {
+                return redirect()->route('empresa.dashboard', ['tab' => 'documentacion'])
+                    ->with('success', 'Documento actualizado correctamente.');
+            }
+
             return redirect()->route('admin.documentos.index')
-                ->with('success', '  Documento actualizado exitosamente');
+                ->with('success', 'Documento actualizado exitosamente');
         } catch (\Exception $e) {
             Log::error('Error al actualizar documento: ' . $e->getMessage());
             return redirect()->back()->with('error', '  Error al actualizar el documento. Intenta de nuevo.');
@@ -370,14 +378,19 @@ class DocumentoController extends Controller
 
         try {
             // Eliminar archivo
-            if ($documento->archivo && Storage::disk('public')->exists($documento->archivo)) {
-                Storage::disk('public')->delete($documento->archivo);
+            if ($documento->archivo && Storage::disk('uploads')->exists($documento->archivo)) {
+                Storage::disk('uploads')->delete($documento->archivo);
             }
 
             $documento->delete();
 
+            if (auth()->user()->id_tipo_usuario == 4) {
+                return redirect()->route('empresa.dashboard', ['tab' => 'documentacion'])
+                    ->with('success', 'Documento eliminado correctamente.');
+            }
+
             return redirect()->route('admin.documentos.index')
-                ->with('success', '  Documento eliminado exitosamente');
+                ->with('success', 'Documento eliminado exitosamente');
         } catch (\Exception $e) {
             Log::error('Error al eliminar documento: ' . $e->getMessage());
             return redirect()->back()->with('error', '  Error al eliminar el documento.');
@@ -399,19 +412,21 @@ class DocumentoController extends Controller
             ->where('NIT', $empresa->NIT)
             ->firstOrFail();
 
-        if (!Storage::disk('public')->exists($documento->archivo)) {
-            return redirect()->route('admin.documentos.index')
+        if (!Storage::disk('uploads')->exists($documento->archivo)) {
+            $redirectRoute = auth()->user()->id_tipo_usuario == 4 ? 'empresa.dashboard' : 'admin.documentos.index';
+            return redirect()->route($redirectRoute)
                 ->with('error', '  El archivo no existe o fue eliminado');
         }
 
         try {
-            return Storage::disk('public')->download(
+            return Storage::disk('uploads')->download(
                 $documento->archivo,
                 basename($documento->archivo)
             );
         } catch (\Exception $e) {
             Log::error('Error al descargar documento: ' . $e->getMessage());
-            return redirect()->route('admin.documentos.index')
+            $redirectRoute = auth()->user()->id_tipo_usuario == 4 ? 'empresa.dashboard' : 'admin.documentos.index';
+            return redirect()->route($redirectRoute)
                 ->with('error', '  Error al descargar el archivo');
         }
     }

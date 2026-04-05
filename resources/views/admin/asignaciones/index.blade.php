@@ -25,9 +25,9 @@
     <!-- Filtros de Búsqueda -->
     <div class="card border-0 shadow-sm mb-4 rounded-3">
         <div class="card-body p-3">
-            <form method="GET" action="{{ route('admin.asignaciones.index') }}" class="row g-3 align-items-center">
-                <div class="col-md-2">
-                    <input type="text" name="id_viaje" class="form-control bg-light" placeholder="ID Asignación" value="{{ request('id_viaje') }}">
+            <form method="GET" action="{{ url()->current() }}" class="row g-3 align-items-center">
+                <div class="col-md-1">
+                    <input type="text" name="id_viaje" class="form-control bg-light" placeholder="ID" value="{{ request('id_viaje') }}">
                 </div>
                 <div class="col-md-2">
                     <select name="placa" class="form-select bg-light">
@@ -41,7 +41,17 @@
                     <select name="id_ruta" class="form-select bg-light">
                         <option value="">Ruta...</option>
                         @foreach($rutas as $ruta)
-                        <option value="{{ $ruta->id_ruta }}" {{ request('id_ruta') == $ruta->id_ruta ? 'selected' : '' }}>{{ $ruta->nombre_ruta ?? 'Ruta '.$ruta->id_ruta }}</option>
+                        <option value="{{ $ruta->id_ruta }}" {{ request('id_ruta') == $ruta->id_ruta ? 'selected' : '' }}>
+                            #{{ $ruta->codigo_ruta }} - {{ $ruta->nombre_ruta ?? 'Ruta' }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="id_estado" class="form-select bg-light">
+                        <option value="">Estado...</option>
+                        @foreach($estados as $est)
+                        <option value="{{ $est->id_estado }}" {{ request('id_estado') == $est->id_estado ? 'selected' : '' }}>{{ $est->nombre_estado }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -49,13 +59,15 @@
                     <input type="text" name="conductor" class="form-control bg-light" placeholder="Conductor..." value="{{ request('conductor') }}">
                 </div>
                 <div class="col-md-2">
-                    <input type="time" name="hora" class="form-control bg-light" value="{{ request('hora') }}" title="Filtrar por hora exacta">
+                    <input type="date" name="fecha" class="form-control bg-light" value="{{ request('fecha') }}" title="Filtrar por fecha">
                 </div>
-                <div class="col-md-2 ms-auto d-flex gap-2">
-                    <button type="submit" class="btn btn-dark fw-semibold px-3 w-100">Filtrar</button>
-                    @if(request()->hasAny(['id_viaje', 'placa', 'id_ruta', 'id_estado', 'conductor', 'hora']))
-                        <a href="{{ route('admin.asignaciones.index') }}" class="btn btn-light text-muted" title="Limpiar">
-                            <span class="material-symbols-rounded" style="font-size: 1.2rem;">filter_alt_off</span>
+                <div class="col-md-1 ms-auto d-flex gap-2">
+                    <button type="submit" class="btn btn-dark fw-semibold px-2 w-100" title="Filtrar">
+                        <span class="material-symbols-rounded">search</span>
+                    </button>
+                    @if(request()->hasAny(['id_viaje', 'placa', 'id_ruta', 'id_estado', 'conductor', 'fecha']))
+                        <a href="{{ url()->current() }}" class="btn btn-light text-muted px-2" title="Limpiar">
+                            <span class="material-symbols-rounded">filter_alt_off</span>
                         </a>
                     @endif
                 </div>
@@ -125,7 +137,7 @@
                             <input type="hidden" name="id_ruta" id="edit_id_ruta_hidden">
                             <select id="edit_id_ruta" class="form-select form-select-sm bg-light" disabled>
                                 @foreach($rutas as $ruta)
-                                <option value="{{ $ruta->id_ruta }}">{{ $ruta->nombre_ruta ?? 'Ruta #'.$ruta->id_ruta }}</option>
+                                <option value="{{ $ruta->id_ruta }}">{{ $ruta->nombre_ruta ?? 'Ruta #'.$ruta->codigo_ruta }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -304,6 +316,10 @@
         const output = document.getElementById(outputId);
         if (!startInput || !startInput.value) {
             output.value = '';
+            // Si es el de creación, bloquear selects
+            if (inputId === 'create_fecha') {
+                toggleModalSelects(false);
+            }
             return;
         }
 
@@ -312,7 +328,70 @@
 
         const endDate = new Date(startDate.getTime() + (8 * 60 * 60 * 1000));
         const options = { hour: '2-digit', minute: '2-digit', hour12: true };
-        output.value = endDate.toLocaleTimeString([], options);
+        output.value = endDate.toLocaleTimeString([], options).toUpperCase();
+
+        // Si es el modal de creación, habilitar y cargar disponibilidad
+        if (inputId === 'create_fecha') {
+            toggleModalSelects(true);
+            actualizarDisponibilidadModal(startInput.value);
+        }
+    }
+
+    function toggleModalSelects(enabled) {
+        const placa = document.getElementById('create_placa');
+        const cond = document.getElementById('create_doc_us');
+        if (!placa || !cond) return;
+
+        placa.disabled = !enabled;
+        cond.disabled = !enabled;
+        placa.title = enabled ? "" : "Fije fecha primero";
+        cond.title = enabled ? "" : "Fije fecha primero";
+    }
+
+    function actualizarDisponibilidadModal(fechaValue) {
+        const placaSelect = document.getElementById('create_placa');
+        const condSelect = document.getElementById('create_doc_us');
+        if (!placaSelect || !condSelect) return;
+
+        placaSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
+        condSelect.innerHTML = '<option value="" disabled selected>Cargando...</option>';
+
+        fetch(`{{ route('empresa.asignaciones.disponibilidad') }}?fecha=${fechaValue}`)
+            .then(r => r.json())
+            .then(data => {
+                // Placas
+                placaSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+                if (data.buses.length === 0) {
+                    placaSelect.innerHTML = '<option value="" disabled>Sin buses disponibles</option>';
+                } else {
+                    data.buses.forEach(b => {
+                        let opt = document.createElement('option');
+                        opt.value = b.placa;
+                        opt.textContent = b.label;
+                        if (b.disabled) opt.disabled = true;
+                        placaSelect.appendChild(opt);
+                    });
+                }
+
+                // Conductores
+                condSelect.innerHTML = '<option value="" disabled selected>Seleccionar...</option>';
+                if (data.conductores.length === 0) {
+                    condSelect.innerHTML = '<option value="" disabled>Sin conductores disponibles</option>';
+                } else {
+                    data.conductores.forEach(c => {
+                        let opt = document.createElement('option');
+                        opt.value = c.doc_usuario;
+                        opt.textContent = c.nombre_completo;
+                        if (c.disabled) opt.disabled = true;
+                        condSelect.appendChild(opt);
+                    });
+                }
+            })
+            .catch(err => {
+                console.error('Error AJAX:', err);
+                placaSelect.innerHTML = '<option value="" disabled>Error al cargar</option>';
+                condSelect.innerHTML = '<option value="" disabled>Error al cargar</option>';
+            });
     }
 
     // Listeners para cambio de fecha
@@ -323,12 +402,12 @@
     document.querySelectorAll('.quick-time').forEach(btn => {
         btn.addEventListener('click', function() {
             const time = this.dataset.time;
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
+            const input = document.getElementById('create_fecha');
             
-            document.getElementById('create_fecha').value = `${year}-${month}-${day}T${time}`;
+            // Si ya hay una fecha, la preservamos. Si no, usamos hoy.
+            let datePart = input.value ? input.value.split('T')[0] : new Date().toISOString().split('T')[0];
+            
+            input.value = `${datePart}T${time}`;
             updateHoraFin('create_fecha', 'create_hora_fin');
         });
     });

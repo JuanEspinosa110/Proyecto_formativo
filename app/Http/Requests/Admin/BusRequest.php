@@ -74,7 +74,16 @@ class BusRequest extends FormRequest
             'id_estado' => [
                 $isUpdate ? 'sometimes' : 'required',
                 'integer',
-                'exists:estado,id_estado'
+                'exists:estado,id_estado',
+                function ($attribute, $value, $fail) use ($user, $isUpdate, $bus) {
+                    if ($user->id_tipo_usuario == 1 && $value == 4) {
+                        // Si es Admin e intenta ponerlo en mantenimiento (4)
+                        $currentBus = $isUpdate ? (\App\Models\Bus::where('placa', $this->route('bus'))->first()) : null;
+                        if (!$currentBus || $currentBus->id_estado != 4) {
+                            $fail('El administrador no tiene permitido enviar vehículos a mantenimiento.');
+                        }
+                    }
+                }
             ],
 
             'linc_transito' => [

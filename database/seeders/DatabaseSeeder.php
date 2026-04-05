@@ -27,6 +27,8 @@ class DatabaseSeeder extends Seeder
             UsuarioEmpresaSeeder::class,
             LicenciaEmpresaSeeder::class,
             SuperAdministradorSeeder::class,
+            PlanesLicenciaSeeder::class,
+            LicenciaSeeder::class,
             BusSeeder::class,
             GestorSetpSeeder::class,
             RutaSeeder::class,
@@ -37,10 +39,13 @@ class DatabaseSeeder extends Seeder
             AsignacionSeeder::class,
             ViajeSeeder::class,
             RecorridoSeeder::class,
+            VentaViajeSeeder::class,
             NovedadRecorridoSeeder::class,
-            MantenimientoSeeder::class,
+            TipoMantenimientoSeeder::class,
             ReporteFallasSeeder::class,
+            MantenimientoSeeder::class,
             GastosSeeder::class,
+            FixTarjetaAlfanumericaSeeder::class,
         ]);
 
     }

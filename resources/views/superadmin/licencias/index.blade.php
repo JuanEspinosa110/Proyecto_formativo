@@ -197,7 +197,7 @@
     </div>
 
     <!-- Información de filtros aplicados -->
-    @if(request()->hasAny(['search', 'estado', 'plan', 'filter']))
+    @if(request()->filled('search') || request()->filled('estado') || request()->filled('plan') || request()->filled('filter'))
     <div class="alert alert-info d-flex justify-content-between align-items-center mb-3">
         <div>
             <i class="fas fa-info-circle me-2"></i>
@@ -299,6 +299,14 @@
                             </td>
                             <td>
                                 <div class="d-flex gap-1 justify-content-center">
+                                    @if($diasRestantes <= 30)
+                                    <a href="{{ route('superadmin.licencias.create', ['nit' => $licencia->NIT]) }}" 
+                                       class="btn btn-sm btn-warning" 
+                                       data-bs-toggle="tooltip" 
+                                       title="Renovar Licencia">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </a>
+                                    @endif
                                     <button class="btn btn-sm btn-outline-info"
                                         data-bs-toggle="tooltip"
                                         title="Ver Detalles"

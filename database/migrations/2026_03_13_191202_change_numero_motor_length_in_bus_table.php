@@ -9,14 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bus', function (Blueprint $table) {
-            $table->string('numero_motor', 17)->change();
+            $table->string('numero_motor', 20)->change();
         });
     }
 
     public function down(): void
     {
         Schema::table('bus', function (Blueprint $table) {
-            $table->string('numero_motor', 17)->change();
+            $table->string('numero_motor', 14)->change();
         });
     }
 };

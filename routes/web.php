@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegistroController;
 use App\Http\Controllers\Auth\RecuperarPasswordController;
 use App\Http\Controllers\Admin\UsuarioController as AdminUsuarioController;
 use App\Http\Controllers\Admin\ReporteController;
+use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\PropietarioController;
 use App\Http\Controllers\ConductorController;
 
@@ -45,11 +46,29 @@ require base_path('routes/gestor-recargas.php');
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\StripeWebhookController;
 
-Route::get('/cliclkpasajes', [LandingController::class, 'index'])->name('home');
+Route::get('/', [LandingController::class, 'index'])->name('home');
+
+// Rutas de Error de Acceso (NIT y Licencia)
+Route::middleware('auth')->group(function () {
+    Route::get('/error/no-asociado', function () {
+        return view('errors.no-nit');
+    })->name('error.no-nit');
+
+    Route::get('/error/licencia-vencida', function () {
+        // Obtener un correo de contacto de SuperAdmin para soporte
+        $contacto = Illuminate\Support\Facades\DB::table('super_administrador')->value('correo') ?? 'soporte@sigu.com';
+        return view('errors.licencia-vencida', compact('contacto'));
+    })->name('error.licencia-vencida');
+});
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// Rutas de 2FA
+Route::get('/2fa/verificar', [\App\Http\Controllers\Auth\TwoFactorController::class, 'index'])->name('2fa.index');
+Route::post('/2fa/verificar', [\App\Http\Controllers\Auth\TwoFactorController::class, 'verify'])->name('2fa.verify');
+Route::post('/2fa/reenviar', [\App\Http\Controllers\Auth\TwoFactorController::class, 'resend'])->name('2fa.resend');
 
 
 
@@ -98,7 +117,7 @@ Route::post('/simulacion/validar', [SimulacionController::class, 'validar'])->na
 Route::middleware('auth:web')->group(function () {
 
     Route::get('/pasajero/dashboard', fn() => view('pasajeros.index'))
-        ->name('pasajero.dashboard')->middleware('role:2');
+        ->name('pasajero.dashboard')->middleware('auth:web,superadmin');
     Route::prefix('conductor')->name('conductor.')->middleware('role:3')->group(function () {
         Route::get('/dashboard', [ConductorController::class, 'dashboard'])->name('dashboard');
         Route::post('/iniciar-turno/{id_viaje}', [ConductorController::class, 'iniciarTurno'])->name('iniciarTurno');
@@ -110,35 +129,12 @@ Route::middleware('auth:web')->group(function () {
         Route::get('/fallas', [ConductorController::class, 'historialFallas'])->name('fallas');
         Route::post('/reportar-falla', [ConductorController::class, 'reportarFalla'])->name('reportarFalla');
     });
-
-        /*
-        Route::middleware(['auth:web', 'role:5'])->prefix('empresa')->name('empresa.')->group(function () {
-            Route::get('/dashboard', [EmpresaController::class, 'dashboard'])->name('dashboard');
-
-            // Usuarios (Propietarios, Conductores)
-            Route::post('/usuarios', [EmpresaController::class, 'storeUsuario'])->name('usuarios.store');
-
-            // Buses
-            Route::post('/buses', [EmpresaController::class, 'storeBus'])->name('buses.store');
-
-            // Documentos
-            Route::post('/documentos/{id}/aprobar', [EmpresaController::class, 'aprobarDocumento'])->name('documentos.aprobar');
-            Route::post('/documentos/{id}/rechazar', [EmpresaController::class, 'rechazarDocumento'])->name('documentos.rechazar');
-
-            // Asignaciones
-            Route::post('/asignaciones', [EmpresaController::class, 'storeAsignacion'])->name('asignaciones.store');
-
-            // Reportes
-            Route::get('/reportes/export', [EmpresaController::class, 'descargarReporte'])->name('reportes.export');
-        });
-        */
-
 });
 
 // ==========================================
 // RAMP: PANEL PROPIETARIO (Independiente)
 // ==========================================
-Route::middleware(['auth:web', 'role:5'])->prefix('propietario')->name('propietario.')->group(function () {
+Route::middleware(['auth:web', 'role:5', 'CheckNit'])->prefix('propietario')->name('propietario.')->group(function () {
     Route::get('/dashboard', [PropietarioController::class, 'dashboard'])->name('dashboard');
     Route::post('/documento', [PropietarioController::class, 'subirDocumento'])->name('subirDocumento');
     Route::post('/gasto', [PropietarioController::class, 'registrarGasto'])->name('registrarGasto');
@@ -146,9 +142,9 @@ Route::middleware(['auth:web', 'role:5'])->prefix('propietario')->name('propieta
     Route::get('/bus/{placa}/detalles', [PropietarioController::class, 'verVehiculo'])->name('verVehiculo');
     Route::get('/bus/{placa}/historial-documental', [PropietarioController::class, 'historialDocumental'])->name('historialDocumental');
     Route::get('/asignacion/{id}/detalle', [PropietarioController::class, 'getDetalleAsignacion'])->name('detalleAsignacion');
-    Route::get('/empresa/dashboard', fn() => view('empresa.dashboard'))
-        ->name('empresa.dashboard');
 });
+
+// PANEL AUXILIAR (Administrado en routes/empresa.php)
 
 
 

@@ -190,6 +190,45 @@
 
     </div>
 
+    <!-- SECCIÓN DE GRÁFICAS (Espejo de Admin) -->
+    <section class="sa-charts-grid mt-5 mb-5 mx-0">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="sa-chart-card shadow-sm border-0 rounded-4 p-4 bg-white">
+                    <h5 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+                        <span class="material-symbols-rounded text-primary">pie_chart</span>
+                        Distribución
+                    </h5>
+                    <div style="height: 300px;">
+                        <canvas id="chartUsersDocs"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="sa-chart-card shadow-sm border-0 rounded-4 p-4 bg-white">
+                    <h5 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+                        <span class="material-symbols-rounded text-success">bar_chart</span>
+                        Buses
+                    </h5>
+                    <div style="height: 300px;">
+                        <canvas id="chartBusesEstado"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="sa-chart-card shadow-sm border-0 rounded-4 p-4 bg-white">
+                    <h5 class="fw-bold text-dark mb-4 d-flex align-items-center gap-2">
+                        <span class="material-symbols-rounded text-info">timeline</span>
+                        Viajes
+                    </h5>
+                    <div style="height: 300px;">
+                        <canvas id="chartViajesRuta"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- INCLUDES DE MODALES -->
     @include('auxiliar.modals.usuarios')
     @include('auxiliar.modals.vehiculos')
@@ -215,3 +254,10 @@
     }
 </style>
 @endsection
+
+@push('scripts')
+<script>
+    window.ADMIN_STATS_URL = "{{ route('auxiliar.dashboard.stats') }}";
+</script>
+<script src="{{ asset('js/dashboard/admin.js') }}" defer></script>
+@endpush

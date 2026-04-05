@@ -60,7 +60,7 @@ class DashboardController extends Controller
             $buses = $nit ? Bus::with('estado')->where('NIT', $nit)->get() : collect();
 
             // Viajes de la empresa (con ruta)
-            $viajes = $nit ? Viaje::with('ruta')->whereHas('ruta', function($q) use ($nit) {
+            $viajes = $nit ? Viaje::with('ruta')->whereHas('bus', function($q) use ($nit) {
                 $q->where('NIT', $nit);
             })->get() : collect();
 

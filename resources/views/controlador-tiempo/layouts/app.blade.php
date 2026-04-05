@@ -122,7 +122,12 @@
                     <span class="sb-ico"><span class="material-symbols-rounded">assignment</span></span>
                     <span>Planillas</span>
                 </a>
-
+                <div class="sigu-sb-divider"></div>
+                <a href="{{ route('pasajero.dashboard') }}"
+                   class="sigu-sb-link {{ request()->routeIs('pasajero.*') ? 'active' : '' }}">
+                    <span class="sb-ico"><span class="material-symbols-rounded">credit_card</span></span>
+                    <span style="font-weight:700;">Mi Tarjeta</span>
+                </a>
             </nav>
 
             <div class="sigu-sidebar-footer">

@@ -9,6 +9,7 @@ use App\Models\Viaje;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Services\ReporteFallaService;
 
 class VerificacionController extends Controller
 {
@@ -79,5 +80,31 @@ class VerificacionController extends Controller
         
         return redirect()->route('controlador-tiempo.dashboard')
             ->with('warning', 'Bus ' . ($recorrido->viaje->placa ?? 'N/A') . ': Incidencia reportada y documentada.');
+    }
+
+    public function reportarFalla(Request $request, $id_recorrido, ReporteFallaService $service)
+    {
+        $request->validate([
+            'descripcion' => 'required|string|min:5',
+            'nivel_urgencia' => 'required|in:Bajo,Medio,Alto'
+        ]);
+
+        $recorrido = Recorrido::with('viaje')->findOrFail($id_recorrido);
+        $controlador = Auth::user();
+
+        $service->registrarFalla(
+            $recorrido->viaje->placa,
+            $controlador->doc_usuario,
+            $request->descripcion,
+            $request->nivel_urgencia
+        );
+
+        $msg = 'Falla mecánica reportada exitosamente.';
+        if ($request->nivel_urgencia === 'Alto') {
+            $msg .= ' La operación del bus y el turno del conductor han sido suspendidos.';
+            return redirect()->route('controlador-tiempo.dashboard')->with('error', $msg);
+        }
+
+        return redirect()->back()->with('success', $msg);
     }
 }

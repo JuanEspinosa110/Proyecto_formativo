@@ -39,7 +39,13 @@
                             <span class="sigu-user-role">Conductor • {{ auth()->user()->doc_usuario }}</span>
                         </div>
                     </div>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2">
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 px-2">
+                        <li>
+                            <a href="{{ route('pasajero.dashboard') }}" class="dropdown-item py-2 fw-medium d-flex align-items-center gap-2 rounded-2 mb-1">
+                                <span class="material-symbols-rounded">credit_card</span> Mi Tarjeta
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider opacity-10"></li>
                         <li>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
