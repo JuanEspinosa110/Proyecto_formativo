@@ -260,7 +260,7 @@ body {
             rgba(0, 0, 0, 0.20) 100%
         ),
         /* Imagen de fondo */
-        url('/imagenes/hero.jpg');
+        url('../imagenes/hero.jpg');
     background-size: cover;
     background-position: right center;
     background-repeat: no-repeat;
@@ -652,7 +652,7 @@ body {
                 rgba(0, 0, 0, 0.90) 50%,
                 rgba(0, 0, 0, 0.50) 100%
             ),
-            url('/imagenes/hero.jpg');
+            url('../imagenes/hero.jpg');
         background-attachment: scroll;
     }
 

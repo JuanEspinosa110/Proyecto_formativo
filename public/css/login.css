@@ -301,7 +301,7 @@
 .login-body { background-color: #F4F4F6; min-height:100vh; font-family: 'Public Sans', sans-serif; overflow:auto; }
 .login-wrapper { height: calc(100vh - 120px); display:flex; justify-content:center; align-items:center; background-color:#F4F4F6; }
 .login-box { width:70%; height:80%; background:#FFFFFF; display:flex; border-radius:16px; overflow:hidden; box-shadow:0 25px 60px rgba(74,78,105,0.15); }
-.login-left { flex:1; background: linear-gradient(rgba(94,84,142,0.65), rgba(74,78,105,0.65)), url('/imagenes/login-gb.png') center/cover no-repeat; }
+.login-left { flex:1; background: linear-gradient(rgba(94,84,142,0.65), rgba(74,78,105,0.65)), url('../imagenes/login-gb.png') center/cover no-repeat; }
 .login-right { flex:1; display:flex; justify-content:center; align-items:center; background:#FFFFFF; }
 .form-control { border:1px solid #DADDE1; border-radius:8px; }
 .form-control:focus { border-color:#5E548E; box-shadow:0 0 0 0.2rem rgba(94,84,142,0.15); }
@@ -322,7 +322,7 @@
 .regis-footer { text-align:center; margin-top:25px; font-size:14px; }
 
 /* ========== RECUPERAR / COMPARTIDO (recov-) ========== */
-.recov-body { min-height:100vh; font-family:'Public Sans',sans-serif; background: linear-gradient(rgba(31,63,109,0.75), rgba(31,63,109,0.75)), url('/imagenes/login-gb.png') center/cover no-repeat; display:flex; flex-direction:column; }
+.recov-body { min-height:100vh; font-family:'Public Sans',sans-serif; background: linear-gradient(rgba(31,63,109,0.75), rgba(31,63,109,0.75)), url('../imagenes/login-gb.png') center/cover no-repeat; display:flex; flex-direction:column; }
 .recov-wrapper { flex:1; display:flex; justify-content:center; align-items:center; }
 .recov-card { width:100%; max-width:460px; backdrop-filter:blur(12px); background:rgba(255,255,255,0.95); border-radius:18px; box-shadow:0 25px 60px rgba(0,0,0,0.2); overflow:hidden; border:1px solid rgba(255,255,255,0.3); transition:0.3s ease; }
 .recov-card:hover{ transform:translateY(-5px); }
@@ -389,7 +389,7 @@
     font-family: 'Public Sans', sans-serif;
     background:
         linear-gradient(rgba(31,63,109,0.75), rgba(31,63,109,0.75)),
-        url('/imagenes/login-gb.png') center/cover no-repeat;
+        url('../imagenes/login-gb.png') center/cover no-repeat;
     display: flex;
     flex-direction: column;
 }
@@ -927,7 +927,7 @@
     flex: 1;
     background:
         linear-gradient(rgba(94,84,142,0.65), rgba(74,78,105,0.65)),
-        url('/imagenes/login-gb.png') center/cover no-repeat;
+        url('../imagenes/login-gb.png') center/cover no-repeat;
 }
 
 .login-card {
