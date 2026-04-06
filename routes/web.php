@@ -272,3 +272,28 @@ Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle']);
 
 // Ruta Global para Ciudades (AJAX) - Para evitar errores de carga en todos los paneles
 Route::get('/api/ciudades/{id_departamento}', [\App\Http\Controllers\SuperAdmin\EmpresaController::class, 'getCiudadesByDepartamento'])->name('api.ciudades');
+
+// DISPARADOR DE CRON (WEB TRIGGER)
+Route::get('/system/cron/execute/{secret}', function ($secret) {
+    if ($secret !== env('CRON_SECRET')) {
+        return response('Acceso denegado. Clave incorrecta.', 403);
+    }
+
+    try {
+        // Ejecuta el scheduler de Laravel
+        Illuminate\Support\Facades\Artisan::call('schedule:run');
+        $output = Illuminate\Support\Facades\Artisan::output();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Scheduler ejecutado correctamente.',
+            'output' => $output,
+            'time' => now()->toDateTimeString()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+})->name('system.cron.execute');

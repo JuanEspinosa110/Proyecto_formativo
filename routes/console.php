@@ -11,3 +11,4 @@ use Illuminate\Support\Facades\Schedule;
 
 Schedule::command('app:check-document-expirations')->daily();
 Schedule::command('app:check-license-expirations')->daily();
+Schedule::command('tarjetas:generar')->hourly();

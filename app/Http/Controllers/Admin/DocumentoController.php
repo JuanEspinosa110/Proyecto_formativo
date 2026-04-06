@@ -139,16 +139,16 @@ class DocumentoController extends Controller
             $query->where('placa', 'like', '%' . $request->placa . '%');
         }
         if ($request->filled('propietario')) {
-            $query->whereHas('bus', function($q) use ($request) {
+            $query->whereHas('bus', function ($q) use ($request) {
                 $q->where('nombre_propietario', 'like', '%' . $request->propietario . '%')
-                  ->orWhere('doc_propietario', 'like', '%' . $request->propietario . '%');
+                    ->orWhere('doc_propietario', 'like', '%' . $request->propietario . '%');
             });
         }
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%$search%")
-                  ->orWhere('placa', 'like', "%$search%");
+                    ->orWhere('placa', 'like', "%$search%");
             });
         }
 
@@ -185,7 +185,7 @@ class DocumentoController extends Controller
             $query->where('placa', 'like', '%' . $request->placa . '%');
         }
         if ($request->filled('propietario')) {
-            $query->whereHas('bus', function($q) use ($request) {
+            $query->whereHas('bus', function ($q) use ($request) {
                 $q->where('nombre_propietario', 'like', '%' . $request->propietario . '%');
             });
         }
