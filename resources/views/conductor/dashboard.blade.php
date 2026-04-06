@@ -80,7 +80,7 @@
 <div class="row g-4 mb-5">
     @if($asignacionActiva)
         @php
-            $enCurso = $asignacionActiva->id_estado == 4; // En Curso
+            $enCurso = $asignacionActiva->id_estado == 12; // EN CURSO
             $vencido = $asignacionActiva->id_estado == 6; // Vencido/No ejecutado
         @endphp
         <div class="col-md-8 col-xl-9">

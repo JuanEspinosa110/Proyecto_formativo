@@ -15,7 +15,7 @@ class SimulacionController extends Controller
         // Obtener viajes de HOY para simular
         $viajes = Viaje::with(['bus', 'ruta', 'conductor', 'estado'])
             ->whereDate('fecha', Carbon::today())
-            ->whereIn('id_estado', [1, 4]) // Solo Programado (1) o En Curso (4)
+            ->whereIn('id_estado', [1, 12]) // Solo Programado (1) o En Curso (12)
             ->whereHas('ruta', function ($q) {
                 $q->where('id_estado', 1); // 1 = ACTIVO en la tabla estado para Rutas
             })

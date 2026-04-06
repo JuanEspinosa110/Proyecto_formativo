@@ -44,6 +44,7 @@
                         $c = match((int)$asig->id_estado) {
                             1 => 'success',
                             2 => 'danger',
+                            12 => 'info',
                             default => 'warning'
                         };
                         @endphp

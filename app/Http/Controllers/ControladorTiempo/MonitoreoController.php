@@ -33,7 +33,7 @@ class MonitoreoController extends Controller
         $buses = Bus::with([
             'estado',
             'asignaciones' => function ($q) {
-            $q->where('id_estado', 4); // Solo viajes activos (EN CURSO)
+            $q->where('id_estado', 12); // Solo viajes activos (EN CURSO)
         },
             'asignaciones.usuario',
             'asignaciones.ruta.barrioOrigen',
@@ -44,7 +44,7 @@ class MonitoreoController extends Controller
         ])
             ->where('NIT', $user->NIT)
             ->whereHas('asignaciones', function ($q) {
-            $q->where('id_estado', 4);
+            $q->where('id_estado', 12);
         })
             ->orderBy('placa')
             ->get();

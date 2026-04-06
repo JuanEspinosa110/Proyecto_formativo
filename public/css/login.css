@@ -299,11 +299,11 @@
 
 /* ========== LOGIN ========== */
 .login-body { background-color: #F4F4F6; min-height:100vh; font-family: 'Public Sans', sans-serif; overflow:auto; }
-.login-wrapper { height: calc(100vh - 120px); display:flex; justify-content:center; align-items:center; background-color:#F4F4F6; }
-.login-box { width:70%; height:80%; background:#FFFFFF; display:flex; border-radius:16px; overflow:hidden; box-shadow:0 25px 60px rgba(74,78,105,0.15); }
-.login-left { flex:1; background: linear-gradient(rgba(94,84,142,0.65), rgba(74,78,105,0.65)), url('../imagenes/login-gb.png') center/cover no-repeat; }
-.login-right { flex:1; display:flex; justify-content:center; align-items:center; background:#FFFFFF; }
-.form-control { border:1px solid #DADDE1; border-radius:8px; }
+.login-wrapper { min-height: calc(100vh - 90px); display:flex; justify-content:center; align-items:center; background-color:#F4F4F6; padding: 20px; }
+.login-box { width:70%; min-height:450px; height:80vh; max-height: 700px; background:#FFFFFF; display:flex; border-radius:16px; overflow:hidden; box-shadow:0 25px 60px rgba(74,78,105,0.15); transition: all 0.3s ease; }
+.login-left { flex:1; background: linear-gradient(rgba(94,84,142,0.65), rgba(74,78,105,0.65)), url('../imagenes/login-gb.png') center/cover no-repeat; display: flex; align-items: center; justify-content: center; }
+.login-right { flex:1; display:flex; justify-content:center; align-items:center; background:#FFFFFF; padding: 20px; }
+.form-control { border:1px solid #DADDE1; border-radius:8px; padding: 10px 14px; }
 .form-control:focus { border-color:#5E548E; box-shadow:0 0 0 0.2rem rgba(94,84,142,0.15); }
 
 /* ========== REGISTER (regis-) ========== */
@@ -905,52 +905,50 @@
     border-color: #4A4E69 !important;
 }
 
-.login-wrapper {
-    height: calc(100vh - 120px); /* respeta header */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #F4F4F6;
-}
-
-    .login-box {
-    width: 70%;
-    height: 80%;
-    background: #FFFFFF;
-    display: flex;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 25px 60px rgba(74, 78, 105, 0.15);
-}
-
-.login-left {
-    flex: 1;
-    background:
-        linear-gradient(rgba(94,84,142,0.65), rgba(74,78,105,0.65)),
-        url('../imagenes/login-gb.png') center/cover no-repeat;
-}
-
-.login-card {
-    width: 80%;
-    max-width: 380px;
-}
-
-.form-control {
-    border: 1px solid #DADDE1;
-    border-radius: 8px;
-}
-
-.form-control:focus {
-    border-color: #5E548E;
-    box-shadow: 0 0 0 0.2rem rgba(94,84,142,0.15);
-}
-
 .login-right {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     background: #FFFFFF;
+}
+
+
+/* ===========================
+   RESPONSIVE QUERIES
+   =========================== */
+
+@media (max-width: 1200px) {
+    .login-box { width: 85%; }
+}
+
+@media (max-width: 992px) {
+    .login-box { width: 95%; height: 70vh; }
+    .login-header { padding: 0 20px; }
+    .logo-title { font-size: 30px; }
+    .logo-subtitle { font-size: 14px; }
+}
+
+@media (max-width: 768px) {
+    .login-header { height: auto; padding: 15px 20px; flex-wrap: wrap; gap: 10px; }
+    .header-left { order: 1; }
+    .header-right { order: 2; }
+    .header-center { order: 3; width: 100%; margin-top: 10px; }
+    
+    .login-wrapper { min-height: calc(100vh - 150px); padding: 10px; }
+    .login-box { flex-direction: column; height: auto; min-height: unset; margin: 20px 0; }
+    .login-left { display: none; }
+    .login-right { width: 100%; padding: 30px 15px; }
+    .login-card { width: 100%; max-width: 100%; padding: 0; border: none; box-shadow: none; }
+    
+    .logo-title { font-size: 24px; }
+    .logo-subtitle { font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+    .header-center { display: none; } /* Hide complicated subtitle on very small screens */
+    .header-left .logo-icon { width: 100px; }
+    .login-header { justify-content: space-between; }
 }
 
 

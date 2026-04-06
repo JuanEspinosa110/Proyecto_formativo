@@ -12,10 +12,6 @@ class BusSeeder extends Seeder
         // --- GENERACIÓN ORGÁNICA DE BUSES (8 por empresa de transporte) ---
         $empresasTransporte = [
             ['NIT' => 900123456, 'prefix' => '000'],
-            ['NIT' => 900111222, 'prefix' => '111'],
-            ['NIT' => 900333444, 'prefix' => '333'],
-            ['NIT' => 900555666, 'prefix' => '555'],
-            ['NIT' => 900777888, 'prefix' => '777'],
         ];
 
         foreach ($empresasTransporte as $empresa) {
