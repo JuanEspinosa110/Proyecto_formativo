@@ -255,17 +255,7 @@ Route::prefix('superadmin')
         Route::get('/dashboard/stats', [DashboardController::class, 'superAdminStats'])
             ->name('dashboard.stats');
 
-        // Ruta de inactivar usuarios (SuperAdmin)
-        Route::patch('usuarios/{doc}/inactivar', [UsuarioController::class, 'inactivar'])
-            ->name('superadmin.usuarios.inactivar');
-
     });
-
-    Route::patch(
-    'usuarios/{doc}/inactivar',
-    [UsuarioController::class, 'inactivar'])->name('admin.usuarios.inactivar');
-
-    Route::put('admin/usuarios/{doc_usuario}', [\App\Http\Controllers\Admin\UsuarioController::class, 'update'])->name('admin.usuarios.update');
 
 // Webhook de Stripe
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle']);
