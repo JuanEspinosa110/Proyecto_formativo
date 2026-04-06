@@ -49,8 +49,8 @@ return [
 
         'uploads' => [
             'driver' => 'local',
-            'root' => base_path(), // Forzamos la raíz del proyecto como destino
-            'url' => env('APP_URL', 'http://localhost'),
+            'root' => public_path(),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/'),
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

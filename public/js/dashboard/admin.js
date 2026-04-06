@@ -67,33 +67,28 @@
   }
 
   function renderDonut(data) {
-    const ctx = document.getElementById('chartUsersDocs');
-    if (!ctx) return;
+    const canvas = document.getElementById('chartUsersDocs');
+    if (!canvas) return;
     const totals = data.totales || {};
-    const users = totals.usuarios || 0;
-    const docs = totals.documentos || 0;
+    const chartData = [totals.usuarios || 0, totals.documentos || 0];
 
-    const chartData = [users, docs];
+    // Limpieza agresiva de Chart.js
+    const old = Chart.getChart(canvas);
+    if (old) old.destroy();
 
-    if (!donutChart) {
-      donutChart = new Chart(ctx.getContext('2d'), {
-        type: 'doughnut',
-        data: {
-          labels: ['Usuarios', 'Documentos'],
-          datasets: [{ data: chartData, backgroundColor: ['#6A4CC5', '#9B84E3'] }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-      });
-    } else {
-      donutChart.data.datasets[0].data = chartData;
-      donutChart.update();
-    }
+    donutChart = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: ['Usuarios', 'Documentos'],
+        datasets: [{ data: chartData, backgroundColor: ['#6A4CC5', '#9B84E3'] }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
   }
 
   function ensureSparkCanvases() {
-    const svgs = Array.from(document.querySelectorAll('.kpi-sparkline'));
-    svgs.forEach((svg, idx) => {
-      // if we already created a canvas, skip
+    const svgs = document.querySelectorAll('.kpi-sparkline');
+    svgs.forEach(svg => {
       if (svg.dataset.replaced === '1') return;
       const canvas = document.createElement('canvas');
       canvas.width = 100; canvas.height = 28; canvas.className = 'kpi-spark-canvas';
@@ -104,67 +99,63 @@
 
   function renderSparklines(data) {
     const series = data.series || [];
-    // arrays
     const usuarios = getSeriesArray(series, 'usuarios');
     const documentos = getSeriesArray(series, 'documentos');
 
     ensureSparkCanvases();
-    const canvases = Array.from(document.querySelectorAll('.kpi-spark-canvas'));
-    // Expecting order: empresa(0), usuarios(1), documentos(2) — we will map usuarios/docs to canvases 0/1/2 possibly
+    const canvases = document.querySelectorAll('.kpi-spark-canvas');
     if (canvases.length === 0) return;
 
-    // Map: if there are 3 canvases, use 0->empresa (usuarios series), 1->usuarios (usuarios series), 2->documentos
     const map = [];
     if (canvases.length >= 3) {
       map.push({ canvas: canvases[0], data: usuarios, color: '#9B84E3' });
       map.push({ canvas: canvases[1], data: usuarios, color: '#6A4CC5' });
       map.push({ canvas: canvases[2], data: documentos, color: '#ff6b6b' });
     } else {
-      // Fallback: fill first with usuarios, second with documentos
       map.push({ canvas: canvases[0], data: usuarios, color: '#6A4CC5' });
       if (canvases[1]) map.push({ canvas: canvases[1], data: documentos, color: '#9B84E3' });
     }
 
     map.forEach((m, i) => {
-      const ctx = m.canvas.getContext('2d');
-      // create or update Chart in sparkCharts
-      if (!sparkCharts[i]) {
-        sparkCharts[i] = new Chart(ctx, {
-          type: 'line',
-          data: { labels: series.map(s => s.day), datasets: [{ data: m.data, borderColor: m.color, backgroundColor: 'rgba(0,0,0,0)', tension: 0.3, pointRadius: 0 }] },
-          options: { responsive: false, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } }, elements: { line: { borderWidth: 2 } } }
-        });
-      } else {
-        sparkCharts[i].data.labels = series.map(s => s.day);
-        sparkCharts[i].data.datasets[0].data = m.data;
-        sparkCharts[i].update();
-      }
+      const old = Chart.getChart(m.canvas);
+      if (old) old.destroy();
+
+      sparkCharts[i] = new Chart(m.canvas.getContext('2d'), {
+        type: 'line',
+        data: { 
+          labels: series.map(s => s.day), 
+          datasets: [{ data: m.data, borderColor: m.color, backgroundColor: 'rgba(0,0,0,0)', tension: 0.3, pointRadius: 0 }] 
+        },
+        options: { 
+          responsive: false, maintainAspectRatio: false, 
+          plugins: { legend: { display: false } }, 
+          scales: { x: { display: false }, y: { display: false } }, 
+          elements: { line: { borderWidth: 2 } } 
+        }
+      });
     });
   }
 
   function renderBusesEstado(data) {
-    const ctx = document.getElementById('chartBusesEstado');
-    if (!ctx) return;
+    const canvas = document.getElementById('chartBusesEstado');
+    if (!canvas) return;
     const buses = data.buses || [];
     const estados = {};
     buses.forEach(bus => {
       const nombre = bus.estado?.nombre_estado || 'Desconocido';
       estados[nombre] = (estados[nombre] || 0) + 1;
     });
-    const labels = Object.keys(estados);
-    const values = Object.values(estados);
 
-    if (busesChart) {
-      busesChart.destroy();
-    }
+    const old = Chart.getChart(canvas);
+    if (old) old.destroy();
 
-    busesChart = new Chart(ctx.getContext('2d'), {
+    busesChart = new Chart(canvas, {
       type: 'bar',
       data: {
-        labels: labels,
+        labels: Object.keys(estados),
         datasets: [{
-          label: 'Cantidad de Buses',
-          data: values,
+          label: 'Buses',
+          data: Object.values(estados),
           backgroundColor: ['#6A4CC5', '#9B84E3', '#ff6b6b', '#4cc56a', '#e3b684']
         }]
       },
@@ -173,28 +164,25 @@
   }
 
   function renderViajesRuta(data) {
-    const ctx = document.getElementById('chartViajesRuta');
-    if (!ctx) return;
+    const canvas = document.getElementById('chartViajesRuta');
+    if (!canvas) return;
     const viajes = data.viajes || [];
     const rutas = {};
-    viajes.forEach(viaje => {
-      const nombre = viaje.ruta?.id_ruta || 'Desconocido';
-      rutas[nombre] = (rutas[nombre] || 0) + 1;
+    viajes.forEach(v => {
+      const r = v.ruta?.id_ruta || 'Desconocido';
+      rutas[r] = (rutas[r] || 0) + 1;
     });
-    const labels = Object.keys(rutas);
-    const values = Object.values(rutas);
 
-    if (viajesChart) {
-      viajesChart.destroy();
-    }
+    const old = Chart.getChart(canvas);
+    if (old) old.destroy();
 
-    viajesChart = new Chart(ctx.getContext('2d'), {
+    viajesChart = new Chart(canvas, {
       type: 'line',
       data: {
-        labels: labels,
+        labels: Object.keys(rutas),
         datasets: [{
-          label: 'Viajes por Ruta',
-          data: values,
+          label: 'Viajes',
+          data: Object.values(rutas),
           borderColor: '#6A4CC5',
           backgroundColor: 'rgba(106,76,197,0.1)',
           tension: 0.3

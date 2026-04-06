@@ -412,23 +412,74 @@ class UsuarioEmpresaSeeder extends Seeder
         // --- ADMIN RECARGAS (nuevo rol 10) ---
         info('Intentando insertar ADMIN RECARGAS en el seeder');
         DB::table('usuario')->insertOrIgnore([
-        [
-        'doc_usuario' => 8002223010,
-        'NIT' => 800222333,
-        'primer_nombre' => 'ADMIN',
-        'segundo_nombre' => 'RECARGAS',
-        'primer_apellido' => 'SUPERGIROS',
-        'segundo_apellido' => 'GANA',
-        'correo' => 'adminrecargas@pagatodo.com',
-        'password' => Hash::make('AdminRecargas123*'),
-        'telefono' => '3009999999',
-        'fecha_nacimiento' => '1980-01-01',
-        'foto_usuario' => null,
-        'id_tipo_usuario' => 10, // ADMIN RECARGAS
-        'id_ciudad' => '730001',
-        'id_estado' => 1
-        ]
-            ]);
+            [
+                'doc_usuario' => 8002223010,
+                'NIT' => 800222333,
+                'primer_nombre' => 'ADMIN',
+                'segundo_nombre' => 'RECARGAS',
+                'primer_apellido' => 'SUPERGIROS',
+                'segundo_apellido' => 'GANA',
+                'correo' => 'adminrecargas@pagatodo.com',
+                'password' => Hash::make('AdminRecargas123*'),
+                'telefono' => '3009999999',
+                'fecha_nacimiento' => '1980-01-01',
+                'foto_usuario' => null,
+                'id_tipo_usuario' => 10, // ADMIN RECARGAS
+                'id_ciudad' => '730001',
+                'id_estado' => 1
+            ]
+        ]);
+
+        // --- CONDUCTORES (doc_usuario inicia en 3) ---
+        $conductoresData = [];
+        $licenciasData = [];
+
+        $nombresRandom = ['Carlos', 'Andrés', 'Luis', 'Javier', 'Miguel', 'José', 'Francisco', 'Manuel', 'Santiago', 'Sebastián', 'Mateo', 'Alejandro', 'Diego', 'Fernando', 'Ricardo'];
+        $nombresRandom2 = ['Antonio', 'Felipe', 'Eduardo', 'Alberto', 'María', 'Lucía', 'Elena', 'Beatriz', 'Isabel', 'Cristina', 'Valeria', 'Daniela', 'Sofía', 'Camila', 'Andrea'];
+        $apellidosRandom = ['Gómez', 'Rodríguez', 'Pérez', 'Sánchez', 'Martínez', 'Espinosa', 'López', 'Torres', 'Ramírez', 'Moreno', 'Vargas', 'Castro', 'Ortiz', 'Rojas', 'Ruiz'];
+        $apellidosRandom2 = ['Mendoza', 'Salazar', 'Cadena', 'Vela', 'Duarte', 'Beltrán', 'Arango', 'Gutiérrez', 'Flórez', 'Quintero', 'Bustamante', 'Osorio', 'Ríos', 'Silva', 'Castaño'];
+
+        for ($i = 0; $i < 10; $i++) {
+            $doc = 3000000000 + ($i + 1);
+            $nombre1 = $nombresRandom[array_rand($nombresRandom)];
+            $nombre2 = $nombresRandom2[array_rand($nombresRandom2)];
+            $apellido1 = $apellidosRandom[array_rand($apellidosRandom)];
+            $apellido2 = $apellidosRandom2[array_rand($apellidosRandom2)];
+
+            $conductoresData[] = [
+                'doc_usuario' => $doc,
+                'NIT' => 900123456, // Empresa TEST
+                'primer_nombre' => strtoupper($nombre1),
+                'segundo_nombre' => strtoupper($nombre2),
+                'primer_apellido' => strtoupper($apellido1),
+                'segundo_apellido' => strtoupper($apellido2),
+                'correo' => strtolower($nombre1 . "." . $apellido1 . $i) . "@transporte.com",
+                'password' => Hash::make('Conductor123*'),
+                'telefono' => '310'.str_pad($i + 1, 7, '0', STR_PAD_LEFT),
+                'fecha_nacimiento' => '198' . rand(0, 9) . '-01-' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT),
+                'foto_usuario' => null,
+                'id_tipo_usuario' => 3, // CONDUCTOR
+                'id_ciudad' => '730001',
+                'id_estado' => 1
+            ];
+
+            $licenciasData[] = [
+                'nombre' => 'LICENCIA CONDUCCIÓN',
+                'archivo' => 'uploads/documentos/licencia_default.png',
+                'fecha_expedicion' => '2024-01-01',
+                'fecha_vencimiento' => '2027-01-01',
+                'id_tipo_documento' => 3, // Licencia
+                'doc_usuario' => $doc,
+                'NIT' => 900123456,
+                'id_estado' => 1, // ACTIVO
+                'created_at' => now(),
+                'updated_at' => now()
+            ];
+        }
+        
+        DB::table('usuario')->insertOrIgnore($conductoresData);
+        DB::table('documentos')->insertOrIgnore($licenciasData);
+        info('Agregados 10 conductores con nombres reales y licencias vinculadas.');
     }
 
 

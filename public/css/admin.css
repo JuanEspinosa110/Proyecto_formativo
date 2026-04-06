@@ -25,15 +25,15 @@
   box-shadow: 2px 6px 18px rgba(31,36,48,0.06);
   border-right: 1px solid rgba(45,52,73,0.06);
   z-index: 50;
-  overflow-y: auto; /* Ensure scrollability on short screens */
-  scrollbar-width: thin;
+  overflow: hidden; /* Disable outer scroll */
 }
 
 .sigu-admin-layout .sigu-sidebar .sigu-sidebar-inner {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
-  padding: 1rem 0;
+  height: 100vh;
+  max-height: 100vh;
+  padding: 1rem 0 0 0;
 }
 
 .sigu-admin-layout .sigu-sidebar .sigu-brand {
@@ -52,7 +52,33 @@
 .sigu-admin-layout .sigu-brand-text .sigu-brand-name { font-weight:700; font-size:1.05rem; }
 .sigu-admin-layout .sigu-brand-text .sigu-brand-sub { font-size:.78rem; opacity:.85; }
 
-.sigu-admin-layout .sigu-sidebar-nav { display: flex; flex-direction: column; padding: .5rem 0; gap: .25rem; }
+.sigu-admin-layout .sigu-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: .5rem 0;
+  gap: .25rem;
+  flex: 1;
+  overflow-y: scroll; /* Forzado siempre visible */
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--p) transparent;
+}
+
+/* Scrollbar premium siempre visible con alto contraste */
+.sigu-admin-layout .sigu-sidebar-nav::-webkit-scrollbar {
+  width: 8px;
+}
+.sigu-admin-layout .sigu-sidebar-nav::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.02);
+}
+.sigu-admin-layout .sigu-sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--p);
+  border-radius: 10px;
+  border: 2px solid #f6f7fb; /* Espacio para que respire */
+}
+.sigu-admin-layout .sigu-sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: var(--p-dark);
+}
 .sigu-admin-layout .sigu-sb-link {
   display: flex;
   gap: .75rem;
@@ -91,8 +117,13 @@
 /* Asegurar espacio inferior en el main para que el footer no lo cubra */
 .sigu-admin-layout .sigu-main-with-sidebar { padding-bottom: 6rem; }
 
-/* Footer del sidebar */
-.sigu-admin-layout .sigu-sidebar-footer { margin-top: auto; padding: 1rem; }
+/* Footer del sidebar - fijo al fondo */
+.sigu-admin-layout .sigu-sidebar-footer {
+  margin-top: auto;
+  padding: 1rem;
+  background: rgba(238, 242, 251, 0.5);
+  border-top: 1px solid rgba(0, 0, 0, 0.03);
+}
 
 /* KPIs */
 .sigu-admin-layout .sa-kpi-section { display:flex; gap:1rem; margin-top:1rem; flex-wrap:wrap; }

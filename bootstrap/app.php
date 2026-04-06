@@ -27,3 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
+
+// Forzar public_path a la raíz si estamos en el hosting (donde public/index.php no existe)
+if (!file_exists($app->basePath('public/index.php'))) {
+    $app->usePublicPath($app->basePath());
+}
+
+return $app;
