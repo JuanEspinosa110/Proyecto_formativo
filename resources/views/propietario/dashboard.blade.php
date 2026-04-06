@@ -141,7 +141,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Viajes Realizados -->
+                    <!-- Viajes Asignados -->
                     <div class="col-md-6 col-xl-3">
                         <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
                             <div class="card-body p-0 container-card">
@@ -153,7 +153,7 @@
                                         <h2 class="fw-black mb-1 text-dark adaptive-number" title="{{ $conteoAsignaciones }}">
                                             {{ $conteoAsignaciones }}
                                         </h2>
-                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Viajes Realizados
+                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Viajes Asignados
                                         </p>
                                     </div>
                                 </div>
@@ -172,7 +172,8 @@
                                         <h2 class="fw-black mb-1 text-dark adaptive-number" title="{{ $conteoDocumentos }}">
                                             {{ $conteoDocumentos }}
                                         </h2>
-                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Documentos Activos
+                                        <p class="text-muted small fw-bold text-uppercase mb-0 text-truncate">Documentos
+                                            Registrados
                                         </p>
                                     </div>
                                 </div>
@@ -769,156 +770,157 @@
 
         <!-- 6. SECCIÓN GANANCIAS (INGRESOS) -->
         @if(request('section') == 'ganancias')
-            <style>
-                .hover-lift {
-                    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-                }
+                <style>
+                    .hover-lift {
+                        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+                    }
 
-                .hover-lift:hover {
-                    transform: translateY(-4px) !important;
-                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
-                }
+                    .hover-lift:hover {
+                        transform: translateY(-4px) !important;
+                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+                    }
 
-                .btn-switch {
-                    transition: all 0.2s;
-                    color: rgba(255, 255, 255, 0.7);
-                }
+                    .btn-switch {
+                        transition: all 0.2s;
+                        color: rgba(255, 255, 255, 0.7);
+                    }
 
-                .btn-switch:hover {
-                    color: white;
-                }
+                    .btn-switch:hover {
+                        color: white;
+                    }
 
-                .btn-switch.active {
-                    background-color: white !important;
-                    color: #0f172a !important;
-                    font-weight: 700 !important;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-                }
+                    .btn-switch.active {
+                        background-color: white !important;
+                        color: #0f172a !important;
+                        font-weight: 700 !important;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+                    }
 
-                .card-gradient-earnings {
-                    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%) !important;
-                }
+                    .card-gradient-earnings {
+                        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%) !important;
+                    }
 
-                .adaptive-title {
-                    font-size: clamp(1.5rem, 8cqw, 3rem);
-                }
-            </style>
+                    .adaptive-title {
+                        font-size: clamp(1.5rem, 8cqw, 3rem);
+                    }
+                </style>
 
-            <!-- 1. ENCABEZADO: TÍTULO + FILTRO -->
-            <div class="d-flex align-items-center justify-content-between gap-4 mb-4 flex-wrap">
-                <div>
-                    <h2 class="h4 fw-bold text-dark mb-1 d-flex align-items-center gap-2">
-                        <span class="material-symbols-rounded text-primary">analytics</span>
-                        Ganancias del Bus
-                    </h2>
-                    <p class="text-muted mb-0 small">Consulta detallada de los ingresos generados por la operación.</p>
+                <!-- 1. ENCABEZADO: TÍTULO + FILTRO -->
+                <div class="d-flex align-items-center justify-content-between gap-4 mb-4 flex-wrap">
+                    <div>
+                        <h2 class="h4 fw-bold text-dark mb-1 d-flex align-items-center gap-2">
+                            <span class="material-symbols-rounded text-primary">analytics</span>
+                            Ganancias del Bus
+                        </h2>
+                        <p class="text-muted mb-0 small">Consulta detallada de los ingresos generados por la operación.</p>
+                    </div>
+                    <!-- Filtro por Mes Compacto -->
+                    <div class="bg-white p-2 rounded-4 shadow-sm border">
+                        <form action="{{ route('propietario.dashboard') }}" method="GET"
+                            class="d-flex align-items-center gap-2 m-0">
+                            <input type="hidden" name="section" value="ganancias">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="form-label x-small fw-bold text-muted text-uppercase mb-0 text-nowrap">Mes:</label>
+                                <input type="month" name="mes_seleccionado"
+                                    class="form-control form-control-sm border-0 bg-light rounded-3"
+                                    value="{{ request('mes_seleccionado') }}" style="width: 140px;">
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">Filtrar</button>
+                        </form>
+                    </div>
                 </div>
-                <!-- Filtro por Mes Compacto -->
-                <div class="bg-white p-2 rounded-4 shadow-sm border">
-                    <form action="{{ route('propietario.dashboard') }}" method="GET"
-                        class="d-flex align-items-center gap-2 m-0">
-                        <input type="hidden" name="section" value="ganancias">
-                        <div class="d-flex align-items-center gap-2">
-                            <label class="form-label x-small fw-bold text-muted text-uppercase mb-0 text-nowrap">Mes:</label>
-                            <input type="month" name="mes_seleccionado"
-                                class="form-control form-control-sm border-0 bg-light rounded-3"
-                                value="{{ request('mes_seleccionado') }}" style="width: 140px;">
-                        </div>
-                        <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold">Filtrar</button>
-                    </form>
-                </div>
-            </div>
 
-            <!-- 2. TARJETA RESUMEN CON TABS -->
-            <div class="row g-4 mb-4">
-                <div class="col-lg-12">
-                    <div class="card border-0 shadow-lg rounded-5 overflow-hidden p-4 text-white card-gradient-earnings">
-                        <div class="row align-items-center">
-                            <div class="col-md-12">
-                                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                                    <div class="container-card">
-                                        <span class="text-white-50 small fw-bold text-uppercase d-block mb-1"
-                                            id="earnings_label">Ingresos de Hoy</span>
-                                        @php
-                                            $valH = $gananciasHoy ?? 0;
-                                            $dispDH = '$' . number_format($valH);
-                                            if ($valH >= 1000000)
-                                                $dispDH = '$' . number_format($valH / 1000000, 1) . 'M';
-                                            elseif ($valH >= 100000)
-                                                $dispDH = '$' . number_format($valH / 1000, 0) . 'K';
-                                        @endphp
-                                        <h1 class="fw-black mb-0 text-white adaptive-title" id="earnings_amount"
-                                            title="${{ number_format($valH) }}">
-                                            {{ $dispDH }}
-                                        </h1>
-                                    </div>
-                                    <div class="d-flex gap-2 bg-white bg-opacity-10 p-1 rounded-pill">
-                                        @php
-                                            $fH = function ($v) {
-                                                if ($v >= 1000000)
-                                                    return '$' . number_format($v / 1000000, 1) . 'M';
-                                                if ($v >= 100000)
-                                                    return '$' . number_format($v / 1000, 0) . 'K';
-                                                return '$' . number_format($v);
-                                            };
-                                        @endphp
-                                        <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch active"
-                                            data-periodo="hoy" data-amount="{{ number_format($gananciasHoy ?? 0) }}"
-                                            data-display="{{ $fH($gananciasHoy ?? 0) }}" data-label="Ingresos de Hoy"
-                                            onclick="switchEarnings(this)">Hoy</button>
-                                        <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch" data-periodo="semana"
-                                            data-amount="{{ number_format($gananciasSemana ?? 0) }}"
-                                            data-display="{{ $fH($gananciasSemana ?? 0) }}" data-label="Ingresos de la Semana"
-                                            onclick="switchEarnings(this)">Semana</button>
-                                        <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch" data-periodo="mes"
-                                            data-amount="{{ number_format($gananciasMes ?? 0) }}"
-                                            data-display="{{ $fH($gananciasMes ?? 0) }}" data-label="Ingresos del Mes"
-                                            onclick="switchEarnings(this)">Mes</button>
-                                    </div>
-                                </div>
-
-                                <hr class="border-white border-opacity-10 my-4">
-
-                                <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <div
-                                            class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
-                                            <div
-                                                class="bg-warning bg-opacity-25 p-2 rounded-3 text-warning d-flex align-items-center justify-content-center">
-                                                <span class="material-symbols-rounded">local_shipping</span>
-                                            </div>
-                                            <div>
-                                                <span class="small d-block text-white-50">Viajes Realizados</span>
-                                                <span class="h5 fw-black text-warning mb-0">{{ $conteoAsignaciones }}
-                                                    viajes</span>
-                                            </div>
+                <!-- 2. TARJETA RESUMEN CON TABS -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-12">
+                        <div class="card border-0 shadow-lg rounded-5 overflow-hidden p-4 text-white card-gradient-earnings">
+                            <div class="row align-items-center">
+                                <div class="col-md-12">
+                                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                                        <div class="container-card">
+                                            <span class="text-white-50 small fw-bold text-uppercase d-block mb-1"
+                                                id="earnings_label">Ingresos de Hoy</span>
+                                            @php
+                                                $valH = $gananciasHoy ?? 0;
+                                                $dispDH = '$' . number_format($valH);
+                                                if ($valH >= 1000000)
+                                                    $dispDH = '$' . number_format($valH / 1000000, 1) . 'M';
+                                                elseif ($valH >= 100000)
+                                                    $dispDH = '$' . number_format($valH / 1000, 0) . 'K';
+                                            @endphp
+                                            <h1 class="fw-black mb-0 text-white adaptive-title" id="earnings_amount"
+                                                title="${{ number_format($valH) }}">
+                                                {{ $dispDH }}
+                                            </h1>
+                                        </div>
+                                        <div class="d-flex gap-2 bg-white bg-opacity-10 p-1 rounded-pill">
+                                            @php
+                                                $fH = function ($v) {
+                                                    if ($v >= 1000000)
+                                                        return '$' . number_format($v / 1000000, 1) . 'M';
+                                                    if ($v >= 100000)
+                                                        return '$' . number_format($v / 1000, 0) . 'K';
+                                                    return '$' . number_format($v);
+                                                };
+                                            @endphp
+                                            <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch active"
+                                                data-periodo="hoy" data-amount="{{ number_format($gananciasHoy ?? 0) }}"
+                                                data-display="{{ $fH($gananciasHoy ?? 0) }}" data-label="Ingresos de Hoy"
+                                                onclick="switchEarnings(this)">Hoy</button>
+                                            <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch" data-periodo="semana"
+                                                data-amount="{{ number_format($gananciasSemana ?? 0) }}"
+                                                data-display="{{ $fH($gananciasSemana ?? 0) }}" data-label="Ingresos de la Semana"
+                                                onclick="switchEarnings(this)">Semana</button>
+                                            <button class="btn btn-sm rounded-pill px-4 fw-bold btn-switch" data-periodo="mes"
+                                                data-amount="{{ number_format($gananciasMes ?? 0) }}"
+                                                data-display="{{ $fH($gananciasMes ?? 0) }}" data-label="Ingresos del Mes"
+                                                onclick="switchEarnings(this)">Mes</button>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div
-                                            class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
+
+                                    <hr class="border-white border-opacity-10 my-4">
+
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
                                             <div
-                                                class="bg-success bg-opacity-25 p-2 rounded-3 text-success d-flex align-items-center justify-content-center">
-                                                <span class="material-symbols-rounded">groups</span>
-                                            </div>
-                                            <div>
-                                                <span class="small d-block text-white-50">Pasajeros Transportados</span>
-                                                <span
-                                                    class="h5 fw-black text-success mb-0">{{ number_format($conteoPasajeros) }}
-                                                    pax</span>
+                                                class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
+                                                <div
+                                                    class="bg-warning bg-opacity-25 p-2 rounded-3 text-warning d-flex align-items-center justify-content-center">
+                                                    <span class="material-symbols-rounded">local_shipping</span>
+                                                </div>
+                                                <div>
+                                                    <span class="small d-block text-white-50">Viajes Asignados</span>
+                                                    <span class="h5 fw-black text-warning mb-0">{{ $conteoAsignaciones }}
+                                                        viajes</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div
-                                            class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
+                                        <div class="col-md-4">
                                             <div
-                                                class="bg-info bg-opacity-25 p-2 rounded-3 text-info d-flex align-items-center justify-content-center">
-                                                <span class="material-symbols-rounded">payments</span>
+                                                class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
+                                                <div
+                                                    class="bg-success bg-opacity-25 p-2 rounded-3 text-success d-flex align-items-center justify-content-center">
+                                                    <span class="material-symbols-rounded">groups</span>
+                                                </div>
+                                                <div>
+                                                    <span class="small d-block text-white-50">Pasajeros Transportados</span>
+                                                    <span
+                                                        class="h5 fw-black text-success mb-0">{{ number_format($conteoPasajeros) }}
+                                                        pax</span>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <span class="small d-block text-white-50">Tarifa Promedio</span>
-                                                <span class="h5 fw-black text-info mb-0">$3,300</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div
+                                                class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-flex align-items-center gap-3 hover-lift">
+                                                <div
+                                                    class="bg-info bg-opacity-25 p-2 rounded-3 text-info d-flex align-items-center justify-content-center">
+                                                    <span class="material-symbols-rounded">payments</span>
+                                                </div>
+                                                <div>
+                                                    <span class="small d-block text-white-50">Tarifa Promedio</span>
+                                                    <span class="h5 fw-black text-info mb-0">$3,300</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -927,15 +929,14 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 3. INGRESO CONSOLIDADO POR VEHÍCULO -->
-            <h6 class="fw-bold text-muted text-uppercase small letter-spacing-1 mb-3 d-flex align-items-center gap-2">
-                <span class="material-symbols-rounded fs-5 text-primary">directions_bus</span>
-                Ingreso Consolidado por Vehículo
-            </h6>
-            <div class="row g-3 mb-4">
-                @forelse($ingresosPorBus as $bus)
+                <!-- 3. INGRESO CONSOLIDADO POR VEHÍCULO -->
+                <h6 class="fw-bold text-muted text-uppercase small letter-spacing-1 mb-3 d-flex align-items-center gap-2">
+                    <span class="material-symbols-rounded fs-5 text-primary">directions_bus</span>
+                    Ingreso Consolidado por Vehículo
+                </h6>
+                <div class="row g-3 mb-4">
+                    @forelse($ingresosPorBus as $bus)
                         <div class="col-md-4 bus-earnings-card" data-hoy-ingresos="{{ number_format($bus->hoy_ingresos) }}"
                             data-hoy-pasajeros="{{ number_format($bus->hoy_pasajeros) }}"
                             data-semana-ingresos="{{ number_format($bus->semana_ingresos) }}"
@@ -969,7 +970,7 @@
                                 </div>
                             </div>
                         </div>
-                @empty
+                    @empty
                         <div class="col-12">
                             <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-white">
                                 <span class="material-symbols-rounded display-5 text-muted opacity-25 mb-2">money_off</span>
@@ -1011,7 +1012,8 @@
                                     @foreach($buses as $b)
                                         <option value="{{ $b->placa }}"
                                             data-modelo="{{ preg_replace('/[^0-9]/', '', $b->modelo) }}">{{ $b->placa }} -
-                                            {{ $b->modelo }}</option>
+                                            {{ $b->modelo }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -1356,7 +1358,7 @@
 
                     <h6 class="fw-bold text-dark text-uppercase mb-3 d-flex align-items-center gap-2">
                         <span class="material-symbols-rounded text-primary">route</span>
-                        Viajes Realizados en el Turno
+                        Viajes Asignados en el Turno
                     </h6>
                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
                         <div class="table-responsive">
@@ -1509,37 +1511,37 @@
                                 const fechaVenc = new Date(doc.fecha_vencimiento).toLocaleDateString();
 
                                 tr.innerHTML = `
-                                    <td class="ps-4">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="bg-${doc.status_color} bg-opacity-10 text-${doc.status_color} p-2 rounded-3">
-                                                <span class="material-symbols-rounded">description</span>
-                                            </div>
-                                            <div class="fw-bold text-dark small">${doc.tipo_documento.nombre}</div>
-                                        </div>
-                                    </td>
-                                    <td class="text-muted small">${fechaCarga}</td>
-                                    <td class="fw-bold text-dark small">${fechaVenc}</td>
-                                    <td>
-                                        <span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} rounded-pill px-3 x-small fw-bold border border-${doc.status_color}">${doc.status_vigencia}</span>
-                                    </td>
-                                    <td class="text-end pe-4">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <button class="btn btn-sm btn-light border p-2 rounded-circle btn-visualizar-table" 
-                                                    data-url="${doc.url_archivo}" 
-                                                    data-nombre="${doc.tipo_documento.nombre}"
-                                                    title="Vista Previa">
-                                                <span class="material-symbols-rounded fs-6">visibility</span>
-                                            </button>
-                                            <a href="${doc.url_archivo}" 
-                                               class="btn btn-sm btn-light border p-2 rounded-circle text-primary" 
-                                               download
-                                               title="Descargar">
-                                                <span class="material-symbols-rounded fs-6">download</span>
-                                            </a>
-                                            ${renewBtn}
-                                        </div>
-                                    </td>
-                                `;
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="bg-${doc.status_color} bg-opacity-10 text-${doc.status_color} p-2 rounded-3">
+                                                        <span class="material-symbols-rounded">description</span>
+                                                    </div>
+                                                    <div class="fw-bold text-dark small">${doc.tipo_documento.nombre}</div>
+                                                </div>
+                                            </td>
+                                            <td class="text-muted small">${fechaCarga}</td>
+                                            <td class="fw-bold text-dark small">${fechaVenc}</td>
+                                            <td>
+                                                <span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} rounded-pill px-3 x-small fw-bold border border-${doc.status_color}">${doc.status_vigencia}</span>
+                                            </td>
+                                            <td class="text-end pe-4">
+                                                <div class="d-flex justify-content-end gap-2">
+                                                    <button class="btn btn-sm btn-light border p-2 rounded-circle btn-visualizar-table" 
+                                                            data-url="${doc.url_archivo}" 
+                                                            data-nombre="${doc.tipo_documento.nombre}"
+                                                            title="Vista Previa">
+                                                        <span class="material-symbols-rounded fs-6">visibility</span>
+                                                    </button>
+                                                    <a href="${doc.url_archivo}" 
+                                                       class="btn btn-sm btn-light border p-2 rounded-circle text-primary" 
+                                                       download
+                                                       title="Descargar">
+                                                        <span class="material-symbols-rounded fs-6">download</span>
+                                                    </a>
+                                                    ${renewBtn}
+                                                </div>
+                                            </td>
+                                        `;
                                 docsBody.appendChild(tr);
                             });
 
@@ -1756,19 +1758,19 @@
                             if (data.recorridos.length > 0) {
                                 data.recorridos.forEach(rec => {
                                     const row = `
-                                        <tr>
-                                            <td class="ps-3">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <span class="material-symbols-rounded text-muted small">${rec.es_regreso ? 'keyboard_return' : 'near_me'}</span>
-                                                    <span class="fw-bold text-dark small">${rec.trayecto}</span>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge bg-light text-dark fw-medium">${rec.hora_salida}</span></td>
-                                            <td><span class="badge bg-light text-dark fw-medium">${rec.hora_llegada}</span></td>
-                                            <td class="text-center"><span class="fw-bold">${rec.cantidad_pasajeros}</span></td>
-                                            <td class="text-end pe-3 fw-bold text-success">$${new Intl.NumberFormat().format(rec.ingresos)}</td>
-                                        </tr>
-                                    `;
+                                                <tr>
+                                                    <td class="ps-3">
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <span class="material-symbols-rounded text-muted small">${rec.es_regreso ? 'keyboard_return' : 'near_me'}</span>
+                                                            <span class="fw-bold text-dark small">${rec.trayecto}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td><span class="badge bg-light text-dark fw-medium">${rec.hora_salida}</span></td>
+                                                    <td><span class="badge bg-light text-dark fw-medium">${rec.hora_llegada}</span></td>
+                                                    <td class="text-center"><span class="fw-bold">${rec.cantidad_pasajeros}</span></td>
+                                                    <td class="text-end pe-3 fw-bold text-success">$${new Intl.NumberFormat().format(rec.ingresos)}</td>
+                                                </tr>
+                                            `;
                                     tbody.innerHTML += row;
                                 });
                             } else {
@@ -1816,48 +1818,48 @@
                                         const isArchivado = doc.es_archivado;
                                         const trClass = isArchivado ? 'opacity-75 bg-light' : '';
                                         rows += `
-                                        <tr class="${trClass}">
-                                            <td class="ps-4">
-                                                <div class="fw-bold text-dark small text-truncate" style="max-width: 250px;" title="${doc.nombre}">${doc.nombre}</div>
-                                                ${isArchivado ? '<span class="badge bg-secondary-subtle text-secondary x-small border border-secondary mt-1">Archivado</span>' : (doc.status_vigencia === 'VENCIDO' ? '<span class="badge bg-danger-subtle text-danger x-small border border-danger mt-1">Vencido</span>' : '<span class="badge bg-success-subtle text-success x-small border border-success mt-1">Activo</span>')}
-                                            </td>
-                                            <td class="text-muted small">${doc.fecha_carga}</td>
-                                            <td class="fw-bold text-dark small">${doc.fecha_vencimiento}</td>
-                                            <td><span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} px-3 py-1 x-small border border-${doc.status_color} rounded-pill fw-bold">${doc.status_vigencia}</span></td>
-                                            <td class="text-end pe-4">
-                                                <div class="d-flex justify-content-end gap-2">
-                                                    ${doc.url_archivo ? `
-                                                    <button class="btn btn-sm btn-light border p-2 rounded-circle text-dark" onclick="mostrarVisor('${doc.url_archivo}', '${tipo}')" title="Vista Previa"><span class="material-symbols-rounded fs-6">visibility</span></button>
-                                                    <a href="${doc.url_archivo}" download class="btn btn-sm btn-light border text-primary p-2 rounded-circle" title="Descargar PDF"><span class="material-symbols-rounded fs-6">download</span></a>
-                                                    ` : '<span class="text-muted small">N/A</span>'}
-                                                </div>
-                                            </td>
-                                        </tr>`;
+                                                <tr class="${trClass}">
+                                                    <td class="ps-4">
+                                                        <div class="fw-bold text-dark small text-truncate" style="max-width: 250px;" title="${doc.nombre}">${doc.nombre}</div>
+                                                        ${isArchivado ? '<span class="badge bg-secondary-subtle text-secondary x-small border border-secondary mt-1">Archivado</span>' : (doc.status_vigencia === 'VENCIDO' ? '<span class="badge bg-danger-subtle text-danger x-small border border-danger mt-1">Vencido</span>' : '<span class="badge bg-success-subtle text-success x-small border border-success mt-1">Activo</span>')}
+                                                    </td>
+                                                    <td class="text-muted small">${doc.fecha_carga}</td>
+                                                    <td class="fw-bold text-dark small">${doc.fecha_vencimiento}</td>
+                                                    <td><span class="badge bg-${doc.status_color}-subtle text-${doc.status_color} px-3 py-1 x-small border border-${doc.status_color} rounded-pill fw-bold">${doc.status_vigencia}</span></td>
+                                                    <td class="text-end pe-4">
+                                                        <div class="d-flex justify-content-end gap-2">
+                                                            ${doc.url_archivo ? `
+                                                            <button class="btn btn-sm btn-light border p-2 rounded-circle text-dark" onclick="mostrarVisor('${doc.url_archivo}', '${tipo}')" title="Vista Previa"><span class="material-symbols-rounded fs-6">visibility</span></button>
+                                                            <a href="${doc.url_archivo}" download class="btn btn-sm btn-light border text-primary p-2 rounded-circle" title="Descargar PDF"><span class="material-symbols-rounded fs-6">download</span></a>
+                                                            ` : '<span class="text-muted small">N/A</span>'}
+                                                        </div>
+                                                    </td>
+                                                </tr>`;
                                     });
 
                                     content.innerHTML += `
-                                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-3">
-                                        <div class="card-header bg-white border-0 p-4">
-                                            <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 text-uppercase letter-spacing-1 small">
-                                                <span class="material-symbols-rounded text-primary fs-5">folder_open</span>
-                                                ${tipo}
-                                            </h6>
-                                        </div>
-                                        <div class="table-responsive">
-                                            <table class="table table-hover align-middle mb-0">
-                                                <thead class="bg-light">
-                                                    <tr>
-                                                        <th class="ps-4 py-3 border-0 small text-muted fw-bold">NOMBRES Y ESTADO</th>
-                                                        <th class="py-3 border-0 small text-muted fw-bold">CARGA</th>
-                                                        <th class="py-3 border-0 small text-muted fw-bold">VENCIMIENTO</th>
-                                                        <th class="py-3 border-0 small text-muted fw-bold">VIGENCIA</th>
-                                                        <th class="py-3 border-0 text-end pe-4 small text-muted fw-bold">ACCIONES</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>${rows}</tbody>
-                                            </table>
-                                        </div>
-                                    </div>`;
+                                            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-3">
+                                                <div class="card-header bg-white border-0 p-4">
+                                                    <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2 text-uppercase letter-spacing-1 small">
+                                                        <span class="material-symbols-rounded text-primary fs-5">folder_open</span>
+                                                        ${tipo}
+                                                    </h6>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover align-middle mb-0">
+                                                        <thead class="bg-light">
+                                                            <tr>
+                                                                <th class="ps-4 py-3 border-0 small text-muted fw-bold">NOMBRES Y ESTADO</th>
+                                                                <th class="py-3 border-0 small text-muted fw-bold">CARGA</th>
+                                                                <th class="py-3 border-0 small text-muted fw-bold">VENCIMIENTO</th>
+                                                                <th class="py-3 border-0 small text-muted fw-bold">VIGENCIA</th>
+                                                                <th class="py-3 border-0 text-end pe-4 small text-muted fw-bold">ACCIONES</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>${rows}</tbody>
+                                                    </table>
+                                                </div>
+                                            </div>`;
                                 }
                             }
                             modalBoveda.show();
@@ -1885,7 +1887,7 @@
                     document.querySelectorAll('.bus-earnings-card').forEach(card => {
                         const ing = card.getAttribute(`data-${periodo}-ingresos`);
                         const pax = card.getAttribute(`data-${periodo}-pasajeros`);
-                        
+
                         // Actualizar monto de ingresos en la tarjeta con formato corto (K, M)
                         const amountEl = card.querySelector('.income-amount');
                         if (amountEl) {
@@ -1893,11 +1895,11 @@
                             let display = '$' + val.toLocaleString();
                             if (val >= 1000000) display = '$' + (val / 1000000).toFixed(1) + 'M';
                             else if (val >= 100000) display = '$' + Math.floor(val / 1000) + 'K';
-                            
+
                             amountEl.innerText = display;
                             amountEl.title = '$' + val.toLocaleString();
                         }
-                        
+
                         // Actualizar pax
                         const paxEl = card.querySelector('.pax-count');
                         if (paxEl) paxEl.innerText = pax + ' Pax';
@@ -1910,15 +1912,15 @@
                         fetch(`?section=ganancias&periodo=${periodo}`, {
                             headers: { 'X-Requested-With': 'XMLHttpRequest' }
                         })
-                        .then(response => response.text())
-                        .then(html => {
-                            tableContainer.innerHTML = html;
-                            tableContainer.style.opacity = '1';
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            tableContainer.style.opacity = '1';
-                        });
+                            .then(response => response.text())
+                            .then(html => {
+                                tableContainer.innerHTML = html;
+                                tableContainer.style.opacity = '1';
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                tableContainer.style.opacity = '1';
+                            });
                     }
                 };
             });

@@ -30,9 +30,9 @@ class ConductorController extends Controller
         $ahora = Carbon::now();
 
         // 2. Estado de la jornada actual
-        // Buscar si tiene un turno activo (1 = Activo) o en curso (4 = En curso) programado para HOY
+        // Buscar si tiene un turno activo (1 = Activo) o en curso (12 = En curso) programado para HOY
         $asignacionActiva = $asignaciones->filter(function ($asig) use ($hoy) {
-            return in_array($asig->id_estado, [1, 4, 6]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
+            return in_array($asig->id_estado, [1, 12, 6]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
         })->first();
 
         // **Auto-vencer turno si pasan más de 4 horas sin iniciar**
@@ -208,8 +208,8 @@ class ConductorController extends Controller
             }
         }
 
-        // 4 = EN_CURSO
-        $viaje->id_estado = 4;
+        // 12 = EN_CURSO
+        $viaje->id_estado = 12;
         $viaje->save();
 
         return redirect()->back()->with('success', 'Turno iniciado. Conduzca con precaución.');
@@ -236,8 +236,8 @@ class ConductorController extends Controller
     {
         $viaje = Viaje::findOrFail($id_viaje);
 
-        // Validar que el turno esté en curso (4) antes de iniciar recorrido
-        if ($viaje->id_estado != 4) {
+        // Validar que el turno esté en curso (12) antes de iniciar recorrido
+        if ($viaje->id_estado != 12) {
             return redirect()->back()->with('error', 'Debe iniciar su turno antes de comenzar un recorrido.');
         }
 
@@ -296,7 +296,7 @@ class ConductorController extends Controller
         $recorrido = Recorrido::with('viaje')->findOrFail($id_recorrido);
         $viaje = $recorrido->viaje;
 
-        if (!$viaje || $viaje->id_estado != 4) {
+        if (!$viaje || $viaje->id_estado != 12) {
             if ($request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => 'No hay viaje activo o el turno finalizó.']);
             }
@@ -404,7 +404,7 @@ class ConductorController extends Controller
         $asignaciones = Viaje::where('doc_us', $conductor->doc_usuario)->get();
         $hoy = Carbon::today();
         $asignacionActiva = $asignaciones->filter(function ($asig) use ($hoy) {
-            return in_array($asig->id_estado, [1, 4]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
+            return in_array($asig->id_estado, [1, 12]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
         })->first();
 
         $type = DB::select('SHOW COLUMNS FROM reportes_fallas WHERE Field = "nivel_urgencia"')[0]->Type;

@@ -55,7 +55,7 @@ class ReporteFallaService
 
         // B. Buscar viajes activos del bus hoy
         $viajesActivos = Viaje::where('placa', $placa)
-            ->whereIn('id_estado', [1, 4]) // PROGRAMADO o EN CURSO
+            ->whereIn('id_estado', [1, 12]) // PROGRAMADO o EN CURSO
             ->get();
 
         foreach ($viajesActivos as $viaje) {

@@ -21,7 +21,7 @@
 
     <div class="header-center">
         <h1 class="logo-title">SIGU</h1>
-        <p class="logo-subtitle">Sistema Integral de Gestión Urbana</p>
+        <p class="logo-subtitle d-none d-md-block">Sistema Integral de Gestión Urbana</p>
     </div>
 
     <div class="header-right">
