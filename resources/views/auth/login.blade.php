@@ -37,8 +37,8 @@
     <div class="login-box">
 
         <!-- LADO IZQUIERDO - IMAGEN -->
-        <div class="login-left">
-            <!-- La imagen se carga desde CSS -->
+        <div class="login-left" style="background: linear-gradient(rgba(94,84,142,0.65), rgba(74,78,105,0.65)), url('{{ asset('imagenes/login-gb.png') }}') center/cover no-repeat;">
+            <!-- La imagen se carga con asset() para asegurar la ruta correcta -->
         </div>
 
         <!-- LADO DERECHO - FORMULARIO -->
