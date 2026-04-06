@@ -42,7 +42,9 @@
 <script>
     function onScanSuccess(decodedText, decodedResult) {
         // Redirigir a la vista de verificación con el ID escaneado
-        window.location.href = `/controlador-tiempo/verificacion/${decodedText}`;
+        // Usamos url() de Blade para asegurar que incluya el subdirectorio si existe (ej. /clickpasajes)
+        const baseUrl = "{{ url('/controlador-tiempo/verificacion') }}";
+        window.location.href = `${baseUrl}/${decodedText}`;
         html5QrcodeScanner.clear();
     }
 

@@ -47,6 +47,15 @@ class PropietarioController extends Controller
         $gananciasMes = 0;
         $ingresosPorBus = collect();
 
+        // Fechas base para filtros globales
+        $mesFiltro = $request->query('mes_seleccionado'); 
+        $mesBase = $mesFiltro ?: \Carbon\Carbon::now()->format('Y-m');
+        $parts = explode('-', $mesBase);
+        $year = $parts[0];
+        $month = $parts[1];
+        $hoy = \Carbon\Carbon::today();
+        $semana = \Carbon\Carbon::now()->startOfWeek();
+
         if ($buses->isNotEmpty()) {
             $queryAsignaciones->whereIn('placa', $busIds);
             
@@ -65,22 +74,11 @@ class PropietarioController extends Controller
             $conteoPasajeros = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
                 $q->whereIn('placa', $busIds);
             })->count();
-            
-            // Filtro por Mes para Ganancias (Captura inicial)
-            $mesFiltro = $request->query('mes_seleccionado'); 
-            $mesBase = $mesFiltro ?: \Carbon\Carbon::now()->format('Y-m');
 
             // 1. Ingresos Totales del Mes Seleccionado
-            $parts = explode('-', $mesBase);
-            $year = $parts[0];
-            $month = $parts[1];
-
             $ingresosTotales = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {
                 $q->whereIn('placa', $busIds);
             })->whereYear('fecha', $year)->whereMonth('fecha', $month)->sum('valor');
-
-            $hoy = \Carbon\Carbon::today();
-            $semana = \Carbon\Carbon::now()->startOfWeek();
 
             // 2. Cálculo de tarjetas resumen
             $gananciasHoy = \App\Models\VentaViaje::whereHas('viaje', function($q) use ($busIds) {

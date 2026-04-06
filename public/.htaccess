@@ -4,30 +4,21 @@
     </IfModule>
 
     RewriteEngine On
-    RewriteBase /clickpasajes/
 
-    # REGLAS PARA ASSETS: Mapear a la raíz física del servidor
-    RewriteRule ^imagenes/(.*)$ /imagenes/$1 [L]
-    RewriteRule ^images/(.*)$ /images/$1 [L]
-    RewriteRule ^uploads/(.*)$ /uploads/$1 [L]
-    RewriteRule ^css/(.*)$ /css/$1 [L]
-    RewriteRule ^js/(.*)$ /js/$1 [L]
-
-    # Handle Authorization Header
+    # 1. Manejar encabezados de Autorización (Importante para API/Seguridad)
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-
-    # Handle X-XSRF-Token Header
+    
+    # 2. Manejar Token XSRF (Seguridad de formularios de Laravel)
     RewriteCond %{HTTP:x-xsrf-token} .
     RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
-    # Redirect Trailing Slashes If Not A Folder...
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_URI} (.+)/$
-    RewriteRule ^ %1 [L,R=301]
+    # 3. REGLA DE ORO: Si el archivo existe físicamente, servirlo directamente
+    # Esto es lo que permite que 'uploads/documentos/faj...png' se vea
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
 
-    # Send Requests To Front Controller...
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_FILENAME} !-f
+    # 4. De lo contrario, enviar todas las solicitudes a index.php (Rutas de Laravel)
     RewriteRule ^ index.php [L]
 </IfModule>

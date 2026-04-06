@@ -175,12 +175,28 @@ class UsuarioEmpresaSeeder extends Seeder
         ];
 
         $nombresAux = [
-            ['Carlos', 'Eduardo'], ['Maria', 'Fernanda'], ['Juan', 'Pablo'], ['Ana', 'Lucia'], ['Jorge', 'Luis'],
-            ['Sonia', 'Patricia'], ['Raul', 'Andres'], ['Isabel', 'Cristina'], ['Pedro', 'Antonio'], ['Marta', 'Cecilia']
+            ['Carlos', 'Eduardo'],
+            ['Maria', 'Fernanda'],
+            ['Juan', 'Pablo'],
+            ['Ana', 'Lucia'],
+            ['Jorge', 'Luis'],
+            ['Sonia', 'Patricia'],
+            ['Raul', 'Andres'],
+            ['Isabel', 'Cristina'],
+            ['Pedro', 'Antonio'],
+            ['Marta', 'Cecilia']
         ];
         $apellidosAux = [
-            ['Lopez', 'Auxiliar'], ['Garcia', 'Control'], ['Martinez', 'Vigilancia'], ['Rodriguez', 'Apoyo'], ['Perez', 'Operativo'],
-            ['Sanchez', 'Logistica'], ['Gomez', 'Terminal'], ['Diaz', 'Rutas'], ['Torres', 'Despacho'], ['Ramirez', 'Empresa']
+            ['Lopez', 'Auxiliar'],
+            ['Garcia', 'Control'],
+            ['Martinez', 'Vigilancia'],
+            ['Rodriguez', 'Apoyo'],
+            ['Perez', 'Operativo'],
+            ['Sanchez', 'Logistica'],
+            ['Gomez', 'Terminal'],
+            ['Diaz', 'Rutas'],
+            ['Torres', 'Despacho'],
+            ['Ramirez', 'Empresa']
         ];
 
         foreach ($empresasTransporte as $empresa) {
@@ -212,10 +228,18 @@ class UsuarioEmpresaSeeder extends Seeder
 
         // --- JEFE DE MANTENIMIENTO (doc_usuario inicia en 9) ---
         $nombresMant = [
-            ['Ricardo', 'Antonio'], ['Sandra', 'Milena'], ['Carlos', 'Andres'], ['Marta', 'Lucia'], ['Luis', 'Alberto']
+            ['Ricardo', 'Antonio'],
+            ['Sandra', 'Milena'],
+            ['Carlos', 'Andres'],
+            ['Marta', 'Lucia'],
+            ['Luis', 'Alberto']
         ];
         $apellidosMant = [
-            ['Morales', 'Mantenimiento'], ['Gomez', 'Taller'], ['Ruiz', 'Mecatronica'], ['Pinto', 'Diesel'], ['Vela', 'Equipos']
+            ['Morales', 'Mantenimiento'],
+            ['Gomez', 'Taller'],
+            ['Ruiz', 'Mecatronica'],
+            ['Pinto', 'Diesel'],
+            ['Vela', 'Equipos']
         ];
 
         foreach ($empresasTransporte as $empresa) {
@@ -247,10 +271,18 @@ class UsuarioEmpresaSeeder extends Seeder
 
         // --- COORDINADOR (doc_usuario inicia en 7) ---
         $nombresCoord = [
-            ['Andres', 'Felipe'], ['Camila', 'Andrea'], ['Diego', 'Fernando'], ['Elena', 'Patricia'], ['Fabio', 'Nelson']
+            ['Andres', 'Felipe'],
+            ['Camila', 'Andrea'],
+            ['Diego', 'Fernando'],
+            ['Elena', 'Patricia'],
+            ['Fabio', 'Nelson']
         ];
         $apellidosCoord = [
-            ['Beltran', 'Coordinador'], ['Cortes', 'Logistica'], ['Duarte', 'Operaciones'], ['Espitia', 'Rutas'], ['Fajardo', 'Control']
+            ['Beltran', 'Coordinador'],
+            ['Cortes', 'Logistica'],
+            ['Duarte', 'Operaciones'],
+            ['Espitia', 'Rutas'],
+            ['Fajardo', 'Control']
         ];
 
         foreach ($empresasTransporte as $empresa) {
@@ -283,80 +315,96 @@ class UsuarioEmpresaSeeder extends Seeder
         // --- ADMIN RECARGAS (id_tipo_usuario = 10) - EMPRESA DE RECARGA (NIT 800222333) ---
         DB::table('usuario')->insertOrIgnore([
             [
-                'doc_usuario'     => 8002223011,
-                'NIT'             => 800222333, // SUPERGIROS GANA GANA (EMPRESA DE RECARGA)
-                'primer_nombre'   => 'CARLOS',
-                'segundo_nombre'  => 'ANDRES',
+                'doc_usuario' => 8002223011,
+                'NIT' => 800222333, // SUPERGIROS GANA GANA (EMPRESA DE RECARGA)
+                'primer_nombre' => 'CARLOS',
+                'segundo_nombre' => 'ANDRES',
                 'primer_apellido' => 'MENDOZA',
-                'segundo_apellido'=> 'RIOS',
-                'correo'          => 'cmendoza@supergiros.com',
-                'password'        => Hash::make('AdminRecargas123*'),
-                'telefono'        => '3001110001',
-                'fecha_nacimiento'=> '1982-04-15',
-                'foto_usuario'    => null,
+                'segundo_apellido' => 'RIOS',
+                'correo' => 'cmendoza@supergiros.com',
+                'password' => Hash::make('AdminRecargas123*'),
+                'telefono' => '3001110001',
+                'fecha_nacimiento' => '1982-04-15',
+                'foto_usuario' => null,
                 'id_tipo_usuario' => 10, // ADMIN RECARGAS
-                'id_ciudad'       => '730001',
-                'id_estado'       => 1
+                'id_ciudad' => '730001',
+                'id_estado' => 1
             ],
             [
-                'doc_usuario'     => 8002223012,
-                'NIT'             => 800222333,
-                'primer_nombre'   => 'LUCIA',
-                'segundo_nombre'  => 'MARCELA',
+                'doc_usuario' => 8002223012,
+                'NIT' => 800222333,
+                'primer_nombre' => 'LUCIA',
+                'segundo_nombre' => 'MARCELA',
                 'primer_apellido' => 'TORRES',
-                'segundo_apellido'=> 'VARGAS',
-                'correo'          => 'ltorres@supergiros.com',
-                'password'        => Hash::make('AdminRecargas123*'),
-                'telefono'        => '3001110002',
-                'fecha_nacimiento'=> '1987-09-22',
-                'foto_usuario'    => null,
+                'segundo_apellido' => 'VARGAS',
+                'correo' => 'ltorres@supergiros.com',
+                'password' => Hash::make('AdminRecargas123*'),
+                'telefono' => '3001110002',
+                'fecha_nacimiento' => '1987-09-22',
+                'foto_usuario' => null,
                 'id_tipo_usuario' => 10, // ADMIN RECARGAS
-                'id_ciudad'       => '730001',
-                'id_estado'       => 1
+                'id_ciudad' => '730001',
+                'id_estado' => 1
             ],
             [
-                'doc_usuario'     => 8002223013,
-                'NIT'             => 800222333,
-                'primer_nombre'   => 'FELIX',
-                'segundo_nombre'  => 'ERNESTO',
+                'doc_usuario' => 8002223013,
+                'NIT' => 800222333,
+                'primer_nombre' => 'FELIX',
+                'segundo_nombre' => 'ERNESTO',
                 'primer_apellido' => 'GUERRERO',
-                'segundo_apellido'=> 'SALCEDO',
-                'correo'          => 'fguerrero@supergiros.com',
-                'password'        => Hash::make('AdminRecargas123*'),
-                'telefono'        => '3001110003',
-                'fecha_nacimiento'=> '1979-12-08',
-                'foto_usuario'    => null,
+                'segundo_apellido' => 'SALCEDO',
+                'correo' => 'fguerrero@supergiros.com',
+                'password' => Hash::make('AdminRecargas123*'),
+                'telefono' => '3001110003',
+                'fecha_nacimiento' => '1979-12-08',
+                'foto_usuario' => null,
                 'id_tipo_usuario' => 10, // ADMIN RECARGAS
-                'id_ciudad'       => '730001',
-                'id_estado'       => 1
+                'id_ciudad' => '730001',
+                'id_estado' => 1
             ],
             [
-                'doc_usuario'     => 8002223014,
-                'NIT'             => 800222333,
-                'primer_nombre'   => 'PAOLA',
-                'segundo_nombre'  => 'VIVIANA',
+                'doc_usuario' => 8002223014,
+                'NIT' => 800222333,
+                'primer_nombre' => 'PAOLA',
+                'segundo_nombre' => 'VIVIANA',
                 'primer_apellido' => 'CASTILLO',
-                'segundo_apellido'=> 'BEDOYA',
-                'correo'          => 'pcastillo@supergiros.com',
-                'password'        => Hash::make('AdminRecargas123*'),
-                'telefono'        => '3001110004',
-                'fecha_nacimiento'=> '1991-06-30',
-                'foto_usuario'    => null,
+                'segundo_apellido' => 'BEDOYA',
+                'correo' => 'pcastillo@supergiros.com',
+                'password' => Hash::make('AdminRecargas123*'),
+                'telefono' => '3001110004',
+                'fecha_nacimiento' => '1991-06-30',
+                'foto_usuario' => null,
                 'id_tipo_usuario' => 10, // ADMIN RECARGAS
-                'id_ciudad'       => '730001',
-                'id_estado'       => 2 // INACTIVO
+                'id_ciudad' => '730001',
+                'id_estado' => 2 // INACTIVO
             ],
         ]);
 
         // --- GESTOR DE RECARGAS (doc_usuario inicia en 8) ---
         $dataGestores = [];
         $nombresGestor = [
-            ['Luis', 'Fernando'], ['Beatriz', 'Elena'], ['Carlos', 'Andres'], ['Diana', 'Marcela'], ['Eduardo', 'Jose'],
-            ['Gloria', 'Patricia'], ['Hugo', 'Hernan'], ['Irene', 'Cecilia'], ['Javier', 'Eduardo'], ['Karla', 'Andrea']
+            ['Luis', 'Fernando'],
+            ['Beatriz', 'Elena'],
+            ['Carlos', 'Andres'],
+            ['Diana', 'Marcela'],
+            ['Eduardo', 'Jose'],
+            ['Gloria', 'Patricia'],
+            ['Hugo', 'Hernan'],
+            ['Irene', 'Cecilia'],
+            ['Javier', 'Eduardo'],
+            ['Karla', 'Andrea']
         ];
         $apellidosGestor = [
-            ['Castro', 'Recaudos'], ['Perez', 'Gana'], ['Gomez', 'Super'], ['Ruiz', 'Puntos'], ['Lopez', 'Giros'],
-            ['Vargas', 'Recarga'], ['Mendoza', 'Saldo'], ['Rios', 'Caja'], ['Silva', 'Ventas'], ['Torres', 'Paga']
+            ['Castro', 'Recaudos'],
+            ['Perez', 'Gana'],
+            ['Gomez', 'Super'],
+            ['Ruiz', 'Puntos'],
+            ['Lopez', 'Giros'],
+            ['Vargas', 'Recarga'],
+            ['Mendoza', 'Saldo'],
+            ['Rios', 'Caja'],
+            ['Silva', 'Ventas'],
+            ['Torres', 'Paga']
         ];
 
         for ($i = 0; $i < 10; $i++) {
@@ -382,10 +430,18 @@ class UsuarioEmpresaSeeder extends Seeder
         // --- GESTOR SETP (doc_usuario inicia en 6) ---
         $dataSetp = [];
         $nombresSetp = [
-            ['Alberto', 'Enrique'], ['Claudia', 'Lucia'], ['Fernando', 'Jose'], ['Gloria', 'Ines'], ['Mauro', 'Javier']
+            ['Alberto', 'Enrique'],
+            ['Claudia', 'Lucia'],
+            ['Fernando', 'Jose'],
+            ['Gloria', 'Ines'],
+            ['Mauro', 'Javier']
         ];
         $apellidosSetp = [
-            ['Gomez', 'Estrategia'], ['Perez', 'Planeacion'], ['Rodriguez', 'Movilidad'], ['Martinez', 'Gestion'], ['Lopez', 'Control']
+            ['Gomez', 'Estrategia'],
+            ['Perez', 'Planeacion'],
+            ['Rodriguez', 'Movilidad'],
+            ['Martinez', 'Gestion'],
+            ['Lopez', 'Control']
         ];
 
         for ($i = 0; $i < 5; $i++) {
@@ -455,7 +511,7 @@ class UsuarioEmpresaSeeder extends Seeder
                 'segundo_apellido' => strtoupper($apellido2),
                 'correo' => strtolower($nombre1 . "." . $apellido1 . $i) . "@transporte.com",
                 'password' => Hash::make('Conductor123*'),
-                'telefono' => '310'.str_pad($i + 1, 7, '0', STR_PAD_LEFT),
+                'telefono' => '310' . str_pad($i + 1, 7, '0', STR_PAD_LEFT),
                 'fecha_nacimiento' => '198' . rand(0, 9) . '-01-' . str_pad(rand(1, 28), 2, '0', STR_PAD_LEFT),
                 'foto_usuario' => null,
                 'id_tipo_usuario' => 3, // CONDUCTOR
@@ -476,7 +532,7 @@ class UsuarioEmpresaSeeder extends Seeder
                 'updated_at' => now()
             ];
         }
-        
+
         DB::table('usuario')->insertOrIgnore($conductoresData);
         DB::table('documentos')->insertOrIgnore($licenciasData);
         info('Agregados 10 conductores con nombres reales y licencias vinculadas.');

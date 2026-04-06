@@ -415,15 +415,29 @@ class DocumentoController extends Controller
             ->where('NIT', $empresa->NIT)
             ->firstOrFail();
 
-        if (!Storage::disk('uploads')->exists($documento->archivo)) {
-            $redirectRoute = auth()->user()->id_tipo_usuario == 4 ? 'empresa.dashboard' : 'admin.documentos.index';
-            return redirect()->route($redirectRoute)
-                ->with('error', '  El archivo no existe o fue eliminado');
+        $filePath = base_path($documento->archivo);
+        
+        if (!file_exists($filePath)) {
+            // Intento secundario asumiendo que el archivo pueda estar en public/uploads/documentos/ (para archivos antiguos en XAMPP local o configuraciones previas)
+            $publicFallback = public_path($documento->archivo);
+            if (file_exists($publicFallback)) {
+                $filePath = $publicFallback;
+            } else {
+                // Intento terciario asumiendo que el archivo pueda estar en storage/app/public/
+                $storageFallback = storage_path('app/public/' . str_replace('uploads/documentos/', '', $documento->archivo));
+                if (file_exists($storageFallback)) {
+                    $filePath = $storageFallback;
+                } else {
+                    $redirectRoute = auth()->user()->id_tipo_usuario == 4 ? 'empresa.dashboard' : 'admin.documentos.index';
+                    return redirect()->route($redirectRoute)
+                        ->with('error', '  El archivo no existe o fue eliminado');
+                }
+            }
         }
 
         try {
-            return Storage::disk('uploads')->download(
-                $documento->archivo,
+            return response()->download(
+                $filePath,
                 basename($documento->archivo)
             );
         } catch (\Exception $e) {
