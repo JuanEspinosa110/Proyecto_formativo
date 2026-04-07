@@ -238,6 +238,23 @@
 
 @push('scripts')
 <script>
+    // Configurar fecha mínima (hoy) para los inputs de fecha
+    function setMinDate() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        // Usamos T00:00 para permitir cualquier hora del día de hoy
+        const minDate = `${year}-${month}-${day}T00:00`;
+        
+        const createInput = document.getElementById('create_fecha');
+        const editInput = document.getElementById('edit_fecha');
+        
+        if (createInput) createInput.min = minDate;
+        if (editInput) editInput.min = minDate;
+    }
+    setMinDate();
+
     // Delegación para botones VER y EDITAR
     document.addEventListener('click', function(e) {
         // Botón VER
@@ -404,8 +421,8 @@
             const time = this.dataset.time;
             const input = document.getElementById('create_fecha');
             
-            // Si ya hay una fecha, la preservamos. Si no, usamos hoy.
-            let datePart = input.value ? input.value.split('T')[0] : new Date().toISOString().split('T')[0];
+            // Si ya hay una fecha, la preservamos. Si no, usamos hoy (local).
+            let datePart = input.value ? input.value.split('T')[0] : new Date().toLocaleDateString('en-CA'); // en-CA gives YYYY-MM-DD
             
             input.value = `${datePart}T${time}`;
             updateHoraFin('create_fecha', 'create_hora_fin');

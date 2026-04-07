@@ -64,7 +64,7 @@
                                 <span class="material-symbols-rounded fs-5">visibility</span>
                             </a>
 
-                            @if($asig->id_estado != 5)
+                            @if($asig->id_estado == 1)
                                 <a href="#" 
                                    class="text-primary text-decoration-none d-flex align-items-center edit-asignacion"
                                    title="Editar asignación"
@@ -81,7 +81,7 @@
                                     </button>
                                 </form>
                             @else
-                                <span class="text-muted opacity-50 d-flex align-items-center" title="Finalizado - No editable">
+                                <span class="text-muted opacity-50 d-flex align-items-center" title="Solo se pueden editar viajes en estado ACTIVO">
                                     <span class="material-symbols-rounded fs-5">lock</span>
                                 </span>
                             @endif

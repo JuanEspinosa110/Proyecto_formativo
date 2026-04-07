@@ -32,7 +32,7 @@
                         <!-- 2. Tiempo -->
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted text-uppercase ls-1">Hora Inicio <span class="text-danger">*</span></label>
-                            <input type="datetime-local" name="fecha" id="create_fecha" class="form-control form-control-sm @error('fecha') is-invalid @enderror" value="{{ old('fecha') }}" required>
+                            <input type="datetime-local" name="fecha" id="create_fecha" class="form-control form-control-sm @error('fecha') is-invalid @enderror" value="{{ old('fecha') }}" min="{{ now()->format('Y-m-d') }}T00:00" required>
                             @error('fecha') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
