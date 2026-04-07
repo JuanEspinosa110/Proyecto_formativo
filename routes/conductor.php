@@ -14,7 +14,7 @@ use App\Http\Controllers\ConductorController;
 |
 */
 
-Route::middleware(['auth:web', 'role:conductor', 'CheckNit'])
+Route::middleware(['auth:web', 'role:conductor', 'CheckNit', 'prevent-back-history'])
     ->prefix('conductor')
     ->name('conductor.')
     ->group(function () {

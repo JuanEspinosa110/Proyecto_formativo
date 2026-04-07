@@ -7,7 +7,7 @@ use App\Http\Controllers\GestorRecargas\TitularidadTarjetaController;
 // ----------------------------------------------------------------------
 // 1. Módulos COMPARTIDOS para Admin (10) y Gestor (8)
 // ----------------------------------------------------------------------
-Route::middleware(['auth:web', 'role:gestor_recargas', 'CheckNit'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
+Route::middleware(['auth:web', 'role:gestor_recargas', 'CheckNit', 'prevent-back-history'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
     Route::get('/dashboard', [GestorRecargaController::class, 'dashboard'])->name('dashboard');
     Route::get('/historial', [GestorRecargaController::class, 'historial'])->name('historial');
 });
@@ -15,7 +15,7 @@ Route::middleware(['auth:web', 'role:gestor_recargas', 'CheckNit'])->prefix('ges
 // ----------------------------------------------------------------------
 // 2. Módulos EXCLUSIVOS para Gestor de Recargas (solo rol 8)
 // ----------------------------------------------------------------------
-Route::middleware(['auth:web', 'role:8', 'CheckNit'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
+Route::middleware(['auth:web', 'role:8', 'CheckNit', 'prevent-back-history'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
     Route::get('/recargar', [GestorRecargaController::class, 'createRecarga'])->name('recargar');
     Route::get('/recargar/consultar', [GestorRecargaController::class, 'consultarTarjeta'])->name('recargar.consultar');
     Route::post('/recargar', [GestorRecargaController::class, 'storeRecarga'])->name('recargar.store');
@@ -32,7 +32,7 @@ Route::middleware(['auth:web', 'role:8', 'CheckNit'])->prefix('gestor-recargas')
 // ----------------------------------------------------------------------
 // 3. Módulos EXCLUSIVOS para Admin de Recargas (solo rol 10)
 // ----------------------------------------------------------------------
-Route::middleware(['auth:web', 'role:admin_recargas', 'CheckNit'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
+Route::middleware(['auth:web', 'role:admin_recargas', 'CheckNit', 'prevent-back-history'])->prefix('gestor-recargas')->name('gestor-recargas.')->group(function () {
     // Gestión de usuarios de la propia empresa
     Route::get('/usuarios', [GestorRecargaController::class, 'usuariosIndex'])->name('usuarios.index');
     Route::get('/usuarios/crear', [GestorRecargaController::class, 'usuariosCreate'])->name('usuarios.create');

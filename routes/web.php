@@ -49,7 +49,7 @@ use App\Http\Controllers\StripeWebhookController;
 Route::get('/', [LandingController::class, 'index'])->name('home');
 
 // Rutas de Error de Acceso (NIT y Licencia)
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'prevent-back-history'])->group(function () {
     Route::get('/error/no-asociado', function () {
         return view('errors.no-nit');
     })->name('error.no-nit');
@@ -114,11 +114,11 @@ use App\Http\Controllers\SimulacionController;
 Route::get('/simulacion', [SimulacionController::class, 'index'])->name('simulacion.index');
 Route::post('/simulacion/validar', [SimulacionController::class, 'validar'])->name('simulacion.validar');
 
-Route::middleware('auth:web')->group(function () {
+Route::middleware(['auth:web', 'prevent-back-history'])->group(function () {
 
     Route::get('/pasajero/dashboard', fn() => view('pasajeros.index'))
         ->name('pasajero.dashboard')->middleware('auth:web,superadmin');
-    Route::prefix('conductor')->name('conductor.')->middleware('role:3')->group(function () {
+    Route::prefix('conductor')->name('conductor.')->middleware(['role:3', 'prevent-back-history'])->group(function () {
         Route::get('/dashboard', [ConductorController::class, 'dashboard'])->name('dashboard');
         Route::post('/iniciar-turno/{id_viaje}', [ConductorController::class, 'iniciarTurno'])->name('iniciarTurno');
         Route::post('/finalizar-turno/{id_viaje}', [ConductorController::class, 'finalizarTurno'])->name('finalizarTurno');

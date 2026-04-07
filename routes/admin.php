@@ -12,7 +12,7 @@ use App\Http\Controllers\JefeMantenimiento\ReporteFallaController;
 
 
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::middleware(['auth:web', 'role:1', 'CheckNit'])->group(function () {
+    Route::middleware(['auth:web', 'role:1', 'CheckNit', 'prevent-back-history'])->group(function () {
         // Dashboard
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');

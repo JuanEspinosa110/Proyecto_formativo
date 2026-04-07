@@ -277,7 +277,8 @@ class ConductorController extends Controller
         $recorrido->hora_llegada = Carbon::now();
 
         if ($request->hasFile('foto_torniquete')) {
-            $path = $request->file('foto_torniquete')->store('evidencias_torniquetes', 'public');
+            // Guardar en el disco 'uploads' (raíz del proyecto) para evitar problemas de symlinks en hosting
+            $path = $request->file('foto_torniquete')->store('uploads/torniquetes', 'uploads');
             $recorrido->foto_torniquete = $path;
         }
 

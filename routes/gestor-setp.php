@@ -18,7 +18,7 @@ use App\Http\Controllers\SuperAdmin\GestorSetpController;
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth:web', 'role:gestor_setp', 'CheckNit'])
+Route::middleware(['auth:web', 'role:gestor_setp', 'CheckNit', 'prevent-back-history'])
     ->prefix('gestor-setp')
     ->name('gestor-setp.')
     ->group(function () {
@@ -73,7 +73,7 @@ Route::middleware(['auth:web', 'role:gestor_setp', 'CheckNit'])
 | aquí para mantener la separación de responsabilidades.
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth:superadmin'])
+Route::middleware(['auth:superadmin', 'prevent-back-history'])
     ->prefix('superadmin/gestores-setp')
     ->name('superadmin.gestores-setp.')
     ->group(function () {
@@ -93,7 +93,7 @@ Route::middleware(['auth:superadmin'])
 */
 use App\Http\Controllers\SuperAdmin\GestorRecargasController;
 
-Route::middleware(['auth:superadmin'])
+Route::middleware(['auth:superadmin', 'prevent-back-history'])
     ->prefix('superadmin/gestores-recargas')
     ->name('superadmin.gestores-recargas.')
     ->group(function () {
