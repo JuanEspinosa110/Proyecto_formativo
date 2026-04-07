@@ -77,7 +77,12 @@ class GestorRecargaController extends Controller
             return response()->json(['success' => false, 'message' => 'Indique el código de la tarjeta.'], 400);
         }
 
-        $tarjeta = Tarjeta::with('usuarioActual')->where('id_tarjeta', $id_tarjeta)->first();
+        $tarjeta = Tarjeta::with('usuarioActual')
+            ->where(function($q) use($id_tarjeta) {
+                $q->where('id_tarjeta', $id_tarjeta)
+                  ->orWhere('codigo_tarjeta', $id_tarjeta);
+            })
+            ->first();
 
         if (!$tarjeta) {
             return response()->json(['success' => false, 'message' => 'Tarjeta no encontrada en el sistema.'], 404);
@@ -174,14 +179,21 @@ class GestorRecargaController extends Controller
         $query->orderBy('created_at', 'desc');
 
         // --- Consulta de cambios de titularidad ---
-        $gestoresNit = Usuario::where('NIT', $nit)->pluck('doc_usuario');
         $queryTitularidad = \App\Models\TitularidadTarjeta::with(['tarjeta', 'usuario', 'estado'])
-            ->whereIn('doc_usuario', $gestoresNit)
+            ->whereHas('usuario', function($q) use($nit) {
+                $q->where('NIT', $nit);
+            })
             ->whereNotNull('motivo_cambio');
 
         // Filtros de titularidad
         if ($request->filled('id_tarjeta')) {
-            $queryTitularidad->where('id_tarjeta', 'like', '%' . $request->id_tarjeta . '%');
+            $busqueda = $request->id_tarjeta;
+            $queryTitularidad->where(function($q) use($busqueda) {
+                $q->where('id_tarjeta', 'like', '%' . $busqueda . '%')
+                  ->orWhereHas('tarjeta', function($q2) use($busqueda) {
+                      $q2->where('codigo_tarjeta', 'like', '%' . $busqueda . '%');
+                  });
+            });
         }
         if ($request->filled('fecha_inicio')) {
             $queryTitularidad->whereDate('fecha_inicio', '>=', $request->fecha_inicio);

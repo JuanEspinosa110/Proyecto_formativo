@@ -208,6 +208,13 @@ class TitularidadTarjetaController extends Controller
                 }
             }
 
+            // ACTIVAR TARJETA Y USUARIO Y ASOCIAR NIT
+            $gestor = \Illuminate\Support\Facades\Auth::user();
+            if ($usuario && is_null($usuario->NIT)) {
+                $usuario->NIT = $gestor->NIT;
+                $usuario->save();
+            }
+
             // Crear nueva titularidad
             $nueva = new \App\Models\TitularidadTarjeta();
             $nueva->id_tarjeta = $id_tarjeta;

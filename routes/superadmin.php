@@ -10,7 +10,7 @@ use App\Http\Controllers\SuperAdmin\Configuracion\CiudadController;
 use App\Http\Controllers\SuperAdmin\Configuracion\TipoMantenimientoController;
 use App\Http\Controllers\SuperAdmin\BarrioController;
 
-Route::middleware(['auth:superadmin'])->prefix('superadmin/configuracion')->name('superadmin.configuracion.')->group(function () {
+Route::middleware(['auth:superadmin', 'prevent-back-history'])->prefix('superadmin/configuracion')->name('superadmin.configuracion.')->group(function () {
 
     // Tipo Documento
     Route::get('tipo-documento', [TipoDocumentoController::class, 'index'])->name('tipo-documento.index');

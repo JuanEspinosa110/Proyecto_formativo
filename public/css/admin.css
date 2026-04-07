@@ -25,15 +25,15 @@
   box-shadow: 2px 6px 18px rgba(31,36,48,0.06);
   border-right: 1px solid rgba(45,52,73,0.06);
   z-index: 50;
-  overflow-y: auto; /* Permite scroll si el contenido total excede la pantalla */
-  scrollbar-width: thin;
+  overflow-y: hidden; /* El contenedor principal no debe tener scroll, solo el nav interno */
 }
 
 .sigu-admin-layout .sigu-sidebar .sigu-sidebar-inner {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  max-height: 100vh;
+  height: 100dvh; /* Altura dinámica para móviles */
+  height: 100vh;  /* Fallback */
+  max-height: 100%;
   padding: 1rem 0 0 0;
 }
 
@@ -44,6 +44,7 @@
   padding: 0 1rem 1rem 1rem;
   text-decoration: none;
   color: inherit;
+  flex-shrink: 0;
 }
 .sigu-admin-layout .sigu-brand-mark {
   width: 44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center;
@@ -59,23 +60,24 @@
   padding: .5rem 0;
   gap: .25rem;
   flex: 1;
-  overflow-y: scroll; /* Forzado siempre visible */
+  min-height: 0; /* CRITICAL: allows flex child to shrink and trigger overflow */
+  overflow-y: auto; 
   overflow-x: hidden;
-  scrollbar-width: thin;
-  scrollbar-color: var(--p) transparent;
+  scrollbar-width: auto; /* Standard width for better visibility */
+  scrollbar-color: var(--p) rgba(0,0,0,0.1); 
 }
 
-/* Scrollbar premium siempre visible con alto contraste */
+/* Scrollbar premium - MÁS VISIBLE */
 .sigu-admin-layout .sigu-sidebar-nav::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 .sigu-admin-layout .sigu-sidebar-nav::-webkit-scrollbar-track {
-  background: rgba(0,0,0,0.02);
+  background: rgba(0,0,0,0.05);
 }
 .sigu-admin-layout .sigu-sidebar-nav::-webkit-scrollbar-thumb {
-  background: var(--p);
+  background: var(--p); /* Ahora es sólido para que se vea bien */
   border-radius: 10px;
-  border: 2px solid #f6f7fb; /* Espacio para que respire */
+  border: 2px solid #f6f7fb; 
 }
 .sigu-admin-layout .sigu-sidebar-nav::-webkit-scrollbar-thumb:hover {
   background: var(--p-dark);
@@ -118,12 +120,14 @@
 /* Asegurar espacio inferior en el main para que el footer no lo cubra */
 .sigu-admin-layout .sigu-main-with-sidebar { padding-bottom: 6rem; }
 
-/* Footer del sidebar - fijo al fondo */
+/* Footer del sidebar - fijo al fondo por el flex:1 del nav */
 .sigu-admin-layout .sigu-sidebar-footer {
   margin-top: auto;
-  padding: 1rem;
-  background: rgba(238, 242, 251, 0.5);
-  border-top: 1px solid rgba(0, 0, 0, 0.03);
+  padding: 1.25rem 1rem;
+  background: #f0f3fa; /* Un poco más oscuro para separarlo visualmente */
+  border-top: 1.5px solid rgba(0, 0, 0, 0.05);
+  flex-shrink: 0; /* No permite que se comprima */
+  z-index: 10;
 }
 
 /* KPIs */
@@ -285,11 +289,20 @@
     position: relative;
     width: 100%;
     height: auto;
-    max-height: 60vh; /* Aumentado para mayor visibilidad en móviles */
+    max-height: none; /* Quitamos la restricción de 60vh para que el contenido fluya o se expanda */
     box-shadow: none;
     border-bottom: 1px solid rgba(0,0,0,0.05);
+    overflow-y: visible;
   }
-  .sigu-admin-layout .sigu-sidebar .sigu-sidebar-inner { min-height: auto; }
+  .sigu-admin-layout .sigu-sidebar .sigu-sidebar-inner { 
+    height: auto; 
+    min-height: auto; 
+    max-height: none;
+  }
+  .sigu-admin-layout .sigu-sidebar-nav {
+    overflow-y: visible; /* En móvil, que el scroll sea el de la página o el contenedor padre si se decide colapsar */
+    flex: none;
+  }
   .sigu-admin-layout .sigu-main-with-sidebar { margin-left: 0; padding: 1rem }
   .sigu-admin-layout .sigu-footer { padding-left: 1.5rem; }
 }

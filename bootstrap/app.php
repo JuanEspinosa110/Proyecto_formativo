@@ -20,7 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class,
             'CheckTarjeta' => \App\Http\Middleware\CheckTarjeta::class,
             'CheckNit' => \App\Http\Middleware\CheckNitAsociado::class,
-                'empresaRecargaAdmin' => \App\Http\Middleware\EmpresaRecargaAdminMiddleware::class,
+            'empresaRecargaAdmin' => \App\Http\Middleware\EmpresaRecargaAdminMiddleware::class,
+            'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
         ]);
     })
         //

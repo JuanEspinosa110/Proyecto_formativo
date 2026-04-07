@@ -11,9 +11,8 @@ use App\Http\Controllers\Auxiliar\ReporteController;
 
 Route::prefix('empresa')->name('empresa.')->group(function () {
     
-    // 🟢 Grupo GENERAL (Administrador [1] y Auxiliar [4])
-    // Se requiere autenticación, rol adecuado y tener un NIT asociado (CheckNit)
-    Route::middleware(['auth:web', 'role:1,4', 'CheckNit'])->group(function () {
+    // Se requiere autenticación, rol adecuado, tener un NIT asociado (CheckNit) y prevenir caché (prevent-back-history)
+    Route::middleware(['auth:web', 'role:1,4', 'CheckNit', 'prevent-back-history'])->group(function () {
         
         // Dashboard Premium (Pestañas)
         Route::get('/', [EmpresaController::class, 'dashboard'])->name('dashboard');
@@ -67,7 +66,7 @@ Route::prefix('empresa')->name('empresa.')->group(function () {
     });
 
     // 🔴 Grupo Exclusivo ADMINISTRADOR (Rol 1)
-    Route::middleware(['auth:web', 'role:1', 'CheckNit'])->group(function () {
+    Route::middleware(['auth:web', 'role:1', 'CheckNit', 'prevent-back-history'])->group(function () {
         // Módulo de Rutas (Solo Admin)
         Route::get('/rutas', [RutaController::class, 'index'])->name('rutas.index');
         Route::post('/rutas', [RutaController::class, 'store'])->name('rutas.store');
@@ -79,7 +78,7 @@ Route::prefix('empresa')->name('empresa.')->group(function () {
 
 // 🔵 Rutas adicionales AUXILIAR (Rol 4) - Si necesita un prefijo específico
 Route::prefix('auxiliar')->name('auxiliar.')
-    ->middleware(['auth:web', 'role:4', 'CheckNit'])
+    ->middleware(['auth:web', 'role:4', 'CheckNit', 'prevent-back-history'])
     ->group(function () {
         // Redirigir o reusar dashboard específico si difiere del general
         Route::get('/', [\App\Http\Controllers\Auxiliar\DashboardController::class, 'index'])->name('dashboard');
