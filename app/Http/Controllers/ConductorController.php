@@ -30,9 +30,9 @@ class ConductorController extends Controller
         $ahora = Carbon::now();
 
         // 2. Estado de la jornada actual
-        // Buscar si tiene un turno activo (1 = Activo) o en curso (12 = En curso) programado para HOY
+        // Buscar si tiene un turno activo (1 = Activo), en curso (12 = En curso) o vencido (8 = Vencida) programado para HOY
         $asignacionActiva = $asignaciones->filter(function ($asig) use ($hoy) {
-            return in_array($asig->id_estado, [1, 12, 6]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
+            return in_array($asig->id_estado, [1, 12, 8]) && Carbon::parse($asig->fecha)->isSameDay($hoy);
         })->first();
 
         // **Auto-vencer turno si pasan más de 4 horas sin iniciar**
@@ -44,9 +44,9 @@ class ConductorController extends Controller
             }
         }
 
-        // Buscar si ya finalizó su turno hoy (8 = FUERA DE SERVICIO)
+        // Buscar si ya finalizó su turno hoy (5 = FINALIZADO)
         $turnoFinalizadoHoy = $asignaciones->filter(function ($asig) use ($hoy) {
-            return $asig->id_estado == 8 && Carbon::parse($asig->fecha)->isSameDay($hoy);
+            return $asig->id_estado == 5 && Carbon::parse($asig->fecha)->isSameDay($hoy);
         })->isNotEmpty();
 
         // 3. Documentos y validaciones (Licencia)

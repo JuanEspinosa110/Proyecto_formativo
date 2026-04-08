@@ -81,7 +81,7 @@
     @if($asignacionActiva)
         @php
             $enCurso = $asignacionActiva->id_estado == 12; // EN CURSO
-            $vencido = $asignacionActiva->id_estado == 6; // Vencido/No ejecutado
+            $vencido = $asignacionActiva->id_estado == 8; // Vencido/No ejecutado (ID 8 en el seeder)
         @endphp
         <div class="col-md-8 col-xl-9">
             <div class="row g-3 h-100">

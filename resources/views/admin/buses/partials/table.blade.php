@@ -81,9 +81,11 @@
                                 </a>
 
                                 {{-- Condicional para Auxiliar: Solo Admin puede eliminar --}}
-                                @if(Auth::user()->id_tipo_usuario == 1)
+@php
+    $routePrefix = auth()->user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
+@endphp
                                     <form id="delete-bus-{{ $bus->placa }}"
-                                        action="{{ route('admin.buses.destroy', $bus->placa) }}" method="POST" class="d-inline">
+                                        action="{{ route($routePrefix . '.buses.destroy', $bus->placa) }}" method="POST" class="d-inline">
                                         @csrf @method('DELETE')
                                         <button type="button"
                                             class="p-0 border-0 bg-transparent text-danger d-flex align-items-center"

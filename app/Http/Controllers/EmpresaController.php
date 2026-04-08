@@ -297,7 +297,7 @@ class EmpresaController extends Controller
 
         // Si es conductor, crear el documento de licencia
         if ($request->id_tipo_usuario == 3 && $request->hasFile('archivo_licencia')) {
-            $pathLicencia = $request->file('archivo_licencia')->store('documentos', 'public');
+            $pathLicencia = $request->file('archivo_licencia')->store('uploads/documentos', 'uploads');
             Documento::create([
                 'nombre' => 'LICENCIA CONDUCCION',
                 'archivo' => $pathLicencia,

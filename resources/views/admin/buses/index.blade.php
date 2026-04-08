@@ -11,7 +11,10 @@
             <p class="text-muted small mb-0">Administra los vehículos y sus estados operativos en tiempo real.</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('admin.buses.export', request()->all()) }}" class="btn btn-outline-success d-flex align-items-center gap-2 px-3 fw-semibold">
+@php
+    $routePrefix = auth()->user()->id_tipo_usuario == 1 ? 'admin' : 'empresa';
+@endphp
+            <a href="{{ route($routePrefix . '.buses.export', request()->all()) }}" class="btn btn-outline-success d-flex align-items-center gap-2 px-3 fw-semibold">
                 <span class="material-symbols-rounded" style="font-size: 1.2rem;">file_download</span>
                 Excel
             </a>
@@ -25,7 +28,7 @@
     <!-- Filtros de Búsqueda -->
     <div class="card border-0 shadow-sm mb-4 rounded-3">
         <div class="card-body p-3">
-            <form method="GET" action="{{ route('admin.buses.index') }}" class="row g-2 align-items-center">
+            <form method="GET" action="{{ route($routePrefix . '.buses.index') }}" class="row g-2 align-items-center">
                 <div class="col-md-7">
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0">
@@ -49,7 +52,7 @@
                 </div>
                 @if(request()->hasAny(['search', 'id_estado']))
                 <div class="col-md-1">
-                    <a href="{{ route('admin.buses.index') }}" class="btn btn-light w-100 text-muted" title="Limpiar filtros">
+                    <a href="{{ route($routePrefix . '.buses.index') }}" class="btn btn-light btn-sm rounded-pill fw-bold border shadow-sm" title="Limpiar Filtros">
                         <span class="material-symbols-rounded" style="font-size: 1.2rem;">filter_alt_off</span>
                     </a>
                 </div>
